@@ -1,0 +1,14 @@
+{
+  "official_subset_feature_count": 25283,
+  "osm_2023_feature_count": 2859,
+  "matched_official_feature_count": 1251,
+  "official_only_feature_count": 24032,
+  "osm_only_feature_count": 1817,
+  "matching_method": "geometry intersects after projecting both layers to EPSG:5174",
+  "merge_policy": "OSM-only footprints are not added to the authoritative official layer.",
+  "qa_flags": [
+    "MATCHED",
+    "OFFICIAL_ONLY",
+    "OSM_ONLY"
+  ]
+}
