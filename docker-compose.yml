@@ -1,0 +1,35 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://floodops:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgis:5432/floodops
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgis:
+        condition: service_healthy
+
+  postgis:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: floodops
+      POSTGRES_USER: floodops
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U floodops -d floodops"]
+      interval: 5s
+      timeout: 5s
+      retries: 10

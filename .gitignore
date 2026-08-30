@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.tsbuildinfo
+data/interim/
+# Local source downloads are preserved outside Git; provenance lives in manifests.
+data/raw/
+data/raw/seoul_flood_footprints_2022/
+# Regenerable large derived exports stay local as well.
+data/processed/seoul_flood_footprints_2022.geojson
+data/processed/seoul_rainfall_2022_event.csv
+data/processed/osong/*_buildings_*.geojson
+data/processed/osong/*_roads_*.geojson
