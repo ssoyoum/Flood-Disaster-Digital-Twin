@@ -1,0 +1,73 @@
+{
+  "aoi": [
+    127.27,
+    36.58,
+    127.4,
+    36.68
+  ],
+  "crs": "EPSG:4326",
+  "validation": "geometry type and validity checks passed",
+  "result": {
+    "osm": {
+      "current": {
+        "snapshot_date": "2026-08-30",
+        "buildings": 4571,
+        "roads": 8458,
+        "waterways": 158,
+        "facilities": 554,
+        "tunnels": 104
+      },
+      "event": {
+        "snapshot_date": "2023-07-15",
+        "buildings": 2859,
+        "roads": 6727,
+        "waterways": 147,
+        "facilities": 386,
+        "tunnels": 95
+      }
+    },
+    "gungpyeong2_underpass": {
+      "feature_count": 1,
+      "source_feature_count": 2,
+      "geometry_type": "MultiLineString"
+    },
+    "boundaries": {
+      "adm1": 2,
+      "adm2": 2
+    },
+    "nasa_power": {
+      "records": 48,
+      "max_mm_per_hour": 154.74
+    },
+    "rasters": {
+      "dem": {
+        "local_file": "data/raw/copernicus_dem_glo30/Copernicus_DSM_COG_10_N36_00_E127_00_DEM.tif",
+        "dimensions": [
+          3600,
+          3600
+        ],
+        "crs": "EPSG:4326",
+        "pixel_scale": [
+          0.0002777777777777778,
+          0.0002777777777777778,
+          0.0
+        ],
+        "sha256": "5ACD8774FC11205E1029B20A59F3444750AC5546A5186E936B8BF334A0F9F48E"
+      },
+      "population": {
+        "local_file": "data/raw/worldpop/kor_pop_2023_CN_100m_R2025A_v1.tif",
+        "dimensions": [
+          7597,
+          6603
+        ],
+        "crs": "EPSG:4326",
+        "pixel_scale": [
+          0.00083333333,
+          0.00083333333,
+          0.0
+        ],
+        "sha256": "EEC167C93B4648BA3E6451DB3AC0A24266E1D15AF365F98DF082E8772169B260"
+      }
+    }
+  }
+}
