@@ -1,0 +1,80 @@
+dataset_name: seoul-2022-flood-decision-mvp
+version: "1.0.0"
+data_year: 2022
+source_updated_at: "2026-01-07"
+acquired_at: "2026-08-30"
+selection_status: "provisional_pipeline_fixture; not the latest source"
+description: "Seoul official 2022 flood footprint with a Seoul-centered OSM reference layer."
+spatial_scope:
+  flood_footprints_wgs84_bounds: [126.781329, 37.435235, 127.173020, 37.690390]
+  osm_roads_bbox: [126.95, 37.50, 127.05, 37.56]
+  osm_buildings_bbox: [126.96, 37.51, 127.03, 37.54]
+  osm_facilities_bbox: [126.95, 37.50, 127.05, 37.56]
+datasets:
+  - name: seoul_flood_footprints_2022
+    origin: OBSERVED
+    data_year: 2022
+    source: Seoul Open Data Plaza
+    source_url: https://data.seoul.go.kr/dataList/OA-15636/F/1/datasetView.do
+    download_url: https://datafile.seoul.go.kr/bigfile/iot/inf/nio_download.do?useCache=false
+    original_file: "2022년 서울시 침수흔적도_260105 수정.zip"
+    local_file: data/raw/seoul_flood_footprints_2022.zip
+    original_crs: EPSG:5179
+    output_crs: EPSG:4326
+    geometry_type: Polygon / MultiPolygon
+    feature_count: 19881
+    license: "Korea Public Nuri Type 1: attribution; commercial use and modification allowed"
+    sha256: 7C67B3DE1F7710BC0A5BA5AF5AB04AE16ADF930FE56164C7D3A2FD05D56515CA
+    notes:
+      - "The source ZIP is preserved without editing."
+      - "The flood footprint is a spatial event record, not a water-level time series."
+
+  - name: seoul_flood_footprints_column_definitions
+    origin: OBSERVED
+    source: Seoul Open Data Plaza
+    source_url: https://data.seoul.go.kr/dataList/OA-15636/F/1/datasetView.do
+    original_file: "서울시 침수흔적도 컬럼 의미.txt"
+    local_file: data/raw/seoul_flood_footprints_columns.txt
+    license: "Same terms as the Seoul flood footprint dataset"
+    sha256: BA0CBCFEA3CB8CFF38697654FF8B89308FC4FAABCA6AF08FC354DA8F29A78930
+
+  - name: seoul_osm_roads_geometry
+    origin: OBSERVED
+    source: OpenStreetMap via Overpass API
+    source_url: https://overpass-api.de/
+    local_file: data/raw/seoul_osm_roads_geometry.json
+    snapshot_date: "2026-08-29T22:40:02Z"
+    original_crs: EPSG:4326
+    output_crs: EPSG:4326
+    geometry_type: LineString
+    feature_count: 13972
+    license: "OpenStreetMap ODbL 1.0; attribution required"
+    sha256: 8C6467FCE80A664597620738F13DDB07DA75E7BE0BAFB3ED3136C8FC9DE9189A
+
+  - name: seoul_osm_buildings
+    origin: OBSERVED
+    source: OpenStreetMap via Overpass API
+    source_url: https://overpass-api.de/
+    local_file: data/raw/seoul_osm_buildings.json
+    snapshot_date: "2026-08-29T22:38:00Z"
+    original_crs: EPSG:4326
+    output_crs: EPSG:4326
+    geometry_type: Point center of building way
+    feature_count: 5938
+    license: "OpenStreetMap ODbL 1.0; attribution required"
+    sha256: 4AB698EC7BEC2351726145F575FCF31925F955C0C0BB39BF603F6EBBB76489FF
+    notes:
+      - "This is a center-point reference layer. Building footprint geometry is required for area exposure analysis."
+
+  - name: seoul_osm_facilities
+    origin: OBSERVED
+    source: OpenStreetMap via Overpass API
+    source_url: https://overpass-api.de/
+    local_file: data/raw/seoul_osm_facilities.json
+    snapshot_date: "2026-08-29T22:39:00Z"
+    original_crs: EPSG:4326
+    output_crs: EPSG:4326
+    geometry_type: Point / center
+    feature_count: 265
+    license: "OpenStreetMap ODbL 1.0; attribution required"
+    sha256: B882079BDB035FEA268CF68A1FF9227998CA2A90C66728844CC87880737CB8C6

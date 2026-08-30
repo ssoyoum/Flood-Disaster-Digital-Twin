@@ -1,0 +1,52 @@
+schema_version: "1.0"
+default_event_id: "osong-2023"
+scope: "FloodOps incident comparison catalog"
+common_priority_layers:
+  - flood_extent
+  - building_polygons
+  - population
+  - road_network
+  - river_network
+  - administrative_boundaries
+  - dem
+  - rainfall
+  - critical_facilities
+events:
+  - id: "osong-2023"
+    data_year: 2023
+    map_theme: "2023 Osong Underpass Flood — Miho River"
+    hazard: "하천·교통시설"
+    focus_feature: "지하차도·교통시설"
+    analysis_flow: "미호강·제방 → 범람 → 지하차도 → 차량·통행자"
+    status: "primary_event"
+    flood_extent_status: "Safety Data national source pending API key"
+    acquired_layers: [dem, population, osm_buildings, osm_roads, osm_facilities]
+  - id: "seoul-2022"
+    data_year: 2022
+    map_theme: "2022 Seoul Urban Flood — Gangnam & Sillim"
+    hazard: "도시 집중호우"
+    focus_feature: "반지하·지하공간"
+    analysis_flow: "강우 → 배수능력 초과 → 저지대 침수 → 건물·인구·지하공간·취약계층"
+    status: "secondary_comparison"
+    flood_extent_status: "Seoul official source acquired"
+  - id: "pohang-2022"
+    data_year: 2022
+    map_theme: "2022 Pohang Typhoon Flood — Naengcheon"
+    hazard: "태풍 유발 하천홍수"
+    focus_feature: "산업시설"
+    analysis_flow: "태풍 → 냉천 범람 → 공동주택·지하주차장·산업시설"
+    status: "cataloged; source connection pending"
+  - id: "iksan-2024"
+    data_year: 2024
+    map_theme: "2024 Iksan Extreme Rainfall Flood — Hamra"
+    hazard: "초단시간 극한호우"
+    focus_feature: "농경지"
+    analysis_flow: "극한강우 → 배수·소하천 용량 초과 → 농촌주거·농경지·도로"
+    status: "cataloged; source connection pending"
+  - id: "andong-uiseong-2026"
+    data_year: 2026
+    map_theme: "2026 Andong–Uiseong Compound Flood — Gwimi & Gugye"
+    hazard: "복합재난"
+    focus_feature: "임시주거·산불피해지역"
+    analysis_flow: "산불 피해지역 → 집중호우 → 임시주택·도로·상수도 → 재이재민"
+    status: "cataloged; live source connection pending"

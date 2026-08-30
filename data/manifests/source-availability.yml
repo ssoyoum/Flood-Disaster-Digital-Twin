@@ -1,0 +1,536 @@
+schema_version: "1.0"
+inventory_date: "2026-08-30"
+date_policy:
+  data_year: "The year represented by the observation or event."
+  source_updated_at: "The last modified date shown by the source portal."
+  acquired_at: "The date this repository downloaded the file."
+  snapshot_date: "The observation/query time for continuously updated sources."
+
+simulation_temporal_policy:
+  event_id: "osong-2023"
+  event_date: "2023-07-15"
+  primary_event_sources: [official_flood_extent, kma_aws_asos, official_damage, official_relief, emergency_alerts]
+  spatial_base_sources: [osm, worldpop, copernicus_dem]
+  runtime_api_calls: false
+  notes:
+    - "Approved API responses are stored as historical snapshots for simulation and annual refresh, not called on every application run."
+
+temporal_alignment_policy:
+  event_year: "The year of the disaster event being simulated."
+  boundary_snapshot: "The source boundary vintage used for spatial aggregation; it must be recorded separately from event_year."
+  boundary_selection: "Prefer an official Korean boundary snapshot from the event year or the nearest available year. Apply the same rule to future event scenarios."
+  population_selection:
+    priority_1: "Statistics Korea / SGIS official detailed spatial population"
+    priority_2: "Official eup-myeon-dong population totals plus WorldPop spatial-distribution adjustment"
+    priority_3: "WorldPop-only estimate as fallback"
+  population_usage:
+    administrative_unit_total: "Official statistics only"
+    regional_comparison: "Official eup-myeon-dong population"
+    flood_extent_exposure: "Official detailed grid population when available; otherwise official eup-myeon-dong total plus WorldPop distribution adjustment"
+    worldpop_only: "Fallback only"
+
+seoul_flood_footprints:
+  source: "Seoul Open Data Plaza"
+  source_url: "https://data.seoul.go.kr/dataList/OA-15636/F/1/datasetView.do"
+  coverage: "Seoul"
+  license: "Korea Public Nuri Type 1"
+  status: "acquired"
+  records:
+    - data_year: 2025
+      source_updated_at: "2026-04-27"
+      acquired_at: "2026-08-30"
+      local_file: "data/raw/seoul_flood_footprints_2025.zip"
+      feature_count: 1132
+      geometry_type: "Polygon"
+      original_crs: "EPSG:5179"
+      sha256: "3C8247F956BE551D18E69B4B94C19D6F00FE391F8CFD2F713EF017FFBA74B99D"
+      selection: "latest_available_source"
+    - data_year: 2024
+      source_updated_at: "2026-01-07"
+      acquired_at: "2026-08-30"
+      local_file: "data/raw/seoul_flood_footprints_2024.zip"
+      feature_count: 121
+      geometry_type: "Polygon"
+      original_crs: "EPSG:5179"
+      sha256: "0877D70EABC254E095E69131A51E6632202BFDD3E37D5881C7143DDA5DA98A1D"
+    - data_year: 2023
+      source_updated_at: "2026-01-07"
+      acquired_at: "2026-08-30"
+      local_file: "data/raw/seoul_flood_footprints_2023.zip"
+      feature_count: 278
+      geometry_type: "Polygon"
+      original_crs: "EPSG:5179"
+      sha256: "0662B7AECCCFE6B3B892B5B14BC1D2956AFFBA9E4D171E292B7E6A1B3DA9A6D3"
+    - data_year: 2022
+      source_updated_at: "2026-01-07"
+      acquired_at: "2026-08-30"
+      local_file: "data/raw/seoul_flood_footprints_2022.zip"
+      feature_count: 19881
+      geometry_type: "Polygon / MultiPolygon"
+      original_crs: "EPSG:5179"
+      sha256: "7C67B3DE1F7710BC0A5BA5AF5AB04AE16ADF930FE56164C7D3A2FD05D56515CA"
+      selection: "provisional_pipeline_fixture; not the latest year"
+  available_years_on_source: [2010, 2011, 2012, 2013, 2014, 2016, 2017, 2018, 2019, 2020, 2022, 2023, 2024, 2025]
+  unavailable_years_on_source: [2015, 2021]
+
+nationwide_flood_footprints:
+  source: "Ministry of the Interior and Safety / Disaster Safety Data Sharing Platform"
+  source_url: "https://www.safetydata.go.kr/disaster-data/totalSearch?query=%EC%B9%A8%EC%88%98"
+  coverage: "national candidate; record availability is event and local-government dependent"
+  status: "candidate_not_downloaded"
+  access: "portal search, sample download, application, or Safety Map API depending on dataset"
+  records:
+    - name: "행정안전부_침수흔적도"
+      data_year: "event-specific; confirm per record"
+      portal_registered_at: "2022-06-30"
+    - name: "침수흔적도_심선 / 침수흔적도_위선"
+      data_year: "event-specific; confirm per record"
+      portal_registered_at: "2025-06-18"
+  notes:
+    - "This is a nationwide source family, not a guarantee that one unauthenticated ZIP contains every municipality and year."
+    - "The selected record and its event year must be stored after portal/API access is confirmed."
+
+water_level_and_rainfall:
+  source: "WAMIS Water Resources Management Information System"
+  source_url: "https://www.wamis.go.kr/main/menuStats.do"
+  coverage: "stations and basins in Korea"
+  data_year: "station-specific historical time series; query the chosen flood event window"
+  status: "source_confirmed_download_pending"
+
+water_level:
+  source: "Ministry of Climate and Environment Han River Flood Control Office / Disaster Safety Data Sharing Platform"
+  source_url: "https://www.safetydata.go.kr/disaster-data/view?dataSn=7"
+  api_endpoint: "https://www.safetydata.go.kr/V2/api/DSSP-IF-00007"
+  dataset_id: "DSSP-IF-00007"
+  coverage: "Han River basin water-level stations"
+  data_year: "event-specific historical series after API authorization"
+  status: "api_key_required"
+  notes:
+    - "The application now has a service-key input and connection test. No key was available during this run, so no water-level response is claimed as acquired."
+
+rainfall:
+  source: "Seoul Open Data Plaza / Seoul Safety Nuri"
+  source_url: "https://data.seoul.go.kr/dataList/OA-1168/F/1/datasetView.do"
+  coverage: "Seoul rainfall gauges"
+  data_year: 2022
+  source_updated_at: "2023-01-27"
+  acquired_at: "2026-08-30"
+  status: "acquired"
+  raw_file: "data/raw/rainfall/seoul_rainfall_2022.zip"
+  processed_file: "data/processed/seoul_rainfall_2022_event.csv"
+  event_window: "2022-08-08 00:00 through 2022-08-17 23:59 KST"
+  temporal_resolution: "10-minute accumulated rainfall"
+  record_count: 68340
+  max_10min_rainfall_mm: 28.5
+  license: "Korea Public Nuri Type 2: attribution; commercial use prohibited"
+  raw_sha256: "F324BB48680E539269768D576EFDC6B5FFFA170058153C29FF04305747AC8035"
+  processed_sha256: "FE645194A7C323B4474BE5D1EB4A589EE52348BCCEA0DAF3760EA2B3648291AE"
+  processing_script: "data/scripts/prepare_seoul_rainfall_2022.py"
+
+population:
+  source: "WorldPop Global2"
+  source_url: "https://www.worldpop.org/hub/project/categories?id=3"
+  coverage: "global gridded population"
+  available_years: "2015-2030"
+  intended_event_year: 2022
+  data_year: 2022
+  source_updated_at: "2025-08-04"
+  acquired_at: "2026-08-30"
+  status: "acquired"
+  local_file: "data/raw/worldpop/kor_pop_2022_CN_100m_R2025A_v1.tif"
+  resolution: "100m"
+  crs: "EPSG:4326"
+  raster_dimensions: "7597 x 6603"
+  sha256: "730D9D5CAF5F3946502F1BEB5B1780D647FFA584FAC775634CD6501CA05F901A"
+  license: "CC BY 4.0"
+
+dem:
+  source: "Copernicus DEM GLO-30"
+  source_url: "https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM"
+  coverage: "global land coverage"
+  product: "30 m DSM"
+  acquisition_period: "2011-2015 TanDEM-X mission data, with gap filling"
+  latest_release_recorded: "2024_1 (2024-07)"
+  event_year: null
+  status: "acquired"
+  acquired_at: "2026-08-30"
+  tiles:
+    - name: "Copernicus_DSM_COG_10_N37_00_E126_00_DEM"
+      local_file: "data/raw/copernicus_dem_glo30/Copernicus_DSM_COG_10_N37_00_E126_00_DEM.tif"
+      object_last_modified: "2022-05-09"
+      crs: "EPSG:4326"
+      raster_dimensions: "3600 x 3600"
+      pixel_size: "1 arc-second; approximately 30m"
+      sha256: "F530DD28308ECD6C5CEB0405DC1FFB7113BCAFDEC30D023DE50F16DC433A274F"
+    - name: "Copernicus_DSM_COG_10_N37_00_E127_00_DEM"
+      local_file: "data/raw/copernicus_dem_glo30/Copernicus_DSM_COG_10_N37_00_E127_00_DEM.tif"
+      object_last_modified: "2022-05-09"
+      crs: "EPSG:4326"
+      raster_dimensions: "3600 x 3600"
+      pixel_size: "1 arc-second; approximately 30m"
+      sha256: "4F8FEF79DA8C18ED9A9A0FB97B3D2695C4681181E013E039D87044E5479F7DF6"
+  notes:
+    - "DEM is a static terrain/surface model, not a 2022 or 2026 flood observation. Store tile version/release and metadata acquisition period separately."
+
+osm:
+  source: "OpenStreetMap via Overpass API"
+  coverage: "Seoul AOI"
+  status: "acquired"
+  snapshot_date: "2026-08-29"
+  event_area_buildings:
+    local_file: "data/raw/seoul_osm_buildings_event_area.json"
+    bbox: [126.78, 37.43, 127.18, 37.70]
+    feature_count: 225925
+    query_timestamp: "2026-08-29T23:29:05Z"
+    sha256: "E2BF4C3876BE89DF015D307AA7DD0C45A69ADA39773F589D2B4E8254F67A0733"
+
+osong_flood_extent:
+  source: "Ministry of the Interior and Safety / Disaster Safety Data Sharing Platform"
+  source_url: "https://www.safetydata.go.kr/disaster-data/totalSearch?query=%EC%B9%A8%EC%88%98"
+  coverage: "2023 Osong, Cheongju, Chungcheongbuk-do"
+  data_year: 2023
+  event_date: "2023-07-15"
+  dataset_id: "DSSP-IF-00117"
+  source_type: "OFFICIAL_EVENT_DATA"
+  data_role: "primary_event_source"
+  status: "BLOCKED_BY_API_APPROVAL"
+  local_file: null
+  notes:
+    - "The app has a service-key input and connection test, but the observed Osong footprint has not been downloaded yet."
+
+osong_rainfall_and_water_level:
+  source: "Disaster Safety Data Sharing Platform / hydrological observation services"
+  source_url: "https://www.safetydata.go.kr/"
+  coverage: "Miho River and Geum River basin stations near Osong"
+  data_year: 2023
+  event_date: "2023-07-15"
+  status: "api_key_required"
+  local_file: null
+  notes:
+    - "Do not use the current demo timeline as an observed 2023 series."
+
+osong_official_incident_apis:
+  source: "Ministry of the Interior and Safety / Disaster Safety Data Sharing Platform"
+  source_url: "https://www.safetydata.go.kr/"
+  data_year: 2023
+  event_date: "2023-07-15"
+  runtime_api_calls: false
+  status: "BLOCKED_BY_API_APPROVAL"
+  records:
+    - dataset_id: "DSSP-IF-00117"
+      name: "행정안전부 침수흔적도"
+      priority: "high"
+      data_role: "primary_event_source"
+      intended_use: "actual Flood Extent"
+    - dataset_id: "DSSP-IF-10175"
+      name: "피해침수"
+      priority: "medium"
+      data_role: "primary_event_source"
+      intended_use: "damage record and spatial-analysis validation"
+    - dataset_id: "DSSP-IF-10184"
+      name: "재해구호상황보고"
+      priority: "medium"
+      data_role: "primary_event_source"
+      intended_use: "evacuees and displaced-person interpretation"
+    - dataset_id: "DSSP-IF-00247"
+      name: "긴급재난문자"
+      priority: "low"
+      data_role: "primary_event_source"
+      intended_use: "historical warning and evacuation timeline"
+  notes:
+    - "These APIs are for one-time historical acquisition and later annual refresh only; the simulation will not call them at runtime."
+    - "Applications have been submitted, but no historical response can be downloaded until approval and credentials are issued."
+
+osong_rainfall_primary:
+  source: "Korea Meteorological Administration AWS/ASOS or local observation network"
+  source_type: "OBSERVATION"
+  data_role: "primary_event_source"
+  source_url: "https://data.kma.go.kr/"
+  coverage: "stations matched to Osong and Miho River event area"
+  data_year: 2023
+  event_date: "2023-07-15"
+  event_window: "2023-07-15 through 2023-07-16 KST"
+  acquisition_workflow: "event -> location/date -> KMA station candidates -> station ID/period/element -> automatic download or manual download -> raw validation/normalization"
+  station_candidates:
+    - station_name: "오창가곡"
+      station_id: "683"
+      station_selection_status: "candidate"
+    - station_name: "청주금천"
+      station_id: "327"
+      station_selection_status: "candidate"
+  required_element: "강수량"
+  required_element_code: "SFC02010001"
+  download_page: "https://data.kma.go.kr/data/grnd/selectAwsRltmList.do?pgmNo56="
+  status: "MANUAL_DOWNLOAD_REQUIRED"
+  local_file: null
+  notes:
+    - "KMA AWS/ASOS is the primary rainfall source. NASA POWER is not a replacement."
+    - "Official direct request returned a header-only CSV; no observation rows were stored."
+    - "Do not reverse-engineer KMA HTML/JavaScript, hidden forms, sessions, or guessed URLs."
+    - "After the user places the official CSV in the designated raw folder, reuse the validation/normalization workflow."
+
+osong_population_2023:
+  source: "Statistics Korea / Ministry of the Interior and Safety Resident Registration Population via KOSIS"
+  source_url: "https://kosis.kr/statisticsList/mass/mass_list.jsp?list_id=&org_id=101&process=statHtml&tbl_id=DT_1B04005N&vw_cd="
+  coverage: "South Korea eup-myeon-dong and five-year age-group monthly population"
+  event_year: 2023
+  data_year: 2023
+  source_period: "2023-01 through 2023-12 (monthly)"
+  unit: "person"
+  population_priority_rank: 2
+  population_role: "official_eup_myeon_dong_total"
+  official_total_population_source: "KOSIS table DT_1B04005N, 2023 monthly mass download"
+  official_dong_population_source: "KOSIS code 4311325000, 오송읍"
+  official_detailed_grid_source: null
+  whole_eup_myeon_dong_population: "Must be supplied by official Statistics Korea / SGIS or resident-registration statistics; do not use WorldPop total."
+  worldpop_usage_scope: "Flood Extent internal spatial-distribution estimation only"
+  source_updated_at: "2026-08-05"
+  acquired_at: "2026-08-30"
+  status: "acquired"
+  local_file: "data/raw/population/kosis_101_DT_1B04005N_M_2023.zip"
+  raw_size_bytes: 9272134
+  raw_record_count: 1020514
+  osong_code: "4311325000"
+  osong_raw_record_count: 264
+  raw_sha256: "5B6E2B8D314096240DE16949E8FDFA4DA3DF569838EB93601C9FFF7708894F18"
+  processed_file: "data/processed/osong/osong_official_population_2023.csv"
+  processed_record_count: 264
+  processed_sha256: "90EFE2D1FD50CBD26032765166BC8E5B322B0A7D06B06E72524DE1694B584B6D"
+  geometry: "NOT_APPLICABLE"
+  crs: "NOT_APPLICABLE"
+  license: "KOSIS source terms"
+  fallback_worldpop:
+    source: "WorldPop Global2"
+    source_url: "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2023/KOR/v1/100m/constrained/kor_pop_2023_CN_100m_R2025A_v1.tif"
+    local_file: "data/raw/worldpop/kor_pop_2023_CN_100m_R2025A_v1.tif"
+    data_year: 2023
+    resolution: "100m"
+    crs: "EPSG:4326"
+    raster_dimensions: "7597 x 6603"
+    sha256: "EEC167C93B4648BA3E6451DB3AC0A24266E1D15AF365F98DF082E8772169B260"
+    role: "fallback spatial distribution only"
+  notes:
+    - "Official monthly population total for 오송읍 is 27,125 in 2023-07."
+    - "WorldPop Korea 2023 remains separately acquired as fallback spatial distribution data only."
+
+osong_dem:
+  source: "Copernicus DEM GLO-30"
+  source_url: "https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM"
+  coverage: "Osong and Miho River area"
+  data_year: null
+  acquisition_period: "2011-2015 TanDEM-X mission data, with gap filling"
+  status: "acquired; terrain derivation pending"
+  acquired_at: "2026-08-30"
+  tile:
+    name: "Copernicus_DSM_COG_10_N36_00_E127_00_DEM"
+    local_file: "data/raw/copernicus_dem_glo30/Copernicus_DSM_COG_10_N36_00_E127_00_DEM.tif"
+    object_last_modified: "2022-05-09"
+    crs: "EPSG:4326"
+    raster_dimensions: "3600 x 3600"
+    pixel_size: "1 arc-second; approximately 30m"
+    sha256: "5ACD8774FC11205E1029B20A59F3444750AC5546A5186E936B8BF334A0F9F48E"
+
+osong_osm:
+  source: "OpenStreetMap via Overpass API"
+  source_url: "https://overpass-api.de/api/interpreter"
+  coverage: "Osong, Gungpyeong 2 Underpass, Miho River context"
+  data_role: "spatial_base_reference_only"
+  event_aligned: false
+  status: "acquired; building polygon preservation pending"
+  snapshot_date: "2026-08-30"
+  local_file: "data/raw/osong/osm_context_2026-08-30.json"
+  bbox: [127.27, 36.58, 127.40, 36.68]
+  element_count: 14239
+  query: "building, highway, waterway, amenity, tunnel=yes highway"
+  sha256: "D631DDF34330B5F81D420F419260868366B0353F65FD69B8496529B7DB9536CF"
+
+osong_osm_processed:
+  source: "OpenStreetMap via Overpass API"
+  source_url: "https://overpass-api.de/api/interpreter"
+  coverage: "Osong, Gungpyeong 2 Underpass, Miho River context"
+  data_role: "spatial_base_reference_only"
+  event_aligned: false
+  status: "acquired; current-context reference only"
+  snapshot_date: "2026-08-30"
+  crs: "EPSG:4326"
+  processing_script: "data/scripts/process_osong_open_data.py"
+  files:
+    buildings:
+      local_file: "data/processed/osong/osong_osm_buildings_2026.geojson"
+      geometry_type: "Polygon"
+      feature_count: 4571
+      sha256: "49D722881003CFFB9FB234D76E1033F19637ECBC9923868D18AE7C8072D06B77"
+    roads:
+      local_file: "data/processed/osong/osong_osm_roads_2026.geojson"
+      geometry_type: "LineString"
+      feature_count: 8458
+      sha256: "CA296B8BD2B8C68ED2031F4C7732C67E6ED6E9C9FB1548B0EC7C8C4361BEF8CB"
+    waterways:
+      local_file: "data/processed/osong/osong_osm_waterways_2026.geojson"
+      geometry_type: "LineString"
+      feature_count: 158
+      sha256: "4370B1F515F8EC0C4587CF02B9AE4D2125A480C6C3729FAD0ED9BD1FE2F6F0D2"
+    facilities:
+      local_file: "data/processed/osong/osong_osm_facilities_2026.geojson"
+      geometry_type: "Point"
+      feature_count: 554
+      sha256: "12DD6217402B6C3E78BC9823B4D966C38A432F3546DA226E0B5EB71C62F08193"
+    tunnels:
+      local_file: "data/processed/osong/osong_osm_tunnels_2026.geojson"
+      geometry_type: "LineString"
+      feature_count: 104
+      sha256: "4A3BE83AD79AA5C725C84679E1FCED7A470C921A6FF3AA045360A660064EFAAF"
+  validation_report: "data/processed/osong/validation_report.json"
+  notes:
+    - "This 2026 snapshot is not used as the event-date spatial base for the 2023 Osong simulation."
+
+osong_osm_event_snapshot:
+  source: "OpenStreetMap Overpass API attic snapshot"
+  source_url: "https://overpass-api.de/api/interpreter"
+  coverage: "Osong, Gungpyeong 2 Underpass, Miho River context"
+  data_role: "spatial_base_for_historical_simulation"
+  event_aligned: true
+  requested_snapshot_date: "2023-07-15T23:59:59Z"
+  response_database_timestamp: "2026-08-30T00:19:49Z"
+  status: "acquired; geometry and validity verified"
+  acquired_at: "2026-08-30"
+  crs: "EPSG:4326"
+  raw_file: "data/raw/osong/osm_context_2023-07-15.json"
+  raw_sha256: "24905E7AE7E8FA7E96957C27FBC031F64F3CA160C14BDE739340E031A9975442"
+  processing_script: "data/scripts/process_osong_open_data.py"
+  processed_files:
+    buildings:
+      local_file: "data/processed/osong/osong_osm_buildings_2023.geojson"
+      geometry_type: "Polygon"
+      feature_count: 2859
+      sha256: "93BC6ABF6F8ED4D2B2E57D9A6F94173A738D48705BE846A88A4D3DDDDB7CBFCE"
+    roads:
+      local_file: "data/processed/osong/osong_osm_roads_2023.geojson"
+      geometry_type: "LineString"
+      feature_count: 6727
+      sha256: "B1AA801D96294E81A1707C313024A0A2C008227A0BC5C51F50D5D34E6962AE28"
+    waterways:
+      local_file: "data/processed/osong/osong_osm_waterways_2023.geojson"
+      geometry_type: "LineString"
+      feature_count: 147
+      sha256: "B22B54252726095700595F783BC22E7B6BFA1564966951BFFACAA61471E24A4A"
+    facilities:
+      local_file: "data/processed/osong/osong_osm_facilities_2023.geojson"
+      geometry_type: "Point"
+      feature_count: 386
+      sha256: "DDC561BB16123B0C5ED4306BD6D13C419A816F9FAEC094B2DE46FD0ADAE0A6E4"
+    tunnels:
+      local_file: "data/processed/osong/osong_osm_tunnels_2023.geojson"
+      geometry_type: "LineString"
+      feature_count: 95
+      sha256: "024343E31D7B3B2087FB6D947944B29100FD1EB833A6A7E2C3C2305F127BA43D"
+
+osong_gungpyeong2_underpass:
+  source: "Official Chungcheongbuk-do facility metadata + event-date OpenStreetMap geometry"
+  data_year: 2023
+  event_date: "2023-07-15"
+  mvp_scope: "Gungpyeong 2 Underpass is the only Osong transport facility represented in the MVP."
+  official_verification:
+    facility_name: "궁평2지하차도"
+    road_route: "지방도 508호선"
+    route_context: "청주-세종 연결 도로"
+    managing_agency: "충청북도도로관리사업소"
+    sources:
+      - "https://www.chungbuk.go.kr/www/selectGosiPblancView.do?key=422&no=50462&pageIndex=447&pageUnit=10&searchCnd=all"
+      - "https://www.chungbuk.go.kr/www/selectBbsNttView.do?bbsNo=65&key=429&nttNo=284501&pageIndex=42&searchCnd=CN&searchCtgry=&searchKrwd=%EB%8F%84%EB%A1%9C"
+      - "https://molit.go.kr/USR/NEWS/m_71/dtl.jsp?id=95088586&lcmspage=62"
+  geometry_source: "OpenStreetMap Overpass attic historical snapshot"
+  geometry_snapshot: "2023-07-15T23:59:59Z"
+  osm_source_features: [556705089, 988994037]
+  status: "acquired; official metadata and event-date geometry combined; geometry validated"
+  crs: "EPSG:4326"
+  processed_file: "data/processed/osong/gungpyeong2_underpass.geojson"
+  geometry_type: "MultiLineString"
+  feature_count: 1
+  source_feature_count: 2
+  sha256: "8B963BE114359526FC97FA5D6C1C51A245FB0EC7AF828F17BC119EB6CDC905AF"
+  processing_script: "data/scripts/process_osong_open_data.py"
+  notes:
+    - "OSM supplies geometry only; official sources supply facility name, route, and managing agency metadata."
+    - "Additional traffic-volume modeling and vehicle-exposure estimation are outside the MVP."
+    - "Post-incident sensors, automatic entry barriers, and water barriers are future scenario metadata only; they are not represented as 2023 observed geometry."
+
+osong_boundaries:
+  source: "geoBoundaries gbOpen"
+  source_url: "https://www.geoboundaries.org/api/current/gbOpen/KOR/ADM2/"
+  coverage: "Republic of Korea administrative boundaries, Osong AOI subset"
+  license: "CC BY 4.0 / source-specific attribution terms"
+  source_data_update_date: "2023-05-03"
+  event_year: 2023
+  boundary_snapshot:
+    ADM1:
+      year: 2023
+      label: "geoBoundaries ADM1 snapshot: 2023"
+    ADM2:
+      year: 2020
+      label: "geoBoundaries ADM2 snapshot: 2020"
+  boundary_year_represented:
+    ADM1: 2023
+    ADM2: 2020
+  snapshot_labels:
+    ADM1: "geoBoundaries ADM1 snapshot: 2023"
+    ADM2: "geoBoundaries ADM2 snapshot: 2020"
+  status: "acquired; AOI subset processed"
+  acquired_at: "2026-08-30"
+  raw_files:
+    ADM1: "data/raw/boundaries/geoBoundaries-KOR-ADM1.geojson"
+    ADM2: "data/raw/boundaries/geoBoundaries-KOR-ADM2.geojson"
+  raw_sha256:
+    ADM1: "6683CD1AD991676D96493FD0AAE068215426497CCF82C8B0EB5683CAD341CDDC"
+    ADM2: "C367911B02F2CD7DCAE6512087D84965131971DE0C9DEF2FC5D0ED9A7392F2D8"
+  processed_files:
+    ADM1: "data/processed/osong/osong_geoboundaries_adm1_aoi.geojson"
+    ADM2: "data/processed/osong/osong_geoboundaries_adm2_aoi.geojson"
+  processed_sha256:
+    ADM1: "7AB2F41F724102874B273E5A838CDC41C636DE25C531327E67802D43E51330C3"
+    ADM2: "F801B6523CF5DEBFF48053656F165508C644F29901E77D6CAD2967A3DAADD8D3"
+  crs: "EPSG:4326"
+  feature_count_in_aoi:
+    ADM1: 2
+    ADM2: 2
+
+osong_nasa_power_precipitation:
+  source: "NASA POWER hourly temporal API"
+  source_url: "https://power.larc.nasa.gov/docs/services/api/temporal/hourly/"
+  api_url: "https://power.larc.nasa.gov/api/temporal/hourly/point"
+  coverage: "Point 36.628N, 127.354E near Osong event area"
+  data_year: 2023
+  event_window: "2023-07-15 00:00 through 2023-07-16 23:00 LST"
+  parameter: "PRECTOTCORR"
+  temporal_resolution: "hourly"
+  status: "VERIFIED"
+  verification: "VERIFIED + REANALYSIS"
+  data_role: "supplementary_comparison"
+  source_type: "REANALYSIS"
+  acquired_at: "2026-08-30"
+  raw_file: "data/raw/osong/nasa_power_precip_2023-07-15_16.json"
+  processed_file: "data/processed/osong/osong_nasa_power_precip_2023-07-15_16.csv"
+  raw_status: "VERIFIED"
+  processed_status: "DERIVED"
+  raw_sha256: "46F7A70F0BA796F64BBF74AF1C73B0F39C409985978CAC6DB9D01577B84F7F0A"
+  processed_sha256: "E59B4BA1584BCB543DFB5981297083227068E66DC38BC4CF5A93F0DBB92E778A"
+  record_count: 48
+  max_mm_per_hour: 154.74
+  crs: "EPSG:4326"
+  latitude: 36.628
+  longitude: 127.354
+  processing_script: "data/scripts/process_osong_open_data.py"
+
+osong_event_report:
+  source: "Construction and Infrastructure Development Information System (CODIL)"
+  source_url: "https://www.codil.or.kr/filebank/original/RK/OTKCRK240265/OTKCRK240265.pdf"
+  coverage: "2023 Osong underpass flood incident context"
+  data_year: 2023
+  status: "acquired; reference document"
+  acquired_at: "2026-08-30"
+  raw_file: "data/raw/osong/osong_2023_event_report_codIL.pdf"
+  processed_file: "data/processed/osong/osong_2023_event_report_codIL.txt"
+  raw_sha256: "D5BE93251EFE84809F02D8EB4B3F64635EAD286633009FF3E0E08C31A2993C7D"
+  processed_sha256: "BF009F6F49498050AC770A4EA2D6402D1A8732C4FC7F88A867CC0AD2AFE94656"
+  page_count: 93
+  text_extraction_check: "미호강 and 궁평 references present"
