@@ -69,5 +69,166 @@
         "sha256": "EEC167C93B4648BA3E6451DB3AC0A24266E1D15AF365F98DF082E8772169B260"
       }
     }
+  },
+  "official_buildings_2023": {
+    "source_stats": {
+      "chungbuk": {
+        "raw_file": "data/raw/building_integrated/vworld_gis_building_integrated_2023-07-12_chungbuk/AL_43_D010_20230712.zip",
+        "raw_size_bytes": 88455711,
+        "raw_sha256": "CE2677389520512FB8EAE4C5DC5AE14D3743FE8F3F877E6AE409133F663541D7",
+        "raw_layers": [
+          {
+            "layer_name": "AL_43_D010_20230712",
+            "geometry_type": "Polygon",
+            "record_count": 811450
+          }
+        ],
+        "subset_feature_count": 25283
+      },
+      "chungnam": {
+        "raw_file": "data/raw/building_integrated/vworld_gis_building_integrated_2023-07-12_chungnam/AL_44_D010_20230712.zip",
+        "raw_size_bytes": 131285090,
+        "raw_sha256": "360B74D5DEBC26685B0C6D58AD67A9F4783B19B336FBAB43AEFC196C5EB81FBD",
+        "raw_layers": [
+          {
+            "layer_name": "AL_44_D010_20230712(2)",
+            "geometry_type": "Polygon",
+            "record_count": 283619
+          },
+          {
+            "layer_name": "AL_44_D010_20230712",
+            "geometry_type": "Polygon",
+            "record_count": 1000000
+          }
+        ],
+        "subset_feature_count": 0
+      }
+    },
+    "processed_file": "data/processed/osong/osong_official_buildings_2023.geojson",
+    "qa_file": "data/processed/osong/osong_building_qa_official_osm_2023.geojson",
+    "qa_summary_file": "data/processed/osong/osong_building_qa_summary_2023.json",
+    "qa_summary": {
+      "official_subset_feature_count": 25283,
+      "osm_2023_feature_count": 2859,
+      "matched_official_feature_count": 1251,
+      "official_only_feature_count": 24032,
+      "osm_only_feature_count": 1817,
+      "matching_method": "geometry intersects after projecting both layers to EPSG:5174",
+      "merge_policy": "OSM-only footprints are not added to the authoritative official layer.",
+      "qa_flags": [
+        "MATCHED",
+        "OFFICIAL_ONLY",
+        "OSM_ONLY"
+      ]
+    },
+    "crs": "EPSG:4326",
+    "validation": "official SHP subset converted to EPSG:4326 and intersect-matched with OSM 2023 footprints"
+  },
+  "kma_aws_rainfall_2023": {
+    "raw_file": "data/raw/rainfall/osong/OBS_AWS_TIM_20260830132752.csv",
+    "raw_size_bytes": 8006,
+    "raw_sha256": "581BD7C93369A22E6511D2FC819FA6A2ED09949EBE73E6B59E11179437D07108",
+    "processed_file": "data/processed/osong/osong_kma_aws_rainfall_2023-07-14_17.csv",
+    "processed_sha256": "FB7CABE89FA0C8DC5BFC76E31F01E55DD8141C37F3A90960D99897C3EA87E4D5",
+    "record_count": 144,
+    "period_start": "2023-07-14 01:00",
+    "period_end": "2023-07-17 00:00",
+    "unit": "mm",
+    "stations": {
+      "327:청주금천": {
+        "record_count": 72,
+        "rainfall_total_mm": 397.0
+      },
+      "977:오창가곡": {
+        "record_count": 72,
+        "rainfall_total_mm": 378.3
+      }
+    }
+  },
+  "wamis_river_network": {
+    "source": "WAMIS national/local river network SHP",
+    "raw_files": {
+      "national": {
+        "local_file": "data/raw/river/wamis_river_network/ntn_rvr.zip",
+        "raw_size_bytes": 16103744,
+        "raw_sha256": "D884F9B56AE52EE6522C362D59A173B7216354C7E8D3D4D8C7B6ED51A77E90A7",
+        "raw_feature_count": 73,
+        "geometry_type": "Polygon",
+        "crs": "EPSG:5179"
+      },
+      "local": {
+        "local_file": "data/raw/river/wamis_river_network/lcl_rvr.zip",
+        "raw_size_bytes": 52147887,
+        "raw_sha256": "4607177A9C51E8F53547202B53D32EC511B77A0D0E46A4D28E70477ABBA05D5C",
+        "raw_feature_count": 3783,
+        "geometry_type": "Polygon",
+        "crs": "EPSG:5179"
+      }
+    },
+    "aoi_bbox": [
+      127.27,
+      36.58,
+      127.4,
+      36.68
+    ],
+    "processed_files": {
+      "national": "data/processed/osong/osong_wamis_national_rivers.geojson",
+      "local": "data/processed/osong/osong_wamis_local_rivers.geojson",
+      "combined": "data/processed/osong/osong_wamis_rivers.geojson"
+    },
+    "processed_feature_count": 8,
+    "processed_crs": "EPSG:4326",
+    "processed_geometry_type": "Polygon / MultiPolygon",
+    "validation": "raw SHP ZIPs downloaded from WAMIS, feature count/CRS/geometry verified, clipped to Osong AOI bbox",
+    "river_name_encoding_validation": {
+      "method": "Read GeoJSON with UTF-8 output and check raw bytes for replacement character EF BF BD",
+      "result": "passed",
+      "sample_names": [
+        "미호천",
+        "노송천",
+        "내창천",
+        "석남천",
+        "조천",
+        "송곡천",
+        "노장천",
+        "병천천"
+      ],
+      "replacement_character_present": false
+    },
+    "processing_script": "data/scripts/process_wamis_river_network.py",
+    "processed_sha256": {
+      "national": "F0B377B533B51CACA2BAE6D1C0021B7381DDBD67B50C30DD3F018FAD3D80D840",
+      "local": "76C33E1BEA4482C140FAA7B073B65C664961A11FD1E5D80D283B169AAF728583",
+      "combined": "512C34BCD424FCE7F8D3FF6DC24095D2DC814B511E12359380D2315D1EECE3AA"
+    }
+  },
+  "dem_terrain_context_2023_osong": {
+    "source": "Copernicus DEM GLO-30",
+    "status": "DERIVED",
+    "role": "Terrain context only; not flood extent",
+    "raw_file": "data/raw/copernicus_dem_glo30/Copernicus_DSM_COG_10_N36_00_E127_00_DEM.tif",
+    "raw_sha256": "5ACD8774FC11205E1029B20A59F3444750AC5546A5186E936B8BF334A0F9F48E",
+    "raw_crs": "EPSG:4326",
+    "aoi_bbox": [
+      127.27,
+      36.58,
+      127.4,
+      36.68
+    ],
+    "window_shape": [
+      361,
+      470
+    ],
+    "min_elevation_m": 14.08,
+    "max_elevation_m": 350.19,
+    "mean_elevation_m": 62.23,
+    "low_elevation_threshold_m": 30.03,
+    "grid_file": "data/processed/osong/osong_dem_elevation_grid.geojson",
+    "grid_feature_count": 1280,
+    "grid_sha256": "FAC0B3FEAD589F72A5D54A2D25E52BC9C285B3B3292C1508A63CE5C9EF84FD9A",
+    "low_elevation_file": "data/processed/osong/osong_dem_low_elevation_context.geojson",
+    "low_elevation_feature_count": 303,
+    "low_elevation_sha256": "5870803DBD401E82E7CC4EA9329D23C14F4AFE83C5F26C16E72534A0FD413B52",
+    "data_warning": "This is terrain context, not observed inundation or modeled flood extent."
   }
 }

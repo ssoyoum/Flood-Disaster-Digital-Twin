@@ -253,21 +253,124 @@ osong_rainfall_primary:
   acquisition_workflow: "event -> location/date -> KMA station candidates -> station ID/period/element -> automatic download or manual download -> raw validation/normalization"
   station_candidates:
     - station_name: "오창가곡"
-      station_id: "683"
-      station_selection_status: "candidate"
+      station_id: "977"
+      station_selection_status: "observed_in_raw_file"
     - station_name: "청주금천"
       station_id: "327"
-      station_selection_status: "candidate"
+      station_selection_status: "observed_in_raw_file"
   required_element: "강수량"
   required_element_code: "SFC02010001"
   download_page: "https://data.kma.go.kr/data/grnd/selectAwsRltmList.do?pgmNo56="
-  status: "MANUAL_DOWNLOAD_REQUIRED"
-  local_file: null
+  status: "acquired"
+  acquired_at: "2026-08-30"
+  local_file: "data/raw/rainfall/osong/OBS_AWS_TIM_20260830132752.csv"
+  raw_size_bytes: 8006
+  raw_sha256: "581BD7C93369A22E6511D2FC819FA6A2ED09949EBE73E6B59E11179437D07108"
+  raw_encoding: "CP949"
+  raw_record_count: 144
+  processed_file: "data/processed/osong/osong_kma_aws_rainfall_2023-07-14_17.csv"
+  processed_status: "DERIVED"
+  processed_sha256: "FB7CABE89FA0C8DC5BFC76E31F01E55DD8141C37F3A90960D99897C3EA87E4D5"
+  observation_period: "2023-07-14 01:00 through 2023-07-17 00:00 KST"
+  stations:
+    - station_name: "청주금천"
+      station_id: "327"
+      record_count: 72
+      rainfall_total_mm: 397.0
+    - station_name: "오창가곡"
+      station_id: "977"
+      record_count: 72
+      rainfall_total_mm: 378.3
   notes:
     - "KMA AWS/ASOS is the primary rainfall source. NASA POWER is not a replacement."
-    - "Official direct request returned a header-only CSV; no observation rows were stored."
+    - "Downloaded manually by the user and verified locally."
     - "Do not reverse-engineer KMA HTML/JavaScript, hidden forms, sessions, or guessed URLs."
-    - "After the user places the official CSV in the designated raw folder, reuse the validation/normalization workflow."
+
+osong_building_integrated_molit_2023_07:
+  source: "MOLIT / VWorld GIS Building Integrated Information"
+  source_name_ko: "국토교통부 GIS건물통합정보 / 건물통합정보"
+  source_type: "OFFICIAL_DOWNLOAD"
+  data_role: "official_building_polygon_and_registry_attributes"
+  source_url: "https://www.vworld.kr/dtmk/dtmk_ntads_s002.do?dsId=18&svcCde=NA&searchKeyword=GIS%EA%B1%B4%EB%AC%BC%ED%86%B5%ED%95%A9%EC%A0%95%EB%B3%B4"
+  event_id: "osong-2023"
+  event_year: 2023
+  target_period: "2023-07"
+  selected_official_file:
+    area: "Chungcheongbuk-do"
+    area_ko: "충청북도"
+    file_group: "AL"
+    file_group_label: "전체데이터"
+    reference_date: "2023-07-12"
+    updated_at: "2023-09-11"
+    dataset_file_id: "20171128DS00010"
+    dataset_file_sequence: "1724"
+    listed_size: "84 MB"
+    listed_size_kb: 86383
+    format: "SHP"
+    geometry: "Polygon"
+    listed_distribution_crs: "BESSEL EPSG:5174 through 2023-08-05; GRS80 EPSG:5186 from 2023-08-08"
+  status: "acquired"
+  acquisition_attempted_at: "2026-08-30"
+  acquired_at: "2026-08-30"
+  local_file: "data/raw/building_integrated/vworld_gis_building_integrated_2023-07-12_chungbuk/AL_43_D010_20230712.zip"
+  raw_size_bytes: 88455711
+  raw_sha256: "CE2677389520512FB8EAE4C5DC5AE14D3743FE8F3F877E6AE409133F663541D7"
+  raw_record_count: 811450
+  geometry: "Polygon"
+  crs: "Korean_1985_Modified_Korea_Central_Belt / Bessel 1841 TM"
+  cpg: "ANSI 949"
+  processed_file: "data/processed/osong/osong_official_buildings_2023.geojson"
+  processed_feature_count: 25283
+  processed_crs: "EPSG:4326"
+  qa_file: "data/processed/osong/osong_building_qa_official_osm_2023.geojson"
+  qa_summary_file: "data/processed/osong/osong_building_qa_summary_2023.json"
+  qa_summary:
+    matched_official_feature_count: 1251
+    official_only_feature_count: 24032
+    osm_only_feature_count: 1817
+  notes:
+    - "Use this official building dataset name instead of calling it 'building-register SHP'."
+    - "This is the preferred official replacement/validation source for OSM building polygons."
+    - "Downloaded manually by the user after VWorld login; failed unauthenticated response files were removed."
+
+osong_building_integrated_molit_2023_07_chungnam:
+  source: "MOLIT / VWorld GIS Building Integrated Information"
+  source_name_ko: "국토교통부 GIS건물통합정보 / 건물통합정보"
+  source_type: "OFFICIAL_DOWNLOAD"
+  data_role: "neighboring_official_building_polygon_and_registry_attributes"
+  source_url: "https://www.vworld.kr/dtmk/dtmk_ntads_s002.do?dsId=18&svcCde=NA&searchKeyword=GIS%EA%B1%B4%EB%AC%BC%ED%86%B5%ED%95%A9%EC%A0%95%EB%B3%B4"
+  event_id: "osong-2023"
+  event_year: 2023
+  target_period: "2023-07"
+  selected_official_file:
+    area: "Chungcheongnam-do"
+    area_ko: "충청남도"
+    file_group: "AL"
+    file_group_label: "전체데이터"
+    reference_date: "2023-07-12"
+    format: "SHP"
+    geometry: "Polygon"
+    listed_distribution_crs: "BESSEL EPSG:5174 through 2023-08-05; GRS80 EPSG:5186 from 2023-08-08"
+  status: "acquired"
+  acquired_at: "2026-08-30"
+  local_file: "data/raw/building_integrated/vworld_gis_building_integrated_2023-07-12_chungnam/AL_44_D010_20230712.zip"
+  raw_size_bytes: 131285090
+  raw_sha256: "360B74D5DEBC26685B0C6D58AD67A9F4783B19B336FBAB43AEFC196C5EB81FBD"
+  raw_layers:
+    - layer_name: "AL_44_D010_20230712"
+      raw_record_count: 1000000
+      geometry: "Polygon"
+      crs: "Korean_1985_Modified_Korea_Central_Belt / Bessel 1841 TM"
+      cpg: "ANSI 949"
+    - layer_name: "AL_44_D010_20230712(2)"
+      raw_record_count: 283619
+      geometry: "Polygon"
+      crs: "Korean_1985_Modified_Korea_Central_Belt / Bessel 1841 TM"
+      cpg: "ANSI 949"
+  notes:
+    - "The ZIP contains two SHP layer parts; keep both until processing confirms the provider's split semantics."
+    - "Use as neighboring official building data only if the Osong AOI or future river-context analysis crosses into Chungcheongnam-do."
+    - "AOI subset processing found no Chungcheongnam-do features intersecting the current Osong AOI."
 
 osong_population_2023:
   source: "Statistics Korea / Ministry of the Interior and Safety Resident Registration Population via KOSIS"
@@ -313,13 +416,117 @@ osong_population_2023:
     - "Official monthly population total for 오송읍 is 27,125 in 2023-07."
     - "WorldPop Korea 2023 remains separately acquired as fallback spatial distribution data only."
 
+osong_wamis_river_network:
+  source: "WAMIS National Water Resources Management Information System"
+  source_name_ko: "국가수자원관리종합정보시스템 국가하천/지방하천 하천망"
+  source_type: "OFFICIAL_DOWNLOAD"
+  data_role: "official_river_polygon_context"
+  source_url: "https://www.wamis.go.kr/main/data_view.do?seq=621&page=1"
+  event_id: "osong-2023"
+  event_year: 2023
+  data_vintage: "NOT_RECORDED"
+  coverage: "South Korea national and local rivers; clipped to Osong AOI bbox"
+  status: "acquired"
+  acquired_at: "2026-08-30"
+  acquisition_workflow:
+    page: "https://www.wamis.go.kr/main/data_view.do?seq=621&page=1"
+    file_list_endpoint: "https://www.wamis.go.kr/main/data_files.do"
+    file_list_method: "POST"
+    file_list_params:
+      pdssn: "621"
+    download_endpoint_template: "https://www.wamis.go.kr/main/download.do?pdssn=621&fileName={serverfilename}"
+  raw_files:
+    national:
+      file_name: "ntn_rvr.zip"
+      local_file: "data/raw/river/wamis_river_network/ntn_rvr.zip"
+      raw_size_bytes: 16103744
+      raw_sha256: "D884F9B56AE52EE6522C362D59A173B7216354C7E8D3D4D8C7B6ED51A77E90A7"
+      raw_feature_count: 73
+      geometry: "Polygon"
+      crs: "EPSG:5179"
+      cpg: "UTF-8"
+    local:
+      file_name: "lcl_rvr.zip"
+      local_file: "data/raw/river/wamis_river_network/lcl_rvr.zip"
+      raw_size_bytes: 52147887
+      raw_sha256: "4607177A9C51E8F53547202B53D32EC511B77A0D0E46A4D28E70477ABBA05D5C"
+      raw_feature_count: 3783
+      geometry: "Polygon"
+      crs: "EPSG:5179"
+      cpg: "UTF-8"
+  processed_files:
+    national:
+      local_file: "data/processed/osong/osong_wamis_national_rivers.geojson"
+      feature_count: 1
+      geometry: "Polygon"
+      crs: "EPSG:4326"
+      sha256: "F0B377B533B51CACA2BAE6D1C0021B7381DDBD67B50C30DD3F018FAD3D80D840"
+    local:
+      local_file: "data/processed/osong/osong_wamis_local_rivers.geojson"
+      feature_count: 7
+      geometry: "Polygon / MultiPolygon"
+      crs: "EPSG:4326"
+      sha256: "76C33E1BEA4482C140FAA7B073B65C664961A11FD1E5D80D283B169AAF728583"
+    combined:
+      local_file: "data/processed/osong/osong_wamis_rivers.geojson"
+      feature_count: 8
+      geometry: "Polygon / MultiPolygon"
+      crs: "EPSG:4326"
+      sha256: "512C34BCD424FCE7F8D3FF6DC24095D2DC814B511E12359380D2315D1EECE3AA"
+  aoi_bbox: [127.27, 36.58, 127.40, 36.68]
+  processing_script: "data/scripts/process_wamis_river_network.py"
+  validation:
+    geometry_verified: true
+    crs_verified: true
+    feature_count_verified: true
+    river_name_encoding_verified: true
+    sample_river_names: ["미호천", "노송천", "내창천", "석남천", "조천", "송곡천", "노장천", "병천천"]
+  notes:
+    - "Use WAMIS river polygons as the official river context for Osong until a more event-specific official river/levee dataset is acquired."
+    - "OSM 2023 waterways remain a supporting cross-check layer, not the authoritative river layer."
+    - "PowerShell default console output can display Korean names as mojibake; validate encoding with UTF-8 file reads or PYTHONIOENCODING=utf-8."
+
+ngii_basic_map_river_candidates:
+  source: "VWorld / National Geographic Information Institute National Base Map"
+  source_name_ko: "국토지리정보원 국가기본도 하천중심선/실폭하천/하천경계"
+  source_type: "OFFICIAL_DOWNLOAD_CANDIDATE"
+  data_role: "candidate_official_river_geometry"
+  status: "MANUAL_DOWNLOAD_REQUIRED"
+  checked_at: "2026-08-30"
+  datasets:
+    - name: "국가기본도_하천중심선"
+      ds_id: "20250122DS00008"
+      source_url: "https://www.vworld.kr/dtmk/dtmk_ntads_s002.do?dsId=20250122DS00008&svcCde=MK"
+      file_name: "국가기본도_하천중심선.zip"
+      file_no: "1"
+      listed_size_kb: 599384
+    - name: "국가기본도_실폭하천"
+      ds_id: "20250122DS00007"
+      source_url: "https://www.vworld.kr/dtmk/dtmk_ntads_s002.do?dsId=20250122DS00007&svcCde=MK"
+      file_name: "국가기본도 실폭하천.zip"
+      file_no: "1"
+      listed_size_kb: 223261
+    - name: "국가기본도_하천경계"
+      ds_id: "20250122DS00006"
+      source_url: "https://www.vworld.kr/dtmk/dtmk_ntads_s002.do?dsId=20250122DS00006&svcCde=MK"
+      file_name: "국가기본도_하천경계.zip"
+      file_no: "1"
+      listed_size_kb: 167703
+  local_evidence_pages:
+    - "data/raw/river/vworld_ngii_river_pages/centerline.html"
+    - "data/raw/river/vworld_ngii_river_pages/area.html"
+    - "data/raw/river/vworld_ngii_river_pages/boundary.html"
+  notes:
+    - "Dataset pages and file metadata are visible, but unauthenticated direct download returned empty responses."
+    - "Do not reverse-engineer login/session flow. Download manually after VWorld login if these layers are needed."
+
 osong_dem:
   source: "Copernicus DEM GLO-30"
   source_url: "https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM"
   coverage: "Osong and Miho River area"
   data_year: null
   acquisition_period: "2011-2015 TanDEM-X mission data, with gap filling"
-  status: "acquired; terrain derivation pending"
+  status: "acquired; terrain context derived"
   acquired_at: "2026-08-30"
   tile:
     name: "Copernicus_DSM_COG_10_N36_00_E127_00_DEM"
@@ -329,14 +536,35 @@ osong_dem:
     raster_dimensions: "3600 x 3600"
     pixel_size: "1 arc-second; approximately 30m"
     sha256: "5ACD8774FC11205E1029B20A59F3444750AC5546A5186E936B8BF334A0F9F48E"
+  terrain_context:
+    source_type: "DEM"
+    processed_status: "DERIVED"
+    role: "Terrain context only; not observed inundation and not modeled Flood Extent"
+    processing_script: "data/scripts/process_osong_dem_context.py"
+    aoi_bbox: [127.27, 36.58, 127.40, 36.68]
+    window_shape: [361, 470]
+    min_elevation_m: 14.08
+    max_elevation_m: 350.19
+    mean_elevation_m: 62.23
+    low_elevation_threshold_m: 30.03
+    threshold_method: "AOI p25 elevation"
+    grid_file: "data/processed/osong/osong_dem_elevation_grid.geojson"
+    grid_feature_count: 1280
+    grid_sha256: "FAC0B3FEAD589F72A5D54A2D25E52BC9C285B3B3292C1508A63CE5C9EF84FD9A"
+    low_elevation_file: "data/processed/osong/osong_dem_low_elevation_context.geojson"
+    low_elevation_feature_count: 303
+    low_elevation_sha256: "5870803DBD401E82E7CC4EA9329D23C14F4AFE83C5F26C16E72534A0FD413B52"
+    summary_file: "data/processed/osong/osong_dem_summary.json"
+    summary_sha256: "03D0E3BDEB8AD4913F1E4BA2B82D4AE029357D19C45FCA1D57926DE9258AE8B4"
+    data_warning: "This terrain layer must not be displayed as observed inundation."
 
 osong_osm:
   source: "OpenStreetMap via Overpass API"
   source_url: "https://overpass-api.de/api/interpreter"
   coverage: "Osong, Gungpyeong 2 Underpass, Miho River context"
-  data_role: "spatial_base_reference_only"
+  data_role: "current_comparison_candidate_only"
   event_aligned: false
-  status: "acquired; building polygon preservation pending"
+  status: "acquired; excluded from 2023 incident analysis"
   snapshot_date: "2026-08-30"
   local_file: "data/raw/osong/osm_context_2026-08-30.json"
   bbox: [127.27, 36.58, 127.40, 36.68]
@@ -348,9 +576,9 @@ osong_osm_processed:
   source: "OpenStreetMap via Overpass API"
   source_url: "https://overpass-api.de/api/interpreter"
   coverage: "Osong, Gungpyeong 2 Underpass, Miho River context"
-  data_role: "spatial_base_reference_only"
+  data_role: "current_comparison_candidate_only"
   event_aligned: false
-  status: "acquired; current-context reference only"
+  status: "acquired; excluded from 2023 incident analysis"
   snapshot_date: "2026-08-30"
   crs: "EPSG:4326"
   processing_script: "data/scripts/process_osong_open_data.py"
@@ -382,13 +610,14 @@ osong_osm_processed:
       sha256: "4A3BE83AD79AA5C725C84679E1FCED7A470C921A6FF3AA045360A660064EFAAF"
   validation_report: "data/processed/osong/validation_report.json"
   notes:
-    - "This 2026 snapshot is not used as the event-date spatial base for the 2023 Osong simulation."
+    - "This 2026 snapshot is retained only as a future current-comparison candidate."
+    - "It is excluded from the 2023 Osong incident analysis."
 
 osong_osm_event_snapshot:
   source: "OpenStreetMap Overpass API attic snapshot"
   source_url: "https://overpass-api.de/api/interpreter"
   coverage: "Osong, Gungpyeong 2 Underpass, Miho River context"
-  data_role: "spatial_base_for_historical_simulation"
+  data_role: "cross_validation_layer_for_official_buildings"
   event_aligned: true
   requested_snapshot_date: "2023-07-15T23:59:59Z"
   response_database_timestamp: "2026-08-30T00:19:49Z"
@@ -424,6 +653,11 @@ osong_osm_event_snapshot:
       geometry_type: "LineString"
       feature_count: 95
       sha256: "024343E31D7B3B2087FB6D947944B29100FD1EB833A6A7E2C3C2305F127BA43D"
+  qa_policy:
+    authoritative_building_layer: "MOLIT GIS Building Integrated Information 2023-07"
+    cross_validation_layer: "OSM historical building footprints 2023-07-15"
+    matching_flags: ["MATCHED", "OFFICIAL_ONLY", "OSM_ONLY"]
+    merge_policy: "Do not automatically add OSM-only footprints to the official building layer."
 
 osong_gungpyeong2_underpass:
   source: "Official Chungcheongbuk-do facility metadata + event-date OpenStreetMap geometry"
