@@ -1,0 +1,53 @@
+{
+  "raw_file": "data/raw/copernicus_dem_glo30/Copernicus_DSM_COG_10_N36_00_E127_00_DEM.tif",
+  "raw_sha256": "5ACD8774FC11205E1029B20A59F3444750AC5546A5186E936B8BF334A0F9F48E",
+  "raw_crs": "EPSG:4326",
+  "raw_pixel_size_degrees": [
+    0.0002777777777777778,
+    0.0002777777777777778
+  ],
+  "raw_tile_shape": [
+    3600,
+    3600
+  ],
+  "window_shape": [
+    361,
+    470
+  ],
+  "window_bounds": [
+    127.26972222222223,
+    36.57972222222222,
+    127.40027777777777,
+    36.68
+  ],
+  "aoi_bbox": [
+    127.27,
+    36.58,
+    127.4,
+    36.68
+  ],
+  "source": "Copernicus DEM GLO-30",
+  "source_type": "DEM",
+  "status": "DERIVED",
+  "role": "Terrain context only",
+  "min_elevation_m": 14.080402374267578,
+  "max_elevation_m": 350.18878173828125,
+  "mean_elevation_m": 62.229550079527364,
+  "percentiles_m": {
+    "p05": 23.942802238464356,
+    "p10": 25.76520195007324,
+    "p25": 30.029383182525635,
+    "p50": 46.31755256652832,
+    "p75": 75.20859336853027,
+    "p90": 127.65861892700195,
+    "p95": 164.8232589721679
+  },
+  "low_elevation_threshold_m": 30.029383182525635,
+  "grid_file": "data/processed/osong/osong_dem_elevation_grid.geojson",
+  "grid_feature_count": 1280,
+  "low_elevation_file": "data/processed/osong/osong_dem_low_elevation_context.geojson",
+  "low_elevation_feature_count": 303,
+  "grid_sha256": "FAC0B3FEAD589F72A5D54A2D25E52BC9C285B3B3292C1508A63CE5C9EF84FD9A",
+  "low_elevation_sha256": "5870803DBD401E82E7CC4EA9329D23C14F4AFE83C5F26C16E72534A0FD413B52",
+  "data_warning": "This is terrain context, not observed inundation or modeled flood extent."
+}
