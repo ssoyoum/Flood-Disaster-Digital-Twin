@@ -3,7 +3,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 
-DataOrigin = Literal["OBSERVED", "DERIVED", "SIMULATED"]
+DataOrigin = Literal["VERIFIED", "DERIVED", "REANALYSIS", "TEMPORARY", "UNAVAILABLE"]
 InterventionType = Literal[
     "EVACUATION",
     "ROAD_CLOSURE",
@@ -36,13 +36,25 @@ class FloodEvent(BaseModel):
 
 
 class ExposureMetrics(BaseModel):
-    flooded_area_km2: float
-    exposed_population: int
-    exposed_buildings: int
-    affected_road_length_km: float
-    critical_infrastructure: int
-    affected_shelters: int
-    origin: Literal["DERIVED"] = "DERIVED"
+    event_id: str
+    origin: DataOrigin = "DERIVED"
+    official_population: int | None
+    building_count: int
+    road_count: int
+    waterway_count: int
+    terrain_low_elevation_cells: int
+    terrain_low_elevation_threshold_m: float | None
+    rainfall_peak_mm_per_hour: float | None
+    rainfall_records: int | None
+    facility_count: int
+    underpass_available: bool
+    flooded_area_km2: float | str
+    exposed_population: int | str
+    exposed_buildings: int | str
+    affected_road_length_km: float | str
+    critical_infrastructure: int | str
+    affected_shelters: int | str
+    data_status: str
 
 
 class Intervention(BaseModel):
@@ -65,4 +77,4 @@ class ScenarioResult(BaseModel):
     result: ExposureMetrics
     reduction_percent: float
     assumptions: list[str]
-    origin: Literal["SIMULATED"] = "SIMULATED"
+    origin: Literal["TEMPORARY"] = "TEMPORARY"
