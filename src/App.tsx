@@ -538,7 +538,33 @@ export default function App() {
               <Metric icon={Waves} label="River polygons" value={formatNumber(summary?.waterway_count)} note="WAMIS official river network" />
               <Metric icon={Mountain} label="Low elevation cells" value={formatNumber(summary?.terrain_low_elevation_cells)} note={`DEM p25 <= ${formatDecimal(summary?.terrain_low_elevation_threshold_m)} m`} />
               <Metric icon={CloudRain} label="Peak hourly rainfall" value={`${formatDecimal(summary?.rainfall_peak_mm_per_hour)} mm`} note={`${formatNumber(summary?.rainfall_records)} KMA AWS records`} />
+              <Metric icon={Waves} label="Peak water level" value={`${formatDecimal(summary?.water_level_peak_m, 2)} m`} note={summary?.water_level_peak_station_name ?? "Flood Control Office"} />
               <Metric icon={Factory} label="Facilities" value={formatNumber(summary?.facility_count)} note="OSM historical POI" />
+              <Metric icon={Waves} label="Safemap flood marks" value={summary?.safemap_floodmarks_available ? "Available" : "Unavailable"} note="WMS raster overlay, not vector analysis" />
+            </div>
+            <div className="hydromet-panel">
+              <div>
+                <div className="eyebrow">OBSERVED HYDROMET</div>
+                <h2>Rainfall → river level → mapped flood marks</h2>
+              </div>
+              <div className="hydromet-flow">
+                <div>
+                  <span>KMA rainfall</span>
+                  <strong>{formatDecimal(summary?.rainfall_peak_mm_per_hour)} mm/hr</strong>
+                  <small>{summary?.rainfall_peak_station_name ?? "station not recorded"} · {summary?.rainfall_peak_timestamp ?? "time not recorded"}</small>
+                </div>
+                <div>
+                  <span>Miho River water level</span>
+                  <strong>{formatDecimal(summary?.primary_water_level_peak_m, 2)} m</strong>
+                  <small>청주시(미호강교) · {summary?.primary_water_level_peak_timestamp ?? "time not recorded"}</small>
+                </div>
+                <div>
+                  <span>Flood marks layer</span>
+                  <strong>{summary?.safemap_floodmarks_available ? "Visible" : "Pending"}</strong>
+                  <small>Safemap WMS raster · visual verification only</small>
+                </div>
+              </div>
+              <p className="data-note">This panel explains the observed event context. It does not calculate exposure until vector Flood Extent is available.</p>
             </div>
             <div className="scenario-section">
               <div className="scenario-title">

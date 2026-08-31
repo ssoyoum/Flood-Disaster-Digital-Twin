@@ -29,7 +29,9 @@ def test_osong_layers_use_processed_files():
     response = client.get("/api/events/osong-2023/layers")
     assert response.status_code == 200
     layers = response.json()
-    assert layers["aoi"]["feature_count"] == 2
+    assert layers["aoi"]["feature_count"] == 1
+    assert layers["aoi"]["source_type"] == "OFFICIAL_ADMIN_BOUNDARY"
+    assert layers["aoi"]["snapshot"] == "2023"
     assert layers["buildings"]["feature_count"] > 0
     assert layers["buildings"]["source_type"] == "OFFICIAL_BUILDING_INTEGRATED_INFORMATION"
     assert layers["buildings"]["snapshot"] == "2023-07-12"
@@ -62,8 +64,14 @@ def test_osong_status_separates_source_types():
     assert response.status_code == 200
     status = response.json()
     assert status["flood_extent"]["status"] == "TEMPORARY"
+    assert status["safemap_floodmarks"]["status"] == "VERIFIED"
+    assert status["safemap_floodmarks"]["source_type"] == "OFFICIAL_WMS_SNAPSHOT"
+    assert status["safemap_floodmarks"]["data_vintage"] == "2024 collection"
     assert status["rainfall"]["source_type"] == "OBSERVATION"
     assert status["rainfall"]["status"] == "VERIFIED"
+    assert status["water_level"]["source_type"] == "OBSERVATION"
+    assert status["water_level"]["status"] == "VERIFIED"
+    assert status["water_level"]["records"] == 1299
     assert status["population"]["status"] == "VERIFIED"
     assert status["dem"]["source_type"] == "DEM"
     assert status["dem"]["low_elevation_feature_count"] == 303
@@ -90,9 +98,20 @@ def test_osong_summary_does_not_calculate_exposure_without_flood_extent():
     assert summary["terrain_low_elevation_cells"] == 303
     assert summary["terrain_low_elevation_threshold_m"] == 30.03
     assert summary["rainfall_records"] == 144
+    assert summary["rainfall_peak_mm_per_hour"] is not None
+    assert summary["water_level_peak_m"] is not None
+    assert summary["primary_water_level_peak_m"] is not None
     assert summary["underpass_available"] is True
+    assert summary["safemap_floodmarks_available"] is True
     assert summary["exposed_population"] == "PENDING_FLOOD_EXTENT"
     assert summary["exposed_buildings"] == "PENDING_FLOOD_EXTENT"
+
+
+def test_osong_safemap_wms_snapshot_serves_local_png():
+    response = client.get("/api/events/osong-2023/flood/safemap-wms-snapshot.png")
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "image/png"
+    assert response.content.startswith(b"\x89PNG")
 
 
 def test_baseline_uses_pending_exposure_metrics():
