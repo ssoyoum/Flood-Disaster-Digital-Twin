@@ -1,0 +1,871 @@
+{
+  "DSSP-IF-00117": {
+    "dataset_id": "DSSP-IF-00117",
+    "record_count": 38003,
+    "field_count": 14,
+    "fields": [
+      "FLDN_AREA",
+      "FLDN_BGNG_TM",
+      "FLDN_BGNG_YMD",
+      "FLDN_CS_DTL_NM",
+      "FLDN_DOWA",
+      "FLDN_DST_NM",
+      "FLDN_END_TM",
+      "FLDN_END_YMD",
+      "FLDN_GRD",
+      "FLDN_YR",
+      "GEOM",
+      "SN",
+      "STDG_CTPV_CD",
+      "STDG_SGG_CD"
+    ],
+    "year_field": "FLDN_YR",
+    "year_counts_top": {
+      "2022": 11703,
+      "2020": 6637,
+      "2006": 3807,
+      "2017": 3532,
+      "2012": 1946,
+      "2013": 1488,
+      "2011": 1485,
+      "2021": 1232,
+      "2009": 1124,
+      "2019": 903,
+      "2018": 893,
+      "2010": 845,
+      "2016": 581,
+      "2007": 419,
+      "2014": 401,
+      "2008": 392,
+      "2002": 312,
+      "외": 257,
+      "2003": 21,
+      "2005": 19,
+      "2015": 6
+    },
+    "region_fields": [
+      "STDG_CTPV_CD",
+      "STDG_SGG_CD"
+    ],
+    "date_fields": [
+      "FLDN_BGNG_YMD",
+      "FLDN_END_YMD"
+    ],
+    "text_fields": [
+      "FLDN_DST_NM",
+      "FLDN_CS_DTL_NM"
+    ],
+    "keyword_hit_count": 3,
+    "keyword_hit_year_counts": {
+      "2018": 3
+    },
+    "keyword_hit_samples": [
+      {
+        "FLDN_YR": "2018",
+        "STDG_CTPV_CD": "41",
+        "STDG_SGG_CD": "41570",
+        "FLDN_BGNG_YMD": "20180828",
+        "FLDN_END_YMD": "20180901",
+        "FLDN_DST_NM": "2018년 집중호우",
+        "FLDN_CS_DTL_NM": "지하차도 상부도로의 범람으로 지하차도 경사로를 통행 빗물 대량으로 유입. 집수정 배전반 침수로 인하여 배수펌프 6대중 3대 작동 정지되어 우수 펌핑 지난"
+      },
+      {
+        "FLDN_YR": "2018",
+        "STDG_CTPV_CD": "41",
+        "STDG_SGG_CD": "41570",
+        "FLDN_BGNG_YMD": "20180828",
+        "FLDN_END_YMD": "20180901",
+        "FLDN_DST_NM": "2018년 집중호우",
+        "FLDN_CS_DTL_NM": "지하차도 상부도로의 범람으로 지하차도 경사로를 통행 빗물 대량으로 유입. 집수정 배전반 침수로 인하여 배수펌프 6대중 3대 작동 정지되어 우수 펌핑 지난"
+      },
+      {
+        "FLDN_YR": "2018",
+        "STDG_CTPV_CD": "41",
+        "STDG_SGG_CD": "41570",
+        "FLDN_BGNG_YMD": "20180828",
+        "FLDN_END_YMD": "20180901",
+        "FLDN_DST_NM": "2018년 집중호우",
+        "FLDN_CS_DTL_NM": "지하차도 상부도로의 범람으로 지하차도 경사로를 통행 빗물 대량으로 유입. 집수정 배전반 침수로 인하여 배수펌프 6대중 3대 작동 정지되어 우수 펌핑 지난"
+      }
+    ],
+    "code_hit_count": 972,
+    "code_hit_year_counts": {
+      "2017": 752,
+      "2018": 47,
+      "2020": 35,
+      "2006": 24,
+      "2012": 21,
+      "2022": 21,
+      "2016": 12,
+      "2021": 10,
+      "2011": 9,
+      "2019": 8,
+      "2008": 8,
+      "2007": 6,
+      "2013": 5,
+      "2009": 5,
+      "외": 4,
+      "2010": 2,
+      "2002": 1,
+      "2014": 1,
+      "2003": 1
+    },
+    "code_hit_samples": [
+      {
+        "FLDN_YR": "2002",
+        "STDG_CTPV_CD": "47",
+        "STDG_SGG_CD": "47130",
+        "FLDN_BGNG_YMD": "20020831",
+        "FLDN_END_YMD": "20020901",
+        "FLDN_DST_NM": "2002년도 제 15호태풍 루사 집중호우",
+        "FLDN_CS_DTL_NM": "농경지 침수 및 농작물 피해, 하우스 파손"
+      },
+      {
+        "FLDN_YR": "2012",
+        "STDG_CTPV_CD": "47",
+        "STDG_SGG_CD": "47150",
+        "FLDN_BGNG_YMD": "20120917",
+        "FLDN_END_YMD": "20120918",
+        "FLDN_DST_NM": "16호태풍산바에의한침수",
+        "FLDN_CS_DTL_NM": "제방붕기및하천범람"
+      },
+      {
+        "FLDN_YR": "2012",
+        "STDG_CTPV_CD": "46",
+        "STDG_SGG_CD": "46130",
+        "FLDN_BGNG_YMD": "20120917",
+        "FLDN_END_YMD": "20120917",
+        "FLDN_DST_NM": "2012년 태풍'산바' 침수 피해",
+        "FLDN_CS_DTL_NM": "만조위시 집중 호우에 의한 침수"
+      },
+      {
+        "FLDN_YR": "2012",
+        "STDG_CTPV_CD": "46",
+        "STDG_SGG_CD": "46130",
+        "FLDN_BGNG_YMD": "20120917",
+        "FLDN_END_YMD": "20120918",
+        "FLDN_DST_NM": "2012년 태풍'산바' 침수 피해",
+        "FLDN_CS_DTL_NM": "만조위시 집중호우 침수 피해"
+      },
+      {
+        "FLDN_YR": "2012",
+        "STDG_CTPV_CD": "46",
+        "STDG_SGG_CD": "46130",
+        "FLDN_BGNG_YMD": "20120917",
+        "FLDN_END_YMD": "20120918",
+        "FLDN_DST_NM": "2012년 태풍'산바' 침수 피해",
+        "FLDN_CS_DTL_NM": "만조위시 집중호우 침수 피해"
+      },
+      {
+        "FLDN_YR": "2012",
+        "STDG_CTPV_CD": "45",
+        "STDG_SGG_CD": "45130",
+        "FLDN_BGNG_YMD": "20120812",
+        "FLDN_END_YMD": "20120813",
+        "FLDN_DST_NM": "군산집중호우",
+        "FLDN_CS_DTL_NM": "국지성호우"
+      },
+      {
+        "FLDN_YR": "2012",
+        "STDG_CTPV_CD": "45",
+        "STDG_SGG_CD": "45140",
+        "FLDN_BGNG_YMD": "20120813",
+        "FLDN_END_YMD": "20120814",
+        "FLDN_DST_NM": "2012년 국지성 집중호우",
+        "FLDN_CS_DTL_NM": "탑천과 기양천의 범람"
+      },
+      {
+        "FLDN_YR": "2012",
+        "STDG_CTPV_CD": "45",
+        "STDG_SGG_CD": "45130",
+        "FLDN_BGNG_YMD": "20120812",
+        "FLDN_END_YMD": "20120813",
+        "FLDN_DST_NM": "군산집중호우",
+        "FLDN_CS_DTL_NM": "국지성호우"
+      },
+      {
+        "FLDN_YR": "2012",
+        "STDG_CTPV_CD": "46",
+        "STDG_SGG_CD": "46130",
+        "FLDN_BGNG_YMD": "20120917",
+        "FLDN_END_YMD": "20120918",
+        "FLDN_DST_NM": "2012년태풍'산바'침수피해",
+        "FLDN_CS_DTL_NM": "만조위시 집중호우로 인한 침수"
+      },
+      {
+        "FLDN_YR": "2012",
+        "STDG_CTPV_CD": "50",
+        "STDG_SGG_CD": "50130",
+        "FLDN_BGNG_YMD": "20120827",
+        "FLDN_END_YMD": "20120828",
+        "FLDN_DST_NM": "태풍'볼라벤'으로 인한 침수",
+        "FLDN_CS_DTL_NM": "지대가 낮아 도로및 주위 높은 지대에서 우수유입"
+      }
+    ],
+    "july_2023_hit_count": 0,
+    "july_2023_samples": [],
+    "geometry_field": "GEOM",
+    "geometry_bbox_tests": {
+      "EPSG:3857": {
+        "bbox_intersection_count": 516,
+        "year_counts": {
+          "2017": 503,
+          "2012": 6,
+          "2016": 3,
+          "2022": 2,
+          "2019": 1,
+          "2020": 1
+        },
+        "sample": [
+          {
+            "FLDN_YR": "2016",
+            "STDG_CTPV_CD": "43",
+            "STDG_SGG_CD": "43113",
+            "FLDN_BGNG_YMD": "20160704",
+            "FLDN_END_YMD": "20160705",
+            "FLDN_DST_NM": "7.1~7.7까지호우",
+            "FLDN_CS_DTL_NM": "집중호우"
+          },
+          {
+            "FLDN_YR": "2016",
+            "STDG_CTPV_CD": "43",
+            "STDG_SGG_CD": "43113",
+            "FLDN_BGNG_YMD": "20160704",
+            "FLDN_END_YMD": "20160704",
+            "FLDN_DST_NM": "7.1~7.7까지호우",
+            "FLDN_CS_DTL_NM": "집중호"
+          },
+          {
+            "FLDN_YR": "2016",
+            "STDG_CTPV_CD": "43",
+            "STDG_SGG_CD": "43113",
+            "FLDN_BGNG_YMD": "20160704",
+            "FLDN_END_YMD": "20160705",
+            "FLDN_DST_NM": "7.1~7.7까지호우",
+            "FLDN_CS_DTL_NM": "집중호우"
+          },
+          {
+            "FLDN_YR": "2017",
+            "STDG_CTPV_CD": "36",
+            "STDG_SGG_CD": "36110",
+            "FLDN_BGNG_YMD": "20170716",
+            "FLDN_END_YMD": "20170716",
+            "FLDN_DST_NM": "2017년 집중호우에 따른 침수",
+            "FLDN_CS_DTL_NM": "집중호우에 따른 침수"
+          },
+          {
+            "FLDN_YR": "2017",
+            "STDG_CTPV_CD": "36",
+            "STDG_SGG_CD": "36110",
+            "FLDN_BGNG_YMD": "20170716",
+            "FLDN_END_YMD": "20170716",
+            "FLDN_DST_NM": "여름철집중호우에따른침수피해",
+            "FLDN_CS_DTL_NM": "집중호우에따른침수피해"
+          }
+        ]
+      },
+      "EPSG:5179": {
+        "bbox_intersection_count": 0,
+        "year_counts": {},
+        "sample": []
+      },
+      "EPSG:5186": {
+        "bbox_intersection_count": 0,
+        "year_counts": {},
+        "sample": []
+      }
+    }
+  },
+  "DSSP-IF-10175": {
+    "dataset_id": "DSSP-IF-10175",
+    "record_count": 48050,
+    "field_count": 36,
+    "fields": [
+      "CTY_FLDN_AREA",
+      "CTY_FLSU_AREA",
+      "CTY_NODR_AREA",
+      "DAM_FACTR_CD",
+      "DAM_HM",
+      "DAM_RGN_DADDR",
+      "DAM_RGN_DONG_CD",
+      "DAM_RGN_MNLNO",
+      "DAM_RGN_RONA_ADDR_CD",
+      "DAM_RGN_RONA_DADDR",
+      "DAM_RGN_STDG_CD",
+      "DAM_RGN_SUBLOTNO",
+      "DMG_YMD",
+      "FILD_FLDN_AREA",
+      "FILD_FLSU_AREA",
+      "FILD_NODR_AREA",
+      "FLDN_BGNG_HM",
+      "FLDN_BGNG_YMD",
+      "FLDN_BLDG_CNT",
+      "FLDN_EXPC_FNTN",
+      "FLDN_EXPC_HR",
+      "FLDN_SN",
+      "FLSU_BLDG_CNT",
+      "FLSU_EXPC_HM",
+      "FLSU_EXPC_YMD",
+      "FRST_REG_DT",
+      "LAST_MDFCN_DT",
+      "MSTN_SN",
+      "MSTN_YR",
+      "NDMS_MSTN_TYPE_CD",
+      "NODR_BLDG_CNT",
+      "PDY_FLDN_AREA",
+      "PDY_FLSU_AREA",
+      "PDY_NODR_AREA",
+      "RGN_CD",
+      "VLD_DTIN_SPTR"
+    ],
+    "year_field": "MSTN_YR",
+    "year_counts_top": {
+      "2003": 20700,
+      "2005": 11433,
+      "2004": 8910,
+      "2006": 3615,
+      "2009": 844,
+      "2007": 751,
+      "2011": 630,
+      "2010": 353,
+      "2012": 261,
+      "2008": 234,
+      "2018": 121,
+      "2016": 70,
+      "2019": 26,
+      "2020": 26,
+      "2024": 24,
+      "2022": 14,
+      "2013": 10,
+      "2017": 9,
+      "2025": 7,
+      "2026": 4,
+      "2014": 4,
+      "2015": 2,
+      "2021": 2
+    },
+    "region_fields": [
+      "RGN_CD",
+      "DAM_RGN_DONG_CD",
+      "DAM_RGN_STDG_CD"
+    ],
+    "date_fields": [
+      "DMG_YMD",
+      "FLDN_BGNG_YMD",
+      "FLSU_EXPC_YMD"
+    ],
+    "text_fields": [
+      "DAM_RGN_DADDR",
+      "DAM_RGN_RONA_DADDR"
+    ],
+    "keyword_hit_count": 44,
+    "keyword_hit_year_counts": {
+      "2003": 14,
+      "2005": 9,
+      "2007": 8,
+      "2006": 6,
+      "2004": 3,
+      "2010": 2,
+      "2008": 1,
+      "2012": 1
+    },
+    "keyword_hit_samples": [
+      {
+        "MSTN_YR": "2004",
+        "RGN_CD": "2911000000",
+        "DAM_RGN_DONG_CD": "2911052500",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": "궁동 56-3번지 수미호텔,수미다방지하",
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2004",
+        "RGN_CD": "2911000000",
+        "DAM_RGN_DONG_CD": "2911052500",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": "궁동 56-3번지 수미호텔,수미다방지하",
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2007",
+        "RGN_CD": "2726000000",
+        "DAM_RGN_DONG_CD": "2726069000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": "사월지하차도",
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2004",
+        "RGN_CD": "2911000000",
+        "DAM_RGN_DONG_CD": "2911052500",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": "궁동 56-3번지 수미호텔,수미다방지하",
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2007",
+        "RGN_CD": "2726000000",
+        "DAM_RGN_DONG_CD": "2726069000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": "매호지하차도",
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2007",
+        "RGN_CD": "2726000000",
+        "DAM_RGN_DONG_CD": "2726069000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": "사월지하차도",
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2007",
+        "RGN_CD": "2726000000",
+        "DAM_RGN_DONG_CD": "2726069000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": "매호지하차도",
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2003",
+        "RGN_CD": "3171000000",
+        "DAM_RGN_DONG_CD": "3171037000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": "미호리 상동마을",
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2003",
+        "RGN_CD": "4617000000",
+        "DAM_RGN_DONG_CD": "4617033000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": "흥덕리",
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2003",
+        "RGN_CD": "4831000000",
+        "DAM_RGN_DONG_CD": "4831036000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": "1395 이오송",
+        "DAM_RGN_RONA_DADDR": null
+      }
+    ],
+    "code_hit_count": 28,
+    "code_hit_year_counts": {
+      "2004": 13,
+      "2005": 8,
+      "2003": 3,
+      "2006": 2,
+      "2013": 2
+    },
+    "code_hit_samples": [
+      {
+        "MSTN_YR": "2004",
+        "RGN_CD": "4311000000",
+        "DAM_RGN_DONG_CD": "4311376000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": null,
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2004",
+        "RGN_CD": "4311000000",
+        "DAM_RGN_DONG_CD": "4311377000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": null,
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2004",
+        "RGN_CD": "4311000000",
+        "DAM_RGN_DONG_CD": "4311376000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": null,
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2004",
+        "RGN_CD": "4311000000",
+        "DAM_RGN_DONG_CD": "4311376000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": null,
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2004",
+        "RGN_CD": "4311000000",
+        "DAM_RGN_DONG_CD": "4311376000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": null,
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2004",
+        "RGN_CD": "4311000000",
+        "DAM_RGN_DONG_CD": "4311376000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": null,
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2004",
+        "RGN_CD": "4311000000",
+        "DAM_RGN_DONG_CD": "4311376000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": null,
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2004",
+        "RGN_CD": "4311000000",
+        "DAM_RGN_DONG_CD": "4311376000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": null,
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2003",
+        "RGN_CD": "4311000000",
+        "DAM_RGN_DONG_CD": "4311376000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": null,
+        "DAM_RGN_RONA_DADDR": null
+      },
+      {
+        "MSTN_YR": "2004",
+        "RGN_CD": "4311000000",
+        "DAM_RGN_DONG_CD": "4311376000",
+        "DAM_RGN_STDG_CD": null,
+        "DMG_YMD": null,
+        "FLDN_BGNG_YMD": null,
+        "FLSU_EXPC_YMD": null,
+        "DAM_RGN_DADDR": null,
+        "DAM_RGN_RONA_DADDR": null
+      }
+    ],
+    "july_2023_hit_count": 0,
+    "july_2023_samples": []
+  },
+  "DSSP-IF-10184": {
+    "dataset_id": "DSSP-IF-10184",
+    "record_count": 39188,
+    "field_count": 21,
+    "fields": [
+      "ATCH_FILE_ID",
+      "DAM_CS_CN",
+      "DAM_DT",
+      "DCSD_CNT",
+      "DEL_YN",
+      "ETC_NOPE",
+      "EVPE_DSSTR_ETC",
+      "FRST_REG_DT",
+      "FRST_RGTR_ID",
+      "INJPSN_CNT",
+      "LAST_MDFCN_DT",
+      "LAST_MDFR_ID",
+      "MSTN_SN",
+      "MSTN_YR",
+      "NDMS_MSTN_TYPE_CD",
+      "RPTP_NO",
+      "SITU_RPT_MNG_NO",
+      "SLGN_ACTV_STTS_ETC",
+      "STDG_CD",
+      "STRG_YN",
+      "UTRH_STTS_ETC"
+    ],
+    "year_field": "MSTN_YR",
+    "year_counts_top": {
+      "2023": 7397,
+      "2025": 6203,
+      "2024": 5719,
+      "2020": 5634,
+      "2022": 3999,
+      "2018": 3312,
+      "2026": 3234,
+      "2021": 2696,
+      "2019": 992,
+      "2017": 2
+    },
+    "region_fields": [
+      "STDG_CD"
+    ],
+    "date_fields": [
+      "DAM_DT"
+    ],
+    "text_fields": [
+      "DAM_CS_CN",
+      "EVPE_DSSTR_ETC",
+      "SLGN_ACTV_STTS_ETC",
+      "UTRH_STTS_ETC"
+    ],
+    "keyword_hit_count": 125,
+    "keyword_hit_year_counts": {
+      "2023": 47,
+      "2026": 30,
+      "2024": 21,
+      "2025": 16,
+      "2022": 4,
+      "2018": 3,
+      "2019": 2,
+      "2021": 2
+    },
+    "keyword_hit_samples": [
+      {
+        "MSTN_YR": "2018",
+        "STDG_CD": "4311",
+        "DAM_DT": "20180430090000",
+        "DAM_CS_CN": "청주지역 지진발생",
+        "EVPE_DSSTR_ETC": null,
+        "SLGN_ACTV_STTS_ETC": null,
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2018",
+        "STDG_CD": "4311",
+        "DAM_DT": "20180329090000",
+        "DAM_CS_CN": "2018. 3. 29.(목) 09시 현재 청주지역 산불 발생으로 인한 인근 마을주택 전소",
+        "EVPE_DSSTR_ETC": null,
+        "SLGN_ACTV_STTS_ETC": null,
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2026",
+        "STDG_CD": "4311",
+        "DAM_DT": "20260418210000",
+        "DAM_CS_CN": "4.13. 충청북도 청주시 봉명동(봉명2송정동) 가스 폭발로 인한 재해 발생",
+        "EVPE_DSSTR_ETC": null,
+        "SLGN_ACTV_STTS_ETC": null,
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2018",
+        "STDG_CD": "4311",
+        "DAM_DT": "20180904000000",
+        "DAM_CS_CN": "9. 3. 호우로 인한 침수우려",
+        "EVPE_DSSTR_ETC": "* 인적사항\n- 장실자(본인), 김상건(자), 노사연(며느리), 김준영(손자), 김민지(손자) / 주소 : 청주시 청원구 2순환로446번길 16\n- 최인희(본인), 김건수(남편), 김창남(자) / 주소 : 청주시 청원구 우암로10번길 67\n->2세대 모두 9. 4.(화) 07:00 귀가조치",
+        "SLGN_ACTV_STTS_ETC": null,
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2019",
+        "STDG_CD": "46170",
+        "DAM_DT": "20190626150000",
+        "DAM_CS_CN": "0",
+        "EVPE_DSSTR_ETC": null,
+        "SLGN_ACTV_STTS_ETC": "<여름철 장마로 인한 집중호우>\n(상황)\n- 전남 영광군 영광읍 월현로 지역일대가 여름철 장마 집중호우의 영향으로 주택, 상가 및 아파트 지하주차장 등 침수 피해 발생\n- 주택 10여채(이재민 10세대 30명 발생), 상사 5동, 지하주차장 2곳 및 지하차도 1곳 침수로 인해 이재민 및 부상자 등 발생\n- 주민 대피에 따른 취사,응급구호세트와 침수지역 양수작업 및 복구작업에 필요한 수중펌프 및 화물트럭 등의 재난관리자원 투입이 필요\n\n* 응원(부족) 자원 : 장비 1(화물트럭 1)\n* 승인기관 : 나주시\n* 집결지 : 영광스포티움",
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2019",
+        "STDG_CD": "36110",
+        "DAM_DT": "20190626000000",
+        "DAM_CS_CN": "훈련",
+        "EVPE_DSSTR_ETC": null,
+        "SLGN_ACTV_STTS_ETC": "부족자원 : 응급구호세트(4), 취사구호세트(4) 청주시에 DRSS 시스템 활용하여 응원요청 ",
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2021",
+        "STDG_CD": "45790",
+        "DAM_DT": "20210824100000",
+        "DAM_CS_CN": "태풍 오마이스로 인한 호우로 낮은 지대에 있는 집의 일부가 침수됨",
+        "EVPE_DSSTR_ETC": "흥덕면(1세대) :집의 일부(거실)만 침수되어 대피하지 않은 상태에서 물이 빠짐, 가전기구 피해로 인해 사유재산피해 신고함\n신림면(2세대) : 법지리-집 마당까지 침수되었다가 물이 빠짐./ 평월리-집의 일부가 침수되었다가 물이 빠짐.",
+        "SLGN_ACTV_STTS_ETC": "흥덕면 : 집의 일부(거실)만 침수되어 대피하지 않은 상태에서 물이 빠짐, 가전기구 피해로 인해 사유재산피해 신고함\n신림면 : 일반물자 전달(2세대)",
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2021",
+        "STDG_CD": "45790",
+        "DAM_DT": "20210824100000",
+        "DAM_CS_CN": "태풍 오마이스로 인한 호우로 낮은 지대에 있는 집의 일부가 침수됨",
+        "EVPE_DSSTR_ETC": "흥덕면(1세대) :집의 일부(거실)만 침수되어 대피하지 않은 상태에서 물이 빠짐, 가전기구 피해로 인해 사유재산피해 신고함\n신림면(2세대) : 법지리-집 마당까지 침수되었다가 물이 빠짐./ 평월리-집의 일부가 침수되었다가 물이 빠짐.",
+        "SLGN_ACTV_STTS_ETC": "흥덕면 : 집의 일부(거실)만 침수되어 대피하지 않은 상태에서 물이 빠짐, 가전기구 피해로 인해 사유재산피해 신고함\n신림면 : 일반물자 전달(2세대)",
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2022",
+        "STDG_CD": "4311",
+        "DAM_DT": "20220525093000",
+        "DAM_CS_CN": "2022년 5월 25일 9시 30분, 03시부터 내린 집중호우로 청주시 일원 하천 범람",
+        "EVPE_DSSTR_ETC": null,
+        "SLGN_ACTV_STTS_ETC": null,
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2022",
+        "STDG_CD": "4311",
+        "DAM_DT": "20220525093000",
+        "DAM_CS_CN": "2022년 5월 25일 9시 30분, 03시부터 내린 집중호우로 청주시 일원 하천 범람",
+        "EVPE_DSSTR_ETC": "일시 대피자 귀가",
+        "SLGN_ACTV_STTS_ETC": null,
+        "UTRH_STTS_ETC": null
+      }
+    ],
+    "code_hit_count": 1,
+    "code_hit_year_counts": {
+      "2025": 1
+    },
+    "code_hit_samples": [
+      {
+        "MSTN_YR": "2025",
+        "STDG_CD": "27720",
+        "DAM_DT": "20250311130000",
+        "DAM_CS_CN": "산불",
+        "EVPE_DSSTR_ETC": null,
+        "SLGN_ACTV_STTS_ETC": null,
+        "UTRH_STTS_ETC": null
+      }
+    ],
+    "july_2023_hit_count": 2386,
+    "july_2023_samples": [
+      {
+        "MSTN_YR": "2023",
+        "STDG_CD": "47210",
+        "DAM_DT": "20230714000000",
+        "DAM_CS_CN": null,
+        "EVPE_DSSTR_ETC": "7.14 11:10 부석면 남대리 주택침수로 1가구2명 대피",
+        "SLGN_ACTV_STTS_ETC": null,
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2023",
+        "STDG_CD": "44180",
+        "DAM_DT": "20230714043700",
+        "DAM_CS_CN": "- 보령시 웅천읍 대창리 375-21 축대 유실 \n- 7.15일 호우",
+        "EVPE_DSSTR_ETC": "- 발생보고: 충청남도 보령시 청라면 장현리 2세대 2명: 7.16 09:00 토사물 주택 침하로 장현1리 마을회관으로 대피.\n ",
+        "SLGN_ACTV_STTS_ETC": "7.14 보령시 응급구호 3세트(남1, 여2)지원 \n7.15 응급구호세트 15개 지원 (남5, 여10)지원\n7.15 응급구호세트 11개 지원(남5, 여6)지원",
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2023",
+        "STDG_CD": "47280",
+        "DAM_DT": "20230714220000",
+        "DAM_CS_CN": "발생보고 : 문경시 산북면 내화리 15세대 25명 / 7월 14일 22경 하천범람 우려 / 금산문화센터로 일시대피\n",
+        "EVPE_DSSTR_ETC": null,
+        "SLGN_ACTV_STTS_ETC": null,
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2023",
+        "STDG_CD": "11410",
+        "DAM_DT": "20230713000000",
+        "DAM_CS_CN": "<3보> 20세대 46명\n대상자 정보 미파악 2가구, 4명\n홍제천로 16-40 연희빌라 5세대 12명: 4세대 10명은 준모텔로 대피 7월 13일 22시경 대피, 1세대 2명 대피 거부 설득중\n홍제천로 16-44(1층) 1세대 3명: 친척집 이동 22시경\n홍제천로 2길 10-8 1세대 3명: 청자모텔 대피 7월 13일 22시경\n홍제천로 16-23 이안휴빌 13세대 29명 : 7월 13일 22시경 청자모텔 대피 5세대 13명, 4세대 12명 친척집 및 지인집으로 대피, 발리모텔 1세대 1명, 카푸치노모텔 1세대 2명, 연희모텔 1세대 1명\n",
+        "EVPE_DSSTR_ETC": "이주거부가구 1세대 2명. 고령의 어르신으로 이주를 거부하심. 계속 설득중",
+        "SLGN_ACTV_STTS_ETC": null,
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2023",
+        "STDG_CD": "41670",
+        "DAM_DT": "20230713150000",
+        "DAM_CS_CN": "집중호우 대비 산북면 주어리 주택침수 우려로 주어리 주민 9세대 13명 산북면 주어리 마을회관 일시대피",
+        "EVPE_DSSTR_ETC": "*발생보고 : 7.13. 14:00~16:30경 산북면 주어리 9세대 13명 주택침수 우려, 산사태 우려로 주어리 마을회관 일시대피\n*귀가보고 : 7.13. 23:00경 주어리마을회관 일시대피자 9세대 13명 귀가 완료",
+        "SLGN_ACTV_STTS_ETC": "기타물품 : 매트리스 6개",
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2023",
+        "STDG_CD": "51750",
+        "DAM_DT": "20230714233000",
+        "DAM_CS_CN": "산사태",
+        "EVPE_DSSTR_ETC": null,
+        "SLGN_ACTV_STTS_ETC": null,
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2023",
+        "STDG_CD": "41450",
+        "DAM_DT": "20230711000000",
+        "DAM_CS_CN": "7.9~ 호우",
+        "EVPE_DSSTR_ETC": "\n\n귀가보고 : 7.13. 17:30경 하남시 항동 258번지 소망의집(장애인복지시설) 시설침수우려로 노인복지관으로 사전대피한 1세대 19명, 7.14. 10:00 귀가완료\n* 아침식사(곰탕 27인분제공 11,000*27/ 일시대피자19명 및 소망의집 종사자 8명 27인분)\n",
+        "SLGN_ACTV_STTS_ETC": null,
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2023",
+        "STDG_CD": "47280",
+        "DAM_DT": "20230714220000",
+        "DAM_CS_CN": "발생보고 : 문경시 산북면 내화리 15세대 25명 / 7월 14일 22경 하천범람 우려 / 금산문화센터로 일시대피\n",
+        "EVPE_DSSTR_ETC": null,
+        "SLGN_ACTV_STTS_ETC": "텐트 15개 설치하여 일시대피자에게 제공",
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2023",
+        "STDG_CD": "47920",
+        "DAM_DT": "20230714000000",
+        "DAM_CS_CN": null,
+        "EVPE_DSSTR_ETC": "-7.14. 오전1리 10가구 22명 오전1리 저수지 월류로 마을회관으로 임시대피\n\n7.14 19:00 호우 대비 사전대피\n- 7.14 춘양면 석현2리 미래환경과학관으로 12세대 26명 일시대피\n- 7.14 상운면 가곡1리 마을회관으로 2세대 3명 일시대피\n- 7.14 상운면 문촌리 마을회관으로 1세대 1명 일시대피\n- 7.14 상운면 가곡3리 마을회관으로 5세대 6명 일시대피\n- 7.14 물야면 오록1리 마을회관으로 1세대 2명 일시대피\n-",
+        "SLGN_ACTV_STTS_ETC": "봉화군 물야면 오전리 1004-3번지\n7.14일 오전 10시경 오전저수지 만수위 발령으로 주택 침수 우려로 오전1리 마을회관에 10세대 22명 임시대피중\n7.14 (오전1리 마을회관) 일시대피자 석식 제공 (7.15 조식 제공 예정) \n",
+        "UTRH_STTS_ETC": null
+      },
+      {
+        "MSTN_YR": "2023",
+        "STDG_CD": "44180",
+        "DAM_DT": "20230714000000",
+        "DAM_CS_CN": "보령시 웅천읍 집중 호우로 인한 축대 유실 \n",
+        "EVPE_DSSTR_ETC": "- 발생위치: 충청남도 보령시 웅천읍 대창리 375-21\n- 대피인원: 8세대 14명\n- 대피일시: 2023. 7. 4. 04:40\n- 대피장소: 대창2리 마을회관\n",
+        "SLGN_ACTV_STTS_ETC": "- 상황 종료 후 일시대피자 8세대 14명 복귀 08:50",
+        "UTRH_STTS_ETC": null
+      }
+    ]
+  }
+}
