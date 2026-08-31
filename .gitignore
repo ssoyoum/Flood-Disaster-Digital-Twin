@@ -6,6 +6,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 *.tsbuildinfo
+.logs/
 data/interim/
 # Local source downloads are preserved outside Git; provenance lives in manifests.
 data/raw/
