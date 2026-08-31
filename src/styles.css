@@ -98,8 +98,10 @@ h2 { margin: 4px 0 0; font-size: 17px; letter-spacing: -.3px; }
 .layer-swatch.facilities { background: #e6a743; border-radius: 50%; }
 .layer-swatch.underpass { background: #d93f35; }
 .layer-swatch.flood_extent { background: #e76858; }
+.layer-swatch.safemap_floodmarks { background: #5b76df; }
 
 .legend-aoi { background: #7bb6b2; }
+.legend-floodmarks { background: #5b76df; }
 .legend-water { background: #2b8ec4; }
 .legend-terrain { background: #c9d05b; }
 .legend-building { background: #315c73; }

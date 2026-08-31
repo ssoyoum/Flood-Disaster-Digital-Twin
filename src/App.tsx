@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { type GeoJSONSource, type MapLayerMouseEvent, type Map as MapLibreMap, type Popup } from "maplibre-gl";
 import { Activity, AlertTriangle, Building2, Check, CloudRain, Factory, Layers3, MapPin, Mountain, Route, Waves } from "lucide-react";
 import * as api from "./api";
-import type { DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayerPayload, LayersResponse } from "./types";
+import type { DataStatusItem, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayerPayload, LayersResponse } from "./types";
 
 const emptyGeoJson: GeoJson = { type: "FeatureCollection", features: [] };
 
@@ -119,7 +119,17 @@ function Metric({ icon: Icon, label, value, note }: { icon: typeof Building2; la
   );
 }
 
-function MapPanel({ layers, visible }: { layers: LayersResponse; visible: Record<keyof LayersResponse, boolean> }) {
+function MapPanel({
+  layers,
+  visible,
+  safemapVisible,
+  safemapOverlay,
+}: {
+  layers: LayersResponse;
+  visible: Record<keyof LayersResponse, boolean>;
+  safemapVisible: boolean;
+  safemapOverlay?: DataStatusItem;
+}) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const hoverPopupRef = useRef<Popup | null>(null);
@@ -161,6 +171,28 @@ function MapPanel({ layers, visible }: { layers: LayersResponse; visible: Record
         paint: { "fill-color": "#c9d05b", "fill-opacity": 0.28 },
       });
       map.addLayer({ id: "terrain-line", type: "line", source: "terrain", paint: { "line-color": "#8d9430", "line-width": 0.6, "line-opacity": 0.45 } });
+
+      const bbox = safemapOverlay?.bbox;
+      const imageUrl = api.assetUrl(safemapOverlay?.image_url);
+      if (bbox && imageUrl) {
+        map.addSource("safemap-floodmarks", {
+          type: "image",
+          url: imageUrl,
+          coordinates: [
+            [bbox[0], bbox[3]],
+            [bbox[2], bbox[3]],
+            [bbox[2], bbox[1]],
+            [bbox[0], bbox[1]],
+          ],
+        });
+        map.addLayer({
+          id: "safemap-floodmarks-raster",
+          type: "raster",
+          source: "safemap-floodmarks",
+          layout: { visibility: safemapVisible ? "visible" : "none" },
+          paint: { "raster-opacity": 0.58 },
+        });
+      }
 
       map.addSource("waterways", { type: "geojson", data: layers.waterways.data as never });
       map.addLayer({ id: "waterways-fill", type: "fill", source: "waterways", paint: { "fill-color": "#2b8ec4", "fill-opacity": 0.28 } });
@@ -306,15 +338,19 @@ function MapPanel({ layers, visible }: { layers: LayersResponse; visible: Record
     [["aoi-fill", "aoi"], ["aoi-line", "aoi"], ["terrain-fill", "terrain"], ["terrain-line", "terrain"], ["waterways-fill", "waterways"], ["waterways-line", "waterways"], ["roads-line", "roads"], ["buildings-fill", "buildings"], ["buildings-line", "buildings"], ["facilities-point", "facilities"], ["underpass-line", "underpass"]].forEach(([layerId, key]) => {
       if (map.getLayer(layerId)) map.setLayoutProperty(layerId, "visibility", visibility(key as keyof LayersResponse));
     });
-  }, [visible]);
+    if (map.getLayer("safemap-floodmarks-raster")) {
+      map.setLayoutProperty("safemap-floodmarks-raster", "visibility", safemapVisible ? "visible" : "none");
+    }
+  }, [visible, safemapVisible]);
 
   return (
     <div className="map-panel">
       <div ref={mapContainer} className="map-canvas" />
       <div className="map-label"><span className="pulse-dot" /> Osong 2023 MVP | Online OSM basemap</div>
-      <div className="map-attribution">Basemap © OpenStreetMap contributors | Tiles: tile.openstreetmap.org | No API key | Current/live reference only</div>
+      <div className="map-attribution">Basemap © OpenStreetMap contributors | Flood marks © MOIS Safemap WMS | Current basemap is context only</div>
       <div className="map-legend">
         <div><i className="legend-aoi" />AOI</div>
+        <div><i className="legend-floodmarks" />Safemap flood marks</div>
         <div><i className="legend-terrain" />Low elevation context</div>
         <div><i className="legend-water" />Official river area</div>
         <div><i className="legend-road" />Road</div>
@@ -345,6 +381,7 @@ export default function App() {
     underpass: true,
     flood_extent: false,
   });
+  const [showSafemapFloodmarks, setShowSafemapFloodmarks] = useState(true);
 
   useEffect(() => {
     async function load() {
@@ -399,9 +436,14 @@ export default function App() {
       role: "Environmental Input",
     },
     {
-      source: "Flood Extent",
+      source: dataStatus?.safemap_floodmarks?.source ?? "Safemap Flood Marks WMS",
+      vintage: dataStatus?.safemap_floodmarks?.data_vintage ?? "NOT RECORDED",
+      role: "Hazard Layer / Visual Verification",
+    },
+    {
+      source: "Vector Flood Extent",
       vintage: vintageFromLayer(layers.flood_extent),
-      role: "Hazard Layer",
+      role: "Hazard Layer / Pending Vector Data",
     },
     {
       source: "Online Basemap",
@@ -452,8 +494,24 @@ export default function App() {
                   {layers[key].status !== "UNAVAILABLE" && <Check size={14} className="check-icon" />}
                 </label>
               ))}
+              <label className="layer-row">
+                <input
+                  type="checkbox"
+                  checked={showSafemapFloodmarks}
+                  onChange={(e) => setShowSafemapFloodmarks(e.target.checked)}
+                  disabled={dataStatus?.safemap_floodmarks?.status !== "VERIFIED"}
+                />
+                <span className="layer-swatch safemap_floodmarks" />
+                <span>
+                  <strong>Safemap Flood Marks</strong>
+                  <small>MOIS WMS Snapshot · {dataStatus?.safemap_floodmarks?.data_vintage ?? "NOT RECORDED"}</small>
+                  <small>visual verification only</small>
+                </span>
+                {dataStatus?.safemap_floodmarks?.status === "VERIFIED" && <Check size={14} className="check-icon" />}
+              </label>
               <div className="reference-layer-list">
-                <div><strong>Flood Extent</strong><small>{vintageFromLayer(layers.flood_extent)} · awaiting official dataset</small></div>
+                <div><strong>Vector Flood Extent</strong><small>{vintageFromLayer(layers.flood_extent)} · awaiting official vector dataset</small></div>
+                <div><strong>Safemap WMS Snapshot</strong><small>{dataStatus?.safemap_floodmarks?.data_vintage ?? "NOT RECORDED"} · not used for exposure counts</small></div>
                 <div><strong>Population</strong><small>KOSIS · {vintageFromStatus(dataStatus?.population)}</small></div>
                 <div><strong>DEM</strong><small>Copernicus · {vintageFromStatus(dataStatus?.dem)}</small></div>
               </div>
@@ -462,14 +520,14 @@ export default function App() {
             <section className="section-block">
               <div className="section-heading"><div><div className="eyebrow">DATA VINTAGE</div><h2>Provenance</h2></div></div>
               <div className="provenance-list">{provenanceItems.map((item) => <ProvenanceCard key={`${item.source}-${item.role}`} item={item} />)}</div>
-              <p className="data-note">Basemap is geographic context only and may differ from the selected analysis layer vintage. Flood Extent is awaiting official MOIS DSSP-IF-00117 data.</p>
+              <p className="data-note">Basemap is geographic context only and may differ from the selected analysis layer vintage. Safemap WMS is a raster snapshot for visual verification; exposure counts remain locked until vector Flood Extent is available.</p>
             </section>
           </div>
           <div className="sidebar-footer"><span>v0.1</span><span>External map tiles enabled</span></div>
         </aside>
 
         <section className="main-canvas">
-          <div className="map-wrap"><MapPanel layers={layers} visible={showLayers} /></div>
+          <div className="map-wrap"><MapPanel layers={layers} visible={showLayers} safemapVisible={showSafemapFloodmarks} safemapOverlay={dataStatus?.safemap_floodmarks} /></div>
           <div className="analysis-panel">
             <div className="analysis-head">
               <div><div className="eyebrow">BASELINE DATA</div><h1>Osong 2023 processed data connection</h1><p>{"Repository -> API -> React/Vite -> MapLibre using local files only."}</p></div>

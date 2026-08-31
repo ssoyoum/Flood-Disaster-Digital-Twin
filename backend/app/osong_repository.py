@@ -7,6 +7,8 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OSONG_DIR = REPO_ROOT / "data" / "processed" / "osong"
+SAFEMAP_WMS_SNAPSHOT = REPO_ROOT / "data" / "raw" / "flood_extent" / "osong" / "safemap_if_0092_wms" / "osong_bbox_4326_layers.png"
+SAFEMAP_WMS_BBOX = [127.275, 36.58, 127.365, 36.67]
 
 EMPTY_FEATURE_COLLECTION = {"type": "FeatureCollection", "features": []}
 
@@ -141,6 +143,7 @@ def _read_kma_rainfall(path: Path) -> dict[str, Any]:
         rows = list(csv.DictReader(handle))
     values = [float(row["rainfall_mm"]) for row in rows if row.get("rainfall_mm")]
     stations: dict[str, dict[str, Any]] = {}
+    peak_row = max(rows, key=lambda row: float(row["rainfall_mm"]) if row.get("rainfall_mm") else -1) if rows else None
     for row in rows:
         station_id = row.get("station_id")
         station_name = row.get("station_name")
@@ -164,8 +167,113 @@ def _read_kma_rainfall(path: Path) -> dict[str, Any]:
         "unit": "mm",
         "records": len(rows),
         "max_mm_per_hour": max(values) if values else None,
+        "peak_timestamp": peak_row["timestamp_kst"] if peak_row else None,
+        "peak_station_id": peak_row["station_id"] if peak_row else None,
+        "peak_station_name": peak_row["station_name"] if peak_row else None,
         "stations": list(stations.values()),
         "path": str(path.relative_to(REPO_ROOT)),
+    }
+
+
+def _read_water_level(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {
+            "status": "UNAVAILABLE",
+            "source": "Flood Control Office water-level observation",
+            "source_type": "OBSERVATION",
+            "records": 0,
+            "path": str(path.relative_to(REPO_ROOT)),
+        }
+
+    with path.open(encoding="utf-8-sig", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    values = [float(row["water_level_m"]) for row in rows if row.get("water_level_m")]
+    peak_row = max(rows, key=lambda row: float(row["water_level_m"]) if row.get("water_level_m") else -1) if rows else None
+    stations: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        station_id = row.get("station_id")
+        if not station_id:
+            continue
+        station = stations.setdefault(
+            station_id,
+            {
+                "station_id": station_id,
+                "station_name": row.get("station_name"),
+                "records": 0,
+                "max_water_level_m": None,
+                "peak_timestamp": None,
+            },
+        )
+        station["records"] += 1
+        if row.get("water_level_m"):
+            value = float(row["water_level_m"])
+            if station["max_water_level_m"] is None or value > station["max_water_level_m"]:
+                station["max_water_level_m"] = value
+                station["peak_timestamp"] = row.get("timestamp_kst")
+    return {
+        "status": "VERIFIED",
+        "source": "Flood Control Office water-level observation",
+        "source_type": "OBSERVATION",
+        "parameter": "water_level_m",
+        "period": "2023-07-14 00:00 through 2023-07-17 00:00 KST",
+        "unit": "m",
+        "records": len(rows),
+        "max_water_level_m": max(values) if values else None,
+        "peak_timestamp": peak_row["timestamp_kst"] if peak_row else None,
+        "peak_station_id": peak_row["station_id"] if peak_row else None,
+        "peak_station_name": peak_row["station_name"] if peak_row else None,
+        "stations": list(stations.values()),
+        "path": str(path.relative_to(REPO_ROOT)),
+    }
+
+
+def _build_hydromet_analysis(rainfall: dict[str, Any], water_level: dict[str, Any], dem: dict[str, Any], safemap: dict[str, Any]) -> dict[str, Any]:
+    rainfall_stations = rainfall.get("stations") or []
+    primary_water_station = next(
+        (station for station in water_level.get("stations") or [] if station.get("station_id") == "3011665"),
+        None,
+    )
+    max_rainfall_total = max((station.get("rainfall_total_mm", 0) for station in rainfall_stations), default=None)
+    return {
+        "title": "Observed rainfall and Miho River water-level context",
+        "status": "READY_WITH_RASTER_FLOODMARKS",
+        "summary": [
+            "KMA AWS rainfall and Flood Control Office water-level observations are connected for the 2023-07-14 to 2023-07-17 event window.",
+            "Safemap flood marks are visible as an official WMS raster overlay, but vector Flood Extent remains pending.",
+            "Exposure counts stay locked because the WMS snapshot is not final vector geometry.",
+        ],
+        "rainfall": {
+            "source": rainfall.get("source"),
+            "period": rainfall.get("period"),
+            "station_count": len(rainfall_stations),
+            "records": rainfall.get("records"),
+            "peak_mm_per_hour": rainfall.get("max_mm_per_hour"),
+            "peak_timestamp": rainfall.get("peak_timestamp"),
+            "peak_station_name": rainfall.get("peak_station_name"),
+            "max_station_total_mm": max_rainfall_total,
+            "stations": rainfall_stations,
+        },
+        "water_level": {
+            "source": water_level.get("source"),
+            "period": water_level.get("period"),
+            "station_count": len(water_level.get("stations") or []),
+            "records": water_level.get("records"),
+            "peak_m": water_level.get("max_water_level_m"),
+            "peak_timestamp": water_level.get("peak_timestamp"),
+            "peak_station_name": water_level.get("peak_station_name"),
+            "primary_station_peak_m": primary_water_station.get("max_water_level_m") if primary_water_station else None,
+            "primary_station_peak_timestamp": primary_water_station.get("peak_timestamp") if primary_water_station else None,
+        },
+        "terrain": {
+            "low_elevation_threshold_m": dem.get("low_elevation_threshold_m"),
+            "low_elevation_feature_count": dem.get("low_elevation_feature_count"),
+        },
+        "floodmarks": {
+            "source": safemap.get("source"),
+            "data_vintage": safemap.get("data_vintage"),
+            "status": safemap.get("status"),
+            "usage": "visual verification only",
+        },
     }
 
 
@@ -221,6 +329,39 @@ def _read_dem_summary(path: Path) -> dict[str, Any]:
     }
 
 
+def get_safemap_floodmarks_overlay() -> dict[str, Any]:
+    if not SAFEMAP_WMS_SNAPSHOT.exists():
+        return {
+            "key": "safemap_floodmarks",
+            "label": "Safemap Flood Marks WMS Snapshot",
+            "status": "UNAVAILABLE",
+            "source_type": "OFFICIAL_WMS_SNAPSHOT",
+            "source": "MOIS Safemap IF_0092_WMS",
+            "snapshot": "NOT RECORDED",
+            "data_vintage": "2024 collection",
+            "role": "Hazard Layer / visual verification only",
+            "path": str(SAFEMAP_WMS_SNAPSHOT.relative_to(REPO_ROOT)),
+            "bbox": SAFEMAP_WMS_BBOX,
+            "image_url": None,
+            "notes": "Safemap WMS snapshot is not vector geometry; do not use it for final exposure counts without vectorization or official vector data.",
+        }
+    return {
+        "key": "safemap_floodmarks",
+        "label": "Safemap Flood Marks WMS Snapshot",
+        "status": "VERIFIED",
+        "source_type": "OFFICIAL_WMS_SNAPSHOT",
+        "source": "MOIS Safemap IF_0092_WMS",
+        "snapshot": "2026-08-31 request snapshot; source page collection year 2024",
+        "data_vintage": "2024 collection",
+        "role": "Hazard Layer / visual verification only",
+        "path": str(SAFEMAP_WMS_SNAPSHOT.relative_to(REPO_ROOT)),
+        "bbox": SAFEMAP_WMS_BBOX,
+        "image_url": "/api/events/osong-2023/flood/safemap-wms-snapshot.png",
+        "image_size_bytes": SAFEMAP_WMS_SNAPSHOT.stat().st_size,
+        "notes": "Safemap WMS snapshot is not vector geometry; do not use it for final exposure counts without vectorization or official vector data.",
+    }
+
+
 def _osm_snapshot(year: int) -> str:
     return "2023-07-15T23:59:59Z" if year == 2023 else "2026-08-30"
 
@@ -237,12 +378,12 @@ def get_osong_repository(layer_year: int = 2023) -> dict[str, Any]:
     layers = {
         "aoi": _layer(
             "aoi",
-            "AOI administrative boundary",
-            OSONG_DIR / "osong_geoboundaries_adm2_aoi.geojson",
+            "Osong-eup administrative boundary",
+            OSONG_DIR / "osong_sgis_admin_boundary_2023.geojson",
             status="VERIFIED",
-            source_type="BOUNDARY_SNAPSHOT",
-            source="geoBoundaries ADM2 snapshot",
-            snapshot="2020",
+            source_type="OFFICIAL_ADMIN_BOUNDARY",
+            source="SGIS OpenAPI administrative boundary",
+            snapshot="2023",
         ),
         "buildings": _layer(
             "buildings",
@@ -314,7 +455,10 @@ def get_osong_repository(layer_year: int = 2023) -> dict[str, Any]:
 
     population = _read_population(OSONG_DIR / "osong_official_population_2023.csv")
     rainfall = _read_kma_rainfall(OSONG_DIR / "osong_kma_aws_rainfall_2023-07-14_17.csv")
+    water_level = _read_water_level(OSONG_DIR / "osong_hrfco_water_level_10m_2023-07-14_17.csv")
     dem = _read_dem_summary(OSONG_DIR / "osong_dem_summary.json")
+    safemap_floodmarks = get_safemap_floodmarks_overlay()
+    analysis = _build_hydromet_analysis(rainfall, water_level, dem, safemap_floodmarks)
 
     return {
         "event": {
@@ -331,18 +475,24 @@ def get_osong_repository(layer_year: int = 2023) -> dict[str, Any]:
             "origin": "DERIVED",
             "data_status": "Offline MVP using local processed Osong data. Flood Extent is TEMPORARY until official MOIS DSSP-IF-00117 data is approved.",
             "event_year": 2023,
-            "boundary_snapshot": "geoBoundaries ADM2 snapshot: 2020",
+            "boundary_snapshot": "SGIS administrative boundary snapshot: 2023",
             "flood_extent": layers["flood_extent"]["data"],
         },
         "layers": layers,
         "population": population,
         "rainfall": rainfall,
+        "water_level": water_level,
         "dem": dem,
+        "safemap_floodmarks": safemap_floodmarks,
+        "analysis": analysis,
         "data_status": {
             "flood_extent": layers["flood_extent"],
+            "safemap_floodmarks": safemap_floodmarks,
             "population": population,
             "rainfall": rainfall,
+            "water_level": water_level,
             "dem": dem,
+            "analysis": analysis,
             "layers": {key: {k: value for k, value in layer.items() if k != "data"} for key, layer in layers.items()},
         },
     }
@@ -374,9 +524,17 @@ def get_osong_summary() -> dict[str, Any]:
         "terrain_low_elevation_cells": layers["terrain"]["feature_count"],
         "terrain_low_elevation_threshold_m": repo["dem"].get("low_elevation_threshold_m"),
         "rainfall_peak_mm_per_hour": repo["rainfall"].get("max_mm_per_hour"),
+        "rainfall_peak_timestamp": repo["rainfall"].get("peak_timestamp"),
+        "rainfall_peak_station_name": repo["rainfall"].get("peak_station_name"),
         "rainfall_records": repo["rainfall"].get("records"),
+        "water_level_peak_m": repo["water_level"].get("max_water_level_m"),
+        "water_level_peak_timestamp": repo["water_level"].get("peak_timestamp"),
+        "water_level_peak_station_name": repo["water_level"].get("peak_station_name"),
+        "primary_water_level_peak_m": repo["analysis"]["water_level"].get("primary_station_peak_m"),
+        "primary_water_level_peak_timestamp": repo["analysis"]["water_level"].get("primary_station_peak_timestamp"),
         "facility_count": layers["facilities"]["feature_count"],
         "underpass_available": layers["underpass"]["feature_count"] > 0,
+        "safemap_floodmarks_available": repo["safemap_floodmarks"]["status"] == "VERIFIED",
         "flooded_area_km2": "PENDING_FLOOD_EXTENT",
         "exposed_population": "PENDING_FLOOD_EXTENT",
         "exposed_buildings": "PENDING_FLOOD_EXTENT",

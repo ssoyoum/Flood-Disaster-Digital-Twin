@@ -59,6 +59,12 @@ export type DataStatusItem = {
   source?: string;
   source_type?: string;
   snapshot?: string | null;
+  data_vintage?: string | null;
+  role?: string;
+  bbox?: [number, number, number, number];
+  image_url?: string | null;
+  image_size_bytes?: number;
+  notes?: string;
   period?: string | null;
   data_year?: number | null;
   unit?: string;
@@ -67,8 +73,10 @@ export type DataStatusItem = {
 
 export type DataStatusResponse = {
   flood_extent: LayerPayload;
+  safemap_floodmarks?: DataStatusItem;
   population: DataStatusItem;
   rainfall: DataStatusItem;
+  water_level?: DataStatusItem;
   dem: DataStatusItem & {
     min_elevation_m?: number;
     max_elevation_m?: number;
@@ -96,9 +104,17 @@ export type ExposureMetrics = {
   terrain_low_elevation_cells: number;
   terrain_low_elevation_threshold_m: number | null;
   rainfall_peak_mm_per_hour: number | null;
+  rainfall_peak_timestamp?: string | null;
+  rainfall_peak_station_name?: string | null;
   rainfall_records: number | null;
+  water_level_peak_m?: number | null;
+  water_level_peak_timestamp?: string | null;
+  water_level_peak_station_name?: string | null;
+  primary_water_level_peak_m?: number | null;
+  primary_water_level_peak_timestamp?: string | null;
   facility_count: number;
   underpass_available: boolean;
+  safemap_floodmarks_available?: boolean;
   flooded_area_km2: number | string;
   exposed_population: number | string;
   exposed_buildings: number | string;

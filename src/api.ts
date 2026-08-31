@@ -2,6 +2,12 @@ import type { DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersRe
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 
+export const assetUrl = (path?: string | null) => {
+  if (!path) return "";
+  if (/^https?:\/\//.test(path)) return path;
+  return `${API_BASE}${path}`;
+};
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, options);
   if (!response.ok) {

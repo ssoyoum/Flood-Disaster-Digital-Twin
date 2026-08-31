@@ -1,9 +1,10 @@
 import httpx
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from .data import EVENT_ID, EVENT_OBSERVATIONS, OBSERVATIONS, get_event, get_events, get_layers
-from .osong_repository import get_osong_data_status, get_osong_summary
+from .osong_repository import SAFEMAP_WMS_SNAPSHOT, get_osong_data_status, get_osong_summary
 from .schemas import Intervention, ScenarioRequest, ScenarioResult
 from .services import apply_intervention, calculate_baseline
 
@@ -71,6 +72,14 @@ def event_status(event_id: str):
 def flood(event_id: str):
     _require_event(event_id)
     return get_event(event_id)["flood_extent"]
+
+
+@app.get("/api/events/{event_id}/flood/safemap-wms-snapshot.png")
+def safemap_wms_snapshot(event_id: str):
+    _require_event(event_id)
+    if event_id != EVENT_ID or not SAFEMAP_WMS_SNAPSHOT.exists():
+        raise HTTPException(status_code=404, detail="Safemap WMS snapshot not found")
+    return FileResponse(SAFEMAP_WMS_SNAPSHOT, media_type="image/png")
 
 
 @app.get("/api/events/{event_id}/flood/timeline")
