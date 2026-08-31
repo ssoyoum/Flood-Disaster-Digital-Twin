@@ -1,5 +1,5 @@
 schema_version: "1.0"
-inventory_date: "2026-08-30"
+inventory_date: "2026-08-31"
 date_policy:
   data_year: "The year represented by the observation or event."
   source_updated_at: "The last modified date shown by the source portal."
@@ -186,28 +186,93 @@ osm:
 
 osong_flood_extent:
   source: "Ministry of the Interior and Safety / Disaster Safety Data Sharing Platform"
-  source_url: "https://www.safetydata.go.kr/disaster-data/totalSearch?query=%EC%B9%A8%EC%88%98"
+  source_url: "https://www.safetydata.go.kr/V2/api/DSSP-IF-00117"
   coverage: "2023 Osong, Cheongju, Chungcheongbuk-do"
   data_year: 2023
   event_date: "2023-07-15"
   dataset_id: "DSSP-IF-00117"
   source_type: "OFFICIAL_EVENT_DATA"
   data_role: "primary_event_source"
-  status: "BLOCKED_BY_API_APPROVAL"
-  local_file: null
+  status: "VERIFIED_SOURCE_ACQUIRED_NO_OSONG_2023_RECORD"
+  api_result_code: "00"
+  api_reported_total_count: 38003
+  raw_page_count: 39
+  raw_record_count: 38003
+  raw_pages_directory: "data/raw/flood_extent/osong/dssp_if_00117_pages/"
+  geometry_field: "GEOM"
+  geometry_format: "WKT"
+  raw_geometry_crs_inferred: "EPSG:3857"
+  processed_crs: "EPSG:4326"
+  processed_candidate_file: "data/processed/osong/osong_dssp_if_00117_2023_candidates.geojson"
+  processed_candidate_feature_count: 0
+  validation_report: "data/processed/osong/validation_report.json"
   notes:
-    - "The app has a service-key input and connection test, but the observed Osong footprint has not been downloaded yet."
+    - "The approved DSSP-IF-00117 API key works for this dataset, and the full 38,003-record API inventory was downloaded as paged raw JSON."
+    - "No records with FLDN_YR=2023 and Cheongju SGG code 43113 were present."
+    - "Do not connect this dataset as observed 2023 Osong Flood Extent unless a matching official record is obtained from another approved URL or portal export."
+
+osong_safemap_floodmarks_wms:
+  source: "MOIS Safemap / 생활안전지도"
+  source_url: "https://www.safemap.go.kr/opna/data/dataViewRenew.do?objtId=212"
+  wms_url: "https://www.safemap.go.kr/openapi2/IF_0092_WMS"
+  layer: "A2SM_FLUDMARKS"
+  coverage: "Osong bbox around Gungpyeong 2 Underpass"
+  bbox_epsg4326: [127.275, 36.580, 127.365, 36.670]
+  source_type: "OFFICIAL_WMS_SNAPSHOT"
+  data_role: "hazard_layer_visual_verification"
+  status: "VERIFIED"
+  data_vintage: "2024 collection"
+  request_snapshot: "2026-08-31"
+  raw_file: "data/raw/flood_extent/osong/safemap_if_0092_wms/osong_bbox_4326_layers.png"
+  image_format: "image/png"
+  image_dimensions: [1024, 1024]
+  image_size_bytes: 296634
+  nontransparent_pixel_count: 146863
+  notes:
+    - "Safemap WMS returned a non-empty flood marks raster for the Osong bbox."
+    - "This raster confirms an official Safemap flood marks overlay exists around the target area, but it is not vector geometry."
+    - "Do not use the WMS image directly for final building/road exposure counts unless it is explicitly vectorized and recorded as a derived raster/vector product, or an official vector flood extent is obtained."
 
 osong_rainfall_and_water_level:
-  source: "Disaster Safety Data Sharing Platform / hydrological observation services"
-  source_url: "https://www.safetydata.go.kr/"
+  source: "KMA AWS rainfall observation + Flood Control Office water-level OpenAPI"
+  source_url: "https://api.hrfco.go.kr/"
   coverage: "Miho River and Geum River basin stations near Osong"
   data_year: 2023
   event_date: "2023-07-15"
-  status: "api_key_required"
-  local_file: null
+  status: "acquired; processed"
+  water_level_source_type: "OBSERVATION"
+  water_level_status: "VERIFIED"
+  water_level_event_window: "2023-07-14 00:00 through 2023-07-17 00:00 KST"
+  water_level_temporal_resolution: "10 minutes"
+  water_level_unit: "m"
+  water_level_stations:
+    - station_id: "3011635"
+      station_name: "청주시(팔결교)"
+      role: "upstream/reference"
+      longitude: 127.4755556
+      latitude: 36.7141667
+    - station_id: "3011665"
+      station_name: "청주시(미호강교)"
+      role: "primary Osong/Miho River station"
+      longitude: 127.3505556
+      latitude: 36.6230556
+    - station_id: "3011685"
+      station_name: "세종시(미호교)"
+      role: "downstream/reference"
+      longitude: 127.3163889
+      latitude: 36.5825
+  raw_files:
+    station_info: "data/raw/water_level/osong/hrfco_waterlevel_info.xml"
+    palgyeol_bridge: "data/raw/water_level/osong/hrfco_waterlevel_10m_3011635_202307140000_202307170000.xml"
+    miho_river_bridge: "data/raw/water_level/osong/hrfco_waterlevel_10m_3011665_202307140000_202307170000.xml"
+    miho_bridge: "data/raw/water_level/osong/hrfco_waterlevel_10m_3011685_202307140000_202307170000.xml"
+  processed_file: "data/processed/osong/osong_hrfco_water_level_10m_2023-07-14_17.csv"
+  processed_sha256: "0394B077453E50BBADDC7A1D47442078C3AA43D312F7AA54FF3BC7BA15898652"
+  record_count: 1299
+  max_water_level_m: 10.09
   notes:
-    - "Do not use the current demo timeline as an observed 2023 series."
+    - "Han River Flood Control Office OpenAPI key can query Geum River basin water-level stations through the national hydrologic OpenAPI endpoint."
+    - "Use 청주시(미호강교) 3011665 as the primary Osong/Miho River station; 팔결교 and 미호교 are retained as upstream/downstream reference stations."
 
 osong_official_incident_apis:
   source: "Ministry of the Interior and Safety / Disaster Safety Data Sharing Platform"
@@ -222,24 +287,39 @@ osong_official_incident_apis:
       priority: "high"
       data_role: "primary_event_source"
       intended_use: "actual Flood Extent"
+      status: "VERIFIED_SOURCE_ACQUIRED_NO_OSONG_2023_RECORD"
     - dataset_id: "DSSP-IF-10175"
       name: "피해침수"
       priority: "medium"
       data_role: "primary_event_source"
       intended_use: "damage record and spatial-analysis validation"
+      status: "VERIFIED_SOURCE_ACQUIRED_NO_OSONG_2023_RECORD"
+      raw_pages_directory: "data/raw/damage_flood/osong/dssp_if_10175_pages/"
+      raw_record_count: 48050
+      osong_2023_candidate_record_count: 0
     - dataset_id: "DSSP-IF-10184"
       name: "재해구호상황보고"
       priority: "medium"
       data_role: "primary_event_source"
       intended_use: "evacuees and displaced-person interpretation"
+      status: "VERIFIED_SOURCE_ACQUIRED_CHEONGJU_2023_OSONG_TEXT_HITS"
+      raw_pages_directory: "data/raw/relief_report/osong/dssp_if_10184_pages/"
+      raw_record_count: 39188
+      osong_2023_candidate_record_count: 22
+      osong_text_hit_record_count: 9
     - dataset_id: "DSSP-IF-00247"
       name: "긴급재난문자"
       priority: "low"
       data_role: "primary_event_source"
       intended_use: "historical warning and evacuation timeline"
+      status: "SERVICE_ACCESS_DENIED"
   notes:
     - "These APIs are for one-time historical acquisition and later annual refresh only; the simulation will not call them at runtime."
-    - "Applications have been submitted, but no historical response can be downloaded until approval and credentials are issued."
+    - "DSSP-IF-00117 key set 1 is active, but the downloaded inventory does not include a 2023 Osong/Cheongju record."
+    - "After IP registration update, DSSP-IF-10175 key set 2 and DSSP-IF-10184 key set 3 are active."
+    - "DSSP-IF-10175 downloaded inventory does not include a 2023 Osong/Cheongju damage-flood candidate record."
+    - "DSSP-IF-10184 downloaded inventory includes 22 Cheongju July 2023 relief-report candidates, including 9 records with Osong-related text hits; it has no Flood Extent geometry."
+    - "DSSP-IF-00247 still returns SERVICE ACCESS DENIED for the available key sets."
 
 osong_rainfall_primary:
   source: "Korea Meteorological Administration AWS/ASOS or local observation network"
@@ -689,6 +769,30 @@ osong_gungpyeong2_underpass:
     - "Additional traffic-volume modeling and vehicle-exposure estimation are outside the MVP."
     - "Post-incident sensors, automatic entry barriers, and water barriers are future scenario metadata only; they are not represented as 2023 observed geometry."
 
+osong_sgis_admin_boundary:
+  source: "SGIS OpenAPI administrative boundary"
+  source_url: "https://sgisapi.mods.go.kr/OpenAPI3/boundary/hadmarea.geojson"
+  coverage: "Chungcheongbuk-do / Cheongju Heungdeok-gu / Osong-eup"
+  source_type: "OFFICIAL_ADMIN_BOUNDARY"
+  event_year: 2023
+  boundary_snapshot: 2023
+  status: "acquired; processed; connected as AOI layer"
+  acquired_at: "2026-08-31"
+  raw_crs: "EPSG:5179"
+  processed_crs: "EPSG:4326"
+  raw_files:
+    chungbuk_sgg: "data/raw/admin_boundary/sgis_2023/sgis_boundary_2023_chungbuk_sgg.geojson"
+    cheongju_heungdeok_emd: "data/raw/admin_boundary/sgis_2023/sgis_boundary_2023_33043_emd.geojson"
+  processed_file: "data/processed/osong/osong_sgis_admin_boundary_2023.geojson"
+  feature_count: 1
+  geometry_type: "Polygon"
+  adm_cd: "33043110"
+  adm_nm: "충청북도 청주시 흥덕구 오송읍"
+  validation_report: "data/processed/osong/validation_report.json"
+  notes:
+    - "SGIS hadmarea.geojson returns projected coordinates; processed output is transformed to EPSG:4326 for MapLibre and analysis."
+    - "This official 2023 boundary supersedes geoBoundaries for the Osong AOI layer."
+
 osong_boundaries:
   source: "geoBoundaries gbOpen"
   source_url: "https://www.geoboundaries.org/api/current/gbOpen/KOR/ADM2/"
@@ -709,7 +813,7 @@ osong_boundaries:
   snapshot_labels:
     ADM1: "geoBoundaries ADM1 snapshot: 2023"
     ADM2: "geoBoundaries ADM2 snapshot: 2020"
-  status: "acquired; AOI subset processed"
+  status: "acquired; AOI subset processed; fallback/reference after SGIS 2023 boundary acquisition"
   acquired_at: "2026-08-30"
   raw_files:
     ADM1: "data/raw/boundaries/geoBoundaries-KOR-ADM1.geojson"

@@ -230,5 +230,1610 @@
     "low_elevation_feature_count": 303,
     "low_elevation_sha256": "5870803DBD401E82E7CC4EA9329D23C14F4AFE83C5F26C16E72534A0FD413B52",
     "data_warning": "This is terrain context, not observed inundation or modeled flood extent."
+  },
+  "hrfco_water_level_2023": {
+    "source": "Ministry of Climate and Environment / Flood Control Office OpenAPI",
+    "source_url": "https://api.hrfco.go.kr/{ServiceKey}/waterlevel/list/10M/{wlobscd}/{start}/{end}.xml",
+    "source_type": "OBSERVATION",
+    "status": "VERIFIED",
+    "period_start": "2023-07-14 00:00 KST",
+    "period_end": "2023-07-17 00:00 KST",
+    "temporal_resolution": "10 minutes",
+    "unit": "m",
+    "record_count": 1299,
+    "stations": {
+      "3011635": {
+        "local_file": "data/raw/water_level/osong/hrfco_waterlevel_10m_3011635_202307140000_202307170000.xml",
+        "raw_size_bytes": 76480,
+        "raw_sha256": "9581C09CCD5FA386B2D6BF380234246506E415B42734D114C9E1466B2B468AC4",
+        "record_count": 433,
+        "station_metadata": {
+          "station_id": "3011635",
+          "station_name": "청주시(팔결교)",
+          "address": "충청북도 청주시",
+          "detail_address": "청원구 외하동 팔결교(충청북도 청주시 청원구 오창읍 가곡리)",
+          "agency": "기후에너지환경부",
+          "longitude": 127.4755556,
+          "latitude": 36.7141667,
+          "longitude_dms": "127-28-32",
+          "latitude_dms": "36-42-51"
+        }
+      },
+      "3011665": {
+        "local_file": "data/raw/water_level/osong/hrfco_waterlevel_10m_3011665_202307140000_202307170000.xml",
+        "raw_size_bytes": 76606,
+        "raw_sha256": "06B7972A48F6D543DB250C6FF57EFF50AACCB76D72EEFAAD7B1C728C4AF46581",
+        "record_count": 433,
+        "station_metadata": {
+          "station_id": "3011665",
+          "station_name": "청주시(미호강교)",
+          "address": "충청북도 청주시",
+          "detail_address": "흥덕구 강내면 탑연리 미호천교(충청북도 청주시 흥덕구 오송읍 궁평리)",
+          "agency": "기후에너지환경부",
+          "longitude": 127.3505556,
+          "latitude": 36.6230556,
+          "longitude_dms": "127-21-02",
+          "latitude_dms": "36-37-23"
+        }
+      },
+      "3011685": {
+        "local_file": "data/raw/water_level/osong/hrfco_waterlevel_10m_3011685_202307140000_202307170000.xml",
+        "raw_size_bytes": 76705,
+        "raw_sha256": "CA7E69185081552F1210E9CF6233D4F2F819756C0FFBFEC0274498CA788D4368",
+        "record_count": 433,
+        "station_metadata": {
+          "station_id": "3011685",
+          "station_name": "세종시(미호교)",
+          "address": "충청북도 청주시",
+          "detail_address": "흥덕구 오송읍 미호교(세종시 연동면 예양리)",
+          "agency": "기후에너지환경부",
+          "longitude": 127.3163889,
+          "latitude": 36.5825,
+          "longitude_dms": "127-18-59",
+          "latitude_dms": "36-34-57"
+        }
+      }
+    },
+    "raw_files": {
+      "station_info": {
+        "local_file": "data/raw/water_level/osong/hrfco_waterlevel_info.xml",
+        "raw_size_bytes": 810842,
+        "raw_sha256": "B52AD03F4A2F35CBFBCE77BA8A11A91211B77299A2009E245A1F92DC56B4968F"
+      },
+      "3011635": {
+        "local_file": "data/raw/water_level/osong/hrfco_waterlevel_10m_3011635_202307140000_202307170000.xml",
+        "raw_size_bytes": 76480,
+        "raw_sha256": "9581C09CCD5FA386B2D6BF380234246506E415B42734D114C9E1466B2B468AC4",
+        "record_count": 433,
+        "station_metadata": {
+          "station_id": "3011635",
+          "station_name": "청주시(팔결교)",
+          "address": "충청북도 청주시",
+          "detail_address": "청원구 외하동 팔결교(충청북도 청주시 청원구 오창읍 가곡리)",
+          "agency": "기후에너지환경부",
+          "longitude": 127.4755556,
+          "latitude": 36.7141667,
+          "longitude_dms": "127-28-32",
+          "latitude_dms": "36-42-51"
+        }
+      },
+      "3011665": {
+        "local_file": "data/raw/water_level/osong/hrfco_waterlevel_10m_3011665_202307140000_202307170000.xml",
+        "raw_size_bytes": 76606,
+        "raw_sha256": "06B7972A48F6D543DB250C6FF57EFF50AACCB76D72EEFAAD7B1C728C4AF46581",
+        "record_count": 433,
+        "station_metadata": {
+          "station_id": "3011665",
+          "station_name": "청주시(미호강교)",
+          "address": "충청북도 청주시",
+          "detail_address": "흥덕구 강내면 탑연리 미호천교(충청북도 청주시 흥덕구 오송읍 궁평리)",
+          "agency": "기후에너지환경부",
+          "longitude": 127.3505556,
+          "latitude": 36.6230556,
+          "longitude_dms": "127-21-02",
+          "latitude_dms": "36-37-23"
+        }
+      },
+      "3011685": {
+        "local_file": "data/raw/water_level/osong/hrfco_waterlevel_10m_3011685_202307140000_202307170000.xml",
+        "raw_size_bytes": 76705,
+        "raw_sha256": "CA7E69185081552F1210E9CF6233D4F2F819756C0FFBFEC0274498CA788D4368",
+        "record_count": 433,
+        "station_metadata": {
+          "station_id": "3011685",
+          "station_name": "세종시(미호교)",
+          "address": "충청북도 청주시",
+          "detail_address": "흥덕구 오송읍 미호교(세종시 연동면 예양리)",
+          "agency": "기후에너지환경부",
+          "longitude": 127.3163889,
+          "latitude": 36.5825,
+          "longitude_dms": "127-18-59",
+          "latitude_dms": "36-34-57"
+        }
+      }
+    },
+    "processed_file": "data/processed/osong/osong_hrfco_water_level_10m_2023-07-14_17.csv",
+    "processed_sha256": "0394B077453E50BBADDC7A1D47442078C3AA43D312F7AA54FF3BC7BA15898652",
+    "max_water_level_m": 10.09,
+    "validation": "HRFCO waterlevel info and 10-minute XML series parsed; station IDs, period, unit, record count, coordinates, and SHA-256 recorded."
+  },
+  "sgis_admin_boundary_2023": {
+    "source": "SGIS OpenAPI administrative boundary",
+    "source_url": "https://sgisapi.mods.go.kr/OpenAPI3/boundary/hadmarea.geojson",
+    "source_type": "OFFICIAL_ADMIN_BOUNDARY",
+    "status": "VERIFIED",
+    "event_year": 2023,
+    "boundary_snapshot": 2023,
+    "raw_files": {
+      "chungbuk_sgg": {
+        "local_file": "data/raw/admin_boundary/sgis_2023/sgis_boundary_2023_chungbuk_sgg.geojson",
+        "raw_size_bytes": 595668,
+        "raw_sha256": "49C0C3CA5D986F49467356DFD7C8A8948A0DA622C1EE813C4C7250E59D221694"
+      },
+      "cheongju_heungdeok_emd": {
+        "local_file": "data/raw/admin_boundary/sgis_2023/sgis_boundary_2023_33043_emd.geojson",
+        "raw_size_bytes": 94448,
+        "raw_sha256": "3CEB6E7215AFFB1A3B98CEE1133CBF9A297483100FC1EF09ABBD950894AFE3FF",
+        "feature_count": 11
+      }
+    },
+    "processed_file": "data/processed/osong/osong_sgis_admin_boundary_2023.geojson",
+    "processed_sha256": "6BF4FD3C7756E1673805FA8C5A291E4CB5434C8D826C3833B1CCC09A3FCD4C39",
+    "feature_count": 1,
+    "geometry_types": [
+      "Polygon"
+    ],
+    "raw_crs": "EPSG:5179",
+    "processed_crs": "EPSG:4326",
+    "administrative_unit": "충청북도 청주시 흥덕구 오송읍",
+    "adm_cd": "33043110",
+    "validation": "SGIS 2023 Cheongju Heungdeok-gu eup/myeon/dong boundary downloaded, Osong-eup feature extracted, and coordinates transformed from EPSG:5179 to EPSG:4326."
+  },
+  "dssp_if_00117_flood_extent": {
+    "source": "Ministry of the Interior and Safety / Disaster Safety Data Sharing Platform",
+    "dataset_id": "DSSP-IF-00117",
+    "source_url": "https://www.safetydata.go.kr/V2/api/DSSP-IF-00117",
+    "status": "VERIFIED_SOURCE_ACQUIRED_NO_OSONG_2023_RECORD",
+    "raw_pages": [
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_01.json",
+        "raw_size_bytes": 1619665,
+        "raw_sha256": "2C8EC4849D20024DA857A553C4D1CFD2EC5A4831C2E09AFF560D56063B6CB5D3",
+        "result_code": "00",
+        "page_no": 1,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_02.json",
+        "raw_size_bytes": 1650365,
+        "raw_sha256": "A4713C7266D83C8B9520220349B68CEE8C7BF07FFF2A9751F4F47DFD54B1A9B9",
+        "result_code": "00",
+        "page_no": 2,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_03.json",
+        "raw_size_bytes": 1524104,
+        "raw_sha256": "EE24CCE487B7F9CF0322D2A344AA616B58226A8D4FE553B19C13E8222194CD80",
+        "result_code": "00",
+        "page_no": 3,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_04.json",
+        "raw_size_bytes": 1203568,
+        "raw_sha256": "D82989A0B3446D5559E9CA5A24D34001813B8A4E09E0505E0F9AB2AFF9F2F086",
+        "result_code": "00",
+        "page_no": 4,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_05.json",
+        "raw_size_bytes": 1778329,
+        "raw_sha256": "F9CD590E76BDA4643829069B770B97B05442CD96791250BAD5E254AFAA1F06D7",
+        "result_code": "00",
+        "page_no": 5,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_06.json",
+        "raw_size_bytes": 1364731,
+        "raw_sha256": "C87786D7F16D4DB7C43A851BEFEF44289DDC379300C765049C2F9DD26250509B",
+        "result_code": "00",
+        "page_no": 6,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_07.json",
+        "raw_size_bytes": 984292,
+        "raw_sha256": "D2A3FB9F59C77980C94E292AA2DE566177F5ECEA41B71D21D06C311AF5B53445",
+        "result_code": "00",
+        "page_no": 7,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_08.json",
+        "raw_size_bytes": 1262872,
+        "raw_sha256": "43CB69A9CAC29A4023228ADC16046AA698FCC681AFE4F29D49B2F03BC43BCF9B",
+        "result_code": "00",
+        "page_no": 8,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_09.json",
+        "raw_size_bytes": 1022513,
+        "raw_sha256": "DA40C596A0D9B831C2D733516297DB4C3E118202994C2265E24728A295F14F8F",
+        "result_code": "00",
+        "page_no": 9,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_10.json",
+        "raw_size_bytes": 1652618,
+        "raw_sha256": "124335EF6F35B68546B6EB3AE393E6934E828CBF7EB82CB7C81E26CED4884E34",
+        "result_code": "00",
+        "page_no": 10,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_11.json",
+        "raw_size_bytes": 1371719,
+        "raw_sha256": "DE2A18B08DFDBDA113461697468E24E78B89A00B526B51B62E52F0D724F066A0",
+        "result_code": "00",
+        "page_no": 11,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_12.json",
+        "raw_size_bytes": 1471307,
+        "raw_sha256": "2CC1FC08B7578F2A1BD836D0DA5E78CF9D1E93D27289CC726CFD3D26BDAC9B7F",
+        "result_code": "00",
+        "page_no": 12,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_13.json",
+        "raw_size_bytes": 1614022,
+        "raw_sha256": "7DDFBD97E8C9727C5F39F324DC489B8A98E6DFBDB0747E6F4683785BF6CC8D63",
+        "result_code": "00",
+        "page_no": 13,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_14.json",
+        "raw_size_bytes": 1375583,
+        "raw_sha256": "09AFCB28862D09D0915D859D6A39FB3CFC6CDCBC8360E528933C350B6726D04A",
+        "result_code": "00",
+        "page_no": 14,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_15.json",
+        "raw_size_bytes": 1705702,
+        "raw_sha256": "B795142FE401AADFAB398057D702D2E679DF66B2DAEFFF7CA49982D0AAD92C32",
+        "result_code": "00",
+        "page_no": 15,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_16.json",
+        "raw_size_bytes": 1567873,
+        "raw_sha256": "A76C916FEC9B192052B3161BA3B6CEA8A8899005CCBB6FA2E6C52D4C7439EAD5",
+        "result_code": "00",
+        "page_no": 16,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_17.json",
+        "raw_size_bytes": 1512320,
+        "raw_sha256": "8D39023E54A3FDC76C25ED15FF55D5D3FFB8C3661EF49F8EED0BA0BE5AA3668A",
+        "result_code": "00",
+        "page_no": 17,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_18.json",
+        "raw_size_bytes": 1283559,
+        "raw_sha256": "58C6A0A4CAAB1C02A5002609DD0C9AF7AEFD45D5CA28BD7E43C9D0B056655971",
+        "result_code": "00",
+        "page_no": 18,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_19.json",
+        "raw_size_bytes": 1094198,
+        "raw_sha256": "1F917693F1266BF63FAAE9DD25EBE99B62EF6B7AABDAD774F7ADC2D0710488EE",
+        "result_code": "00",
+        "page_no": 19,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_20.json",
+        "raw_size_bytes": 978814,
+        "raw_sha256": "35AFBE4026685E5D33A4250253F23C319C3864566D176D0FE3A1319341D839F5",
+        "result_code": "00",
+        "page_no": 20,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_21.json",
+        "raw_size_bytes": 1263383,
+        "raw_sha256": "1ACD87824A83CF085B5F65AACEB7AB747B9FDEB1BF5C0248F9C25EFCE11DA22D",
+        "result_code": "00",
+        "page_no": 21,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_22.json",
+        "raw_size_bytes": 1484182,
+        "raw_sha256": "BEB5B7F260A9328DD22CEEAA998846ED5E77BCC197BD6D6E3EC11898D0FA6D9C",
+        "result_code": "00",
+        "page_no": 22,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_23.json",
+        "raw_size_bytes": 875380,
+        "raw_sha256": "1AD50929934957F072EE6312ED215CC8DAF5272F5AF19267F7E0D917522DC162",
+        "result_code": "00",
+        "page_no": 23,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_24.json",
+        "raw_size_bytes": 1030358,
+        "raw_sha256": "503539A8BE9B6CD7F02CC85FDABA80E2FDBFC3E105302B3689505ADFB3CC0A0C",
+        "result_code": "00",
+        "page_no": 24,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_25.json",
+        "raw_size_bytes": 828661,
+        "raw_sha256": "F09668A736D9A6E89DC6AC9BDB416DC57B75C88397363D081F3DA97B093700ED",
+        "result_code": "00",
+        "page_no": 25,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_26.json",
+        "raw_size_bytes": 892707,
+        "raw_sha256": "4DE7E83B8E838E054E315494336788ACA896454B6F79A633AF69A36A62EDBD11",
+        "result_code": "00",
+        "page_no": 26,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_27.json",
+        "raw_size_bytes": 760418,
+        "raw_sha256": "6B749C45E1646BEF3146F9E793E26F54A4A3D487638097016357C3F7A78FD62C",
+        "result_code": "00",
+        "page_no": 27,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_28.json",
+        "raw_size_bytes": 714873,
+        "raw_sha256": "B1895489A87E8EB7ADD39AF95634EFF8E1615E790F69311E81D734937A314582",
+        "result_code": "00",
+        "page_no": 28,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_29.json",
+        "raw_size_bytes": 681371,
+        "raw_sha256": "984B79E86E46CF94C7B83041891AD1DC8C43A8123E6312682B9D416D305B6E7B",
+        "result_code": "00",
+        "page_no": 29,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_30.json",
+        "raw_size_bytes": 826764,
+        "raw_sha256": "BC197AFCEC3DD08BD049AF487CD5162EB138AAC17EB0AAFDE3954A61A5B7FEE5",
+        "result_code": "00",
+        "page_no": 30,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_31.json",
+        "raw_size_bytes": 865168,
+        "raw_sha256": "F9CCB51207B827EC0AAF8BDB5BC1FA8F4048270C244D8613FFAFE7DF4F4907DF",
+        "result_code": "00",
+        "page_no": 31,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_32.json",
+        "raw_size_bytes": 967434,
+        "raw_sha256": "8C749FA8E36AC2B4CB604FCBCFEDEAA35C325F34541D868003ADCC21D10B2171",
+        "result_code": "00",
+        "page_no": 32,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_33.json",
+        "raw_size_bytes": 1407887,
+        "raw_sha256": "79E15341B343FA74C06D875A49F2FF59A9E3487DCDCDA6908B619EEF7803D034",
+        "result_code": "00",
+        "page_no": 33,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_34.json",
+        "raw_size_bytes": 1704417,
+        "raw_sha256": "C6969727048F601B35C71A15EA0AB842727A2A0ED14A1E78AB8E724022D8E909",
+        "result_code": "00",
+        "page_no": 34,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_35.json",
+        "raw_size_bytes": 1416282,
+        "raw_sha256": "3B475F28903863C4324921A70CFB1ADADC83296B321266559E6DE0B1E0706642",
+        "result_code": "00",
+        "page_no": 35,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_36.json",
+        "raw_size_bytes": 1895288,
+        "raw_sha256": "F999D8AAF81AE020DB53C1C6CBEDEE0480C9C1B180D42CF2690634318804403F",
+        "result_code": "00",
+        "page_no": 36,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_37.json",
+        "raw_size_bytes": 1583054,
+        "raw_sha256": "45EEB9A4D7B23F450AA718757BA9D8B21D11A02E62DA6552792FD40DB9155EB3",
+        "result_code": "00",
+        "page_no": 37,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_38.json",
+        "raw_size_bytes": 1340176,
+        "raw_sha256": "573F2568AEF086813F72D0724F802184686F58672BCBFC449FC66795F3D377BD",
+        "result_code": "00",
+        "page_no": 38,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/flood_extent/osong/dssp_if_00117_pages/dssp_if_00117_page_39.json",
+        "raw_size_bytes": 2147,
+        "raw_sha256": "107D1DAEB9D13A2F355ED8015EB78B1C121C03B5E3B70B07E0AEDE5C4BB21A60",
+        "result_code": "00",
+        "page_no": 39,
+        "num_of_rows": 1000,
+        "total_count": 38003,
+        "record_count": 3
+      }
+    ],
+    "raw_page_count": 39,
+    "raw_record_count": 38003,
+    "api_reported_total_count": 38003,
+    "geometry_field": "GEOM",
+    "geometry_format": "WKT",
+    "raw_geometry_crs_inferred": "EPSG:3857",
+    "processed_crs": "EPSG:4326",
+    "year_counts": {
+      "2002": 312,
+      "2003": 21,
+      "2005": 19,
+      "2006": 3807,
+      "2007": 419,
+      "2008": 392,
+      "2009": 1124,
+      "2010": 845,
+      "2011": 1485,
+      "2012": 1946,
+      "2013": 1488,
+      "2014": 401,
+      "2015": 6,
+      "2016": 581,
+      "2017": 3532,
+      "2018": 893,
+      "2019": 903,
+      "2020": 6637,
+      "2021": 1232,
+      "2022": 11703,
+      "외": 257
+    },
+    "province_counts": {
+      "11": 9002,
+      "26": 479,
+      "27": 5,
+      "28": 144,
+      "29": 447,
+      "30": 171,
+      "31": 402,
+      "36": 25,
+      "41": 6730,
+      "42": 2366,
+      "43": 5218,
+      "44": 1989,
+      "45": 1329,
+      "46": 2472,
+      "47": 1402,
+      "48": 3806,
+      "50": 2016
+    },
+    "cheongju_sgg_code": "43113",
+    "cheongju_record_count": 802,
+    "osong_2023_candidate_record_count": 0,
+    "processed_candidate_file": "data/processed/osong/osong_dssp_if_00117_2023_candidates.geojson",
+    "processed_candidate_sha256": "7626EA83CAEB18D3DAD503B15BFD7EB88C4C13BA8440FAB45C456F9288F03CCE",
+    "validation": "DSSP-IF-00117 API returned 38,003 records across 39 pages, but no records with FLDN_YR=2023 and Cheongju/Osong SGG code 43113 were present.",
+    "data_warning": "Do not connect this dataset as the observed 2023 Osong Flood Extent unless a matching official record is obtained from another approved URL or portal export."
+  },
+  "dssp_if_10175_damage_flood": {
+    "source": "Ministry of the Interior and Safety / Disaster Safety Data Sharing Platform",
+    "dataset_id": "DSSP-IF-10175",
+    "source_url": "https://www.safetydata.go.kr/V2/api/DSSP-IF-10175",
+    "status": "VERIFIED_SOURCE_ACQUIRED_NO_OSONG_2023_RECORD",
+    "raw_page_count": 49,
+    "raw_record_count": 48050,
+    "api_reported_total_count": 48050,
+    "raw_pages": [
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_01.json",
+        "raw_size_bytes": 766133,
+        "raw_sha256": "18E32C383A70B8069DABCE118DC2273905324B4D099DB4329848303653608EE8",
+        "result_code": "00",
+        "page_no": 1,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_02.json",
+        "raw_size_bytes": 767573,
+        "raw_sha256": "72ACE9EDB4F4115E5636BDCEF37E0D836191CE88BB6E4BB3D72340015820A681",
+        "result_code": "00",
+        "page_no": 2,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_03.json",
+        "raw_size_bytes": 767386,
+        "raw_sha256": "0E55C1C1DD68418FF7CCDB5DF11A8F8C4916624A69381A3E96E6D5B3541DDE29",
+        "result_code": "00",
+        "page_no": 3,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_04.json",
+        "raw_size_bytes": 767567,
+        "raw_sha256": "F673B39EB95E429F3F1E27C97B0004AE278803C10BC631A66DEF55388FBC0BF2",
+        "result_code": "00",
+        "page_no": 4,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_05.json",
+        "raw_size_bytes": 764571,
+        "raw_sha256": "7A4E1B768DB98F053FFC5C3D46DF7CD87893A756144507BEFF3191E1375217B8",
+        "result_code": "00",
+        "page_no": 5,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_06.json",
+        "raw_size_bytes": 762477,
+        "raw_sha256": "E1C7EC46E2283D452BE9939C0C6E4B7BB2A7729DF1A60D3728A47FF67A45AE43",
+        "result_code": "00",
+        "page_no": 6,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_07.json",
+        "raw_size_bytes": 764743,
+        "raw_sha256": "F5AF9A18C1EAEEC4086E5C01F4470BA47F5844F6E0F078F4D0AF74574082B05E",
+        "result_code": "00",
+        "page_no": 7,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_08.json",
+        "raw_size_bytes": 765848,
+        "raw_sha256": "14B32BF5A0A0CF5A72CAF3AD4F5571BAFDA7D75D9BE7FFE368CE155B86101FC3",
+        "result_code": "00",
+        "page_no": 8,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_09.json",
+        "raw_size_bytes": 767684,
+        "raw_sha256": "162C4DA2B0A0FF3640EFDE2F766BCE54421A88A9637E0ACCBB5BECA84D172535",
+        "result_code": "00",
+        "page_no": 9,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_10.json",
+        "raw_size_bytes": 766560,
+        "raw_sha256": "32D6078885B5C847C7A73D50E9B03F6F976FB77A03CDBEFE6A3167CFC057F88D",
+        "result_code": "00",
+        "page_no": 10,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_11.json",
+        "raw_size_bytes": 770311,
+        "raw_sha256": "04F167987C11D2D8D812BEE1396D1A7CBF3A14F08C8E63C67B72D877427C8B12",
+        "result_code": "00",
+        "page_no": 11,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_12.json",
+        "raw_size_bytes": 771380,
+        "raw_sha256": "D9D6292D5C0DC34138A433F380563390FF4D594323B2802EAE07BA0AAB0D3564",
+        "result_code": "00",
+        "page_no": 12,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_13.json",
+        "raw_size_bytes": 768387,
+        "raw_sha256": "CCC0FB12A9BA7204767EB1F413BFA275FE652DEF090BB7344B5ED7D4AB698662",
+        "result_code": "00",
+        "page_no": 13,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_14.json",
+        "raw_size_bytes": 768175,
+        "raw_sha256": "6B5F43C4E6BE4A768D4F6A926D61E832299AC9384FCE24992372E03AC3DB9D62",
+        "result_code": "00",
+        "page_no": 14,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_15.json",
+        "raw_size_bytes": 767401,
+        "raw_sha256": "2A116C91591681E754CAC3A4CAD05DA44CC996BF2F2C08C028C614091DE468F9",
+        "result_code": "00",
+        "page_no": 15,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_16.json",
+        "raw_size_bytes": 766378,
+        "raw_sha256": "4A4A6764CF1D32CCB7AC6D4ED3D297A300EC2AFAA8D866CD08B690B2D4E8D2C6",
+        "result_code": "00",
+        "page_no": 16,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_17.json",
+        "raw_size_bytes": 767460,
+        "raw_sha256": "4FD7CC88DBC4092E877A663041763413A00F96C87D43950FFB7DB6B73B4EA23D",
+        "result_code": "00",
+        "page_no": 17,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_18.json",
+        "raw_size_bytes": 767989,
+        "raw_sha256": "57C8D66EEF11F90A50F7E5183848D95358EF633DFDD066BCBD4DBD1E18737082",
+        "result_code": "00",
+        "page_no": 18,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_19.json",
+        "raw_size_bytes": 768799,
+        "raw_sha256": "FA59FBAFAD9567C84D0CD5D832BD29E9BF455625AD69D68BE669E8D62FE49A4D",
+        "result_code": "00",
+        "page_no": 19,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_20.json",
+        "raw_size_bytes": 766689,
+        "raw_sha256": "C23ABFC2FC7CBEA2D6E30495BC0A77FAA392877AB31354CCFA7811F86FA7A50F",
+        "result_code": "00",
+        "page_no": 20,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_21.json",
+        "raw_size_bytes": 770714,
+        "raw_sha256": "E9D8C188286449471B32A3BA58494AB04BF59CE235E42147B3100B2391EBE78D",
+        "result_code": "00",
+        "page_no": 21,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_22.json",
+        "raw_size_bytes": 768257,
+        "raw_sha256": "3C1C268FEAA623909563EFB8782E5B51ED29157D5A814CDCB3B6C70FA7CC91D7",
+        "result_code": "00",
+        "page_no": 22,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_23.json",
+        "raw_size_bytes": 769307,
+        "raw_sha256": "778BA5F11169E1957D3DE8F4C908AE0C3C7D3D17B69B6C8CE55115C7D65B5980",
+        "result_code": "00",
+        "page_no": 23,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_24.json",
+        "raw_size_bytes": 768200,
+        "raw_sha256": "EC29AED233108C4B521F2AB9DB60C1DB26D43D2FC73FFD8019A1091BF20EEE35",
+        "result_code": "00",
+        "page_no": 24,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_25.json",
+        "raw_size_bytes": 768192,
+        "raw_sha256": "2E801D67C4094ECAF57A6B0A1FCF01D8986C0BDFDAAC59FBBED3EAF905FFAA45",
+        "result_code": "00",
+        "page_no": 25,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_26.json",
+        "raw_size_bytes": 768169,
+        "raw_sha256": "2D73271122A2E37A3178B0F61767E4848862478C942AF78C8363C02F574C57A6",
+        "result_code": "00",
+        "page_no": 26,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_27.json",
+        "raw_size_bytes": 769052,
+        "raw_sha256": "B0C12326A7F754EFFE03915994110A0B82AE23B805AD64BDA9B82FFBB34E4593",
+        "result_code": "00",
+        "page_no": 27,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_28.json",
+        "raw_size_bytes": 769713,
+        "raw_sha256": "C999CFA1ABA1D4ECAF0EB3C4801410843C89F766E63E41E4FD6E652B5AB27F72",
+        "result_code": "00",
+        "page_no": 28,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_29.json",
+        "raw_size_bytes": 768298,
+        "raw_sha256": "6659CA59144A32EBB1CFB17D2992E2B1F8F4CE217FC1E26B95BE84D9502FDFD0",
+        "result_code": "00",
+        "page_no": 29,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_30.json",
+        "raw_size_bytes": 769025,
+        "raw_sha256": "6FAF384A53298CB93C223704B514D651DE4C72145EB182D5B1FFF6C16A555284",
+        "result_code": "00",
+        "page_no": 30,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_31.json",
+        "raw_size_bytes": 769134,
+        "raw_sha256": "AFF3FE0CE5E9ABD3A05AAA51676200F08AB6242E5A8B2F195F4469D51238A08D",
+        "result_code": "00",
+        "page_no": 31,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_32.json",
+        "raw_size_bytes": 768956,
+        "raw_sha256": "9F86CBE8A6A038A4D0C3CD3395D0C67E9A064E82C7F0E873E2DF400E0375232B",
+        "result_code": "00",
+        "page_no": 32,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_33.json",
+        "raw_size_bytes": 769167,
+        "raw_sha256": "8D6FAD73922A17AB9E4F9A3542B639AF8ED8BD86F8E1D63A55B321B4A9706DD7",
+        "result_code": "00",
+        "page_no": 33,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_34.json",
+        "raw_size_bytes": 769441,
+        "raw_sha256": "FE5D148DFDA5C113C09AA8A69D29176F446F7785EB89565DBEDCFCEE0C070816",
+        "result_code": "00",
+        "page_no": 34,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_35.json",
+        "raw_size_bytes": 769616,
+        "raw_sha256": "944361495B7DD547EA8290A4423A3ADE624CA2016DF15D69DF7772F53091C458",
+        "result_code": "00",
+        "page_no": 35,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_36.json",
+        "raw_size_bytes": 769258,
+        "raw_sha256": "363C2D52A4899BE6A3A9965C53BE81306EBF60CB48D1D3D60A0DDC62DF4ABF7A",
+        "result_code": "00",
+        "page_no": 36,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_37.json",
+        "raw_size_bytes": 769606,
+        "raw_sha256": "5AB20B4C08F40E1328932B3F82B4E6470093709A514FE28ED4425C909BA49004",
+        "result_code": "00",
+        "page_no": 37,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_38.json",
+        "raw_size_bytes": 769702,
+        "raw_sha256": "E670A364D1EA129655D542A996884CAAC8DEE309A9218FF8A66B47547626A71B",
+        "result_code": "00",
+        "page_no": 38,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_39.json",
+        "raw_size_bytes": 770001,
+        "raw_sha256": "38482EFF718B6897C6CF306454C634EBC1459702E6B8D790E5374BEB20845D41",
+        "result_code": "00",
+        "page_no": 39,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_40.json",
+        "raw_size_bytes": 771411,
+        "raw_sha256": "087C30B054818D9752CBF229AB3A683FED416313A6BEF6BC5798B8C84051A325",
+        "result_code": "00",
+        "page_no": 40,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_41.json",
+        "raw_size_bytes": 770678,
+        "raw_sha256": "D5F4FD016DFC15821188B95319B5F4F55D5EEE4E9834B8BD03DD16D705798C09",
+        "result_code": "00",
+        "page_no": 41,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_42.json",
+        "raw_size_bytes": 770277,
+        "raw_sha256": "A3381446FB0C307036BE8AC632CA31DB32407AA5E093F51A8AE4C72C669E4DBD",
+        "result_code": "00",
+        "page_no": 42,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_43.json",
+        "raw_size_bytes": 769625,
+        "raw_sha256": "B30DEBD58B8FC4D11A2A1E14E3C8284CFCEFC8A211AD8DFD7FE45D33D2B2B5EF",
+        "result_code": "00",
+        "page_no": 43,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_44.json",
+        "raw_size_bytes": 770413,
+        "raw_sha256": "28CF89B67BFEE1EA38B64F44197359DB05084A9D60A9398418A4FB6A22AC04A7",
+        "result_code": "00",
+        "page_no": 44,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_45.json",
+        "raw_size_bytes": 771509,
+        "raw_sha256": "C0561782A445E7540293612D953B6F9A9E9E4A753B59F65964392E0AD3896D7B",
+        "result_code": "00",
+        "page_no": 45,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_46.json",
+        "raw_size_bytes": 764668,
+        "raw_sha256": "23B41AA0DE8B6FB3AF9283E41DC351D1CCA1CDFF956DF745F9A37BA69AD0E82B",
+        "result_code": "00",
+        "page_no": 46,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_47.json",
+        "raw_size_bytes": 767210,
+        "raw_sha256": "34B75FF426A5B7D1B7703BC00748F77207D7EB8F522D985229B76E33D8AEB500",
+        "result_code": "00",
+        "page_no": 47,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_48.json",
+        "raw_size_bytes": 773687,
+        "raw_sha256": "0D0AB1FE0C432BC496B25D0B9CBDF7A77CF0ADDA8E0E33F6C2101DD0C4D68924",
+        "result_code": "00",
+        "page_no": 48,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/damage_flood/osong/dssp_if_10175_pages/dssp_if_10175_page_49.json",
+        "raw_size_bytes": 39067,
+        "raw_sha256": "6F25A7231989BEA00566D5BD1506B4D6A24E98473AB75940CCCC0AA1C998B15F",
+        "result_code": "00",
+        "page_no": 49,
+        "num_of_rows": 1000,
+        "total_count": 48050,
+        "record_count": 50
+      }
+    ],
+    "year_counts": {
+      "2003": 20700,
+      "2004": 8910,
+      "2005": 11433,
+      "2006": 3615,
+      "2007": 751,
+      "2008": 234,
+      "2009": 844,
+      "2010": 353,
+      "2011": 630,
+      "2012": 261,
+      "2013": 10,
+      "2014": 4,
+      "2015": 2,
+      "2016": 70,
+      "2017": 9,
+      "2018": 121,
+      "2019": 26,
+      "2020": 26,
+      "2021": 2,
+      "2022": 14,
+      "2024": 24,
+      "2025": 7,
+      "2026": 4
+    },
+    "plus_one_year_2024_record_count": 24,
+    "cheongju_sgg_code": "43113",
+    "cheongju_stdg_code_prefix": null,
+    "osong_2023_candidate_record_count": 0,
+    "osong_text_hit_record_count": null,
+    "processed_candidate_file": "data/processed/osong/osong_damage_flood_2023_candidates.json",
+    "processed_candidate_sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+    "validation": "DSSP-IF-10175 API source was acquired, but no 2023 Cheongju/Osong candidate records were present.",
+    "data_warning": "Use this source as supporting inventory only unless a matching 2023 Osong event record is obtained."
+  },
+  "dssp_if_10184_relief_report": {
+    "source": "Ministry of the Interior and Safety / Disaster Safety Data Sharing Platform",
+    "dataset_id": "DSSP-IF-10184",
+    "source_url": "https://www.safetydata.go.kr/V2/api/DSSP-IF-10184",
+    "status": "VERIFIED_SOURCE_ACQUIRED_CHEONGJU_2023_OSONG_TEXT_HITS",
+    "raw_page_count": 40,
+    "raw_record_count": 39188,
+    "api_reported_total_count": 39188,
+    "raw_pages": [
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_01.json",
+        "raw_size_bytes": 551126,
+        "raw_sha256": "9BCFBE4D0D90487367901D6FD81E48F476D439E156B6441121412CF19C0EAF37",
+        "result_code": "00",
+        "page_no": 1,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_02.json",
+        "raw_size_bytes": 569107,
+        "raw_sha256": "7E1FDBB1864C5FE7991F758FF8F7AB2C00A9F2D559A7AF981C3E08827A874BF7",
+        "result_code": "00",
+        "page_no": 2,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_03.json",
+        "raw_size_bytes": 571232,
+        "raw_sha256": "B0A4EBA5883233F0D8C9ED681C9788E1AE8B5139BAFD9FC0FEC4A4400CE09178",
+        "result_code": "00",
+        "page_no": 3,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_04.json",
+        "raw_size_bytes": 593543,
+        "raw_sha256": "EB7235B3BA2C7144F10F2AB76858CF7C50A996E090942F88538D4E0B1FAB4B89",
+        "result_code": "00",
+        "page_no": 4,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_05.json",
+        "raw_size_bytes": 557101,
+        "raw_sha256": "DC7DD9B2ED662C263FDE8FFF3C6D3B653E16AF82AA789C1CB90738B59449E56C",
+        "result_code": "00",
+        "page_no": 5,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_06.json",
+        "raw_size_bytes": 645874,
+        "raw_sha256": "090FEEAE11BC94108073DC0DE626C569CE5287AB1184961C32B81FE91BA60D4E",
+        "result_code": "00",
+        "page_no": 6,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_07.json",
+        "raw_size_bytes": 651890,
+        "raw_sha256": "4A9321868AA991B8DD8ED32739739A2DB240EAC9AC433BD556F37958A186785D",
+        "result_code": "00",
+        "page_no": 7,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_08.json",
+        "raw_size_bytes": 649724,
+        "raw_sha256": "CDFC1EAEF94C6EC4FB8B9821FFB92F1E80FBF09CDB074335C6CE98F0207CD0B1",
+        "result_code": "00",
+        "page_no": 8,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_09.json",
+        "raw_size_bytes": 655132,
+        "raw_sha256": "D76B5740A16E1A7FA23E6E52039C4A45B3FB071A520D51EF2F64898E28BB6DE9",
+        "result_code": "00",
+        "page_no": 9,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_10.json",
+        "raw_size_bytes": 623600,
+        "raw_sha256": "C92793B94E270C189AAD8CD78EC0D16FF35D3F3BC983373B6E001A0782D2FA60",
+        "result_code": "00",
+        "page_no": 10,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_11.json",
+        "raw_size_bytes": 632424,
+        "raw_sha256": "9DBFC1662E023E120044E81031932127B8E2DC490E5F35F457C4BE9EDC56A7D9",
+        "result_code": "00",
+        "page_no": 11,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_12.json",
+        "raw_size_bytes": 640806,
+        "raw_sha256": "82908EDB95983DDF2913C4BC9FCDEE1A3318C77E1F819F3FAF28F1C7C30C23DB",
+        "result_code": "00",
+        "page_no": 12,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_13.json",
+        "raw_size_bytes": 671293,
+        "raw_sha256": "14401B450676ABA73BA8F05AC2F6E447A1E5DBDEF8B93B14D476A895CD9103EA",
+        "result_code": "00",
+        "page_no": 13,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_14.json",
+        "raw_size_bytes": 678157,
+        "raw_sha256": "C5FC5B7C2EFE633E8A31DD7562D2D23B35997AF322BD9458EBC661E9648F760A",
+        "result_code": "00",
+        "page_no": 14,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_15.json",
+        "raw_size_bytes": 660563,
+        "raw_sha256": "40DA270C19BC963A8DE76B70651C44DBCE8271D056855F1E96DD4DD0D8A71B8D",
+        "result_code": "00",
+        "page_no": 15,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_16.json",
+        "raw_size_bytes": 686051,
+        "raw_sha256": "57411A5A11A97183BB8B31022C8F0F12F1E5293B976B6B72FF59CFB32F85C0C3",
+        "result_code": "00",
+        "page_no": 16,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_17.json",
+        "raw_size_bytes": 653982,
+        "raw_sha256": "1E22E8B515218B809B67CD797668D93F377DD64F0C44A4C003B142F302DA68D5",
+        "result_code": "00",
+        "page_no": 17,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_18.json",
+        "raw_size_bytes": 601987,
+        "raw_sha256": "BED865F27DFB608DDCB655BDD36B17318126850E440F6C5BD54E8D029F8CC16D",
+        "result_code": "00",
+        "page_no": 18,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_19.json",
+        "raw_size_bytes": 595207,
+        "raw_sha256": "A0D18EE2E8012AC2625452154E50B86578C2B726F952211456DF535A986D4F58",
+        "result_code": "00",
+        "page_no": 19,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_20.json",
+        "raw_size_bytes": 585904,
+        "raw_sha256": "A6C6623F3E3D711FD297BDE2F76D6660199664942F488BD4D38B72F045954C14",
+        "result_code": "00",
+        "page_no": 20,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_21.json",
+        "raw_size_bytes": 802989,
+        "raw_sha256": "FE023E4FDC7441983B9295A555A100864A0129EBF6050A99C56FB361942B15A1",
+        "result_code": "00",
+        "page_no": 21,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_22.json",
+        "raw_size_bytes": 1067473,
+        "raw_sha256": "B8B24A55272E4540D5412F5E038E7E366A972A052803340D0859309CF93F4661",
+        "result_code": "00",
+        "page_no": 22,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_23.json",
+        "raw_size_bytes": 1056540,
+        "raw_sha256": "898F9A37C926F841219388169B2B6B4F6B05DB71BC6B4E8C5663E9B65643B676",
+        "result_code": "00",
+        "page_no": 23,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_24.json",
+        "raw_size_bytes": 888564,
+        "raw_sha256": "06B92F656119BDCB8860DE8B07D0952CBEB0E5736176078E2240470E08F3659D",
+        "result_code": "00",
+        "page_no": 24,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_25.json",
+        "raw_size_bytes": 801874,
+        "raw_sha256": "DB2C37BD9B68C2CF61BD5B625AEAB5D784738AF960F7AACF2CA2C6ADC6131F34",
+        "result_code": "00",
+        "page_no": 25,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_26.json",
+        "raw_size_bytes": 676183,
+        "raw_sha256": "643598FEA2129A4CD9A1458CC1FC07436DCE2CD66593650884F49673D3A5C1E8",
+        "result_code": "00",
+        "page_no": 26,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_27.json",
+        "raw_size_bytes": 691053,
+        "raw_sha256": "1F5186F73328AD8C145E7AD98868D4DE4ABAD9B18A73FB602AD8EF37823D3954",
+        "result_code": "00",
+        "page_no": 27,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_28.json",
+        "raw_size_bytes": 749417,
+        "raw_sha256": "69A20C976A98B2F9113929B8D9E8F1BA78DE1993568D1E6C534B4D7A83DE80BE",
+        "result_code": "00",
+        "page_no": 28,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_29.json",
+        "raw_size_bytes": 835905,
+        "raw_sha256": "E1FA7835AFA007C3860EB1BD7481F30B4D949EDBF910E8DC76089BCB4AC24457",
+        "result_code": "00",
+        "page_no": 29,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_30.json",
+        "raw_size_bytes": 791429,
+        "raw_sha256": "BA2A209B0DB2BF55249CCDB39B569F563A5F1A5A343189B2FF7ACA86B3E5D9F9",
+        "result_code": "00",
+        "page_no": 30,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_31.json",
+        "raw_size_bytes": 651706,
+        "raw_sha256": "869AE745FA434C242DC5BA86A96D2178F746E5AB8FCBA529ACEE307244C1C886",
+        "result_code": "00",
+        "page_no": 31,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_32.json",
+        "raw_size_bytes": 606096,
+        "raw_sha256": "9B214FC47DEE1951648AF042C12E32E4C3B38719FFB47A97AED30C5F7CBD37F7",
+        "result_code": "00",
+        "page_no": 32,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_33.json",
+        "raw_size_bytes": 808697,
+        "raw_sha256": "82B5A376B1EB4646C26F295EB2CA39066294C16859DCF497D8707FB46F5EAB2B",
+        "result_code": "00",
+        "page_no": 33,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_34.json",
+        "raw_size_bytes": 894005,
+        "raw_sha256": "AB02B175F8701C4794FE993BB0FF7214FACA6BD1B32039AFDD787C53D6FC59B0",
+        "result_code": "00",
+        "page_no": 34,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_35.json",
+        "raw_size_bytes": 866307,
+        "raw_sha256": "36D25DFB4AAAB620C96A33E1FC8ACA365E84033DFA74A7A18A2922261A173D4C",
+        "result_code": "00",
+        "page_no": 35,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_36.json",
+        "raw_size_bytes": 925571,
+        "raw_sha256": "1DEE3233F50995372E81FB7D0E68C9E98CA7C2DC976145D3AB853B6F8F419352",
+        "result_code": "00",
+        "page_no": 36,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_37.json",
+        "raw_size_bytes": 826511,
+        "raw_sha256": "C2D69806DF0F320D0785AC0D3C58C5557C9DD11C52BE5060C2DBE2A8D04E8411",
+        "result_code": "00",
+        "page_no": 37,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_38.json",
+        "raw_size_bytes": 648054,
+        "raw_sha256": "D9C83B160BE9449A2A2204F8B46206F7987F24E6BDBB10195F400D2B6728352A",
+        "result_code": "00",
+        "page_no": 38,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_39.json",
+        "raw_size_bytes": 726541,
+        "raw_sha256": "1CAD9B6E5C079CFB7B1E43744AD854DEF2B2C3FE40D4F6E80D9708796F16C69C",
+        "result_code": "00",
+        "page_no": 39,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 1000
+      },
+      {
+        "local_file": "data/raw/relief_report/osong/dssp_if_10184_pages/dssp_if_10184_page_40.json",
+        "raw_size_bytes": 100798,
+        "raw_sha256": "C6D9E0FB5FCAA3872A13E04CDD8DB30C754F9B01F9C354CEC5180C9DEF8EED20",
+        "result_code": "00",
+        "page_no": 40,
+        "num_of_rows": 1000,
+        "total_count": 39188,
+        "record_count": 188
+      }
+    ],
+    "year_counts": {
+      "2017": 2,
+      "2018": 3312,
+      "2019": 992,
+      "2020": 5634,
+      "2021": 2696,
+      "2022": 3999,
+      "2023": 7397,
+      "2024": 5719,
+      "2025": 6203,
+      "2026": 3234
+    },
+    "plus_one_year_2024_record_count": 5719,
+    "cheongju_sgg_code": "43113",
+    "cheongju_stdg_code_prefix": "4311",
+    "osong_2023_candidate_record_count": 22,
+    "osong_text_hit_record_count": 9,
+    "processed_candidate_file": "data/processed/osong/osong_relief_report_2023_candidates.json",
+    "processed_candidate_sha256": "20F556C12F89225181F77DBC7FAB732B9063C49CB09E1F8D8B35984D98915B77",
+    "validation": "DSSP-IF-10184 API source was acquired and contains Cheongju July 2023 relief-report records, including Osong textual references.",
+    "data_warning": "This is report/statistical text data, not Flood Extent geometry. Use it for event damage/evacuation interpretation."
+  },
+  "safemap_if_0092_wms_floodmarks": {
+    "source": "MOIS Safemap / ??????",
+    "source_url": "https://www.safemap.go.kr/opna/data/dataViewRenew.do?objtId=212",
+    "wms_url": "https://www.safemap.go.kr/openapi2/IF_0092_WMS",
+    "layer": "A2SM_FLUDMARKS",
+    "status": "VERIFIED",
+    "source_type": "OFFICIAL_WMS_SNAPSHOT",
+    "data_vintage": "2024 collection",
+    "request_snapshot": "2026-08-31",
+    "bbox_epsg4326": [
+      127.275,
+      36.58,
+      127.365,
+      36.67
+    ],
+    "raw_file": "data/raw/flood_extent/osong/safemap_if_0092_wms/osong_bbox_4326_layers.png",
+    "image_format": "image/png",
+    "image_dimensions": [
+      1024,
+      1024
+    ],
+    "image_size_bytes": 296634,
+    "nontransparent_pixel_count": 146863,
+    "validation": "Safemap IF_0092_WMS returned a non-empty PNG for the Osong bbox. Use as visual hazard overlay only; vector Flood Extent remains pending.",
+    "data_warning": "WMS raster image is not official vector geometry and must not be used for final exposure counts without a documented derived vector/raster mask workflow."
   }
 }

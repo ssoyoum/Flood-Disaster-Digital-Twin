@@ -1,6 +1,6 @@
 # FloodOps TODO
 
-Last Updated: 2026-08-30 23:22 KST
+Last Updated: 2026-08-31 13:05 KST
 
 - 작업 완료·상태 변경 시 TODO.md와 WORKLOG.md의 완료 여부 및 현재 상태가 서로 모순되지 않도록 함께 동기화한다.
 
@@ -10,25 +10,25 @@ Last Updated: 2026-08-30 23:22 KST
   - 기본 사건: `2023 오송 하천·교통시설 침수 · 미호강 · 궁평2지하차도`
   - 분석 흐름: `미호강·제방 → 범람 → 지하차도 → 차량·통행자`
   - 우선 분석 대상: 지하차도·교통시설
-  - 현재 확보: 2023-07-15 OSM 공간 스냅샷, 2023년 인구 래스터, Copernicus DEM, geoBoundaries, NASA POWER 보조자료, 공식 사건 보고서, KMA AWS 강우 원본, 2023-07 공식 건물통합정보, WAMIS 공식 국가하천/지방하천 SHP
-  - 미확보: 2023 오송 침수흔적도, 2023-07-15 수위 원본
+  - 현재 확보: 2023-07-15 OSM 공간 스냅샷, 2023년 인구 래스터, Copernicus DEM, SGIS 2023 오송읍 행정경계, NASA POWER 보조자료, 공식 사건 보고서, KMA AWS 강우 원본, HRFCO 10분 수위 원본, 2023-07 공식 건물통합정보, WAMIS 공식 국가하천/지방하천 SHP, Safemap 침수흔적도 WMS 스냅샷
+  - 미확보: 2023 오송 실제 침수흔적도 벡터 record
 - [ ] 오송 확보 원본 레이어와 과거자료 기반 분석값 연결
   - 실행 중 API를 호출하지 않고 승인 후 확보한 원본 응답을 스냅샷으로 사용
   - 인구는 공식 통계 우선순위와 `event_year`/자료 기준연도를 분리해 관리
-  - WAMIS 하천망과 DEM 저지대 컨텍스트는 원본/processed/API/지도 연결 완료
-  - 공식 침수흔적도 확보 전까지 실제 노출 KPI는 `PENDING_FLOOD_EXTENT`로 유지
+  - WAMIS 하천망, DEM 저지대 컨텍스트, Safemap WMS 스냅샷은 원본/API/지도 연결 완료
+  - KMA 강우와 HRFCO 수위 기반 관측 컨텍스트 분석 패널은 연결 완료
+  - 공식 벡터 침수흔적도 확보 전까지 실제 노출 KPI는 `PENDING_FLOOD_EXTENT`로 유지
 
 ## To Do
 
 ### High Priority
 
-- [ ] 행정안전부 침수흔적도 `DSSP-IF-00117` 원본 확보
-  - 오송 2023 실제 Flood Extent 확보
-  - 승인 후 1회 다운로드한 원본 응답을 저장하고 사건 연도·공간 범위·geometry·CRS·feature count 검증
-- [ ] 2023년에 가까운 한국 공식 행정경계 원본 확보
-  - SGIS boundary API는 `accessToken` 필요
-  - 행안부 도로명주소 전자지도는 신청, 본인확인, 기관 승인 필요
-  - 확보 전까지 geoBoundaries snapshot과 `event_year`를 분리 표기
+- [ ] 2023 오송 실제 침수흔적도 record 확보
+  - `DSSP-IF-00117` API 원본 전체 38,003건은 확보했으나 `FLDN_YR=2023` 후보 record는 0건
+  - `FLDN_YR=2024`도 0건이며, 오송 AOI geometry 교차 후보 516건은 2012/2016/2017/2019/2020/2022 records로 확인됨
+  - Safemap `IF_0092_WMS` 오송 bbox 스냅샷은 확보 및 지도 연결 완료했으나 raster image이므로 정밀 중첩분석용 벡터로 취급하지 않음
+  - 포털의 다른 승인 URL, 파일 export, 또는 별도 지자체/행안부 자료에서 2023 오송 실제 Flood Extent record를 추가 확인
+  - 실제 벡터 record 확보 전까지 앱의 노출 KPI는 `PENDING_FLOOD_EXTENT` 유지
 - [ ] 오송 침수흔적도와 건물·도로·궁평2지하차도 중첩 분석
   - 침수 건물 수, 침수 도로 길이, 지하차도 포함 여부를 실제 geometry로 계산
 - [ ] 2023 오송 공식 읍면동·세부 공간인구 확보
@@ -42,20 +42,19 @@ Last Updated: 2026-08-30 23:22 KST
   - Flood Extent 내부 공간분포 추정 결과만 `DERIVED`로 표시
 - [ ] 미호강 공식 하천망 기반 분석과 행정경계 보강
   - 공식 하천 공간자료: WAMIS 국가하천/지방하천 SHP 원본 확보, 오송 AOI subset, API/지도 연결 완료
+  - 공식 행정경계: SGIS 2023 오송읍 경계 원본 확보, EPSG:4326 processed 변환, API AOI 연결 완료
   - OSM 하천망은 공식 하천망과의 비교·검증 보조자료로 유지
   - 공식 Flood Extent 확보 후 하천 polygon과 침수흔적도·도로·지하차도 관계 분석
-  - 사건연도와 가장 가까운 한국 공식 행정경계 원본을 우선 확인
   - `event_year`와 `boundary_snapshot`을 별도 필드로 기록
   - 범람 원인과 읍·면·동별 집계에 사용
 
 ### Medium Priority
 
-- [ ] 피해침수 `DSSP-IF-10175` 원본 확보
-  - 실제 피해 기록과 침수흔적도·공간분석 결과를 대조해 검증
-  - 피해 유형·발생 시각·위치·공간 객체의 원본 필드 보존
-- [ ] 재해구호상황보고 `DSSP-IF-10184` 원본 확보
-  - 대피 인원·이재민 등 사건 피해 해석 자료 확보
-  - 보고 기준일과 집계 단위를 기록하고 공간자료와 구분해 저장
+- [ ] 오송 2023 직접 피해·구호 record 추가 확인
+  - `DSSP-IF-10175` 원본 전체 48,050건은 확보했으나 2023 청주/오송 후보 record는 0건
+  - `DSSP-IF-10184` 원본 전체 39,188건에서 2023년 7월 청주 `4311*` 후보 22건, 오송 관련 텍스트 hit 9건 확인
+  - `DSSP-IF-10184`는 geometry가 없는 구호상황 보고자료이므로 Flood Extent 대체자료로 사용하지 않음
+  - 포털의 다른 승인 URL, 파일 export, 또는 지자체 사건 보고서에서 오송 직접 피해·침수 geometry record를 확인
 - [ ] 네 가지 API 자료의 과거 스냅샷 검증·정규화
   - API 승인 후 원본 응답, 요청 시각, 데이터 연도, 응답 스키마, SHA-256을 manifest에 기록
   - 애플리케이션 실행 중 API를 매번 호출하거나 실시간 반영하지 않음
@@ -132,6 +131,38 @@ Last Updated: 2026-08-30 23:22 KST
 - [x] KMA AWS 강우 관측 timeline API 연결
   - `/api/events/osong-2023/flood/timeline`을 NASA 데모값에서 KMA AWS processed 144 rows로 교체
   - 관측소: 청주금천 `327`, 오창가곡 `977`, 단위 `mm`
+- [x] HRFCO/Flood Control Office 10분 수위 원본 확보 및 processed 정규화
+  - 원본: `data/raw/water_level/osong/hrfco_waterlevel_info.xml` 및 3개 지점 10분 수위 XML
+  - 관측소: 청주시(팔결교) `3011635`, 청주시(미호강교) `3011665`, 세종시(미호교) `3011685`
+  - 기간: 2023-07-14 00:00 through 2023-07-17 00:00 KST
+  - 결과: `data/processed/osong/osong_hrfco_water_level_10m_2023-07-14_17.csv`, 1,299 rows, 단위 `m`
+- [x] SGIS 2023 공식 오송읍 행정경계 원본 확보 및 AOI 연결
+  - 원본: `data/raw/admin_boundary/sgis_2023/sgis_boundary_2023_chungbuk_sgg.geojson`, `data/raw/admin_boundary/sgis_2023/sgis_boundary_2023_33043_emd.geojson`
+  - 오송읍 코드: `33043110`
+  - 결과: `data/processed/osong/osong_sgis_admin_boundary_2023.geojson`, 1개 Polygon
+  - SGIS 원본 좌표 `EPSG:5179`를 processed에서 `EPSG:4326`으로 변환하고 Backend AOI 레이어에 연결
+- [x] 행정안전부 침수흔적도 `DSSP-IF-00117` API 원본 전체 확보 및 오송 2023 부재 검증
+  - 원본: `data/raw/flood_extent/osong/dssp_if_00117_pages/`, 39 pages, 38,003 records
+  - 응답: `resultCode=00`, geometry field `GEOM`, WKT, raw CRS 추정 `EPSG:3857`
+  - 검증 결과: `FLDN_YR=2023` record 0건, 청주시 `43113`의 2023 candidate 0건
+  - 후보 processed: `data/processed/osong/osong_dssp_if_00117_2023_candidates.geojson`, 0 features
+- [x] Safemap 침수흔적도 WMS 스냅샷 확보 및 MapLibre overlay 연결
+  - 원본: `data/raw/flood_extent/osong/safemap_if_0092_wms/osong_bbox_4326_layers.png`
+  - 출처: 생활안전지도 `IF_0092_WMS`, layer `A2SM_FLUDMARKS`, 수집일 2024
+  - 검증: 1024x1024 PNG, 296,634 bytes, 비투명 픽셀 146,863
+  - 용도: 시각 검증용 Hazard overlay이며 벡터 Flood Extent 또는 노출 KPI 계산 입력으로 사용하지 않음
+- [x] KMA 강우·HRFCO 수위 기반 오송 관측 컨텍스트 분석 패널 연결
+  - API summary에 강우 피크, 강우 피크 시각/관측소, 최고수위, 미호강교 최고수위 시각을 추가
+  - Frontend에 `Observed Hydromet` 패널을 추가해 `강우 → 하천 수위 → Safemap 침수흔적` 흐름을 표시
+  - 벡터 Flood Extent 미확보 상태이므로 노출 인구·침수 건물·침수 도로 정량 KPI는 계속 `PENDING_FLOOD_EXTENT`
+- [x] 피해침수 `DSSP-IF-10175` API 원본 전체 확보 및 오송 2023 부재 검증
+  - 원본: `data/raw/damage_flood/osong/dssp_if_10175_pages/`, 49 pages, 48,050 records
+  - 검증 결과: 2023 청주시/오송 후보 0건
+  - 후보 processed: `data/processed/osong/osong_damage_flood_2023_candidates.json`, 0 records
+- [x] 재해구호상황보고 `DSSP-IF-10184` API 원본 전체 확보 및 오송 2023 후보 검증
+  - 원본: `data/raw/relief_report/osong/dssp_if_10184_pages/`, 40 pages, 39,188 records
+  - 검증 결과: 2023년 7월 청주 `4311*` 후보 22건, 오송 관련 텍스트 hit 9건
+  - 후보 processed: `data/processed/osong/osong_relief_report_2023_candidates.json`, 22 records
 - [x] 오송 사건일 기준 OSM historical snapshot 확보 및 processed 데이터 생성
   - 요청 시점: `2023-07-15T23:59:59Z`
   - 건물 2,859개, 도로 6,727개, 하천 147개, 시설 386개, 터널 95개
@@ -177,21 +208,18 @@ Last Updated: 2026-08-30 23:22 KST
 
 사용자가 직접 제공하거나 공식 사이트에서 수동 다운로드해야 하는 데이터입니다. 새 데이터 출처를 추가하라는 뜻이 아니라, 이미 확인한 공식 출처가 인증/승인/수동 다운로드 단계에 있어 대기 중이라는 의미입니다.
 
-- [ ] 2023년에 가까운 한국 공식 행정경계 원본 확보
-  - 상태: `MANUAL_DOWNLOAD_REQUIRED`
-  - SGIS: `accessToken` 필요
-  - 행안부 도로명주소 전자지도: 신청, 본인확인, 기관 승인 필요
-  - 상세 사유: `data/manifests/source-availability.yml`의 행정경계 항목
-
 - [ ] 행정안전부 재난안전데이터공유플랫폼 API 승인 후 원본 응답 저장
   - 상태: `BLOCKED_BY_API_APPROVAL`
-  - 대상: `DSSP-IF-00117`, `DSSP-IF-10175`, `DSSP-IF-10184`, `DSSP-IF-00247`
+  - 대상: `DSSP-IF-00247`
   - 승인 및 service key 발급 후 사건 기간/지역 기준으로 1회 원본 응답을 저장
 
 ## Known Issues
 
 - [ ] 오송 Flood Extent는 현재 사건 위치 기반 임시 폴리곤이며 관측 침수흔적도가 아님
-- [ ] 신청한 재난안전데이터공유플랫폼 API는 승인 전이라 실제 응답을 저장하지 못함
+- [ ] `DSSP-IF-00117` 원본 API는 정상 응답을 확보했지만 2023 오송/청주 후보 record가 없어 실제 Flood Extent로 연결하지 않음
+- [ ] `DSSP-IF-10175` 원본 API는 정상 응답을 확보했지만 2023 오송/청주 후보 record가 없어 직접 피해침수 record로 연결하지 않음
+- [ ] `DSSP-IF-10184` 원본 API에는 2023년 7월 청주/오송 구호상황 후보가 있으나 geometry가 없는 보고자료이므로 Flood Extent로 대체하지 않음
+- [ ] `DSSP-IF-00247` 긴급재난문자는 현재 available key set에서 `SERVICE_ACCESS_DENIED`
 - [ ] 공식 세부 공간인구는 아직 확보 전이며, 공식 읍면동 인구는 확보됨. WorldPop은 fallback 공간분포 자료로만 사용
 - [ ] DEM 저지대 컨텍스트는 연결 완료, 흐름 방향·집수 경로 분석은 미구현
 - [ ] OSM 건물과 Facilities/POI는 같은 OSM 원본에서 분리한 별도 레이어이며, 같은 장소에서 겹칠 수 있음
@@ -199,6 +227,6 @@ Last Updated: 2026-08-30 23:22 KST
 - [ ] OSM 2026-08-30 스냅샷은 2023 오송 당시 분석에서 제외하고, 추후 현재 비교용 데이터로만 검토
 - [ ] 공식 건물 분석 데이터는 processed 변환과 OSM QA 플래그 생성까지 완료됐지만, 공식 침수흔적도와의 중첩 계산은 아직 미완료
 - [ ] NASA POWER 강수는 재분석 자료이며 실제 관측소 강우량을 대체하지 않음
-- [ ] geoBoundaries ADM2는 `boundary_snapshot: 2020`이며 `event_year: 2023`과 별도임; 2023년에 더 가까운 한국 공식 ADM2 원본을 추가 확인해야 함
+- [ ] geoBoundaries ADM2는 SGIS 2023 공식 오송읍 경계 확보 이후 fallback/reference로만 유지
 - [ ] 오송 AOI OSM 행정경계 쿼리는 서버 timeout으로 확보하지 못해 geoBoundaries로 대체함
 - [ ] 전국 침수흔적도는 후보 데이터셋만 확인했으며 오송 record 다운로드는 미완료
