@@ -12,6 +12,78 @@ SAFEMAP_WMS_BBOX = [127.275, 36.58, 127.365, 36.67]
 
 EMPTY_FEATURE_COLLECTION = {"type": "FeatureCollection", "features": []}
 
+OSONG_RECONSTRUCTION_EVENTS = [
+    {
+        "time": "2023-07-15T04:10:00+09:00",
+        "label": "Flood warning",
+        "state": "warning",
+        "description": "Flood warning issued before the underpass inundation sequence.",
+        "source": "Official incident timeline; source-page evidence pending",
+        "role": "Incident Record",
+        "confidence": "NEEDS_SOURCE_PAGE",
+    },
+    {
+        "time": "2023-07-15T06:40:00+09:00",
+        "label": "Miho River design flood level reached",
+        "state": "hydraulic_warning",
+        "description": "Miho River bridge water level reached the reported design flood level of 29.02 m.",
+        "source": "Official incident timeline + HRFCO observation context; source-page evidence pending",
+        "role": "Hydromet Threshold",
+        "confidence": "NEEDS_SOURCE_PAGE",
+    },
+    {
+        "time": "2023-07-15T07:50:00+09:00",
+        "label": "Overtopping begins",
+        "state": "overtopping",
+        "description": "Reported overflow near the temporary levee before structural failure.",
+        "source": "Official incident timeline; source-page evidence pending",
+        "role": "Incident Record",
+        "confidence": "NEEDS_SOURCE_PAGE",
+    },
+    {
+        "time": "2023-07-15T08:09:00+09:00",
+        "label": "Temporary levee failure",
+        "state": "levee_failure",
+        "description": "Temporary levee failure is treated as the baseline simulation event that changes the underpass risk state.",
+        "source": "Official incident timeline; source-page evidence pending",
+        "role": "Baseline Event",
+        "confidence": "NEEDS_SOURCE_PAGE",
+    },
+    {
+        "time": "2023-07-15T08:27:00+09:00",
+        "label": "Underpass inflow starts",
+        "state": "underpass_inflow",
+        "description": "Water inflow into Gungpyeong 2 Underpass begins; rule-based auto-closure scenario activates here.",
+        "source": "Official incident timeline / CCTV-derived timing; source-page evidence pending",
+        "role": "Validation Target",
+        "confidence": "NEEDS_SOURCE_PAGE",
+    },
+    {
+        "time": "2023-07-15T08:35:00+09:00",
+        "label": "Unsafe driving condition",
+        "state": "unsafe_driving",
+        "description": "The underpass is treated as unsafe for vehicle passage.",
+        "source": "Official incident timeline / CCTV-derived timing; source-page evidence pending",
+        "role": "Validation Target",
+        "confidence": "NEEDS_SOURCE_PAGE",
+    },
+    {
+        "time": "2023-07-15T08:40:00+09:00",
+        "label": "Full inundation",
+        "state": "full_inundation",
+        "description": "The underpass reaches full inundation in the baseline sequence.",
+        "source": "Official incident timeline / CCTV-derived timing; source-page evidence pending",
+        "role": "Validation Target",
+        "confidence": "NEEDS_SOURCE_PAGE",
+    },
+]
+
+
+def _minutes_between(start: str, end: str) -> int:
+    from datetime import datetime
+
+    return int((datetime.fromisoformat(end) - datetime.fromisoformat(start)).total_seconds() // 60)
+
 
 def _read_geojson(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
@@ -421,6 +493,15 @@ def get_osong_repository(layer_year: int = 2023) -> dict[str, Any]:
             source="Copernicus DEM GLO-30 derived low-elevation context",
             snapshot="2011-2015 acquisition; object modified 2022-05-09",
         ),
+        "approx_flood_envelope": _layer(
+            "approx_flood_envelope",
+            "Approximate Flood Envelope Timeline",
+            OSONG_DIR / "osong_approx_flood_envelope_timeline.geojson",
+            status="TEMPORARY",
+            source_type="DERIVED_APPROXIMATION",
+            source="KMA rainfall + Flood Control Office water level + Copernicus DEM + WAMIS river geometry + incident timeline",
+            snapshot="2023-07-15 incident timeline with 2023-07-14 through 2023-07-17 observations",
+        ),
         "facilities": _layer(
             "facilities",
             f"OSM Facilities {layer_year}",
@@ -510,12 +591,111 @@ def get_osong_data_status() -> dict[str, Any]:
     return get_osong_repository()["data_status"]
 
 
+def get_osong_reconstruction() -> dict[str, Any]:
+    repo = get_osong_repository()
+    events = OSONG_RECONSTRUCTION_EVENTS
+    by_state = {event["state"]: event for event in events}
+    inflow_time = by_state["underpass_inflow"]["time"]
+    unsafe_time = by_state["unsafe_driving"]["time"]
+    full_time = by_state["full_inundation"]["time"]
+    levee_failure_time = by_state["levee_failure"]["time"]
+    response_window_min = _minutes_between(inflow_time, unsafe_time)
+    full_inundation_window_min = _minutes_between(inflow_time, full_time)
+    failure_to_inflow_min = _minutes_between(levee_failure_time, inflow_time)
+
+    return {
+        "event_id": "osong-2023",
+        "title": "2023 Osong observed event reconstruction",
+        "model_type": "Historical Disaster Reconstruction Digital Twin MVP",
+        "event_year": 2023,
+        "status": "READY_FOR_RULE_BASED_REPLAY",
+        "replay": events,
+        "baseline": {
+            "name": "Baseline: 2023 observed incident sequence",
+            "description": "Observed rainfall, water-level context, and official incident timing are replayed as a rule-based state sequence.",
+            "states": [
+                {"state": "warning", "time": by_state["warning"]["time"], "underpass_status": "open", "risk": "elevated"},
+                {"state": "levee_failure", "time": levee_failure_time, "underpass_status": "open", "risk": "critical"},
+                {"state": "underpass_inflow", "time": inflow_time, "underpass_status": "open", "risk": "life_safety_threat"},
+                {"state": "unsafe_driving", "time": unsafe_time, "underpass_status": "unsafe", "risk": "vehicle_passage_not_viable"},
+                {"state": "full_inundation", "time": full_time, "underpass_status": "inundated", "risk": "complete_loss_of_service"},
+            ],
+            "failure_to_inflow_min": failure_to_inflow_min,
+            "inflow_to_unsafe_min": response_window_min,
+            "inflow_to_full_inundation_min": full_inundation_window_min,
+        },
+        "intervention": {
+            "name": "Scenario A: water-depth sensor + automatic entrance closure",
+            "type": "ROAD_CLOSURE",
+            "trigger": "underpass_water_depth >= 0.15 m",
+            "trigger_time": inflow_time,
+            "trigger_basis": "Scenario rule based on post-incident automatic closure concept; not hydraulically simulated.",
+            "closure_action": "Close underpass entrances and block new vehicle entry.",
+            "estimated_effect": "Prevents additional entry after detected inflow; does not estimate vehicles already inside.",
+            "available_response_window_min": response_window_min,
+            "time_until_full_inundation_min": full_inundation_window_min,
+            "result_status": "RULE_BASED_INTERVENTION",
+        },
+        "provenance": [
+            {
+                "source": repo["rainfall"].get("source"),
+                "data_vintage": repo["rainfall"].get("period"),
+                "role": "Observed Input",
+                "status": repo["rainfall"].get("status"),
+            },
+            {
+                "source": repo["water_level"].get("source"),
+                "data_vintage": repo["water_level"].get("period"),
+                "role": "Observed Input",
+                "status": repo["water_level"].get("status"),
+            },
+            {
+                "source": "Official incident timeline / CCTV-derived timing",
+                "data_vintage": "2023-07-15; source-page evidence pending",
+                "role": "Incident State Validation",
+                "status": "TEMPORARY",
+            },
+            {
+                "source": repo["layers"]["approx_flood_envelope"].get("source"),
+                "data_vintage": repo["layers"]["approx_flood_envelope"].get("snapshot"),
+                "role": "Approximate visualization envelope",
+                "status": repo["layers"]["approx_flood_envelope"].get("status"),
+            },
+            {
+                "source": repo["layers"]["underpass"].get("source"),
+                "data_vintage": repo["layers"]["underpass"].get("snapshot"),
+                "role": "Transport Facility Geometry",
+                "status": repo["layers"]["underpass"].get("status"),
+            },
+            {
+                "source": repo["safemap_floodmarks"].get("source"),
+                "data_vintage": repo["safemap_floodmarks"].get("data_vintage"),
+                "role": "Visual verification only",
+                "status": repo["safemap_floodmarks"].get("status"),
+            },
+        ],
+        "limitations": [
+            "This MVP reconstructs the observed event timeline and intervention window; it is not a calibrated 2D hydraulic model.",
+            "Underpass water depth is not computed from hydraulics. The 15 cm threshold is represented as a rule-based intervention trigger.",
+            "Approximate flood envelope is a temporary DEM-constrained visualization layer, not official Flood Extent or a hydraulic simulation.",
+            "Flood Extent and exposure counts remain PENDING_FLOOD_EXTENT until verified vector flood geometry or calibrated simulation output is available.",
+            "CCTV-derived inundation timestamps still need explicit source-page evidence in the manifest.",
+        ],
+    }
+
+
 def get_osong_summary() -> dict[str, Any]:
     repo = get_osong_repository()
     layers = repo["layers"]
+    reconstruction = get_osong_reconstruction()
     return {
         "event_id": "osong-2023",
         "origin": "DERIVED",
+        "model_type": "Historical Disaster Reconstruction Digital Twin MVP",
+        "baseline_state": "Observed incident replay connected",
+        "intervention_state": "Scenario A rule-based auto-closure available",
+        "response_window_min": reconstruction["intervention"]["available_response_window_min"],
+        "time_until_full_inundation_min": reconstruction["intervention"]["time_until_full_inundation_min"],
         "official_population": repo["population"]["osong_population"],
         "official_population_unit": repo["population"]["unit"],
         "building_count": layers["buildings"]["feature_count"],

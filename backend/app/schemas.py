@@ -38,6 +38,11 @@ class FloodEvent(BaseModel):
 class ExposureMetrics(BaseModel):
     event_id: str
     origin: DataOrigin = "DERIVED"
+    model_type: str | None = None
+    baseline_state: str | None = None
+    intervention_state: str | None = None
+    response_window_min: int | None = None
+    time_until_full_inundation_min: int | None = None
     official_population: int | None
     building_count: int
     road_count: int
@@ -45,9 +50,17 @@ class ExposureMetrics(BaseModel):
     terrain_low_elevation_cells: int
     terrain_low_elevation_threshold_m: float | None
     rainfall_peak_mm_per_hour: float | None
+    rainfall_peak_timestamp: str | None = None
+    rainfall_peak_station_name: str | None = None
     rainfall_records: int | None
+    water_level_peak_m: float | None = None
+    water_level_peak_timestamp: str | None = None
+    water_level_peak_station_name: str | None = None
+    primary_water_level_peak_m: float | None = None
+    primary_water_level_peak_timestamp: str | None = None
     facility_count: int
     underpass_available: bool
+    safemap_floodmarks_available: bool | None = None
     flooded_area_km2: float | str
     exposed_population: int | str
     exposed_buildings: int | str

@@ -1,4 +1,4 @@
-import type { DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, SafetyDataApiTestResult, ScenarioResult, InterventionType } from "./types";
+import type { DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType } from "./types";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 
@@ -23,6 +23,7 @@ export const getTimeline = (eventId: string) => request<Observation[]>(`/api/eve
 export const getLayers = (eventId: string, layerYear = 2023) => request<LayersResponse>(`/api/events/${eventId}/layers?layer_year=${encodeURIComponent(layerYear)}`);
 export const getSummary = (eventId: string) => request<ExposureMetrics>(`/api/events/${eventId}/summary`);
 export const getStatus = (eventId: string) => request<DataStatusResponse>(`/api/events/${eventId}/status`);
+export const getReconstruction = (eventId: string) => request<ReconstructionResponse>(`/api/events/${eventId}/reconstruction`);
 export const getBuildings = () => request<GeoJson>("/api/buildings");
 export const getRoads = () => request<GeoJson>("/api/roads");
 export const getInfrastructure = () => request<GeoJson>("/api/infrastructure");

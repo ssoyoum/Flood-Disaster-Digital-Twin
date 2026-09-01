@@ -4,7 +4,7 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from .data import EVENT_ID, EVENT_OBSERVATIONS, OBSERVATIONS, get_event, get_events, get_layers
-from .osong_repository import SAFEMAP_WMS_SNAPSHOT, get_osong_data_status, get_osong_summary
+from .osong_repository import SAFEMAP_WMS_SNAPSHOT, get_osong_data_status, get_osong_reconstruction, get_osong_summary
 from .schemas import Intervention, ScenarioRequest, ScenarioResult
 from .services import apply_intervention, calculate_baseline
 
@@ -104,6 +104,14 @@ def event_summary(event_id: str):
         "origin": "UNAVAILABLE",
         "data_status": "Processed data is not connected for this event.",
     }
+
+
+@app.get("/api/events/{event_id}/reconstruction")
+def event_reconstruction(event_id: str):
+    _require_event(event_id)
+    if event_id == EVENT_ID:
+        return get_osong_reconstruction()
+    raise HTTPException(status_code=404, detail="Reconstruction is not connected for this event")
 
 
 @app.post("/api/integrations/safety-data/test")

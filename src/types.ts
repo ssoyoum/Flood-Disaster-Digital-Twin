@@ -49,6 +49,7 @@ export type LayersResponse = {
   buildings: LayerPayload;
   waterways: LayerPayload;
   terrain: LayerPayload;
+  approx_flood_envelope: LayerPayload;
   facilities: LayerPayload;
   underpass: LayerPayload;
   flood_extent: LayerPayload;
@@ -97,6 +98,11 @@ export type SafetyDataApiTestResult = {
 export type ExposureMetrics = {
   event_id: string;
   origin: DataStatus;
+  model_type?: string | null;
+  baseline_state?: string | null;
+  intervention_state?: string | null;
+  response_window_min?: number | null;
+  time_until_full_inundation_min?: number | null;
   official_population: number | null;
   building_count: number;
   road_count: number;
@@ -132,6 +138,57 @@ export type Observation = {
   unit: string;
   quality_flag: string;
   origin: DataStatus;
+};
+
+export type ReconstructionEvent = {
+  time: string;
+  label: string;
+  state: string;
+  description: string;
+  source: string;
+  role: string;
+  confidence: string;
+};
+
+export type ReconstructionResponse = {
+  event_id: string;
+  title: string;
+  model_type: string;
+  event_year: number;
+  status: string;
+  replay: ReconstructionEvent[];
+  baseline: {
+    name: string;
+    description: string;
+    states: Array<{
+      state: string;
+      time: string;
+      underpass_status: string;
+      risk: string;
+    }>;
+    failure_to_inflow_min: number;
+    inflow_to_unsafe_min: number;
+    inflow_to_full_inundation_min: number;
+  };
+  intervention: {
+    name: string;
+    type: InterventionType;
+    trigger: string;
+    trigger_time: string;
+    trigger_basis: string;
+    closure_action: string;
+    estimated_effect: string;
+    available_response_window_min: number;
+    time_until_full_inundation_min: number;
+    result_status: string;
+  };
+  provenance: Array<{
+    source: string;
+    data_vintage: string;
+    role: string;
+    status: DataStatus | string;
+  }>;
+  limitations: string[];
 };
 
 export type InterventionType =

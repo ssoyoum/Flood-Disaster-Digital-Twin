@@ -1,0 +1,51 @@
+{
+  "created_at": "2026-09-01T01:19:16.539932+00:00",
+  "output_file": "data\\processed\\osong\\osong_approx_flood_envelope_timeline.geojson",
+  "status": "TEMPORARY",
+  "source_type": "DERIVED_APPROXIMATION",
+  "crs": "EPSG:4326 / CRS84",
+  "geometry_types": [
+    "LineString",
+    "Polygon"
+  ],
+  "feature_count": 1127,
+  "stage_counts": {
+    "warning": 0,
+    "hydraulic_warning": 36,
+    "overtopping": 96,
+    "levee_failure": 182,
+    "underpass_inflow": 241,
+    "unsafe_driving": 270,
+    "full_inundation": 298
+  },
+  "input_files": [
+    "data\\processed\\osong\\osong_dem_low_elevation_context.geojson",
+    "data\\processed\\osong\\osong_wamis_rivers.geojson",
+    "data\\processed\\osong\\gungpyeong2_underpass.geojson",
+    "data\\processed\\osong\\osong_kma_aws_rainfall_2023-07-14_17.csv",
+    "data\\processed\\osong\\osong_hrfco_water_level_10m_2023-07-14_17.csv"
+  ],
+  "rainfall_context": {
+    "source": "KMA AWS/ASOS rainfall observation",
+    "period": "2023-07-14 01:00 through 2023-07-17 00:00 KST",
+    "records": 144,
+    "peak_mm_per_hour": 32.5,
+    "peak_timestamp": "2023-07-15 06:00",
+    "peak_station_id": "327",
+    "peak_station_name": "청주금천"
+  },
+  "water_level_context": {
+    "source": "Flood Control Office water-level observation",
+    "period": "2023-07-14 00:00 through 2023-07-17 00:00 KST",
+    "records": 1299,
+    "peak_m": 10.09,
+    "peak_timestamp": "2023-07-15 09:20",
+    "peak_station_id": "3011665",
+    "peak_station_name": "청주시(미호강교)"
+  },
+  "validity_assessment": {
+    "appropriate_use": "Visual historical reconstruction and communication of plausible low-lying affected envelope by timeline stage.",
+    "inappropriate_use": "Official flood extent, hydraulic simulation, depth/velocity estimate, or final exposure KPI.",
+    "confidence": "LOW_TO_MEDIUM_FOR_SPATIAL_EXTENT; MEDIUM_FOR_EVENT_SEQUENCE_VISUALIZATION"
+  }
+}

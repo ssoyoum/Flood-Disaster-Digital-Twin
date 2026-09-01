@@ -41,6 +41,9 @@ def test_osong_layers_use_processed_files():
     assert layers["waterways"]["snapshot"] == "NOT RECORDED"
     assert layers["terrain"]["feature_count"] == 303
     assert layers["terrain"]["source_type"] == "DEM_TERRAIN_CONTEXT"
+    assert layers["approx_flood_envelope"]["status"] == "TEMPORARY"
+    assert layers["approx_flood_envelope"]["source_type"] == "DERIVED_APPROXIMATION"
+    assert layers["approx_flood_envelope"]["feature_count"] > 0
     assert layers["facilities"]["feature_count"] == 386
     assert layers["underpass"]["feature_count"] == 1
     assert layers["underpass"]["data"]["features"][0]["geometry"]["type"] == "MultiLineString"
@@ -56,6 +59,7 @@ def test_osong_layers_ignore_current_osm_for_incident_analysis():
     assert layers["waterways"]["snapshot"] == "NOT RECORDED"
     assert layers["waterways"]["feature_count"] == 8
     assert layers["terrain"]["feature_count"] == 303
+    assert layers["approx_flood_envelope"]["status"] == "TEMPORARY"
     assert layers["facilities"]["feature_count"] == 386
 
 
@@ -75,6 +79,7 @@ def test_osong_status_separates_source_types():
     assert status["population"]["status"] == "VERIFIED"
     assert status["dem"]["source_type"] == "DEM"
     assert status["dem"]["low_elevation_feature_count"] == 303
+    assert status["layers"]["approx_flood_envelope"]["status"] == "TEMPORARY"
 
 
 def test_osong_timeline_uses_kma_observations():
@@ -103,8 +108,25 @@ def test_osong_summary_does_not_calculate_exposure_without_flood_extent():
     assert summary["primary_water_level_peak_m"] is not None
     assert summary["underpass_available"] is True
     assert summary["safemap_floodmarks_available"] is True
+    assert summary["model_type"] == "Historical Disaster Reconstruction Digital Twin MVP"
+    assert summary["response_window_min"] == 8
+    assert summary["time_until_full_inundation_min"] == 13
     assert summary["exposed_population"] == "PENDING_FLOOD_EXTENT"
     assert summary["exposed_buildings"] == "PENDING_FLOOD_EXTENT"
+
+
+def test_osong_reconstruction_serves_replay_and_rule_based_intervention():
+    response = client.get("/api/events/osong-2023/reconstruction")
+    assert response.status_code == 200
+    reconstruction = response.json()
+    assert reconstruction["model_type"] == "Historical Disaster Reconstruction Digital Twin MVP"
+    assert len(reconstruction["replay"]) == 7
+    assert reconstruction["baseline"]["failure_to_inflow_min"] == 18
+    assert reconstruction["baseline"]["inflow_to_unsafe_min"] == 8
+    assert reconstruction["intervention"]["type"] == "ROAD_CLOSURE"
+    assert reconstruction["intervention"]["trigger"] == "underpass_water_depth >= 0.15 m"
+    assert reconstruction["intervention"]["available_response_window_min"] == 8
+    assert any("not a calibrated 2D hydraulic model" in item for item in reconstruction["limitations"])
 
 
 def test_osong_safemap_wms_snapshot_serves_local_png():
@@ -120,3 +142,17 @@ def test_baseline_uses_pending_exposure_metrics():
     result = response.json()["result"]
     assert result["event_id"] == "osong-2023"
     assert result["exposed_population"] == "PENDING_FLOOD_EXTENT"
+
+
+def test_road_closure_intervention_returns_rule_based_auto_closure():
+    response = client.post(
+        "/api/scenarios",
+        json={"name": "Auto closure", "intervention_type": "ROAD_CLOSURE", "event_id": "osong-2023"},
+    )
+    assert response.status_code == 200
+    scenario = response.json()
+    assert scenario["intervention"]["type"] == "ROAD_CLOSURE"
+    assert scenario["result"]["intervention_state"] == "Scenario A: water-depth sensor + automatic entrance closure"
+    assert scenario["result"]["response_window_min"] == 8
+    assert scenario["result"]["exposed_population"] == "PENDING_FLOOD_EXTENT"
+    assert any("water-depth sensor" in item for item in scenario["assumptions"])

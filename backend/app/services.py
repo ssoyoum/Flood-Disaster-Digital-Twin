@@ -1,5 +1,5 @@
 from .data import EVENT_ID
-from .osong_repository import get_osong_summary
+from .osong_repository import get_osong_reconstruction, get_osong_summary
 from .schemas import ExposureMetrics, Intervention
 
 
@@ -31,6 +31,22 @@ def calculate_baseline(event_id: str = EVENT_ID) -> ExposureMetrics:
 
 def apply_intervention(intervention: Intervention, event_id: str = EVENT_ID) -> tuple[ExposureMetrics, list[str]]:
     baseline = calculate_baseline(event_id)
+    if event_id == EVENT_ID and intervention.type == "ROAD_CLOSURE":
+        reconstruction = get_osong_reconstruction()
+        result = baseline.model_copy(
+            update={
+                "intervention_state": reconstruction["intervention"]["name"],
+                "response_window_min": reconstruction["intervention"]["available_response_window_min"],
+                "time_until_full_inundation_min": reconstruction["intervention"]["time_until_full_inundation_min"],
+                "data_status": "Rule-based auto-closure scenario connected. Exposure KPIs remain PENDING_FLOOD_EXTENT.",
+            }
+        )
+        return result, [
+            "Scenario A uses a water-depth sensor + automatic entrance closure rule.",
+            "The trigger threshold is represented as underpass_water_depth >= 0.15 m, but underpass depth is not hydraulically simulated.",
+            "The intervention blocks new entries after detected inflow and does not estimate vehicles already inside.",
+            "Exposure reduction is not calculated until vector Flood Extent or calibrated simulation output is available.",
+        ]
     return baseline, [
         "Official Flood Extent is unavailable, so exposure reduction is not calculated.",
         f"{intervention.type} is retained as future scenario metadata only.",
