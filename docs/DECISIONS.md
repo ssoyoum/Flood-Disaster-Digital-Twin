@@ -1,91 +1,97 @@
 # FloodOps Decisions
 
-중요한 기술·데이터 선택을 기록한다. 새로운 결정은 날짜, 결정 내용, 이유, 영향과 함께 추가한다.
+Last updated: 2026-09-01
 
-## Decision Record Template
+This document records important design and data decisions. Detailed daily work belongs in `WORKLOG.md`; current priorities belong in `TODO.md`.
 
-기술 선택은 다음 질문을 검토한 뒤 기록한다.
+## D-001 Target Reference Case
 
-- 왜 Leaflet이 아니라 MapLibre인가?
-- 왜 React Query와 Zustand를 분리했는가?
-- 왜 PostGIS를 사용하는가?
-- 왜 GeoJSON에서 Vector Tile로 전환하는가?
-- 왜 WebSocket을 사용하는가?
-- 왜 Simulation을 Backend로 분리하는가?
-- 왜 Cesium은 후순위인가?
+- Date: 2026-08-30
+- Decision: Start the MVP with `osong-2023`.
+- Reason: The Osong case connects river flooding, levee failure, transport infrastructure, underpass inundation, and response timing in one compact reference case.
+- Impact: Data acquisition, API design, UI, and scenario logic prioritize the 2023 Osong event before expanding to other cases.
 
-## D-001 대표 사건
+## D-002 Keep Event Year and Data Vintage Separate
 
-- 날짜: 2026-08-30
-- 결정: MVP 대표 사건은 `osong-2023`으로 시작한다.
-- 이유: 하천 범람과 지하차도·교통시설 노출을 하나의 사건 흐름으로 설명할 수 있다.
-- 영향: 현재 데이터 확보와 검증은 오송 2023을 우선한다.
+- Date: 2026-08-30
+- Decision: Track `event_year`, `data_vintage`, `boundary_snapshot`, `snapshot_date`, and acquisition date separately.
+- Reason: Historical reconstruction can use data collected or published at different times.
+- Impact: The UI and manifests must not imply that every layer is 2023 data just because the event year is 2023.
 
-## D-002 시간 정합성
+## D-003 Separate Official Event Evidence from Spatial Context Data
 
-- 날짜: 2026-08-30
-- 결정: `event_year`, `data_year`, `boundary_snapshot`, `snapshot_date`를 별도 필드로 기록한다.
-- 이유: 사건 발생연도와 데이터 제작·조회 시점을 혼동하지 않기 위해서다.
-- 영향: 공간자료와 관측자료는 사건 시점과 가장 가까운 유효 snapshot을 선택한다.
+- Date: 2026-08-30
+- Decision: Use official or observed data for rainfall, water level, incident evidence, flood marks, damage, and relief records when available. Use OSM, WorldPop, Copernicus DEM, and similar data as spatial context or fallback analysis inputs.
+- Reason: Event causality and impact interpretation should not be replaced by generic global/open data when official event evidence exists.
+- Impact: OSM/NASA-style sources are not presented as official incident evidence.
 
-## D-003 공식자료와 공간 기반자료의 역할 분리
+## D-004 Population Data Priority
 
-- 날짜: 2026-08-30
-- 결정: 침수·강우·피해·대피 해석은 공식자료를 우선하고, 건물·도로·하천·인구분포·고도 등 공간분석 기반자료는 오픈데이터를 활용할 수 있다.
-- 이유: 사건 자체의 사실성은 공식자료로 확보하고, 공간분석의 재현성과 범용성은 공개 기반자료로 보완하기 위해서다.
-- 영향: OSM, WorldPop, Copernicus DEM은 공식 사건자료의 대체물이 아니다.
+- Date: 2026-08-30
+- Decision: Prioritize official fine-grained population data, then official eup/myeon/dong population plus WorldPop spatial distribution, then WorldPop-only fallback.
+- Reason: Total population and regional comparison values should come from official statistics.
+- Impact: WorldPop is used for spatial distribution estimation, not as a direct replacement for official local totals.
 
-## D-004 인구자료 우선순위
+## D-005 NASA POWER Classification
 
-- 날짜: 2026-08-30
-- 결정: 공식 세부 공간인구, 공식 읍면동 인구와 WorldPop 보정, WorldPop 단독 fallback 순서로 사용한다.
-- 이유: 읍면동 전체 인구와 지역 비교는 공식 통계를 사용해야 한다.
-- 영향: WorldPop은 Flood Extent 내부 공간분포 추정에만 사용한다.
+- Date: 2026-08-30
+- Decision: NASA POWER raw data is classified as `REANALYSIS`; project-converted CSV outputs are classified as `DERIVED`.
+- Reason: The project did not create the NASA reanalysis source, but it did create processed derivatives.
+- Impact: KMA AWS/ASOS remains the primary observed rainfall source for the Osong reconstruction.
 
-## D-005 NASA POWER 분류
+## D-006 Use API Downloads as Historical Snapshots
 
-- 날짜: 2026-08-30
-- 결정: NASA POWER 원본은 `source_type: REANALYSIS` 및 `raw_status: VERIFIED`로 기록하고, 프로젝트용 CSV 변환본만 `processed_status: DERIVED`로 기록한다.
-- 이유: 원본 재분석자료와 프로젝트가 생성한 가공본을 구분하기 위해서다.
-- 영향: 기상청 AWS/ASOS 실제 관측값을 주 강우자료로 유지한다.
+- Date: 2026-08-30
+- Decision: Approved external API responses are stored as raw historical snapshots. The running application should not call external historical-data APIs on every request.
+- Reason: The project reconstructs past events and needs reproducible data states.
+- Impact: APIs are useful for periodic dataset refresh, not live runtime dependency in the MVP.
 
-## D-006 과거자료 기반 실행
+## D-007 Gungpyeong 2 Underpass MVP Scope
 
-- 날짜: 2026-08-30
-- 결정: 승인된 API 응답과 다운로드 원본은 historical snapshot으로 저장하고, 애플리케이션 실행 중 매번 외부 API를 호출하지 않는다.
-- 이유: 과거 사건 시뮬레이션의 재현성을 보장하기 위해서다.
-- 영향: API는 초기 확보와 추후 연간 갱신에만 사용한다.
+- Date: 2026-08-30
+- Decision: Model Gungpyeong 2 underpass as the single core transport facility for the Osong MVP.
+- Reason: It is the central thematic asset and can be validated with official facility information and local geometry.
+- Impact: Traffic volume and vehicle-level exposure modeling are deferred.
 
-## D-007 궁평2지하차도 MVP 범위
+## D-008 Document Responsibilities
 
-- 날짜: 2026-08-30
-- 결정: 오송 MVP의 핵심 교통시설은 궁평2지하차도 1개로 제한한다.
-- 이유: 시설정보와 geometry를 검증 가능한 범위로 먼저 결합하기 위해서다.
-- 영향: 차량별 노출, 실시간 교통량, 복잡한 교통 시뮬레이션은 후속 범위다.
+- Date: 2026-08-30
+- Decision: Keep document roles separate.
+- Files:
+  - `README.md`: project entry and run instructions
+  - `TODO.md`: current work and priority
+  - `docs/PROJECT_PLAN.md`: planning and product direction
+  - `docs/DEVELOPMENT_GUIDE.md`: implementation rules
+  - `docs/DATA_GUIDE.md`: data acquisition and provenance rules
+  - `docs/ARCHITECTURE.md`: system structure
+  - `docs/DECISIONS.md`: design and data decisions
+  - `docs/data-quality.md`: data-quality issues
+- Impact: Avoid copying the same explanation into multiple documents.
 
-## D-008 문서와 상태의 기준 위치
+## D-009 Official 2023 Building Layer
 
-- 프로젝트 계획과 범위: `docs/PROJECT_PLAN.md`
-- 개발·테스트 규칙: `docs/DEVELOPMENT_GUIDE.md`
-- 데이터 정책과 상태 정의: `docs/DATA_GUIDE.md` 및 `data/manifests/`
-- 실행 구조: `docs/ARCHITECTURE.md`
-- 현재 작업: `TODO.md`
+- Date: 2026-08-30
+- Decision: Use MOLIT/VWorld `GIS Building Integrated Information` 2023-07 SHP as the authoritative building layer for the 2023 Osong analysis.
+- Reason: OSM and official building data differ; the official 2023 dataset is more defensible as the analysis baseline.
+- Impact: OSM 2023 building footprints are used as QA/cross-validation, with `MATCHED`, `OFFICIAL_ONLY`, and `OSM_ONLY` flags. OSM 2026 is excluded from 2023 incident analysis and kept only for current-state comparison.
 
-## D-009 오송 건물 기준 레이어
+## D-010 Osong Reconstruction Does Not Depend on Flood Extent First
 
-- 날짜: 2026-08-30
-- 결정: 2023 오송 건물 분석의 authoritative building layer는 국토교통부/VWorld `GIS건물통합정보` 충청북도 전체데이터 기준일 2023-07-12 SHP로 둔다.
-- 이유: OSM 건물과 공식 건물통합정보는 서로 누락·차이가 있으므로, 사건 당시 분석 기준을 공식 2023 SHP로 두는 편이 더 방어 가능하다.
-- 영향: OSM 2023 건물 footprint는 공식 데이터와의 공간 매칭 및 QA 보조 레이어로 사용하고, 자동 병합하지 않는다.
-- 영향: 공간 매칭 결과는 `MATCHED`, `OFFICIAL_ONLY`, `OSM_ONLY` 플래그로 보존한다.
-- 영향: OSM 2026 스냅샷은 2023 당시 분석에서 제외하고, 추후 현재 상태 비교용 후보로만 보관한다.
+- Date: 2026-08-31
+- Decision: Treat the Osong case as an observed-event reconstruction based on rainfall, water level, incident timeline, levee events, and underpass inundation timing. Official Flood Extent is validation material, not the only starting point.
+- Reason: The Osong disaster is strongly explained by hydromet observations and event timing even when an official vector flood extent is unavailable.
+- Impact: Historical Replay and baseline/intervention logic can proceed, while final exposure geometry remains pending.
 
-## Change Log
+## D-011 Approximate Flood Envelope Classification
 
-### 2026-08-30
+- Date: 2026-09-01
+- Decision: Keep `approx_flood_envelope` as a temporary DEM-constrained derived approximation.
+- Reason: It helps make Historical Replay spatially visible, but it is not a calibrated hydraulic model or official inundation boundary.
+- Impact: The layer can be shown in the map as a reconstruction aid, but it cannot be used as official Flood Extent, depth, velocity, or final exposure KPI geometry.
 
-- 기획안·개발지침·데이터 가이드를 역할별 문서로 분리했다.
-- NASA POWER raw/processed 상태 정의를 분리했다.
-- DSSP 피해·구호·긴급재난문자 우선순위를 낮췄다.
-- `MANUAL_DOWNLOAD_REQUIRED`를 사용자 수동 다운로드 대기 상태로 정의했다.
-- 오송 건물 기준 레이어를 공식 2023 `GIS건물통합정보`로 정하고 OSM은 QA 보조 레이어로 분리했다.
+## D-012 HAND Before Full Hydraulic Simulation
+
+- Date: 2026-09-01
+- Decision: The next spatial reconstruction improvement should evaluate HAND plus observed water level and DEM connectivity before introducing HEC-RAS/LISFLOOD-FP as project-critical MVP dependencies.
+- Reason: HAND better matches the current reconstruction goal while staying lighter than full 2D hydraulics.
+- Impact: HEC-RAS remains Phase 2, while Phase 1 focuses on observed reconstruction and defensible What-if comparison.

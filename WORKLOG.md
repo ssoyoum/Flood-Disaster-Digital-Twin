@@ -364,3 +364,176 @@
 
 문제/해결:
 - 의미 있는 오류 없음.
+
+## 데이터 품질 이슈 관리 문서 추가
+
+- 시작 시각: 2026-08-31 22:53:00 +09:00
+- 종료 시각: 2026-08-31 22:56:00 +09:00
+- 총 소요시간: 3분
+
+주요 작업:
+- 프로젝트 데이터 품질 이슈를 관리할 `docs/data-quality.md` 기준 문서를 추가했다.
+- 기관별 snapshot 차이, WMS raster/vector 구분, DSSP 후보 사용 가능성, 강우·수위 시간축 정합성을 초기 이슈로 기록했다.
+
+검증 결과:
+- 문서 상단 요약, 이슈별 Status/Impact/원인/영향/해결/검증/근거/Residual risk 항목 포함 확인.
+
+문제/해결:
+- 의미 있는 오류 없음.
+
+## TODO 운영 구조 재정리
+
+- 시작 시각: 2026-08-31 22:56:00 +09:00
+- 종료 시각: 2026-08-31 23:00:00 +09:00
+- 총 소요시간: 4분
+
+주요 작업:
+- `TODO.md`를 NOW, BLOCKED, NEXT, LATER, DONE SUMMARY 중심으로 재구성했다.
+- Known Issues 반복 항목은 TODO 액션으로 정리하고, 데이터 품질 문제는 `docs/data-quality.md`를 기준 문서로 분리했다.
+- 완료 상세는 `WORKLOG.md`와 manifest/report를 기준으로 확인하도록 TODO 상단 안내를 정리했다.
+
+검증 결과:
+- NOW 항목을 오송 MVP 완료에 직접 필요한 5개 작업으로 제한.
+
+문제/해결:
+- 의미 있는 오류 없음.
+
+## 오송 사고 재현 방식 재정의
+
+- 시작 시각: 2026-08-31 23:03:00 +09:00
+- 종료 시각: 2026-08-31 23:08:00 +09:00
+- 총 소요시간: 5분
+
+주요 작업:
+- 오송 케이스를 Flood Extent 선행 확보형이 아니라 강우·수위·제방붕괴·지하차도 침수 시간축 기반 재현 케이스로 재정의했다.
+- TODO의 NOW/BLOCKED/NEXT를 재현 입력값, 사건기록 검증, 후행 Flood Extent 검증 흐름에 맞춰 정리했다.
+- 데이터 품질 문서에 사건 시간축 원문 근거 미연결 이슈를 추가하고, 결정 기록에 D-010을 남겼다.
+
+검증 결과:
+- 문서 변경만 수행했으며 코드 테스트는 실행하지 않음.
+
+문제/해결:
+- 문제: 기존 TODO가 공식 Flood Extent 미확보를 시뮬레이션 차단 요소처럼 표현함. 해결: Flood Extent를 후행 검증자료로 재분류.
+
+## FloodOps 1.0 문서 정의 동기화
+
+- 시작 시각: 2026-08-31 23:23:00 +09:00
+- 종료 시각: 2026-08-31 23:26:00 +09:00
+- 총 소요시간: 3분
+
+주요 작업:
+- README, TODO, PROJECT_PLAN을 `Historical Disaster Reconstruction Digital Twin MVP` 정의에 맞춰 동기화했다.
+- FloodOps 1.0/2.0/3.0/Operational Twin 발전 단계를 문서화했다.
+- 오송 reference case를 관측자료·사건기록·공간맥락·대응개입 What-if 흐름으로 정리했다.
+
+검증 결과:
+- README 첫 화면, TODO NOW, PROJECT_PLAN 정의/Phase 구분에서 같은 MVP 정의 사용 확인.
+
+문제/해결:
+- 문제: 기획안 일부에 Flood Extent 선행·일반 시뮬레이션 중심 표현이 남아 있었음. 해결: 사고 재현 중심 표현으로 정리.
+
+## Historical Replay 및 자동 진입차단 Intervention MVP
+
+- 시작 시각: 2026-08-31 23:27:00 +09:00
+- 종료 시각: 2026-08-31 23:40:00 +09:00
+- 총 소요시간: 13분
+
+주요 작업:
+- `/api/events/osong-2023/reconstruction` endpoint를 추가해 7개 사건 replay event, baseline, intervention, provenance, limitations를 반환하도록 구현했다.
+- Frontend에 Historical Replay 재생/정지/슬라이더 UI와 Baseline/Intervention 1개 비교 패널을 추가했다.
+- Intervention은 수위센서 + 자동 진입차단시설 rule-based scenario로 구현하고, 노출 KPI는 계속 `PENDING_FLOOD_EXTENT`로 유지했다.
+
+검증 결과:
+- Backend tests: `11 passed`
+- Frontend build: 통과
+- API 확인: reconstruction `200`, replay event 7개, response window 8분, scenario `PENDING_FLOOD_EXTENT`
+- Dev server 확인: backend health `200`, frontend `200`
+
+문제/해결:
+- 문제: 초기 구현은 replay 목록만 표시해 Historical Replay로 보기 부족했음. 해결: 재생/정지 버튼과 timeline slider를 추가.
+- 문제: 기존 backend dev server가 이전 코드로 떠 있어 `/reconstruction`이 404를 반환함. 해결: 8000번 backend를 재시작해 새 endpoint 응답 확인.
+
+## React 과제 제출 브랜치 구조 정리
+
+- 시작 시각: 2026-09-01 00:00:00 +09:00
+- 종료 시각: 2026-09-01 00:05:00 +09:00
+- 총 소요시간: 5분
+
+주요 작업:
+- `react-assignment` 브랜치를 생성하고 React 과제용 컴포넌트 구조를 정리했다.
+- `App`은 `time`, `scenario`, `layers`, `eventData` 상태를 관리하고 `EventHeader`, `MapPanel`, `Timeline`, `HydrometPanel`, `ScenarioToggle`, `ProvenancePanel`을 조립하도록 정리했다.
+- 기존 오송 Historical Replay와 Baseline/Intervention 기능은 유지했다.
+
+검증 결과:
+- Frontend build: 통과
+- Backend tests: `11 passed`
+
+문제/해결:
+- 의미 있는 오류 없음.
+
+## Historical Replay 지도 상태 오버레이 연결
+
+- 시작 시각: 2026-09-01 09:03 +09:00
+- 종료 시각: 2026-09-01 09:08 +09:00
+- 총 소요시간: 5분
+주요 작업:
+- Timeline의 `time`과 `scenario` 상태를 `MapPanel`에 전달하도록 연결했다.
+- 궁평2지하차도 위치에 replay 위험 상태 GeoJSON 오버레이, 라벨, 선 색상 변화를 추가했다.
+- Intervention 모드에서는 08:27 이후 자동 진입차단 상태가 지도에서 별도 색상으로 표시되도록 했다.
+
+검증 결과:
+- Frontend build: 통과
+- Backend tests: `11 passed`
+
+문제/해결:
+- 문제: Play 시 카드만 강조되고 지도는 정적으로 유지됨. 해결: MapLibre `replay-risk` source를 시간 상태에 따라 갱신하도록 연결.
+
+## React 과제 UI 간결화 및 Replay 의미 명시
+
+- 시작 시각: 2026-09-01 09:14 +09:00
+- 종료 시각: 2026-09-01 09:21 +09:00
+- 총 소요시간: 7분
+주요 작업:
+- 과제 화면의 기본 KPI를 4개로 줄이고, 기본 지도 레이어를 AOI/하천/도로/건물/지하차도 중심으로 정리했다.
+- 사이드바 provenance 설명을 짧은 Map meaning 안내로 바꾸고, 지도 영역과 Timeline 가독성을 개선했다.
+- Replay 지도 표시는 실제 침수 확장 범위가 아니라 사건 상태 marker임을 화면에 명시했다.
+
+검증 결과:
+- Frontend build: 통과
+
+문제/해결:
+- 문제: 과제용 화면이 본 프로젝트 데이터 설명까지 모두 보여줘 복잡했음. 해결: 제출용 핵심 흐름 중심으로 UI 밀도를 낮춤.
+
+## 오송 approximate flood envelope 생성 및 연결
+
+- 시작 시각: 2026-09-01 10:02 +09:00
+- 종료 시각: 2026-09-01 10:19 +09:00
+- 총 소요시간: 17분
+주요 작업:
+- KMA 강우, Flood Control Office 수위, Copernicus DEM 저지대 셀, WAMIS 하천, 궁평2지하차도, 사건 시간축으로 temporary approximate flood envelope를 생성했다.
+- `approx_flood_envelope` 레이어를 Backend Repository/API/React/MapLibre에 연결하고 Timeline 단계별로 현재 envelope만 표시하도록 했다.
+- manifest와 data-quality 문서에 `TEMPORARY`, `DERIVED_APPROXIMATION`, official Flood Extent/2D hydraulics 아님을 기록했다.
+
+검증 결과:
+- 생성 파일: `data/processed/osong/osong_approx_flood_envelope_timeline.geojson`
+- Feature count: 1127 total, stage counts 36/96/182/241/270/298
+- Backend tests: `11 passed`
+- Frontend build: 통과
+
+문제/해결:
+- 문제: 물리 침수범위 없이 지도 변화가 약했음. 해결: 공식 자료 기반 사건 시간축과 DEM 저지대 조건을 결합한 임시 근사 envelope를 별도 레이어로 추가.
+## FloodOps 개발 지침 및 기획 문서 재정렬
+
+- 시작 시각: 2026-09-01 10:45 +09:00
+- 종료 시각: 2026-09-01 10:52 +09:00
+- 총 소요시간: 7분
+주요 작업:
+- FloodOps를 `Historical Disaster Reconstruction + Counterfactual Intervention + Decision Support` 중심의 Digital Twin PoC로 재정의했다.
+- `README.md`, `docs/PROJECT_PLAN.md`, `docs/DEVELOPMENT_GUIDE.md`, `docs/DECISIONS.md`, `TODO.md`를 같은 정의에 맞춰 정리했다.
+- `approx_flood_envelope`를 `TEMPORARY + DERIVED + APPROXIMATION`으로 명시하고 공식 Flood Extent/수심/유속/정밀 예측으로 표현하지 않도록 지침화했다.
+
+검증 결과:
+- 문서 전용 변경이며 코드 테스트는 새로 실행하지 않았다.
+
+문제/해결:
+- 기존 일부 문서가 인코딩 깨짐 상태라 부분 수정 대신 기준 문서를 새 구조로 교체했다.
