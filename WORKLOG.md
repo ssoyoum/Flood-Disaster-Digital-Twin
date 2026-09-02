@@ -588,3 +588,22 @@
 
 검증 결과:
 - 문서 상태 동기화 작업이며 코드 테스트는 실행하지 않았다.
+
+## What-if A 차단 시각 분석 API 연결
+
+- 시작 시각: 2026-09-02 23:05 +09:00
+- 종료 시각: 2026-09-02 23:25 +09:00
+- 총 소요시간: 20분
+
+주요 작업:
+- `main` 정리 커밋 이후 `feature/agent-tools` branch를 분기했다. Agent 관련 도메인 API는 이 branch에서 진행한다.
+- `POST /api/events/{event_id}/analysis/closure-timing`을 추가했다. 재구성 timeline의 관측 timestamp 간 차이만 계산하는 What-if A 분석이다.
+- 산출값: 차단 시점의 사건 상태, 유입/주행불능/완전침수까지 남은 분, Scenario A(08:27 감지 차단) 대비 선행 시간, 5단계 분류.
+- 오류 처리를 분리했다. 존재하지 않는 event는 404, reconstruction 미연결 event는 404, 파싱 불가 시각은 422.
+- `coverage_status: fallback`과 근거 note를 응답에 포함했다. timeline timestamp의 confidence가 `NEEDS_SOURCE_PAGE`이기 때문이다.
+- 테스트 4개를 추가해 총 17개가 통과한다.
+
+검토 결과:
+- envelope 면적을 실측한 결과 HAND final stage 54.392 km2가 오송읍 AOI 40.557 km2의 1.34배였다. AOI 내부로 클립해도 19.416 km2로 읍 면적의 47.9%다.
+- 이 envelope으로 공간중첩 시 건물 11,591동(45.8%), 도로 659.5 km(50.5%)가 영향으로 집계된다. 절대 수치를 근거로 쓸 수 없어 `docs/data-quality.md`에 DQ-008로 기록했다.
+- AOI 자체는 유지한다. AOI는 데이터 확보 범위이고, 영향 분석은 사건 영향권이라는 더 좁은 범위를 별도로 두어야 한다.

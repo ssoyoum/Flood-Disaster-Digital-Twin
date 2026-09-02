@@ -1,6 +1,6 @@
 ﻿# Data Quality Register
 
-Last updated: 2026-09-01 14:40 KST
+Last updated: 2026-09-02 23:20 KST
 
 주요 데이터셋 또는 snapshot:
 - 2023 Osong event data package
@@ -126,12 +126,27 @@ Open data-quality issues count: 3
 - 근거 코드/산출물 경로: `data/scripts/create_osong_hand_reconstruction.py`, `data/processed/osong/osong_hand_reconstruction_grid.geojson`, `data/processed/osong/osong_hand_flood_envelope_timeline.geojson`, `data/processed/osong/osong_hand_reconstruction_validation.json`, `backend/app/osong_repository.py`, `src/App.tsx`
 - Residual risk / 남은 한계: 하천-저지대 연결성은 DEM grid와 WAMIS river geometry 기반의 근사이며, 실제 범람 유량·제방 붕괴 폭·배수시설·지하차도 내부 체적을 반영하지 않는다.
 
+### DQ-008: Reconstruction envelope covers most of the AOI, so it cannot back absolute exposure counts
+
+- Status: Open / blocks exposure-style impact metrics
+- Impact: High
+- 발견일: 2026-09-02
+- 대상 데이터셋: `data/processed/osong/osong_hand_flood_envelope_timeline.geojson`, `data/processed/osong/osong_approx_flood_envelope_timeline.geojson`
+- 증상: HAND final stage envelope 면적이 54.392 km2로 오송읍 AOI(40.557 km2)의 1.34배이며, AOI 내부로 클립해도 19.416 km2로 읍 면적의 47.9%를 덮는다. 첫 stage(`hydraulic_warning`, 06:40)에서 이미 28.001 km2다.
+- 원인: envelope이 제방 붕괴 지점으로부터의 사건별 전파가 아니라 AOI 전역의 낮은 HAND 등급 지형 선택에 가깝다. 붕괴 지점 기준 연결 성분 제약과 AOI 클립이 적용되지 않았다.
+- 분석 결과에 미치는 영향: 이 envelope으로 공간중첩을 수행하면 공식 건물 25,283동 중 11,591동(45.8%), OSM 도로 1,305.2 km 중 659.5 km(50.5%)가 영향으로 집계된다. approx envelope도 22.6% / 26.3%다. 2023년 오송 침수는 미호강 임시제방 붕괴 지점~궁평2지하차도 회랑에 집중된 사건이므로 이 절대 수치는 근거로 제시할 수 없다.
+- 해결 방법: (1) 절대 카운트 대신 stage별 증분과 궁평2지하차도 중심 반경 제한 지표를 사용한다. (2) envelope 재생성 시 붕괴 지점 기준 연결 성분 제약과 AOI 클립을 적용한다. (2)는 기존 분석 로직 변경이므로 DECISIONS 기록 후 별도 branch에서 수행한다.
+- 검증 방법: AOI 면적, stage별 envelope 면적, AOI 클립 면적, 건물/도로 교차 수를 EPSG:5179 투영에서 재계산해 비교한다.
+- 근거 코드/산출물 경로: `data/processed/osong/osong_reconstruction_envelope_comparison.json`, `data/processed/osong/osong_sgis_admin_boundary_2023.geojson`, `data/scripts/create_osong_hand_reconstruction.py`
+- Residual risk / 남은 한계: 공식 vector Flood Extent가 없어 축소된 envelope도 정답과 대조 검증할 수 없다. 노출 KPI는 계속 `PENDING_FLOOD_EXTENT`로 유지한다.
+
 ## Open issues / watchlist
 
 - DSSP-IF-00117 또는 대체 공식 vector Flood Extent 확보 시 DQ-001, DQ-002를 재검증한다.
 - 공식 조사자료 기반 event reconstruction timeline을 만들면 DQ-004, DQ-005를 함께 재검증한다.
 - HAND reconstruction을 고도화할 때 gauge datum, breach geometry, discharge, drainage structure 확보 여부를 재검증한다.
 - 다음 사건을 추가할 때 WMS raster를 vector Flood Extent처럼 사용하는 일이 없는지 확인한다.
+- envelope 기반 공간중첩 지표를 노출할 때 DQ-008의 면적 비율을 함께 표시했는지 확인한다.
 - 공식 건물통합정보와 OSM historical building QA에서 `MATCHED`, `OFFICIAL_ONLY`, `OSM_ONLY` 비율을 산출하면 별도 DQ issue 또는 validation metric으로 기록한다.
 - SGIS 또는 공식 행정경계 snapshot이 변경되면 `event_year`와 `boundary_snapshot` 혼동 여부를 재검증한다.
 - 강우·수위 신규 관측소를 추가하면 timezone, period, unit, aggregation interval을 다시 확인한다.

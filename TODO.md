@@ -1,6 +1,6 @@
 # FloodOps TODO
 
-Last Updated: 2026-09-01 23:05 KST
+Last Updated: 2026-09-02 23:25 KST
 
 - Current identity: **Counterfactual Disaster Digital Twin PoC**
 - Current MVP: **Historical Disaster Reconstruction + What-if Intervention**
@@ -11,8 +11,8 @@ Last Updated: 2026-09-01 23:05 KST
 ## NOW
 
 - Status: Active
-- Last updated: 2026-09-01
-- Next action: Use the validated reconstruction layers to finish What-if comparison, provenance review, and remaining validation gaps.
+- Last updated: 2026-09-02
+- Next action: What-if A는 API로 연결됐다. 남은 것은 What-if B 가정 파라미터화, DQ-008을 반영한 영향 지표 설계, provenance 점검이다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
@@ -34,9 +34,21 @@ Last Updated: 2026-09-01 23:05 KST
   - 남은 검증: 관측소 기준면, 제방 붕괴 위치/폭, 유량, 배수시설, CCTV/공식 조사 timestamp 근거 연결.
   - 수위값 자체를 DEM 절대 수면고나 공식 침수심으로 해석하지 않는다.
 - [ ] What-if 2~3개 구현
-  - A: 차량 진입 차단 시각 변경, 예: 08:25 / 08:30 / 08:35
-  - B: 차수벽 설치 여부 또는 간단한 유입 감소 가정
-  - C: 제방 조건 변경은 계산 근거가 충분할 때만 적용한다.
+  - [x] A: 차량 진입 차단 시각 변경, 예: 08:25 / 08:30 / 08:35
+    - `POST /api/events/{event_id}/analysis/closure-timing` 연결 (`feature/agent-tools`)
+    - 산출: 차단 시점 사건 상태, 유입/주행불능/완전침수까지 남은 분, Scenario A(08:27 감지 차단) 대비 선행 시간
+    - 08:25 차단 시 유입 2분 전, 완전침수 15분 전 확보. 08:35는 이미 주행불능 시점이라 선행 시간 -8분.
+    - 관측 timestamp 간 산술만 수행한다. 차량 수, 사상자, 피해액은 산출하지 않는다.
+  - [ ] B: 차수벽 설치 여부 또는 간단한 유입 감소 가정
+    - 차수벽 높이에서 유입량을 계산할 유량/통수단면/조도가 없다.
+    - 구현 가능한 형태: "유입 지연 Δt분"을 사용자 입력 가정으로 받아 timeline을 shift한다. 물리 계산이 아님을 응답에 명시한다.
+  - [ ] C: 제방 조건 변경은 계산 근거가 충분할 때만 적용한다.
+    - 붕괴 위치/폭/유량 미확보로 현재 보류 유지.
+- [ ] DQ-008 대응: envelope 기반 영향 지표 설계
+  - HAND final stage 54.392 km2 = AOI 40.557 km2의 1.34배. AOI 클립 후에도 읍 면적의 47.9%.
+  - 그대로 중첩하면 건물 45.8%, 도로 50.5%가 영향으로 집계되어 근거로 제시할 수 없다.
+  - 비파괴 경로: stage별 증분 지표 + 궁평2지하차도 중심 반경 제한 집계, `coverage_status` 명시.
+  - envelope 자체 개선(붕괴 지점 기준 연결 성분 제약, AOI 클립)은 DECISIONS 기록 후 별도 branch에서 수행한다.
 - [ ] Baseline vs Scenario 비교 고도화
   - 비교 가능: 대응 시작시점, 차단 상태, 위험구간 접근 가능 여부, 잠재 범람 envelope 차이
   - 금지: 사망자 감소, 피해액 감소, 실제 피해 감소율 임의 추정
