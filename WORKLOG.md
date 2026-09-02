@@ -624,5 +624,22 @@
 - 오송 외 reconstruction 미연결 event는 404로 처리한다.
 
 남은 작업:
-- React 또는 Agent Tool wrapper에서 해당 API를 호출하는 연결을 별도 작업으로 진행한다.
+- React에서 해당 API를 호출하는 연결은 별도 작업으로 진행한다.
 - DQ-008 영향 지표는 공식 침수범위가 확보되기 전까지 fallback/diagnostic 결과로만 노출한다.
+
+## Agent Tool wrapper 등록
+
+- 작업일: 2026-09-02
+
+주요 작업:
+- `/api/agent/tools`에서 실제 실행 가능한 Tool catalog를 제공한다.
+- `/api/agent/tools/{tool_name}`에서 event metadata, historical reconstruction, What-if A/B 분석을 dispatch한다.
+- Tool wrapper는 기존 repository/service를 호출하며 GIS 파일 직접 접근, 외부 API 임의 호출, 미확인 수치 생성을 하지 않는다.
+- 분석 결과는 기존 Pydantic 결과 스키마로 검증한 뒤 반환해 일반 API와 provenance/limitation 계약을 유지한다.
+
+검증 결과:
+- Agent Tool catalog, What-if B dispatch, 미등록 Tool 거부 테스트를 추가했다.
+- Backend tests `23 passed, 1 warning`을 확인했다.
+
+남은 작업:
+- 자연어 intent 분석과 multi-tool workflow orchestration은 Tool 계약이 안정화된 뒤 추가한다.

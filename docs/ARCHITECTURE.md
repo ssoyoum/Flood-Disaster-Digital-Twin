@@ -88,6 +88,23 @@ proxy and rule-based intervention factors. It is intentionally marked
 damage-cost model. Swagger is available at `/docs` when the FastAPI server is
 running, and the machine-readable contract is `/openapi.json`.
 
+## Agent Tool Boundary
+
+The Agent layer exposes only registered tools that delegate to existing event
+repositories and analysis services:
+
+```text
+GET  /api/agent/tools
+POST /api/agent/tools/{tool_name}
+  -> validate event and tool parameters
+  -> call an existing domain service
+  -> return the tool result with provenance and limitations
+```
+
+The current registry includes event metadata, historical reconstruction,
+closure-timing What-if A, and inflow-delay What-if B. The wrapper does not read
+GIS files directly, call external APIs, or invent missing flood measurements.
+
 - 실제 PostGIS Repository와 Migration은 아직 연결하지 않는다.
 - 과거 사건 자료는 저장된 snapshot을 사용하며 런타임마다 외부 API를 호출하지 않는다.
 - 실제 Flood Extent, 관측 강우, 공식 세부 공간인구가 확보되면 데이터 처리 계층을 통해 연결한다.

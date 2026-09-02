@@ -1,6 +1,6 @@
 # FloodOps TODO
 
-Last Updated: 2026-09-02 23:23 KST
+Last Updated: 2026-09-02 23:31 KST
 
 - Current identity: **Counterfactual Disaster Digital Twin PoC**
 - Current MVP: **Historical Disaster Reconstruction + What-if Intervention**
@@ -12,7 +12,7 @@ Last Updated: 2026-09-02 23:23 KST
 
 - Status: Active
 - Last updated: 2026-09-02
-- Next action: What-if A/B API가 연결됐다. 남은 것은 DQ-008을 반영한 영향 지표 설계, provenance 점검, Agent Tool wrapper 연결이다.
+- Next action: What-if A/B와 Agent Tool wrapper가 연결됐다. 남은 것은 DQ-008을 반영한 영향 지표 설계, provenance 점검, workflow orchestration이다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
