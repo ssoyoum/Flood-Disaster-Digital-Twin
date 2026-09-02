@@ -1,6 +1,6 @@
 ﻿# Data Quality Register
 
-Last updated: 2026-09-01 10:19 KST
+Last updated: 2026-09-01 14:40 KST
 
 주요 데이터셋 또는 snapshot:
 - 2023 Osong event data package
@@ -111,10 +111,26 @@ Open data-quality issues count: 3
 - 검증 방법: stage별 feature count, CRS, geometry type, 입력 파일 경로, rainfall/water-level provenance를 validation report에 기록하고 frontend build/backend tests로 API 연결을 확인한다.
 - 근거 코드/산출물 경로: `data/scripts/create_osong_approx_flood_envelope.py`, `data/processed/osong/osong_approx_flood_envelope_timeline.geojson`, `data/processed/osong/osong_approx_flood_envelope_validation.json`, `backend/app/osong_repository.py`, `src/App.tsx`
 - Residual risk / 남은 한계: 붕괴 단면, 유량, 배수 구조, 지하차도 내부 수심 변화가 모델링되지 않았으므로 공간 범위 신뢰도는 낮음~중간 수준으로 제한된다.
+
+### DQ-007: HAND reconstruction uses relative water-level change, not absolute DEM water surface
+
+- Status: Accepted limitation
+- Impact: High
+- 발견일: 2026-09-01
+- 대상 데이터셋: `data/processed/osong/osong_hand_reconstruction_grid.geojson`, `data/processed/osong/osong_hand_flood_envelope_timeline.geojson`
+- 증상: HAND-like envelope는 하천 대비 상대고도와 연결성을 사용하지만, HRFCO 관측 수위의 기준면을 DEM vertical datum으로 변환하지 않았다.
+- 원인: 현재 확보한 수위 processed CSV에는 관측소 수위값과 위치는 있으나, 해당 수위를 DEM 해발고도 수면으로 환산할 gauge datum / rating / river cross-section 정보가 없다.
+- 분석 결과에 미치는 영향: 수위값을 직접 DEM 고도와 비교한 실제 침수 수면으로 해석할 수 없다. 지도 결과는 시간별 위험공간 재구성용이며 실제 침수심·유속·면적 검증값이 아니다.
+- 해결 방법: API/UI/manifest에서 `TEMPORARY`, `DERIVED_APPROXIMATION`, HAND-like reconstruction임을 명시한다. Phase 2에서는 gauge datum, breach geometry, discharge, roughness, drainage structure를 확보해 calibrated physical model과 비교한다.
+- 검증 방법: HAND grid feature count, stage별 selected feature count, CRS, geometry type, stage별 observed water level, relative water-level rise, input file path를 validation report에 기록한다.
+- 근거 코드/산출물 경로: `data/scripts/create_osong_hand_reconstruction.py`, `data/processed/osong/osong_hand_reconstruction_grid.geojson`, `data/processed/osong/osong_hand_flood_envelope_timeline.geojson`, `data/processed/osong/osong_hand_reconstruction_validation.json`, `backend/app/osong_repository.py`, `src/App.tsx`
+- Residual risk / 남은 한계: 하천-저지대 연결성은 DEM grid와 WAMIS river geometry 기반의 근사이며, 실제 범람 유량·제방 붕괴 폭·배수시설·지하차도 내부 체적을 반영하지 않는다.
+
 ## Open issues / watchlist
 
 - DSSP-IF-00117 또는 대체 공식 vector Flood Extent 확보 시 DQ-001, DQ-002를 재검증한다.
 - 공식 조사자료 기반 event reconstruction timeline을 만들면 DQ-004, DQ-005를 함께 재검증한다.
+- HAND reconstruction을 고도화할 때 gauge datum, breach geometry, discharge, drainage structure 확보 여부를 재검증한다.
 - 다음 사건을 추가할 때 WMS raster를 vector Flood Extent처럼 사용하는 일이 없는지 확인한다.
 - 공식 건물통합정보와 OSM historical building QA에서 `MATCHED`, `OFFICIAL_ONLY`, `OSM_ONLY` 비율을 산출하면 별도 DQ issue 또는 validation metric으로 기록한다.
 - SGIS 또는 공식 행정경계 snapshot이 변경되면 `event_year`와 `boundary_snapshot` 혼동 여부를 재검증한다.

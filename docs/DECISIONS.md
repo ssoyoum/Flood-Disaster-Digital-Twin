@@ -88,6 +88,14 @@ This document records important design and data decisions. Detailed daily work b
 - Decision: Keep `approx_flood_envelope` as a temporary DEM-constrained derived approximation.
 - Reason: It helps make Historical Replay spatially visible, but it is not a calibrated hydraulic model or official inundation boundary.
 - Impact: The layer can be shown in the map as a reconstruction aid, but it cannot be used as official Flood Extent, depth, velocity, or final exposure KPI geometry.
+- Detail:
+  - `approx_flood_envelope`
+  - 기존 단순 근사 방식
+  - Input: DEM low-elevation context, WAMIS river proximity, underpass proximity, incident timeline stage.
+  - Method: already-low DEM cells are selected by stage thresholds and distance buffers.
+  - Strength: simple, fast, easy to explain as a first MVP visualization.
+  - Limit: it only starts from low-elevation cells, so it does not explicitly model relative height above drainage or drainage-connected terrain.
+  - Status: retained as comparison and fallback visualization, not the preferred reconstruction layer.
 
 ## D-012 HAND Before Full Hydraulic Simulation
 
@@ -95,3 +103,35 @@ This document records important design and data decisions. Detailed daily work b
 - Decision: The next spatial reconstruction improvement should evaluate HAND plus observed water level and DEM connectivity before introducing HEC-RAS/LISFLOOD-FP as project-critical MVP dependencies.
 - Reason: HAND better matches the current reconstruction goal while staying lighter than full 2D hydraulics.
 - Impact: HEC-RAS remains Phase 2, while Phase 1 focuses on observed reconstruction and defensible What-if comparison.
+- Detail:
+  - `hand_reconstruction`
+  - 하천 연결성 + 상대고도 기반 개선 방식
+  - Input: Copernicus DEM grid, WAMIS drainage geometry, HRFCO/Flood Control Office observed water-level time series, KMA rainfall context, Gungpyeong 2 underpass geometry, incident timeline stage.
+  - Method: calculate a HAND-like relative elevation for each DEM grid cell against nearby WAMIS drainage-context cells, then filter cells by drainage connectivity, river-to-underpass flow corridor, and observed relative water-level rise by stage.
+  - Core rule: HRFCO 관측 수위와 DEM 고도의 수직 기준이 직접 일치한다고 가정하지 않고, HAND 기반 상대고도와 관측 수위 변화량을 결합하는 방식으로 공간 재구성을 수행한다.
+  - Why this is better than `approx_flood_envelope`: it uses all DEM grid cells, evaluates terrain relative to river/drainage context, and ties timeline expansion to observed water-level changes instead of using only broad low-elevation thresholds.
+  - Limit: gauge datum is not converted to DEM vertical datum, so the output is not an absolute water-surface model, flood depth, velocity, or official Flood Extent.
+  - Status: preferred Phase 1 reconstruction layer for map replay, still classified as `TEMPORARY` and `DERIVED_APPROXIMATION`.
+
+## D-013 Reconstruction Envelope Comparison
+
+- Date: 2026-09-01
+- Decision: Show and document both `approx_flood_envelope` and `hand_reconstruction`, with `hand_reconstruction` enabled by default.
+- Reason: The two layers explain model evolution. The first is a simple low-elevation approximation; the second is a more defensible drainage-relative reconstruction.
+- Impact: Users can compare the old and improved reconstruction methods without mistaking either for official Flood Extent.
+- Stage comparison:
+
+| Stage | Time meaning | approx features | approx area km2 | HAND features | HAND area km2 | Interpretation |
+| --- | --- | ---: | ---: | ---: | ---: | --- |
+| warning | Flood warning | 0 | 0.0000 | 0 | 0.0000 | No envelope shown before hydraulic threshold stage. |
+| hydraulic_warning | Design flood level reached | 36 | 3.6275 | 278 | 28.0008 | HAND expands earlier because it considers drainage-relative low terrain, not only p25 low-elevation cells. |
+| overtopping | Overtopping begins | 96 | 9.6726 | 341 | 34.3466 | HAND adds connected flood-prone terrain as observed water level rises. |
+| levee_failure | Temporary levee failure | 182 | 18.3358 | 418 | 42.1027 | HAND reflects breach-stage connectivity toward the underpass corridor. |
+| underpass_inflow | Underpass inflow starts | 241 | 24.2784 | 476 | 47.9448 | HAND shows broader potential connected terrain at the validation point. |
+| unsafe_driving | Unsafe driving condition | 270 | 27.1991 | 508 | 51.1678 | HAND remains broader but still bounded by connectivity and HAND threshold. |
+| full_inundation | Full inundation | 298 | 30.0194 | 540 | 54.3915 | HAND final envelope is larger, but still a derived reconstruction layer, not final inundation geometry. |
+
+- Reading rule:
+  - Larger HAND area does not mean verified larger flood damage.
+  - It means the improved method identifies more terrain as drainage-connected and relatively low under the observed event progression.
+  - Final exposure KPIs remain `PENDING_FLOOD_EXTENT` until official vector Flood Extent or calibrated hydraulic output is available.

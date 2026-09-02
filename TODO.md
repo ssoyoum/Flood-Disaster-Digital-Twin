@@ -1,6 +1,6 @@
 # FloodOps TODO
 
-Last Updated: 2026-09-01 10:45 KST
+Last Updated: 2026-09-01 23:05 KST
 
 - Current identity: **Counterfactual Disaster Digital Twin PoC**
 - Current MVP: **Historical Disaster Reconstruction + What-if Intervention**
@@ -12,20 +12,27 @@ Last Updated: 2026-09-01 10:45 KST
 
 - Status: Active
 - Last updated: 2026-09-01
-- Next action: Validate the current observed reconstruction and turn it into a defensible baseline/intervention MVP.
+- Next action: Use the validated reconstruction layers to finish What-if comparison, provenance review, and remaining validation gaps.
 
-- [ ] Historical Replay 완성
+- [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
   - 지도 상태와 timeline 상태가 같이 변해야 한다.
   - 단순 뉴스 timeline처럼 보이지 않게 공간 상태 변화를 유지한다.
-- [ ] 현재 `approx_flood_envelope` 동작 검증
+- [x] 현재 `approx_flood_envelope` 동작 검증
   - 현재 정의: `TEMPORARY + DERIVED + APPROXIMATION`
   - 용도: DEM low-elevation 기반 시간별 범람 근사 envelope
   - 금지: 실제 침수범위, 공식 Flood Extent, 실제 수심, 실제 유속, 정확한 침수예측으로 표현하지 않는다.
   - 현재 생성 결과: total 1,127 features; stage counts 36 / 96 / 182 / 241 / 270 / 298
-- [ ] 실제 수위와 공간상태 연결 보강
-  - HRFCO/Flood Control Office 수위 시계열과 사건 stage를 더 명확히 연결한다.
-  - 수위값 자체와 지도 envelope 변화가 같은 기준 시각을 쓰는지 검증한다.
+- [x] HAND reconstruction 검증 및 비교
+  - 현재 생성 결과: HAND grid 1,280 features; timeline 2,565 features
+  - stage counts: 278 / 341 / 418 / 476 / 508 / 540
+  - approx vs HAND comparison 생성 완료: final stage area 30.0194 km2 vs 54.3915 km2
+  - 수위 관측값은 DEM 절대 수면고가 아니라 relative stage pressure로만 사용한다.
+  - 공식 Flood Extent, depth, velocity, final exposure KPI로 사용하지 않는다.
+- [ ] 실제 수위와 공간상태 연결 검증 보강
+  - HAND reconstruction은 HRFCO 수위 변화와 사건 stage를 relative stage pressure로 연결했다.
+  - 남은 검증: 관측소 기준면, 제방 붕괴 위치/폭, 유량, 배수시설, CCTV/공식 조사 timestamp 근거 연결.
+  - 수위값 자체를 DEM 절대 수면고나 공식 침수심으로 해석하지 않는다.
 - [ ] What-if 2~3개 구현
   - A: 차량 진입 차단 시각 변경, 예: 08:25 / 08:30 / 08:35
   - B: 차수벽 설치 여부 또는 간단한 유입 감소 가정
@@ -64,9 +71,9 @@ Last Updated: 2026-09-01 10:45 KST
 - Last updated: 2026-09-01
 - Next action: Improve validation, error handling, and user-facing clarity after the MVP reconstruction loop is stable.
 
-- [ ] HAND 적용 가능성 검토
-  - 목표: 단순 저지대 threshold에서 `HAND + 실제 수위 + DEM 연결성` 방식으로 발전
-  - 결과도 공식 Flood Extent와 동일시하지 않는다.
+- [ ] HAND reconstruction을 official validation material과 비교
+  - Safemap WMS raster 및 향후 official vector Flood Extent와 시각/공간 유사도를 비교한다.
+  - gauge datum, breach geometry, discharge, drainage structure가 없다는 한계를 유지한다.
 - [ ] 공식 Flood Extent 확보 후 geometry 중첩 분석
   - 대상: 공식 건물, 도로, 궁평2지하차도
   - 산출: 침수 건물 수, 침수 도로 길이, 지하차도 포함 여부
@@ -135,5 +142,7 @@ Last Updated: 2026-09-01 10:45 KST
 - [x] OSM historical snapshot 및 official building QA 생성
 - [x] Safemap flood-mark WMS raster overlay 연결
 - [x] `approx_flood_envelope` temporary derived approximation 생성 및 지도 연결
+- [x] HAND-like reconstruction grid/timeline 생성 및 지도 연결
+- [x] approx_flood_envelope vs HAND reconstruction 시간별 method comparison 생성 및 Replay UI 연결
 - [x] data-quality issue tracking 문서 추가
 - [x] README, Project Plan, Development Guide, Decision Records를 Counterfactual Disaster Digital Twin 정의에 맞춰 정리

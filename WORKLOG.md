@@ -537,3 +537,54 @@
 
 문제/해결:
 - 기존 일부 문서가 인코딩 깨짐 상태라 부분 수정 대신 기준 문서를 새 구조로 교체했다.
+
+## HAND reconstruction 생성 및 지도 연결
+
+- 시작 시각: 2026-09-01 14:32 +09:00
+- 종료 시각: 2026-09-01 14:40 +09:00
+- 총 소요시간: 8분
+
+주요 작업:
+- Copernicus DEM grid, WAMIS river, HRFCO 수위, KMA 강우, 사건 timeline을 이용해 HAND-like reconstruction grid/timeline을 생성했다.
+- `hand_reconstruction` 레이어를 Backend Repository/API/React/MapLibre에 연결하고 기본 지도 레이어로 켰다.
+- 수위값은 DEM 절대 수면고가 아니라 relative stage pressure로만 사용한다고 manifest와 data-quality 문서에 명시했다.
+
+검증 결과:
+- HAND grid 1,280 features, timeline 2,565 features, geometry `Polygon`/`LineString`.
+- Backend tests: `11 passed, 1 warning`; frontend build: 통과, Vite chunk size warning만 있음.
+- Repository 확인: `TEMPORARY DERIVED_APPROXIMATION 2565 ['LineString', 'Polygon']`.
+
+문제/해결:
+- 수위 관측 기준면과 DEM 기준면을 직접 맞출 수 없어 공식 Flood Extent/수심/유속이 아닌 HAND-like derived approximation으로 제한했다.
+
+## Reconstruction envelope method comparison
+
+- 시작 시각: 2026-09-01 14:41 +09:00
+- 종료 시각: 2026-09-01 14:48 +09:00
+- 총 소요시간: 7분
+
+주요 작업:
+- `approx_flood_envelope`와 `hand_reconstruction`의 stage별 feature count 및 EPSG:5179 기준 면적을 비교했다.
+- 비교 산출물 `osong_reconstruction_envelope_comparison.json`을 만들고 `/reconstruction` API와 Replay UI에 연결했다.
+- `DECISIONS.md`에 기존 단순 근사 방식과 HAND 기반 개선 방식의 차이, 수직 기준면 미가정 원칙을 상세 기록했다.
+
+검증 결과:
+- Final stage 면적 비교: approx 30.0194 km2, HAND 54.3915 km2.
+- HAND는 모든 stage에서 approx보다 넓게 산출되며, 이는 공식 침수면적이 아니라 method diagnostic으로 기록했다.
+- Backend tests: `11 passed, 1 warning`; frontend build: 통과, Vite chunk size warning만 있음.
+
+문제/해결:
+- 면적 차이가 실제 피해면적 차이로 오해될 수 있어 UI/manifest/decision 기록에 exposure KPI 근거가 아니라고 명시했다.
+
+## TODO/WORKLOG HAND 상태 동기화
+
+- 시작 시각: 2026-09-01 23:03 +09:00
+- 종료 시각: 2026-09-01 23:05 +09:00
+- 총 소요시간: 2분
+
+주요 작업:
+- HAND reconstruction과 approx envelope 비교는 산출물/API/UI/테스트가 완료된 상태이므로 TODO의 완료 여부를 WORKLOG와 맞췄다.
+- 실제 수위 연결은 완료 처리하지 않고, 기준면·제방 붕괴·유량·배수시설·CCTV timestamp 검증 보강 항목으로 남겼다.
+
+검증 결과:
+- 문서 상태 동기화 작업이며 코드 테스트는 실행하지 않았다.
