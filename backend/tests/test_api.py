@@ -439,6 +439,8 @@ def test_agent_workflow_chains_context_and_analysis_tools():
     assert payload["tool_calls"][1]["result_keys"]
     assert payload["result"]["analysis"] == "closure_timing_whatif"
     assert len(payload["result"]["scenarios"]) == 2
+    assert payload["provenance"]
+    assert payload["coverage_status"] == "fallback"
 
 
 def test_agent_workflow_chains_inflow_delay_tool():
@@ -476,6 +478,8 @@ def test_agent_exposure_inventory_workflow_does_not_use_flood_envelope():
         "get_exposure_inventory",
     ]
     assert payload["result"]["analysis"] == "exposure_inventory"
+    assert payload["provenance"]
+    assert payload["coverage_status"] == "covered"
 
 
 def test_exposure_inventory_is_independent_of_flood_envelope():

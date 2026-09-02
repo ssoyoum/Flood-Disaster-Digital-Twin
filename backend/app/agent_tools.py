@@ -155,11 +155,14 @@ def execute_agent_workflow(request: AgentWorkflowRequest) -> dict[str, Any]:
             tool_names.insert(1, "get_reconstruction")
     tool_calls = []
     analysis_result: dict[str, Any] = {}
+    context_result: dict[str, Any] = {}
 
     for order, tool_name in enumerate(tool_names, start=1):
         result = execute_agent_tool(tool_name, request.event_id, tool_request)
         if tool_name == analysis_tool:
             analysis_result = result
+        if tool_name == "get_reconstruction":
+            context_result = result
         tool_calls.append(
             {
                 "order": order,
@@ -169,12 +172,21 @@ def execute_agent_workflow(request: AgentWorkflowRequest) -> dict[str, Any]:
             }
         )
 
+    provenance = analysis_result.get("provenance") or context_result.get("provenance")
+    if not isinstance(provenance, list):
+        provenance = analysis_result.get("inventory_sources", [])
+    if not isinstance(provenance, list):
+        provenance = []
+
     return {
         "workflow": request.workflow,
         "event_id": request.event_id,
         "status": "COMPLETED",
         "tool_calls": tool_calls,
         "result": analysis_result,
+        "provenance": provenance,
+        "coverage_status": analysis_result.get("coverage_status"),
+        "coverage_note": analysis_result.get("coverage_note"),
     }
 
 

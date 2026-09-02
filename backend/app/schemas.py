@@ -293,6 +293,9 @@ class AgentWorkflowResult(BaseModel):
     status: Literal["COMPLETED"]
     tool_calls: list[AgentToolTrace]
     result: dict
+    provenance: list[dict[str, Any]] = Field(default_factory=list)
+    coverage_status: str | None = None
+    coverage_note: str | None = None
 
 
 AgentPlanStatus = Literal["READY", "NEEDS_CLARIFICATION", "UNSUPPORTED"]

@@ -905,6 +905,13 @@ function AgentPanel({ eventId }: { eventId: string }) {
         <div className="agent-result">
           <div className="agent-result-head"><strong>Workflow completed</strong><span>{workflowResult.workflow}</span></div>
           <div className="agent-tools">{workflowResult.tool_calls.map((call) => <span key={call.order}>{call.order}. {call.tool_name}</span>)}</div>
+          {workflowResult.provenance.length > 0 && (
+            <div className="agent-provenance">
+              <strong>Provenance</strong>
+              {workflowResult.provenance.map((item, index) => <small key={`${String(item.key ?? item.source ?? "source")}-${index}`}>{String(item.label ?? item.key ?? "source")} · {String(item.source ?? "source not recorded")} · {String(item.snapshot ?? item.data_vintage ?? item.status ?? "status not recorded")}</small>)}
+            </div>
+          )}
+          {workflowResult.coverage_note && <small className="agent-coverage">Coverage · {workflowResult.coverage_status ?? "not recorded"} · {workflowResult.coverage_note}</small>}
           <div className="agent-result-boundary">
             <strong>근거와 한계</strong>
             {Array.isArray(resultAssumptions) && resultAssumptions.map((item) => <small key={String(item)}>가정 · {String(item)}</small>)}

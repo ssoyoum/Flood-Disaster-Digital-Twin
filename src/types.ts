@@ -289,4 +289,7 @@ export type AgentWorkflowResult = {
     result_keys: string[];
   }>;
   result: Record<string, unknown>;
+  provenance: Array<Record<string, unknown>>;
+  coverage_status?: string | null;
+  coverage_note?: string | null;
 };
