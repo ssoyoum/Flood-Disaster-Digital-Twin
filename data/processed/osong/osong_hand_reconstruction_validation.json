@@ -1,0 +1,117 @@
+{
+  "created_at": "2026-09-01T05:35:01.693041+00:00",
+  "status": "TEMPORARY",
+  "source_type": "DERIVED_APPROXIMATION",
+  "method": "HAND-like relative elevation and drainage connectivity reconstruction.",
+  "output_files": [
+    "data/processed/osong/osong_hand_reconstruction_grid.geojson",
+    "data/processed/osong/osong_hand_flood_envelope_timeline.geojson"
+  ],
+  "input_files": [
+    "data/processed/osong/osong_dem_elevation_grid.geojson",
+    "data/processed/osong/osong_wamis_rivers.geojson",
+    "data/processed/osong/gungpyeong2_underpass.geojson",
+    "data/processed/osong/osong_hrfco_water_level_10m_2023-07-14_17.csv",
+    "data/processed/osong/osong_kma_aws_rainfall_2023-07-14_17.csv"
+  ],
+  "crs": "EPSG:4326 / CRS84",
+  "hand_grid_feature_count": 1280,
+  "timeline_feature_count": 2565,
+  "timeline_geometry_types": [
+    "LineString",
+    "Polygon"
+  ],
+  "hand_stats": {
+    "min_hand_m": 0.0,
+    "max_hand_m": 242.71,
+    "mean_hand_m": 23.09,
+    "drainage_cell_count": 276
+  },
+  "stage_counts": {
+    "warning": 0,
+    "hydraulic_warning": 278,
+    "overtopping": 341,
+    "levee_failure": 418,
+    "underpass_inflow": 476,
+    "unsafe_driving": 508,
+    "full_inundation": 540
+  },
+  "stage_contexts": [
+    {
+      "stage_index": 0,
+      "time": "2023-07-15T04:10:00+09:00",
+      "state": "warning",
+      "observed_water_level_m": 7.69,
+      "water_level_timestamp_kst": "2023-07-15 04:10",
+      "relative_water_level_rise_m": 0.0,
+      "hand_threshold_m": 0.25,
+      "selected_feature_count": 0
+    },
+    {
+      "stage_index": 1,
+      "time": "2023-07-15T06:40:00+09:00",
+      "state": "hydraulic_warning",
+      "observed_water_level_m": 9.3,
+      "water_level_timestamp_kst": "2023-07-15 06:40",
+      "relative_water_level_rise_m": 1.61,
+      "hand_threshold_m": 1.81,
+      "selected_feature_count": 278
+    },
+    {
+      "stage_index": 2,
+      "time": "2023-07-15T07:50:00+09:00",
+      "state": "overtopping",
+      "observed_water_level_m": 9.85,
+      "water_level_timestamp_kst": "2023-07-15 07:50",
+      "relative_water_level_rise_m": 2.16,
+      "hand_threshold_m": 2.96,
+      "selected_feature_count": 341
+    },
+    {
+      "stage_index": 3,
+      "time": "2023-07-15T08:09:00+09:00",
+      "state": "levee_failure",
+      "observed_water_level_m": 9.96,
+      "water_level_timestamp_kst": "2023-07-15 08:10",
+      "relative_water_level_rise_m": 2.27,
+      "hand_threshold_m": 3.87,
+      "selected_feature_count": 418
+    },
+    {
+      "stage_index": 4,
+      "time": "2023-07-15T08:27:00+09:00",
+      "state": "underpass_inflow",
+      "observed_water_level_m": 10.01,
+      "water_level_timestamp_kst": "2023-07-15 08:30",
+      "relative_water_level_rise_m": 2.32,
+      "hand_threshold_m": 4.52,
+      "selected_feature_count": 476
+    },
+    {
+      "stage_index": 5,
+      "time": "2023-07-15T08:35:00+09:00",
+      "state": "unsafe_driving",
+      "observed_water_level_m": 10.01,
+      "water_level_timestamp_kst": "2023-07-15 08:30",
+      "relative_water_level_rise_m": 2.32,
+      "hand_threshold_m": 5.12,
+      "selected_feature_count": 508
+    },
+    {
+      "stage_index": 6,
+      "time": "2023-07-15T08:40:00+09:00",
+      "state": "full_inundation",
+      "observed_water_level_m": 10.03,
+      "water_level_timestamp_kst": "2023-07-15 08:40",
+      "relative_water_level_rise_m": 2.34,
+      "hand_threshold_m": 5.54,
+      "selected_feature_count": 540
+    }
+  ],
+  "validity_assessment": {
+    "appropriate_use": "Historical reconstruction visualization using observed water-level timing and terrain connectivity.",
+    "inappropriate_use": "Official Flood Extent, hydraulic simulation, depth/velocity estimate, or final exposure KPI.",
+    "confidence": "MEDIUM_FOR_RELATIVE_TERRAIN_CONNECTIVITY; LOW_TO_MEDIUM_FOR_SPATIAL_EXTENT"
+  },
+  "data_warning": "This is a HAND-like approximation. Gauge datum is not converted to DEM vertical datum."
+}

@@ -679,6 +679,95 @@ osong_approx_flood_envelope:
     - "This layer is not a hydraulic simulation."
     - "Do not use it as VERIFIED exposure geometry."
 
+osong_hand_reconstruction:
+  source: "Copernicus DEM + WAMIS river geometry + Flood Control Office water level + KMA rainfall + official incident timeline"
+  source_type: "DERIVED_APPROXIMATION"
+  status: "TEMPORARY"
+  data_role: "HAND-like historical reconstruction visualization"
+  event_id: "osong-2023"
+  event_year: 2023
+  data_vintage: "2023-07-15 incident timeline with 2023-07-14 through 2023-07-17 observations"
+  crs: "EPSG:4326 / CRS84"
+  hand_grid_file: "data/processed/osong/osong_hand_reconstruction_grid.geojson"
+  timeline_file: "data/processed/osong/osong_hand_flood_envelope_timeline.geojson"
+  validation_report: "data/processed/osong/osong_hand_reconstruction_validation.json"
+  processing_script: "data/scripts/create_osong_hand_reconstruction.py"
+  hand_grid_feature_count: 1280
+  timeline_feature_count: 2565
+  geometry_types: ["Polygon", "LineString"]
+  hand_stats:
+    min_hand_m: 0.0
+    max_hand_m: 242.71
+    mean_hand_m: 23.09
+    drainage_cell_count: 276
+  stage_counts:
+    warning: 0
+    hydraulic_warning: 278
+    overtopping: 341
+    levee_failure: 418
+    underpass_inflow: 476
+    unsafe_driving: 508
+    full_inundation: 540
+  input_files:
+    dem_grid: "data/processed/osong/osong_dem_elevation_grid.geojson"
+    rivers: "data/processed/osong/osong_wamis_rivers.geojson"
+    underpass: "data/processed/osong/gungpyeong2_underpass.geojson"
+    rainfall: "data/processed/osong/osong_kma_aws_rainfall_2023-07-14_17.csv"
+    water_level: "data/processed/osong/osong_hrfco_water_level_10m_2023-07-14_17.csv"
+  method_summary:
+    - "Calculate HAND-like relative elevation from each DEM grid cell to nearby WAMIS drainage-context cells."
+    - "Use observed Flood Control Office water-level rise as relative stage pressure, not absolute DEM water-surface elevation."
+    - "Constrain the envelope by WAMIS drainage connectivity, river-to-underpass corridor distance, and event timeline stage."
+  validity:
+    appropriate_use: "Historical reconstruction visualization using observed water-level timing and terrain connectivity."
+    inappropriate_use: "Official Flood Extent, calibrated 2D hydraulics, depth/velocity estimate, or final exposure KPI."
+    confidence: "MEDIUM_FOR_RELATIVE_TERRAIN_CONNECTIVITY; LOW_TO_MEDIUM_FOR_SPATIAL_EXTENT"
+  data_warning:
+    - "Gauge water-level datum is not converted to DEM vertical datum."
+    - "This layer is not official Flood Extent."
+    - "This layer is not a hydraulic simulation."
+    - "Do not use it as VERIFIED exposure geometry."
+
+osong_reconstruction_envelope_comparison:
+  source: "Project comparison of approx_flood_envelope and hand_reconstruction outputs"
+  source_type: "DERIVED_COMPARISON"
+  status: "TEMPORARY"
+  data_role: "method comparison only"
+  event_id: "osong-2023"
+  event_year: 2023
+  comparison_file: "data/processed/osong/osong_reconstruction_envelope_comparison.json"
+  processing_script: "data/scripts/compare_osong_reconstruction_envelopes.py"
+  area_crs: "EPSG:5179"
+  input_files:
+    approx_flood_envelope: "data/processed/osong/osong_approx_flood_envelope_timeline.geojson"
+    hand_reconstruction: "data/processed/osong/osong_hand_flood_envelope_timeline.geojson"
+  method_summary:
+    - "Compare stage-level polygon feature counts and projected areas for the existing low-elevation approximation and the improved HAND-like reconstruction."
+    - "Use comparison for method explanation, not official inundation area or exposure KPI evidence."
+  stage_area_km2:
+    hydraulic_warning:
+      approx: 3.6275
+      hand: 28.0008
+    overtopping:
+      approx: 9.6726
+      hand: 34.3466
+    levee_failure:
+      approx: 18.3358
+      hand: 42.1027
+    underpass_inflow:
+      approx: 24.2784
+      hand: 47.9448
+    unsafe_driving:
+      approx: 27.1991
+      hand: 51.1678
+    full_inundation:
+      approx: 30.0194
+      hand: 54.3915
+  data_warning:
+    - "Comparison areas are method diagnostics only."
+    - "They are not official inundation area."
+    - "Do not use them as exposure KPI evidence."
+
 osong_osm:
   source: "OpenStreetMap via Overpass API"
   source_url: "https://overpass-api.de/api/interpreter"

@@ -1,0 +1,93 @@
+{
+  "created_at": "2026-09-01T05:43:21.232380+00:00",
+  "event_id": "osong-2023",
+  "status": "TEMPORARY",
+  "source_type": "DERIVED_COMPARISON",
+  "role": "Compare old low-elevation approximation with HAND-like reconstruction.",
+  "inputs": [
+    "data/processed/osong/osong_approx_flood_envelope_timeline.geojson",
+    "data/processed/osong/osong_hand_flood_envelope_timeline.geojson"
+  ],
+  "area_crs": "EPSG:5179",
+  "data_warning": [
+    "Areas are method-comparison areas, not official inundation area.",
+    "HAND uses relative water-level change and drainage-relative elevation, not absolute water-surface elevation.",
+    "Do not use this comparison as exposure KPI evidence."
+  ],
+  "methods": {
+    "approx_flood_envelope": "Existing simple approximation using low-elevation DEM cells and distance thresholds.",
+    "hand_reconstruction": "Improved HAND-like reconstruction using drainage-relative elevation, WAMIS connectivity, observed water-level rise, and timeline stages."
+  },
+  "rows": [
+    {
+      "stage": "warning",
+      "label": "",
+      "approx_features": 0,
+      "approx_area_km2": 0.0,
+      "hand_features": 0,
+      "hand_area_km2": 0.0,
+      "hand_minus_approx_area_km2": 0.0,
+      "hand_to_approx_area_ratio": null
+    },
+    {
+      "stage": "hydraulic_warning",
+      "label": "Design flood level reached",
+      "approx_features": 36,
+      "approx_area_km2": 3.6275,
+      "hand_features": 278,
+      "hand_area_km2": 28.0008,
+      "hand_minus_approx_area_km2": 24.3733,
+      "hand_to_approx_area_ratio": 7.72
+    },
+    {
+      "stage": "overtopping",
+      "label": "Overtopping begins",
+      "approx_features": 96,
+      "approx_area_km2": 9.6726,
+      "hand_features": 341,
+      "hand_area_km2": 34.3466,
+      "hand_minus_approx_area_km2": 24.674,
+      "hand_to_approx_area_ratio": 3.55
+    },
+    {
+      "stage": "levee_failure",
+      "label": "Temporary levee failure",
+      "approx_features": 182,
+      "approx_area_km2": 18.3358,
+      "hand_features": 418,
+      "hand_area_km2": 42.1027,
+      "hand_minus_approx_area_km2": 23.7669,
+      "hand_to_approx_area_ratio": 2.3
+    },
+    {
+      "stage": "underpass_inflow",
+      "label": "Underpass inflow starts",
+      "approx_features": 241,
+      "approx_area_km2": 24.2784,
+      "hand_features": 476,
+      "hand_area_km2": 47.9448,
+      "hand_minus_approx_area_km2": 23.6664,
+      "hand_to_approx_area_ratio": 1.97
+    },
+    {
+      "stage": "unsafe_driving",
+      "label": "Unsafe driving condition",
+      "approx_features": 270,
+      "approx_area_km2": 27.1991,
+      "hand_features": 508,
+      "hand_area_km2": 51.1678,
+      "hand_minus_approx_area_km2": 23.9687,
+      "hand_to_approx_area_ratio": 1.88
+    },
+    {
+      "stage": "full_inundation",
+      "label": "Full inundation",
+      "approx_features": 298,
+      "approx_area_km2": 30.0194,
+      "hand_features": 540,
+      "hand_area_km2": 54.3915,
+      "hand_minus_approx_area_km2": 24.3721,
+      "hand_to_approx_area_ratio": 1.81
+    }
+  ]
+}
