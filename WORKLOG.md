@@ -607,3 +607,22 @@
 - envelope 면적을 실측한 결과 HAND final stage 54.392 km2가 오송읍 AOI 40.557 km2의 1.34배였다. AOI 내부로 클립해도 19.416 km2로 읍 면적의 47.9%다.
 - 이 envelope으로 공간중첩 시 건물 11,591동(45.8%), 도로 659.5 km(50.5%)가 영향으로 집계된다. 절대 수치를 근거로 쓸 수 없어 `docs/data-quality.md`에 DQ-008로 기록했다.
 - AOI 자체는 유지한다. AOI는 데이터 확보 범위이고, 영향 분석은 사건 영향권이라는 더 좁은 범위를 별도로 두어야 한다.
+
+## What-if B 유입 지연 가정 API 연결
+
+- 작업일: 2026-09-02
+
+주요 작업:
+- `POST /api/events/{event_id}/analysis/inflow-delay`를 추가했다.
+- 사용자 입력 `delay_minutes`(0~180분)를 받아 `underpass_inflow`, `unsafe_driving`, `full_inundation` 시각을 동일한 Δt만큼 이동한다.
+- 차수벽 높이, 유량, 통수단면, 조도 자료가 없어 유입량·수심을 계산하지 않고 timeline-shift 가정으로 제한했다.
+- `coverage_status: fallback`, baseline/shifted milestone, assumptions, limitations를 응답에 포함했다.
+
+검증 결과:
+- What-if B API 테스트를 추가해 Backend tests `20 passed, 1 warning`을 확인했다.
+- 음수 및 180분 초과 입력은 422로 거부한다.
+- 오송 외 reconstruction 미연결 event는 404로 처리한다.
+
+남은 작업:
+- React 또는 Agent Tool wrapper에서 해당 API를 호출하는 연결을 별도 작업으로 진행한다.
+- DQ-008 영향 지표는 공식 침수범위가 확보되기 전까지 fallback/diagnostic 결과로만 노출한다.

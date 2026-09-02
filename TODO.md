@@ -1,6 +1,6 @@
 # FloodOps TODO
 
-Last Updated: 2026-09-02 23:25 KST
+Last Updated: 2026-09-02 23:23 KST
 
 - Current identity: **Counterfactual Disaster Digital Twin PoC**
 - Current MVP: **Historical Disaster Reconstruction + What-if Intervention**
@@ -12,7 +12,7 @@ Last Updated: 2026-09-02 23:25 KST
 
 - Status: Active
 - Last updated: 2026-09-02
-- Next action: What-if A는 API로 연결됐다. 남은 것은 What-if B 가정 파라미터화, DQ-008을 반영한 영향 지표 설계, provenance 점검이다.
+- Next action: What-if A/B API가 연결됐다. 남은 것은 DQ-008을 반영한 영향 지표 설계, provenance 점검, Agent Tool wrapper 연결이다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
@@ -39,7 +39,10 @@ Last Updated: 2026-09-02 23:25 KST
     - 산출: 차단 시점 사건 상태, 유입/주행불능/완전침수까지 남은 분, Scenario A(08:27 감지 차단) 대비 선행 시간
     - 08:25 차단 시 유입 2분 전, 완전침수 15분 전 확보. 08:35는 이미 주행불능 시점이라 선행 시간 -8분.
     - 관측 timestamp 간 산술만 수행한다. 차량 수, 사상자, 피해액은 산출하지 않는다.
-  - [ ] B: 차수벽 설치 여부 또는 간단한 유입 감소 가정
+  - [x] B: 차수벽 설치 여부 또는 간단한 유입 감소 가정
+    - `POST /api/events/{event_id}/analysis/inflow-delay` 연결 (`feature/agent-tools`)
+    - 구현 형태: `delay_minutes`를 사용자 입력 가정으로 받아 `underpass_inflow` 이후 timeline을 shift한다.
+    - 0~180분 범위를 검증하며, 물리 계산이 아님을 응답의 assumptions/limitations에 명시한다.
     - 차수벽 높이에서 유입량을 계산할 유량/통수단면/조도가 없다.
     - 구현 가능한 형태: "유입 지연 Δt분"을 사용자 입력 가정으로 받아 timeline을 shift한다. 물리 계산이 아님을 응답에 명시한다.
   - [ ] C: 제방 조건 변경은 계산 근거가 충분할 때만 적용한다.
