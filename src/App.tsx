@@ -1,8 +1,8 @@
 ﻿import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import maplibregl, { type GeoJSONSource, type MapLayerMouseEvent, type Map as MapLibreMap, type Popup } from "maplibre-gl";
-import { Activity, AlertTriangle, Building2, Check, CloudRain, Layers3, MapPin, Pause, Play, Route, Waves } from "lucide-react";
+import { Activity, AlertTriangle, Bot, Building2, Check, CloudRain, Layers3, MapPin, Pause, Play, Route, Send, Waves } from "lucide-react";
 import * as api from "./api";
-import type { DataStatusItem, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayerPayload, LayersResponse, ReconstructionResponse } from "./types";
+import type { AgentIntentPlanResult, AgentWorkflowResult, DataStatusItem, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayerPayload, LayersResponse, ReconstructionResponse } from "./types";
 
 const emptyGeoJson: GeoJson = { type: "FeatureCollection", features: [] };
 
@@ -824,6 +824,99 @@ function ScenarioToggle({
   );
 }
 
+function AgentPanel({ eventId }: { eventId: string }) {
+  const [message, setMessage] = useState("오송 지하차도 08:25와 08:35 차단 시각을 비교해줘");
+  const [plan, setPlan] = useState<AgentIntentPlanResult | null>(null);
+  const [workflowResult, setWorkflowResult] = useState<AgentWorkflowResult | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const planIntent = async () => {
+    if (!message.trim()) return;
+    setBusy(true);
+    setError(null);
+    setWorkflowResult(null);
+    try {
+      setPlan(await api.planAgentIntent(eventId, message.trim()));
+    } catch {
+      setError("Agent planner API를 호출하지 못했습니다.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const runWorkflow = async () => {
+    if (!plan?.workflow || plan.status !== "READY") return;
+    setBusy(true);
+    setError(null);
+    try {
+      setWorkflowResult(await api.runAgentWorkflow(eventId, plan.workflow, plan.parameters));
+    } catch {
+      setError("계획된 Agent workflow를 실행하지 못했습니다.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const resultAssumptions = workflowResult?.result.assumptions;
+  const resultLimitations = workflowResult?.result.limitations;
+
+  return (
+    <section className="agent-panel">
+      <div className="agent-head">
+        <div>
+          <div className="eyebrow">AI-ASSISTED RESEARCH WORKFLOW</div>
+          <h2><Bot size={18} /> Agent workflow</h2>
+          <p>등록된 분석 도구를 계획하고 실행합니다. 자연어 요청 자체로 수치를 계산하지 않습니다.</p>
+        </div>
+        <span className="agent-status">DETERMINISTIC PLAN</span>
+      </div>
+      <form className="agent-form" onSubmit={(event) => { event.preventDefault(); void planIntent(); }}>
+        <input
+          aria-label="Agent request"
+          value={message}
+          onChange={(event) => setMessage(event.target.value)}
+          placeholder="예: 오송 침수 상황을 보여줘"
+        />
+        <button className="primary-button" type="submit" disabled={busy || !message.trim()}>
+          <Send size={13} /> 계획 생성
+        </button>
+      </form>
+
+      {plan && (
+        <div className={`agent-plan ${plan.status.toLowerCase()}`}>
+          <div className="agent-plan-title">
+            <div><span>PLAN STATUS</span><strong>{plan.status}</strong></div>
+            <div><span>WORKFLOW</span><strong>{plan.workflow ?? "선택되지 않음"}</strong></div>
+          </div>
+          <p className="agent-reason">{plan.reason}</p>
+          {plan.tool_names.length > 0 && <div className="agent-tools">{plan.tool_names.map((tool, index) => <span key={tool}>{index + 1}. {tool}</span>)}</div>}
+          {Object.keys(plan.parameters).length > 1 && <pre className="agent-parameters">{JSON.stringify(plan.parameters, null, 2)}</pre>}
+          {plan.assumptions.map((item) => <small className="agent-assumption" key={item}>{item}</small>)}
+          {plan.status === "READY" && plan.workflow && (
+            <button className="primary-button agent-run" type="button" onClick={() => void runWorkflow()} disabled={busy}>
+              <Play size={13} /> {busy ? "실행 중..." : "계획 실행"}
+            </button>
+          )}
+        </div>
+      )}
+
+      {workflowResult && (
+        <div className="agent-result">
+          <div className="agent-result-head"><strong>Workflow completed</strong><span>{workflowResult.workflow}</span></div>
+          <div className="agent-tools">{workflowResult.tool_calls.map((call) => <span key={call.order}>{call.order}. {call.tool_name}</span>)}</div>
+          <div className="agent-result-boundary">
+            <strong>근거와 한계</strong>
+            {Array.isArray(resultAssumptions) && resultAssumptions.map((item) => <small key={String(item)}>가정 · {String(item)}</small>)}
+            {Array.isArray(resultLimitations) && resultLimitations.map((item) => <small key={String(item)}>한계 · {String(item)}</small>)}
+          </div>
+        </div>
+      )}
+      {error && <p className="agent-error">{error}</p>}
+    </section>
+  );
+}
+
 export default function App() {
   const [events, setEvents] = useState<FloodEvent[]>([]);
   const [eventData, setEventData] = useState<FloodEvent | null>(null);
@@ -938,6 +1031,7 @@ export default function App() {
             {reconstruction && <Timeline reconstruction={reconstruction} time={time} playing={replayPlaying} setTime={setTime} setPlaying={setReplayPlaying} />}
             <HydrometPanel summary={summary} />
             <ScenarioToggle reconstruction={reconstruction} scenario={scenario} setScenario={setScenario} summary={summary} />
+            <AgentPanel eventId={eventData.id} />
           </div>
         </section>
       </main>

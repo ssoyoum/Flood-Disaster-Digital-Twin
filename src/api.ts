@@ -1,4 +1,4 @@
-import type { DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
+import type { AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 
@@ -57,4 +57,18 @@ export const testSafetyDataApi = (serviceKey: string) =>
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ service_key: serviceKey }),
+  });
+
+export const planAgentIntent = (eventId: string, message: string) =>
+  request<AgentIntentPlanResult>("/api/agent/plan", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event_id: eventId, message }),
+  });
+
+export const runAgentWorkflow = (eventId: string, workflow: AgentWorkflowName, parameters: Record<string, unknown>) =>
+  request<AgentWorkflowResult>("/api/agent/workflows", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event_id: eventId, workflow, ...parameters }),
   });

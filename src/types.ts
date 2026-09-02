@@ -264,3 +264,29 @@ export type ScenarioResult = {
   assumptions: string[];
   origin: "TEMPORARY";
 };
+
+export type AgentWorkflowName = "situation" | "closure_timing" | "inflow_delay" | "exposure_inventory";
+
+export type AgentIntentPlanResult = {
+  status: "READY" | "NEEDS_CLARIFICATION" | "UNSUPPORTED";
+  event_id: string;
+  workflow?: AgentWorkflowName | null;
+  parameters: Record<string, unknown>;
+  tool_names: string[];
+  reason: string;
+  assumptions: string[];
+  limitations: string[];
+};
+
+export type AgentWorkflowResult = {
+  workflow: AgentWorkflowName;
+  event_id: string;
+  status: "COMPLETED";
+  tool_calls: Array<{
+    order: number;
+    tool_name: string;
+    status: "completed";
+    result_keys: string[];
+  }>;
+  result: Record<string, unknown>;
+};
