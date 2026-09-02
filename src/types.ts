@@ -50,6 +50,7 @@ export type LayersResponse = {
   waterways: LayerPayload;
   terrain: LayerPayload;
   approx_flood_envelope: LayerPayload;
+  hand_reconstruction: LayerPayload;
   facilities: LayerPayload;
   underpass: LayerPayload;
   flood_extent: LayerPayload;
@@ -109,6 +110,7 @@ export type ExposureMetrics = {
   waterway_count: number;
   terrain_low_elevation_cells: number;
   terrain_low_elevation_threshold_m: number | null;
+  hand_reconstruction_features?: number;
   rainfall_peak_mm_per_hour: number | null;
   rainfall_peak_timestamp?: string | null;
   rainfall_peak_station_name?: string | null;
@@ -188,6 +190,24 @@ export type ReconstructionResponse = {
     role: string;
     status: DataStatus | string;
   }>;
+  envelope_comparison?: {
+    status: DataStatus | string;
+    source_type: string;
+    role: string;
+    area_crs?: string;
+    data_warning?: string[];
+    methods?: Record<string, string>;
+    rows: Array<{
+      stage: string;
+      label: string;
+      approx_features: number;
+      approx_area_km2: number;
+      hand_features: number;
+      hand_area_km2: number;
+      hand_minus_approx_area_km2: number;
+      hand_to_approx_area_ratio: number | null;
+    }>;
+  };
   limitations: string[];
 };
 
@@ -198,6 +218,41 @@ export type InterventionType =
   | "TEMPORARY_BARRIER"
   | "LEVEE_IMPROVEMENT"
   | "INFRASTRUCTURE_PROTECTION";
+
+export type ScenarioIntervention =
+  | "flood_barrier"
+  | "evacuation_support"
+  | "road_closure"
+  | "levee_improvement"
+  | "infrastructure_protection";
+
+export type PortfolioScenario = {
+  scenario_id: number;
+  name: string;
+  event_id: string;
+  building_ids: number[];
+  interventions: ScenarioIntervention[];
+  status: "DRAFT" | "COMPLETED";
+  created_at: string;
+};
+
+export type PortfolioScenarioRunResult = {
+  scenario_id: number;
+  name: string;
+  event_id: string;
+  building_ids: number[];
+  interventions: ScenarioIntervention[];
+  status: "COMPLETED";
+  before_priority_buildings: number;
+  after_priority_buildings: number;
+  risk_reduction: number;
+  before_risk_score: number;
+  after_risk_score: number;
+  priority_building_ids_before: number[];
+  priority_building_ids_after: number[];
+  assumptions: string[];
+  origin: "TEMPORARY";
+};
 
 export type ScenarioResult = {
   scenario_id: string;

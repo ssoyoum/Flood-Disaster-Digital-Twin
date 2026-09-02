@@ -21,6 +21,7 @@ const emptyLayers: LayersResponse = {
   waterways: emptyLayer("waterways", "Waterways"),
   terrain: emptyLayer("terrain", "Terrain Context"),
   approx_flood_envelope: emptyLayer("approx_flood_envelope", "Approximate Flood Envelope"),
+  hand_reconstruction: emptyLayer("hand_reconstruction", "HAND Reconstruction"),
   facilities: emptyLayer("facilities", "Facilities"),
   underpass: emptyLayer("underpass", "Gungpyeong 2 Underpass"),
   flood_extent: emptyLayer("flood_extent", "Flood Extent"),
@@ -33,6 +34,7 @@ const layerLabels: Record<keyof LayersResponse, string> = {
   waterways: "Waterways",
   terrain: "Terrain Context",
   approx_flood_envelope: "Approx Flood Envelope",
+  hand_reconstruction: "HAND Reconstruction",
   facilities: "Facilities",
   underpass: "Gungpyeong 2 Underpass",
   flood_extent: "Flood Extent",
@@ -254,6 +256,32 @@ function MapPanel({
         paint: { "line-color": "#d93f35", "line-width": 3.2, "line-dasharray": [1, 1], "line-opacity": 0.88 },
       });
 
+      map.addSource("hand_reconstruction", { type: "geojson", data: layers.hand_reconstruction.data as never });
+      map.addLayer({
+        id: "hand-reconstruction-fill",
+        type: "fill",
+        source: "hand_reconstruction",
+        filter: ["all", ["==", ["geometry-type"], "Polygon"], ["==", ["get", "stage_index"], time]],
+        paint: {
+          "fill-color": scenario === "intervention" ? "#37a881" : "#2f8ec9",
+          "fill-opacity": ["interpolate", ["linear"], ["get", "hand_threshold_m"], 0, 0.12, 6, 0.38],
+        },
+      });
+      map.addLayer({
+        id: "hand-reconstruction-line",
+        type: "line",
+        source: "hand_reconstruction",
+        filter: ["all", ["==", ["geometry-type"], "Polygon"], ["==", ["get", "stage_index"], time]],
+        paint: { "line-color": "#1c648d", "line-width": 0.7, "line-opacity": 0.45 },
+      });
+      map.addLayer({
+        id: "hand-connection-line",
+        type: "line",
+        source: "hand_reconstruction",
+        filter: ["all", ["==", ["geometry-type"], "LineString"], ["==", ["get", "stage_index"], time]],
+        paint: { "line-color": "#1b7d68", "line-width": 3.4, "line-dasharray": [1.2, 0.8], "line-opacity": 0.9 },
+      });
+
       const bbox = safemapOverlay?.bbox;
       const imageUrl = api.assetUrl(safemapOverlay?.image_url);
       if (bbox && imageUrl) {
@@ -432,6 +460,16 @@ function MapPanel({
           .addTo(map);
       });
 
+      map.on("click", "hand-reconstruction-fill", (event: MapLayerMouseEvent) => {
+        const feature = event.features?.[0];
+        if (!feature) return;
+        const properties = feature.properties ?? {};
+        new maplibregl.Popup({ offset: 14 })
+          .setLngLat(event.lngLat)
+          .setHTML(popupHtml("HAND reconstruction cell", [["stage", properties.label], ["HAND", `${properties.hand_m ?? "Unknown"} m`], ["threshold", `${properties.hand_threshold_m ?? "Unknown"} m`], ["water level", `${properties.observed_water_level_m ?? "Unknown"} m`], ["source", layers.hand_reconstruction.source], ["data vintage", vintageFromLayer(layers.hand_reconstruction)]]))
+          .addTo(map);
+      });
+
       map.on("click", "underpass-line", (event: MapLayerMouseEvent) => {
         const feature = event.features?.[0];
         if (!feature) return;
@@ -475,6 +513,18 @@ function MapPanel({
       map.setFilter("approx-flow-path-line", ["all", ["==", ["geometry-type"], "LineString"], ["==", ["get", "stage_index"], time]]);
       map.setPaintProperty("approx-flow-path-line", "line-color", scenario === "intervention" ? "#1f8064" : "#d93f35");
     }
+    if (map.getLayer("hand-reconstruction-fill")) {
+      map.setFilter("hand-reconstruction-fill", ["all", ["==", ["geometry-type"], "Polygon"], ["==", ["get", "stage_index"], time]]);
+      map.setPaintProperty("hand-reconstruction-fill", "fill-color", scenario === "intervention" ? "#37a881" : "#2f8ec9");
+    }
+    if (map.getLayer("hand-reconstruction-line")) {
+      map.setFilter("hand-reconstruction-line", ["all", ["==", ["geometry-type"], "Polygon"], ["==", ["get", "stage_index"], time]]);
+      map.setPaintProperty("hand-reconstruction-line", "line-color", scenario === "intervention" ? "#1f8064" : "#1c648d");
+    }
+    if (map.getLayer("hand-connection-line")) {
+      map.setFilter("hand-connection-line", ["all", ["==", ["geometry-type"], "LineString"], ["==", ["get", "stage_index"], time]]);
+      map.setPaintProperty("hand-connection-line", "line-color", scenario === "intervention" ? "#1f8064" : "#1b7d68");
+    }
     if (map.getLayer("underpass-line")) {
       map.setPaintProperty("underpass-line", "line-color", replayColor(activeReplay?.state, scenario));
       map.setPaintProperty("underpass-line", "line-width", scenario === "intervention" && replaySeverity(activeReplay?.state) >= 5 ? 8 : 6);
@@ -485,7 +535,7 @@ function MapPanel({
     const map = mapRef.current;
     if (!map || !map.isStyleLoaded()) return;
     const visibility = (key: keyof LayersResponse) => visible[key] ? "visible" : "none";
-    [["aoi-fill", "aoi"], ["aoi-line", "aoi"], ["terrain-fill", "terrain"], ["terrain-line", "terrain"], ["approx-flood-envelope-fill", "approx_flood_envelope"], ["approx-flood-envelope-line", "approx_flood_envelope"], ["approx-flow-path-line", "approx_flood_envelope"], ["waterways-fill", "waterways"], ["waterways-line", "waterways"], ["roads-line", "roads"], ["buildings-fill", "buildings"], ["buildings-line", "buildings"], ["facilities-point", "facilities"], ["underpass-line", "underpass"]].forEach(([layerId, key]) => {
+    [["aoi-fill", "aoi"], ["aoi-line", "aoi"], ["terrain-fill", "terrain"], ["terrain-line", "terrain"], ["approx-flood-envelope-fill", "approx_flood_envelope"], ["approx-flood-envelope-line", "approx_flood_envelope"], ["approx-flow-path-line", "approx_flood_envelope"], ["hand-reconstruction-fill", "hand_reconstruction"], ["hand-reconstruction-line", "hand_reconstruction"], ["hand-connection-line", "hand_reconstruction"], ["waterways-fill", "waterways"], ["waterways-line", "waterways"], ["roads-line", "roads"], ["buildings-fill", "buildings"], ["buildings-line", "buildings"], ["facilities-point", "facilities"], ["underpass-line", "underpass"]].forEach(([layerId, key]) => {
       if (map.getLayer(layerId)) map.setLayoutProperty(layerId, "visibility", visibility(key as keyof LayersResponse));
     });
     if (map.getLayer("safemap-floodmarks-raster")) {
@@ -500,13 +550,14 @@ function MapPanel({
         <div className={`map-replay-banner ${scenario}`}>
           <span>{formatClock(activeReplay.time)}</span>
           <strong>{scenario === "intervention" && replaySeverity(activeReplay.state) >= 5 ? "Auto closure active" : activeReplay.label}</strong>
-          <small>{scenario === "baseline" ? "Status marker, not flood extent" : "Road closure what-if, not flood extent"}</small>
+          <small>{scenario === "baseline" ? "HAND-based reconstruction, not official extent" : "Road closure what-if, not official extent"}</small>
         </div>
       )}
       <div className="map-label"><span className="pulse-dot" /> Osong 2023 MVP | Online OSM basemap</div>
       <div className="map-attribution">Basemap © OpenStreetMap contributors | Flood marks © MOIS Safemap WMS | Current basemap is context only</div>
       <div className="map-legend">
         <div><i className="legend-replay" />Replay status</div>
+        <div><i className="legend-hand" />HAND reconstruction</div>
         <div><i className="legend-approx-flood" />Approx envelope</div>
         <div><i className="legend-aoi" />AOI</div>
         <div><i className="legend-water" />Official river area</div>
@@ -589,10 +640,10 @@ function ProvenancePanel({
         <section className="section-block">
           <div className="section-heading"><div><div className="eyebrow">DATA</div><h2>Map meaning</h2></div></div>
           <div className="reference-layer-list">
-            <div><strong>Replay</strong><small>Timeline status plus DEM-based approximate envelope</small></div>
+            <div><strong>Replay</strong><small>Timeline status plus HAND-based reconstruction envelope</small></div>
             <div><strong>Analysis layers</strong><small>2023 event data where recorded</small></div>
             <div><strong>Basemap</strong><small>Current online reference only</small></div>
-            <div><strong>Flood extent</strong><small>Approx envelope is temporary, not official vector data</small></div>
+            <div><strong>Flood extent</strong><small>HAND/approx envelopes are temporary, not official vector data</small></div>
           </div>
         </section>
       </div>
@@ -659,6 +710,34 @@ function Timeline({
           </div>
         ))}
       </div>
+      {reconstruction.envelope_comparison?.rows?.length ? (
+        <div className="method-comparison">
+          <div className="method-comparison-head">
+            <div>
+              <div className="eyebrow">METHOD COMPARISON</div>
+              <h3>Approx envelope vs HAND reconstruction</h3>
+            </div>
+            <span>{reconstruction.envelope_comparison.area_crs ?? "EPSG:5179"} area check</span>
+          </div>
+          <div className="comparison-table">
+            <div className="comparison-table-header">
+              <span>Stage</span>
+              <span>Approx</span>
+              <span>HAND</span>
+              <span>Delta</span>
+            </div>
+            {reconstruction.envelope_comparison.rows.map((row) => (
+              <div className={`comparison-table-row ${row.stage === reconstruction.replay[time]?.state ? "active" : ""}`} key={row.stage}>
+                <span><strong>{row.label || row.stage}</strong><small>{row.stage}</small></span>
+                <span>{row.approx_area_km2.toFixed(2)} km2<small>{row.approx_features} cells</small></span>
+                <span>{row.hand_area_km2.toFixed(2)} km2<small>{row.hand_features} cells</small></span>
+                <span>+{row.hand_minus_approx_area_km2.toFixed(2)} km2<small>{row.hand_to_approx_area_ratio ? `${row.hand_to_approx_area_ratio}x` : "n/a"}</small></span>
+              </div>
+            ))}
+          </div>
+          <p className="data-note">Comparison areas are method diagnostics only. They are not official inundation area or exposure KPI evidence.</p>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -687,7 +766,7 @@ function HydrometPanel({ summary }: { summary: ExposureMetrics | null }) {
           <small>Safemap WMS raster · visual verification only</small>
         </div>
       </div>
-      <p className="data-note">The map shows a DEM-constrained approximate envelope. It is not official Flood Extent, depth, or velocity.</p>
+      <p className="data-note">The map shows a HAND-like reconstruction envelope driven by observed water-level timing. It is not official Flood Extent, depth, or velocity.</p>
     </div>
   );
 }
@@ -763,7 +842,8 @@ export default function App() {
     buildings: true,
     waterways: true,
     terrain: false,
-    approx_flood_envelope: true,
+    approx_flood_envelope: false,
+    hand_reconstruction: true,
     facilities: false,
     underpass: true,
     flood_extent: false,
@@ -812,7 +892,7 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, [reconstruction, replayPlaying]);
 
-  const layerRows = useMemo<Array<keyof LayersResponse>>(() => ["aoi", "approx_flood_envelope", "waterways", "roads", "buildings", "underpass"], []);
+  const layerRows = useMemo<Array<keyof LayersResponse>>(() => ["aoi", "hand_reconstruction", "approx_flood_envelope", "waterways", "roads", "buildings", "underpass"], []);
 
   if (loading) return <div className="app-state"><Activity className="spin" /><strong>Loading FloodOps offline MVP</strong><span>Reading local processed Osong data.</span></div>;
   if (error || !eventData) return <div className="app-state error-state"><AlertTriangle /><strong>Unable to load MVP</strong><span>{error}</span></div>;

@@ -1,4 +1,4 @@
-import type { DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType } from "./types";
+import type { DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 
@@ -36,6 +36,21 @@ export const createScenario = (name: string, interventionType: InterventionType,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, intervention_type: interventionType, event_id: eventId }),
   });
+
+export const createPortfolioScenario = (payload: {
+  name?: string;
+  event_id?: string;
+  building_ids: number[];
+  interventions: ScenarioIntervention[];
+}) =>
+  request<PortfolioScenario>("/api/scenarios", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+export const runPortfolioScenario = (scenarioId: number) =>
+  request<PortfolioScenarioRunResult>(`/api/scenarios/${scenarioId}/run`, { method: "POST" });
 
 export const testSafetyDataApi = (serviceKey: string) =>
   request<SafetyDataApiTestResult>("/api/integrations/safety-data/test", {

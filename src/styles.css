@@ -96,6 +96,7 @@ h2 { margin: 4px 0 0; font-size: 17px; letter-spacing: -.3px; }
 .layer-swatch.waterways { background: #2b8ec4; }
 .layer-swatch.terrain { background: #c9d05b; }
 .layer-swatch.approx_flood_envelope { background: #d8793c; }
+.layer-swatch.hand_reconstruction { background: #2f8ec9; }
 .layer-swatch.facilities { background: #e6a743; border-radius: 50%; }
 .layer-swatch.underpass { background: #d93f35; }
 .layer-swatch.flood_extent { background: #e76858; }
@@ -104,6 +105,7 @@ h2 { margin: 4px 0 0; font-size: 17px; letter-spacing: -.3px; }
 .legend-aoi { background: #7bb6b2; }
 .legend-replay { background: #d8793c; border-radius: 50% !important; }
 .legend-approx-flood { background: rgba(216,121,60,.55); }
+.legend-hand { background: rgba(47,142,201,.55); }
 .legend-floodmarks { background: #5b76df; }
 .legend-water { background: #2b8ec4; }
 .legend-terrain { background: #c9d05b; }
@@ -448,6 +450,81 @@ h2 { margin: 4px 0 0; font-size: 17px; letter-spacing: -.3px; }
 .timeline-event.underpass_inflow { border-top: 3px solid #d8793c; }
 .timeline-event.unsafe_driving { border-top: 3px solid #a94848; }
 .timeline-event.full_inundation { border-top: 3px solid #713f58; }
+.method-comparison {
+  margin-top: 14px;
+  border: 1px solid #dce5e5;
+  border-radius: 7px;
+  background: #fff;
+  padding: 13px;
+}
+.method-comparison-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.method-comparison-head h3 {
+  margin: 3px 0 0;
+  color: #213b47;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+.method-comparison-head > span {
+  color: #71838b;
+  font-size: 10px;
+  font-weight: 800;
+}
+.comparison-table {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid #e4ebeb;
+  border-radius: 6px;
+}
+.comparison-table-header,
+.comparison-table-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.3fr) repeat(3, minmax(82px, .7fr));
+}
+.comparison-table-header {
+  background: #f2f6f6;
+}
+.comparison-table-header span {
+  color: #788991;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .7px;
+  padding: 8px 9px;
+}
+.comparison-table-row {
+  background: #fff;
+}
+.comparison-table-row.active {
+  background: #eef8f6;
+}
+.comparison-table-row > span {
+  min-width: 0;
+  color: #324d58;
+  font-size: 11px;
+  padding: 8px 9px;
+  border-top: 1px solid #eef3f3;
+}
+.comparison-table-row strong,
+.comparison-table-row small {
+  display: block;
+}
+.comparison-table-row strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+}
+.comparison-table-row small {
+  margin-top: 2px;
+  color: #8a999f;
+  font-size: 9px;
+}
 .scenario-cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
