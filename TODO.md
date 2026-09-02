@@ -12,7 +12,7 @@ Last Updated: 2026-09-02 23:31 KST
 
 - Status: Active
 - Last updated: 2026-09-02
-- Next action: What-if A/B와 Agent Tool wrapper가 연결됐다. 남은 것은 DQ-008을 반영한 영향 지표 설계, provenance 점검, workflow orchestration이다.
+- Next action: Agent intent planning까지 연결됐다. 남은 것은 provenance 요약, React workflow 실행 연결, 연구 결과 요약 단계다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
@@ -48,6 +48,8 @@ Last Updated: 2026-09-02 23:31 KST
   - [ ] C: 제방 조건 변경은 계산 근거가 충분할 때만 적용한다.
     - 붕괴 위치/폭/유량 미확보로 현재 보류 유지.
 - [ ] DQ-008 대응: envelope 기반 영향 지표 설계
+  - [x] envelope 중첩 대신 사건 초점 시설 반경별 exposure inventory API와 Agent workflow를 연결했다.
+  - exposure inventory는 침수 영향 추정이 아니라 반경 안의 건물·도로·시설 재고이며 `PENDING_FLOOD_EXTENT` 경계를 유지한다.
   - HAND final stage 54.392 km2 = AOI 40.557 km2의 1.34배. AOI 클립 후에도 읍 면적의 47.9%.
   - 그대로 중첩하면 건물 45.8%, 도로 50.5%가 영향으로 집계되어 근거로 제시할 수 없다.
   - 비파괴 경로: stage별 증분 지표 + 궁평2지하차도 중심 반경 제한 집계, `coverage_status` 명시.

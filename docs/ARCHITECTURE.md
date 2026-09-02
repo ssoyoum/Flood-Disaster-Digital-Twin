@@ -96,14 +96,22 @@ repositories and analysis services:
 ```text
 GET  /api/agent/tools
 POST /api/agent/tools/{tool_name}
-  -> validate event and tool parameters
-  -> call an existing domain service
-  -> return the tool result with provenance and limitations
+POST /api/agent/plan
+POST /api/agent/workflows
+  -> plan supported intent without executing a tool
+  -> validate event and workflow parameters
+  -> call context and analysis tools in sequence
+  -> return tool-call trace and domain result
 ```
 
 The current registry includes event metadata, historical reconstruction,
-closure-timing What-if A, and inflow-delay What-if B. The wrapper does not read
-GIS files directly, call external APIs, or invent missing flood measurements.
+closure-timing What-if A, inflow-delay What-if B, and envelope-independent
+exposure inventory. The `situation` workflow returns event and reconstruction
+context; analysis workflows chain event context, reconstruction, and one
+analysis tool. The deterministic intent planner recognizes only these
+registered workflows and returns `NEEDS_CLARIFICATION` or `UNSUPPORTED` when
+it cannot select one safely. The wrapper does not read GIS files directly, call
+external APIs, or invent missing flood measurements.
 
 - 실제 PostGIS Repository와 Migration은 아직 연결하지 않는다.
 - 과거 사건 자료는 저장된 snapshot을 사용하며 런타임마다 외부 API를 호출하지 않는다.

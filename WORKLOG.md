@@ -642,4 +642,41 @@
 - Backend tests `23 passed, 1 warning`을 확인했다.
 
 남은 작업:
-- 자연어 intent 분석과 multi-tool workflow orchestration은 Tool 계약이 안정화된 뒤 추가한다.
+- 자연어 intent 분석과 사용자 친화적 결과 요약은 Tool 계약이 안정화된 뒤 추가한다.
+
+## Agent multi-tool workflow orchestration
+
+- 작업일: 2026-09-02
+
+주요 작업:
+- `POST /api/agent/workflows`를 추가해 명시적 workflow를 실행한다.
+- `closure_timing`과 `inflow_delay` workflow는 `get_event` → `get_reconstruction` → 분석 Tool 순서로 호출한다.
+- 각 단계의 Tool 이름, 실행 순서, 결과 key를 `tool_calls` trace로 반환한다.
+- 현재 workflow 선택은 명시적 enum으로 제한하고, 자연어 intent planning은 다음 단계로 남겼다.
+
+검증 결과:
+- closure-timing/inflow-delay workflow 연속 호출 테스트를 추가했다.
+- Backend tests `25 passed, 1 warning`을 확인했다.
+
+남은 작업:
+- 자연어 요청을 workflow와 파라미터로 변환하는 intent planning을 추가한다.
+- Agent 응답에 데이터 근거와 한계를 사용자 친화적으로 요약하는 단계를 추가한다.
+
+## Agent deterministic intent planning
+
+- 작업일: 2026-09-02
+
+주요 작업:
+- `POST /api/agent/plan`을 추가해 자연어 요청을 등록된 workflow 선택 계획으로 변환한다.
+- 차단 시각, 유입 지연, 반경별 exposure inventory, 역사 재생 요청을 제한된 marker와 정규식으로 결정적으로 매핑한다.
+- 메시지에서 인식한 시각·분·반경만 파라미터로 전달하고, 값이 없으면 workflow 기본값 사용을 assumptions에 기록한다.
+- 복수 분석 의도는 `NEEDS_CLARIFICATION`, 등록되지 않은 예측·임의 분석 요청은 `UNSUPPORTED`로 반환한다.
+- `situation` workflow를 추가해 `get_event` → `get_reconstruction` 상황 조회 경로도 명시적으로 실행할 수 있게 했다.
+
+검증 결과:
+- 한국어 시각/반경 추출, 복수 의도 명확화, 미지원 요청 거부, situation workflow 테스트를 추가했다.
+- Backend tests `36 passed, 1 warning`을 확인했다.
+
+남은 작업:
+- Planner는 실행하지 않는 계획 단계이므로 React에서 계획 확인 후 workflow를 실행하는 UI 연결이 필요하다.
+- 실제 결과를 연구자용 요약으로 변환할 때 provenance와 limitations를 누락하지 않는 출력 단계를 추가한다.
