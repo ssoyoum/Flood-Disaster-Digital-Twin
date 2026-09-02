@@ -238,3 +238,24 @@ class InflowDelayResult(BaseModel):
     scenarios: list[InflowDelayScenario]
     assumptions: list[str]
     limitations: list[str]
+
+
+class AgentToolDescriptor(BaseModel):
+    name: str
+    description: str
+    input_fields: list[str]
+    output: str
+
+
+class AgentToolCallRequest(BaseModel):
+    """Common request envelope for registered Agent tools."""
+
+    event_id: str = "osong-2023"
+    closure_times: list[str] | None = None
+    delay_minutes: list[Annotated[int, Field(ge=0, le=180)]] | None = None
+
+
+class AgentToolCallResult(BaseModel):
+    tool_name: str
+    event_id: str
+    result: dict

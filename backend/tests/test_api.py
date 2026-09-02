@@ -301,3 +301,39 @@ def test_inflow_delay_whatif_requires_connected_reconstruction():
     )
     assert response.status_code == 404
     assert "not connected" in response.json()["detail"]
+
+
+def test_agent_tools_expose_only_registered_domain_tools():
+    response = client.get("/api/agent/tools")
+    assert response.status_code == 200
+    tools = response.json()
+    assert [tool["name"] for tool in tools] == [
+        "get_event",
+        "get_reconstruction",
+        "analyze_closure_timing",
+        "analyze_inflow_delay",
+    ]
+    assert "closure_times" in tools[2]["input_fields"]
+    assert "delay_minutes" in tools[3]["input_fields"]
+
+
+def test_agent_tool_dispatches_inflow_delay_with_domain_result():
+    response = client.post(
+        "/api/agent/tools/analyze_inflow_delay",
+        json={"event_id": "osong-2023", "delay_minutes": [5]},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["tool_name"] == "analyze_inflow_delay"
+    assert payload["result"]["analysis"] == "inflow_delay_whatif"
+    assert payload["result"]["scenarios"][0]["delay_minutes"] == 5
+    assert payload["result"]["scenarios"][0]["milestones"][0]["shifted_by_min"] == 5
+
+
+def test_agent_tool_rejects_unknown_tool():
+    response = client.post(
+        "/api/agent/tools/invent_flood_depth",
+        json={"event_id": "osong-2023"},
+    )
+    assert response.status_code == 404
+    assert "Unknown agent tool" in response.json()["detail"]

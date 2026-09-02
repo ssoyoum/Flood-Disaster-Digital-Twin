@@ -3,12 +3,16 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
+from .agent_tools import execute_agent_tool, list_agent_tools
 from .data import EVENT_ID, EVENT_OBSERVATIONS, OBSERVATIONS, get_event, get_events, get_layers
 from .osong_repository import SAFEMAP_WMS_SNAPSHOT, get_osong_data_status, get_osong_reconstruction, get_osong_summary
 from .scenario_repository import create_scenario as save_scenario, get_scenario, mark_completed
 from .schemas import (
     ClosureTimingRequest,
     ClosureTimingResult,
+    AgentToolCallRequest,
+    AgentToolCallResult,
+    AgentToolDescriptor,
     InflowDelayRequest,
     InflowDelayResult,
     Intervention,
@@ -306,3 +310,30 @@ def inflow_delay_analysis(event_id: str, request: InflowDelayRequest):
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/api/agent/tools", response_model=list[AgentToolDescriptor], tags=["agent"])
+def agent_tools():
+    """List the deterministic tools currently available to the Agent layer."""
+
+    return list_agent_tools()
+
+
+@app.post(
+    "/api/agent/tools/{tool_name}",
+    response_model=AgentToolCallResult,
+    tags=["agent"],
+)
+def run_agent_tool(tool_name: str, request: AgentToolCallRequest):
+    """Execute one registered analysis/data tool without LLM-side invention."""
+
+    _require_event(request.event_id)
+    try:
+        result = execute_agent_tool(tool_name, request.event_id, request)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ReconstructionUnavailable as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return AgentToolCallResult(tool_name=tool_name, event_id=request.event_id, result=result)
