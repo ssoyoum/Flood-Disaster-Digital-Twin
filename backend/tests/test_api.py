@@ -315,10 +315,12 @@ def test_agent_tools_expose_only_registered_domain_tools():
         "analyze_closure_timing",
         "analyze_inflow_delay",
         "get_exposure_inventory",
+        "compare_scenarios",
     ]
     assert "closure_times" in tools[2]["input_fields"]
     assert "delay_minutes" in tools[3]["input_fields"]
     assert "radii_m" in tools[4]["input_fields"]
+    assert "comparison_type" in tools[5]["input_fields"]
 
 
 def test_agent_tool_dispatches_inflow_delay_with_domain_result():
@@ -466,6 +468,41 @@ def test_agent_exposure_inventory_tool_preserves_dq008_boundary():
     assert payload["result"]["analysis"] == "exposure_inventory"
     assert payload["result"]["rings"][0]["radius_m"] == 500
     assert any("not a flood impact estimate" in item for item in payload["result"]["limitations"])
+
+
+def test_agent_compare_scenarios_reports_closure_timing_against_baseline():
+    response = client.post(
+        "/api/agent/tools/compare_scenarios",
+        json={
+            "event_id": "osong-2023",
+            "comparison_type": "closure_timing",
+            "closure_times": ["08:25"],
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()["result"]
+    assert result["analysis"] == "scenario_comparison"
+    assert result["comparison_type"] == "closure_timing"
+    assert result["comparisons"][0]["lead_time_vs_detection_trigger_min"] == 2
+    assert result["provenance"]
+    assert any("avoided damage" in item for item in result["limitations"])
+
+
+def test_agent_compare_scenarios_includes_zero_delay_baseline():
+    response = client.post(
+        "/api/agent/tools/compare_scenarios",
+        json={
+            "event_id": "osong-2023",
+            "comparison_type": "inflow_delay",
+            "delay_minutes": [10],
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()["result"]
+    assert result["comparison_type"] == "inflow_delay"
+    assert result["baseline"]["delay_minutes"] == 0
+    assert result["comparisons"][0]["delay_minutes"] == 10
+    assert result["comparisons"][0]["minutes_gained_before_full_inundation"] == 10
 
 
 def test_agent_exposure_inventory_workflow_does_not_use_flood_envelope():

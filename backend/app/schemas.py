@@ -254,6 +254,7 @@ class AgentToolCallRequest(BaseModel):
     closure_times: list[str] | None = None
     delay_minutes: list[Annotated[int, Field(ge=0, le=180)]] | None = None
     radii_m: list[Annotated[int, Field(ge=50, le=20000)]] | None = None
+    comparison_type: Literal["closure_timing", "inflow_delay"] = "closure_timing"
 
 
 class AgentToolCallResult(BaseModel):
@@ -323,6 +324,21 @@ class AgentIntentPlanResult(BaseModel):
     reason: str
     assumptions: list[str] = Field(default_factory=list)
     limitations: list[str] = Field(default_factory=list)
+
+
+class ScenarioComparisonResult(BaseModel):
+    """Baseline comparison limited to supported, domain-derived time measures."""
+
+    event_id: str
+    analysis: Literal["scenario_comparison"] = "scenario_comparison"
+    comparison_type: Literal["closure_timing", "inflow_delay"]
+    coverage_status: CoverageStatus
+    coverage_note: str
+    baseline: dict[str, Any]
+    comparisons: list[dict[str, Any]]
+    provenance: list[dict[str, Any]]
+    assumptions: list[str]
+    limitations: list[str]
 
 
 class ExposureRing(BaseModel):

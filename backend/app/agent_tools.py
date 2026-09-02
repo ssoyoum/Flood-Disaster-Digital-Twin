@@ -20,6 +20,7 @@ from .schemas import (
     ExposureInventoryResult,
     InflowDelayRequest,
     InflowDelayResult,
+    ScenarioComparisonResult,
 )
 from .services import (
     ReconstructionUnavailable,
@@ -63,6 +64,12 @@ _TOOL_CATALOG: tuple[dict[str, Any], ...] = (
         "input_fields": ["event_id", "radii_m"],
         "output": "exposure inventory, not flood impact estimate",
     },
+    {
+        "name": "compare_scenarios",
+        "description": "Compare supported closure-timing or inflow-delay scenarios against a registered baseline.",
+        "input_fields": ["event_id", "comparison_type", "closure_times", "delay_minutes"],
+        "output": "baseline versus scenario timing comparison, not damage reduction",
+    },
 )
 
 
@@ -105,12 +112,74 @@ def _get_exposure_inventory(event_id: str, request: AgentToolCallRequest) -> dic
     ).model_dump()
 
 
+def _compare_scenarios(event_id: str, request: AgentToolCallRequest) -> dict[str, Any]:
+    reconstruction = _get_reconstruction(event_id, request)
+    provenance = reconstruction.get("provenance", [])
+    if request.comparison_type == "closure_timing":
+        raw = analyze_closure_timing(
+            event_id,
+            request.closure_times or ClosureTimingRequest().closure_times,
+        )
+        result = {
+            "event_id": event_id,
+            "comparison_type": "closure_timing",
+            "coverage_status": raw["coverage_status"],
+            "coverage_note": raw["coverage_note"],
+            "baseline": {
+                "name": "Registered detection-trigger baseline",
+                "closure_time": reconstruction["intervention"]["trigger_time"],
+                "basis": reconstruction["intervention"]["trigger_basis"],
+            },
+            "comparisons": [
+                {
+                    "scenario": f"closure at {scenario['closure_time']}",
+                    "closure_time": scenario["closure_time"],
+                    "classification": scenario["classification"],
+                    "minutes_before_underpass_inflow": scenario["minutes_before_underpass_inflow"],
+                    "minutes_before_full_inundation": scenario["minutes_before_full_inundation"],
+                    "lead_time_vs_detection_trigger_min": scenario["lead_time_vs_detection_trigger_min"],
+                }
+                for scenario in raw["scenarios"]
+            ],
+            "provenance": provenance,
+            "assumptions": raw["assumptions"],
+            "limitations": raw["limitations"] + [
+                "This comparison reports timeline differences only; it does not estimate avoided damage or casualties."
+            ],
+        }
+    else:
+        requested = request.delay_minutes or InflowDelayRequest().delay_minutes
+        raw = analyze_inflow_delay(event_id, [0, *requested])
+        baseline = next(
+            scenario for scenario in raw["scenarios"] if scenario["delay_minutes"] == 0
+        )
+        result = {
+            "event_id": event_id,
+            "comparison_type": "inflow_delay",
+            "coverage_status": raw["coverage_status"],
+            "coverage_note": raw["coverage_note"],
+            "baseline": baseline,
+            "comparisons": [
+                scenario
+                for scenario in raw["scenarios"]
+                if scenario["delay_minutes"] != 0
+            ],
+            "provenance": provenance,
+            "assumptions": raw["assumptions"],
+            "limitations": raw["limitations"] + [
+                "This comparison reports shifted milestone time only; it does not estimate hydraulic or damage reduction."
+            ],
+        }
+    return ScenarioComparisonResult.model_validate(result).model_dump()
+
+
 _HANDLERS: dict[str, ToolHandler] = {
     "get_event": _get_event,
     "get_reconstruction": _get_reconstruction,
     "analyze_closure_timing": _analyze_closure_timing,
     "analyze_inflow_delay": _analyze_inflow_delay,
     "get_exposure_inventory": _get_exposure_inventory,
+    "compare_scenarios": _compare_scenarios,
 }
 
 
@@ -193,6 +262,23 @@ def execute_agent_workflow(request: AgentWorkflowRequest) -> dict[str, Any]:
 _CLOSURE_MARKERS = ("차단", "통제", "폐쇄", "closure", "close")
 _INFLOW_MARKERS = ("유입", "차수벽", "inflow", "delay")
 _EXPOSURE_MARKERS = ("건물", "도로", "시설", "노출", "반경", "exposure", "inventory")
+_UNSUPPORTED_MARKERS = (
+    "사망자",
+    "사상자",
+    "부상자",
+    "피해액",
+    "피해 비용",
+    "피해율",
+    "피해 감소",
+    "침수심",
+    "정확한 침수면적",
+    "예측",
+    "forecast",
+    "casualt",
+    "damage cost",
+    "flood depth",
+    "inundated area",
+)
 _SITUATION_MARKERS = (
     "상황",
     "재구성",
@@ -290,6 +376,13 @@ def plan_agent_intent(request: AgentIntentPlanRequest) -> dict[str, Any]:
             "The Agent must present the selected tool result and its provenance/limitations.",
         ],
     }
+
+    if _contains_marker(text, _UNSUPPORTED_MARKERS):
+        return {
+            **base,
+            "status": "UNSUPPORTED",
+            "reason": "The request asks for an unregistered impact or forecast quantity.",
+        }
 
     if len(actionable) > 1:
         return {

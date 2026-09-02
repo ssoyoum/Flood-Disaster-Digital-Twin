@@ -1,0 +1,122 @@
+[
+  {
+    "id": "situation_ko",
+    "message": "오송 침수 상황을 보여줘",
+    "status": "READY",
+    "workflow": "situation",
+    "parameters": {"event_id": "osong-2023"},
+    "tool_names": ["get_event", "get_reconstruction"]
+  },
+  {
+    "id": "replay_ko",
+    "message": "오송 사건 타임라인을 재구성해줘",
+    "status": "READY",
+    "workflow": "situation",
+    "parameters": {"event_id": "osong-2023"},
+    "tool_names": ["get_event", "get_reconstruction"]
+  },
+  {
+    "id": "closure_clock",
+    "message": "08:25에 지하차도를 차단하면 어떻게 돼?",
+    "status": "READY",
+    "workflow": "closure_timing",
+    "parameters": {"event_id": "osong-2023", "closure_times": ["08:25"]},
+    "tool_names": ["get_event", "get_reconstruction", "analyze_closure_timing"]
+  },
+  {
+    "id": "closure_korean_clock",
+    "message": "8시 25분과 8시 35분 차량 통제 시각을 비교해줘",
+    "status": "READY",
+    "workflow": "closure_timing",
+    "parameters": {"event_id": "osong-2023", "closure_times": ["08:25", "08:35"]},
+    "tool_names": ["get_event", "get_reconstruction", "analyze_closure_timing"]
+  },
+  {
+    "id": "closure_default",
+    "message": "차량 진입 통제 시각별 결과를 비교해줘",
+    "status": "READY",
+    "workflow": "closure_timing",
+    "parameters": {"event_id": "osong-2023"},
+    "tool_names": ["get_event", "get_reconstruction", "analyze_closure_timing"]
+  },
+  {
+    "id": "inflow_delay_10",
+    "message": "차수벽으로 유입을 10분 늦추면 어떻게 달라져?",
+    "status": "READY",
+    "workflow": "inflow_delay",
+    "parameters": {"event_id": "osong-2023", "delay_minutes": [10]},
+    "tool_names": ["get_event", "get_reconstruction", "analyze_inflow_delay"]
+  },
+  {
+    "id": "inflow_delay_multiple",
+    "message": "유입 지연 10분과 30분을 비교해줘",
+    "status": "READY",
+    "workflow": "inflow_delay",
+    "parameters": {"event_id": "osong-2023", "delay_minutes": [10, 30]},
+    "tool_names": ["get_event", "get_reconstruction", "analyze_inflow_delay"]
+  },
+  {
+    "id": "exposure_radius",
+    "message": "지하차도 500m 안에 건물과 도로가 얼마나 있어?",
+    "status": "READY",
+    "workflow": "exposure_inventory",
+    "parameters": {"event_id": "osong-2023", "radii_m": [500]},
+    "tool_names": ["get_event", "get_exposure_inventory"]
+  },
+  {
+    "id": "exposure_rings",
+    "message": "반경 300m와 1000m의 시설 재고를 보여줘",
+    "status": "READY",
+    "workflow": "exposure_inventory",
+    "parameters": {"event_id": "osong-2023", "radii_m": [300, 1000]},
+    "tool_names": ["get_event", "get_exposure_inventory"]
+  },
+  {
+    "id": "exposure_default",
+    "message": "지하차도 주변 건물과 도로 재고를 조회해줘",
+    "status": "READY",
+    "workflow": "exposure_inventory",
+    "parameters": {"event_id": "osong-2023"},
+    "tool_names": ["get_event", "get_exposure_inventory"]
+  },
+  {
+    "id": "reject_casualties",
+    "message": "차단하면 사망자가 몇 명 줄어들어?",
+    "status": "UNSUPPORTED",
+    "workflow": null,
+    "parameters": {"event_id": "osong-2023"},
+    "tool_names": []
+  },
+  {
+    "id": "reject_depth",
+    "message": "오송 지하차도의 정확한 침수심을 알려줘",
+    "status": "UNSUPPORTED",
+    "workflow": null,
+    "parameters": {"event_id": "osong-2023"},
+    "tool_names": []
+  },
+  {
+    "id": "clarify_multiple",
+    "message": "차단 시각과 유입 지연을 같이 비교해줘",
+    "status": "NEEDS_CLARIFICATION",
+    "workflow": null,
+    "parameters": {"event_id": "osong-2023"},
+    "tool_names": []
+  },
+  {
+    "id": "clarify_mixed",
+    "message": "500m 건물과 10분 유입 지연을 함께 분석해줘",
+    "status": "NEEDS_CLARIFICATION",
+    "workflow": null,
+    "parameters": {"event_id": "osong-2023"},
+    "tool_names": []
+  },
+  {
+    "id": "reject_forecast",
+    "message": "내일 오송 강수량을 예측해줘",
+    "status": "UNSUPPORTED",
+    "workflow": null,
+    "parameters": {"event_id": "osong-2023"},
+    "tool_names": []
+  }
+]
