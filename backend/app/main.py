@@ -9,6 +9,7 @@ from .agent_tools import (
     list_agent_tools,
     plan_agent_intent,
 )
+from .llm_planner import MODEL_ID as LLM_PLANNER_MODEL, LlmPlannerUnavailable, llm_planner_status, plan_with_llm
 from .data import EVENT_ID, EVENT_OBSERVATIONS, OBSERVATIONS, get_event, get_events, get_layers
 from .osong_repository import SAFEMAP_WMS_SNAPSHOT, get_osong_data_status, get_osong_reconstruction, get_osong_summary
 from .scenario_repository import create_scenario as save_scenario, get_scenario, mark_completed
@@ -359,7 +360,30 @@ def plan_agent(request: AgentIntentPlanRequest):
     """Convert supported natural-language intent into a non-executing plan."""
 
     _require_event(request.event_id)
-    return plan_agent_intent(request)
+
+    if request.planner in {"auto", "llm"}:
+        try:
+            plan = plan_with_llm(request)
+        except (LlmPlannerUnavailable, ValueError) as exc:
+            failure = str(exc)
+        except Exception as exc:  # An SDK or network failure must not break planning.
+            failure = f"The LLM planner raised {type(exc).__name__}: {exc}"
+        else:
+            return {
+                **plan,
+                "planner_used": "llm",
+                "planner_note": (
+                    f"Routed by {LLM_PLANNER_MODEL}. The model only selected the workflow and "
+                    "extracted parameters; every reported value comes from the tool layer."
+                ),
+            }
+        if request.planner == "llm":
+            raise HTTPException(status_code=503, detail=f"LLM planner unavailable. {failure}")
+        note = f"Fell back to the deterministic planner. {failure}"
+    else:
+        note = "Deterministic planner was requested."
+
+    return {**plan_agent_intent(request), "planner_used": "deterministic", "planner_note": note}
 
 
 @app.post(
@@ -400,3 +424,19 @@ def exposure_inventory(
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/api/agent/planner-status", tags=["agent"])
+def agent_planner_status():
+    """Report whether the LLM planner can run, without calling the API."""
+
+    status = llm_planner_status()
+    return {
+        **status,
+        "model": LLM_PLANNER_MODEL,
+        "fallback": "deterministic",
+        "note": (
+            "The LLM only routes a request to a registered workflow and extracts parameters. "
+            "Analysis values always come from the deterministic tool layer."
+        ),
+    }

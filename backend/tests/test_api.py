@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
 
+import pytest
+
 from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -519,3 +521,89 @@ def test_exposure_inventory_requires_focus_feature_layer():
     response = client.get("/api/events/seoul-2022/exposure-inventory")
     assert response.status_code == 404
     assert "focus feature" in response.json()["detail"]
+
+
+def test_planner_status_reports_llm_availability_without_calling_the_api():
+    response = client.get("/api/agent/planner-status")
+    assert response.status_code == 200
+    status = response.json()
+    assert status["model"] == "claude-opus-5"
+    assert status["fallback"] == "deterministic"
+    assert isinstance(status["available"], bool)
+
+
+def test_plan_falls_back_to_deterministic_planner_without_llm_credentials():
+    response = client.post(
+        "/api/agent/plan",
+        json={"event_id": "osong-2023", "message": "08:25에 지하차도를 차단했으면?", "planner": "auto"},
+    )
+    assert response.status_code == 200
+    plan = response.json()
+    assert plan["planner_used"] == "deterministic"
+    assert plan["workflow"] == "closure_timing"
+    assert plan["parameters"]["closure_times"] == ["08:25"]
+
+
+def test_plan_with_explicit_llm_planner_reports_unavailable_instead_of_guessing():
+    response = client.post(
+        "/api/agent/plan",
+        json={"event_id": "osong-2023", "message": "08:25에 차단했으면?", "planner": "llm"},
+    )
+    if response.status_code == 200:
+        assert response.json()["planner_used"] == "llm"
+    else:
+        assert response.status_code == 503
+        assert "LLM planner unavailable" in response.json()["detail"]
+
+
+def test_llm_plan_parameters_are_revalidated_against_tool_ranges():
+    from app.llm_planner import LlmPlan, _validated_parameters
+
+    ok = _validated_parameters(
+        LlmPlan(workflow="exposure_inventory", radii_m=[500], reason="radius request"),
+        "osong-2023",
+    )
+    assert ok["radii_m"] == [500]
+
+    for bad in (
+        LlmPlan(workflow="exposure_inventory", radii_m=[10], reason="too small"),
+        LlmPlan(workflow="inflow_delay", delay_minutes=[999], reason="too long"),
+        LlmPlan(workflow="closure_timing", closure_times=["25:99"], reason="not a clock time"),
+    ):
+        with pytest.raises(ValueError):
+            _validated_parameters(bad, "osong-2023")
+
+
+def test_llm_planner_routes_through_deterministic_tools(monkeypatch):
+    from app import main as main_module
+
+    def fake_plan(request):
+        return {
+            "status": "READY",
+            "event_id": request.event_id,
+            "workflow": "closure_timing",
+            "parameters": {"event_id": request.event_id, "closure_times": ["08:25"]},
+            "tool_names": ["get_event", "get_reconstruction", "analyze_closure_timing"],
+            "reason": "Detected a closure timing request.",
+            "assumptions": [],
+            "limitations": ["The model only routed the request."],
+        }
+
+    monkeypatch.setattr(main_module, "plan_with_llm", fake_plan)
+    response = client.post(
+        "/api/agent/plan",
+        json={"event_id": "osong-2023", "message": "08:25에 차단했으면?", "planner": "llm"},
+    )
+    assert response.status_code == 200
+    plan = response.json()
+    assert plan["planner_used"] == "llm"
+    assert plan["workflow"] == "closure_timing"
+
+    # The plan only routes; the numbers still come from the deterministic tool.
+    executed = client.post(
+        "/api/agent/workflows",
+        json={"event_id": "osong-2023", "workflow": plan["workflow"], **{"closure_times": ["08:25"]}},
+    )
+    assert executed.status_code == 200
+    result = executed.json()["result"]
+    assert result["scenarios"][0]["minutes_before_underpass_inflow"] == 2

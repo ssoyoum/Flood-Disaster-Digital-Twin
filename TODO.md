@@ -12,7 +12,7 @@ Last Updated: 2026-09-02 23:31 KST
 
 - Status: Active
 - Last updated: 2026-09-02
-- Next action: Agent plan → workflow, provenance, 결과 한계 표시까지 연결됐다. 남은 것은 연구 결과 요약 단계다.
+- Next action: LLM intent planner를 결정론 planner 위에 얹었다. 남은 것은 `compare_scenarios` Tool과 연구 결과 요약 단계다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
@@ -54,6 +54,13 @@ Last Updated: 2026-09-02 23:31 KST
   - 그대로 중첩하면 건물 45.8%, 도로 50.5%가 영향으로 집계되어 근거로 제시할 수 없다.
   - 비파괴 경로: stage별 증분 지표 + 궁평2지하차도 중심 반경 제한 집계, `coverage_status` 명시.
   - envelope 자체 개선(붕괴 지점 기준 연결 성분 제약, AOI 클립)은 DECISIONS 기록 후 별도 branch에서 수행한다.
+- [x] LLM intent planner 최소 연결
+  - `backend/app/llm_planner.py` 신규. `POST /api/agent/plan`에 `planner: auto|deterministic|llm` 선택 추가.
+  - LLM은 등록된 workflow 선택과 파라미터 추출만 수행한다. 분석 수치는 전부 결정론 Tool 결과를 사용한다.
+  - 모델이 반환한 파라미터는 분석 endpoint와 동일한 범위(`radii_m` 50~20000, `delay_minutes` 0~180, `HH:MM`)로 재검증한다.
+  - SDK/자격증명 부재나 검증 실패 시 결정론 planner로 폴백한다. `planner=llm` 명시 시에만 503으로 실패를 노출한다.
+  - `GET /api/agent/planner-status`로 API 호출 없이 가용성을 조회한다.
+  - 모델: `claude-opus-5`. `ANTHROPIC_API_KEY` 미설정 시에도 서비스는 정상 동작한다.
 - [ ] Baseline vs Scenario 비교 고도화
   - 비교 가능: 대응 시작시점, 차단 상태, 위험구간 접근 가능 여부, 잠재 범람 envelope 차이
   - 금지: 사망자 감소, 피해액 감소, 실제 피해 감소율 임의 추정

@@ -715,3 +715,23 @@
 
 남은 작업:
 - provenance와 분석 결과를 연구 보고서 형식의 간결한 요약으로 변환하는 단계를 추가한다.
+
+## LLM intent planner 최소 연결
+
+- 시작 시각: 2026-09-03 00:00 +09:00
+- 종료 시각: 2026-09-03 00:20 +09:00
+- 총 소요시간: 20분
+
+주요 작업:
+- `backend/app/llm_planner.py`를 추가했다. Anthropic Messages API의 structured output(`messages.parse`)으로 workflow 라우팅과 파라미터 추출만 수행한다.
+- LLM에게 분석을 시키지 않는다. system prompt에서 사상자·피해액·침수심·침수면적 요청은 `unsupported`로 라우팅하도록 지시했다.
+- 모델이 반환한 파라미터를 `_validated_parameters`에서 분석 endpoint와 동일한 범위로 재검증한다. 범위를 벗어나면 ValueError로 폴백한다.
+- `POST /api/agent/plan`에 `planner` 선택을 추가했다. `auto`는 LLM 실패 시 결정론 planner로 폴백하고, `llm`은 503으로 실패를 드러낸다.
+- `GET /api/agent/planner-status`를 추가해 API 호출 없이 SDK/자격증명 가용성을 확인한다.
+- `backend/requirements.txt`에 `anthropic==1.3.0`, `.env.example`에 `ANTHROPIC_API_KEY`를 추가했다.
+- 테스트 5개를 추가해 총 41개가 통과한다. 네트워크나 API 키 없이도 전부 통과한다.
+
+검증 결과:
+- 자격증명이 없는 현재 상태에서 `planner=auto`는 결정론 planner로 폴백하며 `closure_times: ["08:25"]`를 그대로 추출한다.
+- LLM planner를 모킹해도 최종 수치는 결정론 Tool에서 나온다. 08:25 차단 시 유입까지 2분은 동일하다.
+

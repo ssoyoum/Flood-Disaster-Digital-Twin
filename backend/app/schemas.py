@@ -299,6 +299,7 @@ class AgentWorkflowResult(BaseModel):
 
 
 AgentPlanStatus = Literal["READY", "NEEDS_CLARIFICATION", "UNSUPPORTED"]
+AgentPlannerChoice = Literal["auto", "deterministic", "llm"]
 
 
 class AgentIntentPlanRequest(BaseModel):
@@ -306,6 +307,7 @@ class AgentIntentPlanRequest(BaseModel):
 
     message: str = Field(min_length=1, max_length=1000)
     event_id: str = "osong-2023"
+    planner: AgentPlannerChoice = "auto"
 
 
 class AgentIntentPlanResult(BaseModel):
@@ -313,6 +315,8 @@ class AgentIntentPlanResult(BaseModel):
 
     status: AgentPlanStatus
     event_id: str
+    planner_used: Literal["deterministic", "llm"] = "deterministic"
+    planner_note: str = ""
     workflow: AgentWorkflowName | None = None
     parameters: dict[str, Any] = Field(default_factory=dict)
     tool_names: list[str] = Field(default_factory=list)
