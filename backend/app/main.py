@@ -1,18 +1,28 @@
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from .agent_tools import execute_agent_tool, list_agent_tools
+from .agent_tools import (
+    execute_agent_tool,
+    execute_agent_workflow,
+    list_agent_tools,
+    plan_agent_intent,
+)
 from .data import EVENT_ID, EVENT_OBSERVATIONS, OBSERVATIONS, get_event, get_events, get_layers
 from .osong_repository import SAFEMAP_WMS_SNAPSHOT, get_osong_data_status, get_osong_reconstruction, get_osong_summary
 from .scenario_repository import create_scenario as save_scenario, get_scenario, mark_completed
 from .schemas import (
     ClosureTimingRequest,
     ClosureTimingResult,
+    ExposureInventoryResult,
+    AgentIntentPlanRequest,
+    AgentIntentPlanResult,
     AgentToolCallRequest,
     AgentToolCallResult,
     AgentToolDescriptor,
+    AgentWorkflowRequest,
+    AgentWorkflowResult,
     InflowDelayRequest,
     InflowDelayResult,
     Intervention,
@@ -27,6 +37,7 @@ from .services import (
     ReconstructionUnavailable,
     analyze_closure_timing,
     analyze_inflow_delay,
+    build_exposure_inventory,
     apply_intervention,
     calculate_baseline,
     run_scenario,
@@ -337,3 +348,55 @@ def run_agent_tool(tool_name: str, request: AgentToolCallRequest):
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     return AgentToolCallResult(tool_name=tool_name, event_id=request.event_id, result=result)
+
+
+@app.post(
+    "/api/agent/plan",
+    response_model=AgentIntentPlanResult,
+    tags=["agent"],
+)
+def plan_agent(request: AgentIntentPlanRequest):
+    """Convert supported natural-language intent into a non-executing plan."""
+
+    _require_event(request.event_id)
+    return plan_agent_intent(request)
+
+
+@app.post(
+    "/api/agent/workflows",
+    response_model=AgentWorkflowResult,
+    tags=["agent"],
+)
+def run_agent_workflow(request: AgentWorkflowRequest):
+    """Run a registered multi-tool analysis workflow."""
+
+    _require_event(request.event_id)
+    try:
+        return execute_agent_workflow(request)
+    except ReconstructionUnavailable as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get(
+    "/api/events/{event_id}/exposure-inventory",
+    response_model=ExposureInventoryResult,
+    tags=["analysis"],
+)
+def exposure_inventory(
+    event_id: str,
+    radii_m: list[int] = Query(default=[300, 500, 1000, 2000], max_length=10),
+):
+    """Path A: inventory inside rings around the event focus feature.
+
+    Independent of the reconstruction envelope. See DQ-008 and D-014.
+    """
+
+    _require_event(event_id)
+    try:
+        return build_exposure_inventory(event_id, radii_m)
+    except ReconstructionUnavailable as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc

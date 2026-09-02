@@ -1,4 +1,4 @@
-from typing import Annotated, Literal
+from typing import Any, Annotated, Literal
 
 from pydantic import BaseModel, Field
 
@@ -253,9 +253,104 @@ class AgentToolCallRequest(BaseModel):
     event_id: str = "osong-2023"
     closure_times: list[str] | None = None
     delay_minutes: list[Annotated[int, Field(ge=0, le=180)]] | None = None
+    radii_m: list[Annotated[int, Field(ge=50, le=20000)]] | None = None
 
 
 class AgentToolCallResult(BaseModel):
     tool_name: str
     event_id: str
     result: dict
+
+
+AgentWorkflowName = Literal[
+    "situation",
+    "closure_timing",
+    "inflow_delay",
+    "exposure_inventory",
+]
+
+
+class AgentWorkflowRequest(BaseModel):
+    """Explicit workflow request for orchestration before natural-language planning."""
+
+    workflow: AgentWorkflowName
+    event_id: str = "osong-2023"
+    closure_times: list[str] | None = None
+    delay_minutes: list[Annotated[int, Field(ge=0, le=180)]] | None = None
+    radii_m: list[Annotated[int, Field(ge=50, le=20000)]] | None = None
+
+
+class AgentToolTrace(BaseModel):
+    order: int
+    tool_name: str
+    status: Literal["completed"]
+    result_keys: list[str]
+
+
+class AgentWorkflowResult(BaseModel):
+    workflow: AgentWorkflowName
+    event_id: str
+    status: Literal["COMPLETED"]
+    tool_calls: list[AgentToolTrace]
+    result: dict
+
+
+AgentPlanStatus = Literal["READY", "NEEDS_CLARIFICATION", "UNSUPPORTED"]
+
+
+class AgentIntentPlanRequest(BaseModel):
+    """Natural-language request to deterministic workflow planning."""
+
+    message: str = Field(min_length=1, max_length=1000)
+    event_id: str = "osong-2023"
+
+
+class AgentIntentPlanResult(BaseModel):
+    """Inspectable plan; planning never executes a tool or invents results."""
+
+    status: AgentPlanStatus
+    event_id: str
+    workflow: AgentWorkflowName | None = None
+    parameters: dict[str, Any] = Field(default_factory=dict)
+    tool_names: list[str] = Field(default_factory=list)
+    reason: str
+    assumptions: list[str] = Field(default_factory=list)
+    limitations: list[str] = Field(default_factory=list)
+
+
+class ExposureRing(BaseModel):
+    radius_m: int
+    area_km2: float
+    buildings: int
+    roads_km: float
+    facilities: int
+
+
+class InventorySource(BaseModel):
+    key: str
+    label: str
+    source: str
+    snapshot: str | None
+    status: str
+    feature_count: int
+
+
+class ExposureInventoryResult(BaseModel):
+    """Counts of connected inventory layers around the event focus feature.
+
+    This is deliberately independent of any flood envelope. It answers "what is
+    inside this radius", never "what was flooded".
+    """
+
+    event_id: str
+    analysis: Literal["exposure_inventory"] = "exposure_inventory"
+    origin: Literal["DERIVED"] = "DERIVED"
+    coverage_status: CoverageStatus
+    coverage_note: str
+    focus_feature: str
+    focus_feature_layer: str
+    focus_feature_source: str
+    inventory_sources: list[InventorySource]
+    rings: list[ExposureRing]
+    assumptions: list[str]
+    limitations: list[str]

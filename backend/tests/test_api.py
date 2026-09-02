@@ -312,9 +312,11 @@ def test_agent_tools_expose_only_registered_domain_tools():
         "get_reconstruction",
         "analyze_closure_timing",
         "analyze_inflow_delay",
+        "get_exposure_inventory",
     ]
     assert "closure_times" in tools[2]["input_fields"]
     assert "delay_minutes" in tools[3]["input_fields"]
+    assert "radii_m" in tools[4]["input_fields"]
 
 
 def test_agent_tool_dispatches_inflow_delay_with_domain_result():
@@ -337,3 +339,179 @@ def test_agent_tool_rejects_unknown_tool():
     )
     assert response.status_code == 404
     assert "Unknown agent tool" in response.json()["detail"]
+
+
+def test_agent_plan_extracts_closure_timing_without_executing_tools():
+    response = client.post(
+        "/api/agent/plan",
+        json={
+            "message": "오송 지하차도 08:25와 08:35 차단 시각을 비교해줘",
+            "event_id": "osong-2023",
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "READY"
+    assert payload["workflow"] == "closure_timing"
+    assert payload["parameters"]["closure_times"] == ["08:25", "08:35"]
+    assert payload["tool_names"] == [
+        "get_event",
+        "get_reconstruction",
+        "analyze_closure_timing",
+    ]
+
+
+def test_agent_plan_extracts_exposure_radius_and_preserves_boundary():
+    response = client.post(
+        "/api/agent/plan",
+        json={"message": "지하차도 500m, 1000m 반경의 건물과 도로 재고를 보여줘"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["workflow"] == "exposure_inventory"
+    assert payload["parameters"]["radii_m"] == [500, 1000]
+    assert payload["tool_names"] == ["get_event", "get_exposure_inventory"]
+    assert any("does not execute" in item for item in payload["limitations"])
+
+
+def test_agent_plan_requires_clarification_for_multiple_analysis_intents():
+    response = client.post(
+        "/api/agent/plan",
+        json={"message": "차단 시각과 유입 지연을 같이 비교해줘"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "NEEDS_CLARIFICATION"
+    assert payload["workflow"] is None
+    assert payload["tool_names"] == []
+
+
+def test_agent_plan_supports_situation_replay_and_rejects_unknown_intent():
+    response = client.post(
+        "/api/agent/plan",
+        json={"message": "오송 침수 상황과 타임라인을 보여줘"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["workflow"] == "situation"
+    assert payload["tool_names"] == ["get_event", "get_reconstruction"]
+
+    response = client.post(
+        "/api/agent/plan",
+        json={"message": "내일 강수량을 예측해줘"},
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "UNSUPPORTED"
+
+
+def test_agent_situation_workflow_returns_reconstruction_context():
+    response = client.post(
+        "/api/agent/workflows",
+        json={"workflow": "situation"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert [call["tool_name"] for call in payload["tool_calls"]] == [
+        "get_event",
+        "get_reconstruction",
+    ]
+    assert payload["result"]["event_id"] == "osong-2023"
+
+
+def test_agent_workflow_chains_context_and_analysis_tools():
+    response = client.post(
+        "/api/agent/workflows",
+        json={
+            "workflow": "closure_timing",
+            "event_id": "osong-2023",
+            "closure_times": ["08:25", "08:35"],
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["workflow"] == "closure_timing"
+    assert payload["status"] == "COMPLETED"
+    assert [call["tool_name"] for call in payload["tool_calls"]] == [
+        "get_event",
+        "get_reconstruction",
+        "analyze_closure_timing",
+    ]
+    assert payload["tool_calls"][1]["result_keys"]
+    assert payload["result"]["analysis"] == "closure_timing_whatif"
+    assert len(payload["result"]["scenarios"]) == 2
+
+
+def test_agent_workflow_chains_inflow_delay_tool():
+    response = client.post(
+        "/api/agent/workflows",
+        json={"workflow": "inflow_delay", "delay_minutes": [10]},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert [call["tool_name"] for call in payload["tool_calls"]][-1] == "analyze_inflow_delay"
+    assert payload["result"]["scenarios"][0]["delay_minutes"] == 10
+
+
+def test_agent_exposure_inventory_tool_preserves_dq008_boundary():
+    response = client.post(
+        "/api/agent/tools/get_exposure_inventory",
+        json={"event_id": "osong-2023", "radii_m": [500]},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["result"]["analysis"] == "exposure_inventory"
+    assert payload["result"]["rings"][0]["radius_m"] == 500
+    assert any("not a flood impact estimate" in item for item in payload["result"]["limitations"])
+
+
+def test_agent_exposure_inventory_workflow_does_not_use_flood_envelope():
+    response = client.post(
+        "/api/agent/workflows",
+        json={"workflow": "exposure_inventory", "radii_m": [300, 500]},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert [call["tool_name"] for call in payload["tool_calls"]] == [
+        "get_event",
+        "get_exposure_inventory",
+    ]
+    assert payload["result"]["analysis"] == "exposure_inventory"
+
+
+def test_exposure_inventory_is_independent_of_flood_envelope():
+    response = client.get("/api/events/osong-2023/exposure-inventory")
+    assert response.status_code == 200
+    result = response.json()
+    assert result["analysis"] == "exposure_inventory"
+    assert result["coverage_status"] == "covered"
+    assert result["focus_feature_layer"] == "underpass"
+
+    radii = [ring["radius_m"] for ring in result["rings"]]
+    assert radii == sorted(radii)
+    buildings = [ring["buildings"] for ring in result["rings"]]
+    roads = [ring["roads_km"] for ring in result["rings"]]
+    assert buildings == sorted(buildings)
+    assert roads == sorted(roads)
+    assert buildings[0] > 0
+
+    assert any("not a flood impact estimate" in item for item in result["limitations"])
+    assert any("DQ-008" in item for item in result["limitations"])
+    assert {source["key"] for source in result["inventory_sources"]} == {"buildings", "roads", "facilities"}
+
+
+def test_exposure_inventory_accepts_custom_radii():
+    response = client.get("/api/events/osong-2023/exposure-inventory?radii_m=250&radii_m=750")
+    assert response.status_code == 200
+    assert [ring["radius_m"] for ring in response.json()["rings"]] == [250, 750]
+
+
+def test_exposure_inventory_rejects_out_of_range_radius():
+    response = client.get("/api/events/osong-2023/exposure-inventory?radii_m=10")
+    assert response.status_code == 422
+    assert "between 50 and 20000" in response.json()["detail"]
+
+
+def test_exposure_inventory_requires_focus_feature_layer():
+    response = client.get("/api/events/seoul-2022/exposure-inventory")
+    assert response.status_code == 404
+    assert "focus feature" in response.json()["detail"]
