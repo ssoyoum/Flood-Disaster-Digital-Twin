@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 
 DataOrigin = Literal["VERIFIED", "DERIVED", "REANALYSIS", "TEMPORARY", "UNAVAILABLE"]
+CoverageStatus = Literal["covered", "fallback", "unavailable"]
 InterventionType = Literal[
     "EVACUATION",
     "ROAD_CLOSURE",
@@ -142,3 +143,55 @@ class ScenarioRunResult(BaseModel):
     priority_building_ids_after: list[int]
     assumptions: list[str]
     origin: Literal["TEMPORARY"] = "TEMPORARY"
+
+
+ClosureClassification = Literal[
+    "PREEMPTIVE_BEFORE_LEVEE_FAILURE",
+    "BEFORE_UNDERPASS_INFLOW",
+    "AFTER_INFLOW_BEFORE_UNSAFE_DRIVING",
+    "AFTER_UNSAFE_DRIVING",
+    "AFTER_FULL_INUNDATION",
+]
+
+
+class ClosureTimingRequest(BaseModel):
+    """What-if A: change the underpass entrance closure time.
+
+    ``closure_times`` accepts ``HH:MM`` in the incident-day local time or a full
+    ISO-8601 timestamp. The analysis only rearranges observed incident
+    timestamps; it does not model hydraulics, traffic, or casualties.
+    """
+
+    closure_times: list[str] = Field(default_factory=lambda: ["08:25", "08:30", "08:35"], min_length=1, max_length=10)
+
+
+class ClosureTimingMilestone(BaseModel):
+    state: str
+    label: str
+    time: str
+
+
+class ClosureTimingScenario(BaseModel):
+    closure_time: str
+    state_at_closure: str | None
+    label_at_closure: str | None
+    classification: ClosureClassification
+    entry_blocked_before_inflow: bool
+    minutes_before_underpass_inflow: int
+    minutes_before_unsafe_driving: int
+    minutes_before_full_inundation: int
+    lead_time_vs_detection_trigger_min: int
+
+
+class ClosureTimingResult(BaseModel):
+    event_id: str
+    analysis: Literal["closure_timing_whatif"] = "closure_timing_whatif"
+    origin: Literal["TEMPORARY"] = "TEMPORARY"
+    coverage_status: CoverageStatus
+    coverage_note: str
+    detection_trigger_time: str
+    detection_trigger_basis: str
+    milestones: list[ClosureTimingMilestone]
+    scenarios: list[ClosureTimingScenario]
+    assumptions: list[str]
+    limitations: list[str]

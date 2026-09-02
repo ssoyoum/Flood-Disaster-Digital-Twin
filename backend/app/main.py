@@ -7,6 +7,8 @@ from .data import EVENT_ID, EVENT_OBSERVATIONS, OBSERVATIONS, get_event, get_eve
 from .osong_repository import SAFEMAP_WMS_SNAPSHOT, get_osong_data_status, get_osong_reconstruction, get_osong_summary
 from .scenario_repository import create_scenario as save_scenario, get_scenario, mark_completed
 from .schemas import (
+    ClosureTimingRequest,
+    ClosureTimingResult,
     Intervention,
     ScenarioCreateRequest,
     ScenarioIntervention,
@@ -15,7 +17,14 @@ from .schemas import (
     ScenarioResult,
     ScenarioRunResult,
 )
-from .services import apply_intervention, calculate_baseline, run_scenario, validate_scenario_buildings
+from .services import (
+    ReconstructionUnavailable,
+    analyze_closure_timing,
+    apply_intervention,
+    calculate_baseline,
+    run_scenario,
+    validate_scenario_buildings,
+)
 
 
 app = FastAPI(title="FloodOps API", version="0.1.0")
@@ -260,3 +269,20 @@ def run_created_scenario(scenario_id: int):
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     mark_completed(scenario_id)
     return result
+
+
+@app.post(
+    "/api/events/{event_id}/analysis/closure-timing",
+    response_model=ClosureTimingResult,
+    tags=["analysis"],
+)
+def closure_timing_analysis(event_id: str, request: ClosureTimingRequest):
+    """What-if A: compare underpass closure times against the observed timeline."""
+
+    _require_event(event_id)
+    try:
+        return analyze_closure_timing(event_id, request.closure_times)
+    except ReconstructionUnavailable as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc

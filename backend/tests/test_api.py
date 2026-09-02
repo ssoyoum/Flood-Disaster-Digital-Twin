@@ -203,3 +203,57 @@ def test_portfolio_scenario_rejects_unknown_building_id():
     )
     assert response.status_code == 422
     assert "Unknown building_ids" in response.json()["detail"]
+
+
+def test_closure_timing_whatif_compares_against_observed_timeline():
+    response = client.post(
+        "/api/events/osong-2023/analysis/closure-timing",
+        json={"closure_times": ["08:25", "08:30", "08:35"]},
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["analysis"] == "closure_timing_whatif"
+    assert result["coverage_status"] == "fallback"
+    assert result["detection_trigger_time"] == "2023-07-15T08:27:00+09:00"
+
+    preemptive, at_inflow, at_unsafe = result["scenarios"]
+    assert preemptive["classification"] == "BEFORE_UNDERPASS_INFLOW"
+    assert preemptive["entry_blocked_before_inflow"] is True
+    assert preemptive["minutes_before_underpass_inflow"] == 2
+    assert preemptive["minutes_before_full_inundation"] == 15
+    assert preemptive["lead_time_vs_detection_trigger_min"] == 2
+
+    assert at_inflow["classification"] == "AFTER_INFLOW_BEFORE_UNSAFE_DRIVING"
+    assert at_inflow["entry_blocked_before_inflow"] is False
+    assert at_inflow["minutes_before_underpass_inflow"] == -3
+
+    assert at_unsafe["classification"] == "AFTER_UNSAFE_DRIVING"
+    assert at_unsafe["minutes_before_unsafe_driving"] == 0
+    assert at_unsafe["state_at_closure"] == "unsafe_driving"
+
+
+def test_closure_timing_does_not_estimate_casualties_or_damage():
+    response = client.post("/api/events/osong-2023/analysis/closure-timing", json={})
+    assert response.status_code == 200
+    result = response.json()
+    assert len(result["scenarios"]) == 3
+    assert any("not a hydraulic or traffic simulation" in item for item in result["limitations"])
+    assert any("casualty" in item for item in result["limitations"])
+
+
+def test_closure_timing_rejects_unparsable_time():
+    response = client.post(
+        "/api/events/osong-2023/analysis/closure-timing",
+        json={"closure_times": ["25:99"]},
+    )
+    assert response.status_code == 422
+    assert "must be HH:MM" in response.json()["detail"]
+
+
+def test_closure_timing_requires_connected_reconstruction():
+    response = client.post(
+        "/api/events/seoul-2022/analysis/closure-timing",
+        json={"closure_times": ["08:25"]},
+    )
+    assert response.status_code == 404
+    assert "not connected" in response.json()["detail"]

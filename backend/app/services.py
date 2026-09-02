@@ -3,6 +3,7 @@ from .data import get_layers
 from .osong_repository import get_osong_reconstruction, get_osong_summary
 from .schemas import ExposureMetrics, Intervention, ScenarioRecord, ScenarioRunResult
 
+from datetime import datetime
 from functools import lru_cache
 
 from shapely.geometry import shape
@@ -168,3 +169,124 @@ def validate_scenario_buildings(event_id: str, building_ids: list[int]) -> None:
     unknown_ids = sorted(set(building_ids) - set(risk_index))
     if unknown_ids:
         raise ValueError(f"Unknown building_ids for {event_id}: {unknown_ids}")
+
+
+class ReconstructionUnavailable(LookupError):
+    """Raised when an event has no connected incident reconstruction timeline."""
+
+
+_CLOSURE_MILESTONES = ("levee_failure", "underpass_inflow", "unsafe_driving", "full_inundation")
+
+
+def _reconstruction_for(event_id: str) -> dict:
+    if event_id == EVENT_ID:
+        return get_osong_reconstruction()
+    raise ReconstructionUnavailable(
+        f"Incident reconstruction timeline is not connected for {event_id}"
+    )
+
+
+def _parse_closure_time(value: str, reference: datetime) -> datetime:
+    """Accept ``HH:MM`` on the incident day, or a full ISO-8601 timestamp."""
+
+    text = value.strip()
+    try:
+        if len(text) <= 5 and ":" in text:
+            hour, minute = (int(part) for part in text.split(":"))
+            return reference.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        parsed = datetime.fromisoformat(text)
+    except ValueError as exc:
+        raise ValueError(
+            f"closure_time '{value}' must be HH:MM on the incident day or an ISO-8601 timestamp"
+        ) from exc
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=reference.tzinfo)
+
+
+def _classify_closure(closure: datetime, milestone: dict[str, datetime]) -> str:
+    if closure <= milestone["levee_failure"]:
+        return "PREEMPTIVE_BEFORE_LEVEE_FAILURE"
+    if closure <= milestone["underpass_inflow"]:
+        return "BEFORE_UNDERPASS_INFLOW"
+    if closure < milestone["unsafe_driving"]:
+        return "AFTER_INFLOW_BEFORE_UNSAFE_DRIVING"
+    if closure < milestone["full_inundation"]:
+        return "AFTER_UNSAFE_DRIVING"
+    return "AFTER_FULL_INUNDATION"
+
+
+def analyze_closure_timing(event_id: str, closure_times: list[str]) -> dict:
+    """What-if A: rearrange the underpass closure time against observed milestones.
+
+    Every returned number is a difference between incident timestamps that are
+    already stored in the reconstruction timeline. No hydraulic, traffic, or
+    casualty estimate is produced here.
+    """
+
+    reconstruction = _reconstruction_for(event_id)
+    replay = reconstruction["replay"]
+    times = {entry["state"]: datetime.fromisoformat(entry["time"]) for entry in replay}
+    missing = [state for state in _CLOSURE_MILESTONES if state not in times]
+    if missing:
+        raise ReconstructionUnavailable(
+            f"Reconstruction timeline for {event_id} is missing required states: {missing}"
+        )
+
+    milestone = {state: times[state] for state in _CLOSURE_MILESTONES}
+    trigger_time = datetime.fromisoformat(reconstruction["intervention"]["trigger_time"])
+    ordered_replay = sorted(replay, key=lambda entry: entry["time"])
+
+    scenarios = []
+    for value in dict.fromkeys(closure_times):
+        closure = _parse_closure_time(value, milestone["underpass_inflow"])
+        state_at_closure = None
+        for entry in ordered_replay:
+            if datetime.fromisoformat(entry["time"]) <= closure:
+                state_at_closure = entry
+            else:
+                break
+        scenarios.append(
+            {
+                "closure_time": closure.isoformat(),
+                "state_at_closure": state_at_closure["state"] if state_at_closure else None,
+                "label_at_closure": state_at_closure["label"] if state_at_closure else None,
+                "classification": _classify_closure(closure, milestone),
+                "entry_blocked_before_inflow": closure <= milestone["underpass_inflow"],
+                "minutes_before_underpass_inflow": _minutes(closure, milestone["underpass_inflow"]),
+                "minutes_before_unsafe_driving": _minutes(closure, milestone["unsafe_driving"]),
+                "minutes_before_full_inundation": _minutes(closure, milestone["full_inundation"]),
+                "lead_time_vs_detection_trigger_min": _minutes(closure, trigger_time),
+            }
+        )
+    scenarios.sort(key=lambda item: item["closure_time"])
+
+    return {
+        "event_id": event_id,
+        "coverage_status": "fallback",
+        "coverage_note": (
+            "Incident timestamps are reconstruction values whose confidence is NEEDS_SOURCE_PAGE. "
+            "Timing differences are exact, but the underlying milestone times still need source-page evidence."
+        ),
+        "detection_trigger_time": trigger_time.isoformat(),
+        "detection_trigger_basis": reconstruction["intervention"]["trigger_basis"],
+        "milestones": [
+            {"state": entry["state"], "label": entry["label"], "time": entry["time"]}
+            for entry in ordered_replay
+        ],
+        "scenarios": scenarios,
+        "assumptions": [
+            "Closure blocks new vehicle entry from the given time onward.",
+            "Observed milestone times are held fixed; only the closure time changes.",
+            "A positive minutes_before_* value means the closure happens before that milestone.",
+            "lead_time_vs_detection_trigger_min compares against Scenario A, which closes at detected inflow.",
+        ],
+        "limitations": [
+            "This is timeline arithmetic on reconstructed incident timestamps, not a hydraulic or traffic simulation.",
+            "Vehicles already inside the underpass at closure time are not estimated.",
+            "No casualty, damage-cost, or exposure reduction is derived from these time windows.",
+            "Underpass water depth is not computed; the 0.15 m detection threshold stays a rule-based trigger.",
+        ],
+    }
+
+
+def _minutes(start: datetime, end: datetime) -> int:
+    return round((end - start).total_seconds() / 60)
