@@ -299,6 +299,17 @@ h2 { margin: 4px 0 0; font-size: 17px; letter-spacing: -.3px; }
   border-top: 1px solid #edf1f1;
   padding-top: 10px;
 }
+.agent-provenance {
+  display: grid;
+  gap: 3px;
+  margin-top: 12px;
+  border-top: 1px solid #edf1f1;
+  padding-top: 10px;
+}
+.agent-provenance strong { color: #536d75; font-size: 9px; }
+.agent-provenance small,
+.agent-coverage { color: #7e9198; font-size: 9px; line-height: 1.45; }
+.agent-coverage { display: block; margin-top: 9px; }
 .agent-result-boundary strong { color: #536d75; font-size: 9px; }
 .agent-result-boundary small { margin-top: 0; color: #7e9198; }
 .agent-error { color: #a24f46; }
