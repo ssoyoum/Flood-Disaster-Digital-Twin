@@ -735,3 +735,32 @@
 - 자격증명이 없는 현재 상태에서 `planner=auto`는 결정론 planner로 폴백하며 `closure_times: ["08:25"]`를 그대로 추출한다.
 - LLM planner를 모킹해도 최종 수치는 결정론 Tool에서 나온다. 08:25 차단 시 유입까지 2분은 동일하다.
 
+## Agent intent evaluation set
+
+- 작업일: 2026-09-03
+
+주요 작업:
+- `backend/tests/agent_intent_cases.json`에 한국어 질문 15개와 기대 status/workflow/파라미터/Tool sequence를 고정했다.
+- 상황 조회, 차단 시각, 유입 지연, 반경별 재고, unsupported, 복수 의도 명확화 케이스를 포함했다.
+- 피해액·사상자·침수심·예측 요청은 분석 marker가 함께 있어도 `UNSUPPORTED`가 우선되도록 planner를 보강했다.
+
+검증 결과:
+- 평가셋 `15 passed`.
+
+## Agent compare_scenarios Tool
+
+- 작업일: 2026-09-03
+
+주요 작업:
+- 등록된 baseline과 closure timing 또는 inflow delay 시나리오를 비교하는 `compare_scenarios` Tool을 추가했다.
+- closure timing은 감지 기반 baseline 대비 선행 시간을, inflow delay는 지연 0분 baseline 대비 milestone 이동을 반환한다.
+- reconstruction provenance, coverage status/note, assumptions/limitations를 결과에 포함한다.
+- 공식 Flood Extent 기반 피해율·피해액·사상자·침수심 비교는 범위에서 제외했다.
+
+검증 결과:
+- closure timing baseline 비교와 inflow delay 0분 baseline 포함 테스트를 추가했다.
+- Agent 관련 선택 테스트 `33 passed`를 확인했다.
+
+남은 작업:
+- `compare_scenarios`를 자연어 planner workflow까지 확장할지는 해커톤에서 실제 시연 흐름을 확인한 뒤 결정한다.
+

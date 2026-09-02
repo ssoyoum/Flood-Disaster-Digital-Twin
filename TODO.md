@@ -12,7 +12,7 @@ Last Updated: 2026-09-02 23:31 KST
 
 - Status: Active
 - Last updated: 2026-09-02
-- Next action: LLM intent planner를 결정론 planner 위에 얹었다. 남은 것은 `compare_scenarios` Tool과 연구 결과 요약 단계다.
+- Next action: LLM fallback, 한국어 평가셋, 제한적 scenario comparison까지 연결됐다. 남은 것은 연구 결과 요약 단계다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
@@ -61,8 +61,13 @@ Last Updated: 2026-09-02 23:31 KST
   - SDK/자격증명 부재나 검증 실패 시 결정론 planner로 폴백한다. `planner=llm` 명시 시에만 503으로 실패를 노출한다.
   - `GET /api/agent/planner-status`로 API 호출 없이 가용성을 조회한다.
   - 모델: `claude-opus-5`. `ANTHROPIC_API_KEY` 미설정 시에도 서비스는 정상 동작한다.
+- [x] Agent intent planner 한국어 평가셋
+  - 15개 질문에 대해 기대 status, workflow, 파라미터, Tool sequence를 fixture로 고정했다.
+  - 사망자·피해액·침수심·예측 요청은 다른 marker보다 우선해 `UNSUPPORTED`로 거부한다.
 - [ ] Baseline vs Scenario 비교 고도화
   - 비교 가능: 대응 시작시점, 차단 상태, 위험구간 접근 가능 여부, 잠재 범람 envelope 차이
+  - [x] `compare_scenarios` Tool 최소 구현: closure timing/inflow delay의 baseline 대비 시간 비교
+  - 금지: 피해액, 사상자, 실제 침수면적·침수심 감소율 추정
   - 금지: 사망자 감소, 피해액 감소, 실제 피해 감소율 임의 추정
 - [ ] Provenance와 한계 표시 점검
   - Event Year, Data Vintage, Source, Role을 분리해 표시한다.

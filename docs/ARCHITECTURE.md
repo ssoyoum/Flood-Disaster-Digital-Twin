@@ -111,9 +111,11 @@ it does not calculate or rewrite domain metrics in the browser.
 
 The current registry includes event metadata, historical reconstruction,
 closure-timing What-if A, inflow-delay What-if B, and envelope-independent
-exposure inventory. The `situation` workflow returns event and reconstruction
+exposure inventory, and baseline scenario comparison. The `situation` workflow returns event and reconstruction
 context; analysis workflows chain event context, reconstruction, and one
-analysis tool. The deterministic intent planner recognizes only these
+analysis tool. `compare_scenarios` is intentionally limited to baseline versus
+closure/inflow timing measures; it does not produce damage, casualty, depth, or
+official inundation estimates. The deterministic intent planner recognizes only these
 registered workflows and returns `NEEDS_CLARIFICATION` or `UNSUPPORTED` when
 it cannot select one safely. The wrapper does not read GIS files directly, call
 external APIs, or invent missing flood measurements. Workflow responses also
