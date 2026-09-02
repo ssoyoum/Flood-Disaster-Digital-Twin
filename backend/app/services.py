@@ -3,11 +3,13 @@ from .data import get_layers
 from .osong_repository import get_osong_reconstruction, get_osong_summary
 from .schemas import ExposureMetrics, Intervention, ScenarioRecord, ScenarioRunResult
 
+import math
 from datetime import datetime, timedelta
 from functools import lru_cache
 
 from shapely.geometry import shape
-from shapely.ops import unary_union
+from shapely.ops import transform, unary_union
+from shapely.strtree import STRtree
 
 
 def calculate_baseline(event_id: str = EVENT_ID) -> ExposureMetrics:
@@ -363,3 +365,140 @@ def analyze_inflow_delay(event_id: str, delay_minutes: list[int]) -> dict:
 
 def _minutes(start: datetime, end: datetime) -> int:
     return round((end - start).total_seconds() / 60)
+
+
+_FOCUS_LAYER_KEYS = ("underpass", "facilities")
+_INVENTORY_LAYER_KEYS = ("buildings", "roads", "facilities")
+
+
+def _metric_projector(lat0_deg: float):
+    """Local equirectangular projection, accurate to well under 1% over an AOI.
+
+    The backend depends on shapely only, so this avoids pulling in pyproj for a
+    few square kilometres of counting geometry.
+    """
+
+    lon_scale = 111320.0 * math.cos(math.radians(lat0_deg))
+    lat_scale = 110574.0
+
+    def project(x, y, z=None):
+        return (x * lon_scale, y * lat_scale)
+
+    return project
+
+
+def _focus_layer(layers: dict, event_id: str) -> tuple[dict, str]:
+    for key in _FOCUS_LAYER_KEYS:
+        layer = layers.get(key) or {}
+        if layer.get("data", {}).get("features"):
+            return layer, key
+    raise ReconstructionUnavailable(f"No focus feature layer is connected for {event_id}")
+
+
+@lru_cache(maxsize=4)
+def _exposure_index(event_id: str) -> dict:
+    layers = get_layers(event_id)
+    focus_layer, focus_key = _focus_layer(layers, event_id)
+    focus_geom = unary_union(
+        [shape(feature["geometry"]) for feature in focus_layer["data"]["features"] if feature.get("geometry")]
+    )
+    project = _metric_projector(focus_geom.centroid.y)
+    focus_point = transform(project, focus_geom).centroid
+
+    def points(key: str):
+        features = layers.get(key, {}).get("data", {}).get("features", [])
+        return [transform(project, shape(f["geometry"]).centroid) for f in features if f.get("geometry")]
+
+    def lines(key: str):
+        features = layers.get(key, {}).get("data", {}).get("features", [])
+        return [transform(project, shape(f["geometry"])) for f in features if f.get("geometry")]
+
+    buildings = points("buildings")
+    facilities = points("facilities")
+    roads = lines("roads")
+    return {
+        "focus_point": focus_point,
+        "focus_key": focus_key,
+        "focus_label": focus_layer.get("label", focus_key),
+        "focus_source": focus_layer.get("source", "UNKNOWN"),
+        "buildings": buildings,
+        "buildings_tree": STRtree(buildings) if buildings else None,
+        "facilities": facilities,
+        "facilities_tree": STRtree(facilities) if facilities else None,
+        "roads": roads,
+        "roads_tree": STRtree(roads) if roads else None,
+        "sources": [
+            {
+                "key": key,
+                "label": layers[key].get("label", key),
+                "source": layers[key].get("source", "UNKNOWN"),
+                "snapshot": layers[key].get("snapshot"),
+                "status": layers[key].get("status", "UNKNOWN"),
+                "feature_count": layers[key].get("feature_count", 0),
+            }
+            for key in _INVENTORY_LAYER_KEYS
+            if key in layers
+        ],
+    }
+
+
+def build_exposure_inventory(event_id: str, radii_m: list[int]) -> dict:
+    """Path A: count connected inventory inside rings around the focus feature.
+
+    No flood envelope is used. DQ-008 showed the reconstruction envelope covers
+    about half of the AOI, so envelope intersection cannot support absolute
+    impact counts.
+    """
+
+    for radius in radii_m:
+        if not 50 <= radius <= 20000:
+            raise ValueError(f"radii_m must be between 50 and 20000 metres, got {radius}")
+
+    index = _exposure_index(event_id)
+    focus = index["focus_point"]
+    rings = []
+    for radius in sorted(dict.fromkeys(radii_m)):
+        circle = focus.buffer(radius)
+        buildings = 0
+        if index["buildings_tree"] is not None:
+            buildings = sum(1 for i in index["buildings_tree"].query(circle) if circle.contains(index["buildings"][i]))
+        facilities = 0
+        if index["facilities_tree"] is not None:
+            facilities = sum(1 for i in index["facilities_tree"].query(circle) if circle.contains(index["facilities"][i]))
+        roads_m = 0.0
+        if index["roads_tree"] is not None:
+            roads_m = sum(index["roads"][i].intersection(circle).length for i in index["roads_tree"].query(circle))
+        rings.append(
+            {
+                "radius_m": radius,
+                "area_km2": round(circle.area / 1e6, 4),
+                "buildings": buildings,
+                "roads_km": round(roads_m / 1000, 3),
+                "facilities": facilities,
+            }
+        )
+
+    return {
+        "event_id": event_id,
+        "coverage_status": "covered",
+        "coverage_note": (
+            "Counts come from connected official building and OSM road/facility inventories. "
+            "They do not depend on any flood envelope."
+        ),
+        "focus_feature": index["focus_label"],
+        "focus_feature_layer": index["focus_key"],
+        "focus_feature_source": index["focus_source"],
+        "inventory_sources": index["sources"],
+        "rings": rings,
+        "assumptions": [
+            "Rings are geodesic-free circles on a local equirectangular projection centred on the focus feature.",
+            "Buildings and facilities are counted by their centroid falling inside the ring.",
+            "Road length is the length of each road clipped to the ring.",
+        ],
+        "limitations": [
+            "This is an exposure inventory, not a flood impact estimate. It answers what is inside the radius, not what was flooded.",
+            "Per DQ-008 the reconstruction envelope covers about half of the AOI, so envelope intersection is not used here.",
+            "Exposure KPIs stay PENDING_FLOOD_EXTENT until official vector Flood Extent is connected.",
+            "Building inventory is the 2023-07 official snapshot; roads and facilities are the 2023 OSM historical snapshot.",
+        ],
+    }

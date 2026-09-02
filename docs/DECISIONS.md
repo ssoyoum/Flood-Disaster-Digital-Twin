@@ -135,3 +135,16 @@ This document records important design and data decisions. Detailed daily work b
   - Larger HAND area does not mean verified larger flood damage.
   - It means the improved method identifies more terrain as drainage-connected and relatively low under the observed event progression.
   - Final exposure KPIs remain `PENDING_FLOOD_EXTENT` until official vector Flood Extent or calibrated hydraulic output is available.
+
+## D-014 Exposure Inventory Before Envelope-Based Impact Metrics
+
+- Decision: 침수 영향 지표를 envelope 공간중첩으로 산출하지 않는다. 대신 사건 초점 시설 기준 반경별 노출 재고(exposure inventory)를 산출한다. envelope은 시간에 따른 위험 확산 맥락으로만 유지한다.
+- Context: DQ-008 검증 결과 HAND envelope이 stage 6에서 AOI의 51.4%를 덮고, 지하차도 500m 반경에서는 건물의 92.2%를 침수로 판정한다. DEM 해상도를 318m에서 28m로 높여도 이 비율이 개선되지 않았다. 지배적 레버는 connectivity distance이며 HAND 조건의 기여는 회랑을 좁힐수록 0에 수렴한다.
+- Alternatives considered:
+  - 경로 B: 선택 규칙을 재설계해 envelope을 좁힌 뒤 공간중첩 영향 지표를 산출한다. 공식 벡터 Flood Extent가 없어 어떤 파라미터가 옳은지 검증할 기준이 없다. connectivity 150m는 15.1%, 300m는 23.7%를 주지만 둘 중 무엇이 사실에 가까운지 판단할 근거가 없다. 검증 기준 없는 파라미터 조정은 근거 없는 튜닝이므로 채택하지 않는다.
+  - AOI 클립만 적용하고 기존 영향 지표를 유지한다. AOI 내부 비율이 그대로여서 문제를 해결하지 못한다.
+- Consequence:
+  - 노출 재고는 공식 건물 대장, OSM 도로, OSM 시설 재고를 그대로 사용하므로 envelope 정확도에 의존하지 않는다.
+  - 노출 재고는 침수 영향 추정이 아니다. "반경 안에 무엇이 있는가"이지 "무엇이 침수됐는가"가 아니라는 점을 API와 UI에서 명시한다.
+  - 노출 KPI는 계속 PENDING_FLOOD_EXTENT로 유지한다.
+  - 경로 B는 Safemap WMS raster 대조 검증 절차를 만든 뒤 재검토한다.

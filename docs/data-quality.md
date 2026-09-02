@@ -1,6 +1,6 @@
 ﻿# Data Quality Register
 
-Last updated: 2026-09-02 23:20 KST
+Last updated: 2026-09-02 23:55 KST
 
 주요 데이터셋 또는 snapshot:
 - 2023 Osong event data package
@@ -137,6 +137,17 @@ Open data-quality issues count: 3
 - 분석 결과에 미치는 영향: 이 envelope으로 공간중첩을 수행하면 공식 건물 25,283동 중 11,591동(45.8%), OSM 도로 1,305.2 km 중 659.5 km(50.5%)가 영향으로 집계된다. approx envelope도 22.6% / 26.3%다. 2023년 오송 침수는 미호강 임시제방 붕괴 지점~궁평2지하차도 회랑에 집중된 사건이므로 이 절대 수치는 근거로 제시할 수 없다.
 - 해결 방법: (1) 절대 카운트 대신 stage별 증분과 궁평2지하차도 중심 반경 제한 지표를 사용한다. (2) envelope 재생성 시 붕괴 지점 기준 연결 성분 제약과 AOI 클립을 적용한다. (2)는 기존 분석 로직 변경이므로 DECISIONS 기록 후 별도 branch에서 수행한다.
 - 검증 방법: AOI 면적, stage별 envelope 면적, AOI 클립 면적, 건물/도로 교차 수를 EPSG:5179 투영에서 재계산해 비교한다.
+- 검증 실행 결과 (2026-09-02): 기존 HAND 알고리즘을 그대로 두고 DEM 격자만 바꾼 4개 변형을 stage 6에서 비교했다.
+  - V0 현재 40x32 클립 없음: 54.16 km2, AOI 대비 133.5%, AOI 건물 60.0%, 지하차도 500m 건물 99.5%
+  - V1 40x32 + AOI 클립: 19.56 km2, AOI 대비 48.2%, AOI 건물 59.2%, 500m 건물 99.5%
+  - V2 native 30m 클립 없음: 61.01 km2, AOI 대비 150.4%, AOI 건물 62.0%, 500m 건물 92.2%
+  - V3 native 30m + AOI 클립: 20.83 km2, AOI 대비 51.4%, AOI 건물 62.0%, 500m 건물 92.2%
+  - 결론 1: 해상도를 11배(318m -> 28m) 높여도 AOI 대비 비율이 48.2%에서 51.4%로 개선되지 않는다. 해상도는 과대추정의 원인이 아니다.
+  - 결론 2: AOI 클립은 AOI 밖 침수 주장만 제거한다(133.5% -> 48.2%). 내부 비율은 바뀌지 않는다.
+  - 결론 3: 30m 해상도는 국소 변별에만 기여한다. stage 4 기준 500m 반경 건물 비율이 99.5%에서 74.7%로 내려간다.
+- 원인 분해 (V3, 30m, stage 6): 하천 1350m 이내 66.9%, flow corridor 660m 5.4%, 지하차도 1215m 11.4%, connectivity 합집합 69.0%, hand <= 5.54m 63.1%, 최종 교집합 51.6%. AOI가 미호강 범람원이라 두 조건 모두 구분력이 낮다. 30m HAND 값의 p50은 0.45 m다.
+- 민감도: connectivity 150m에서는 hand 임계를 5.54 m에서 0.5 m로 11배 조여도 15.1%에서 15.0%로만 바뀐다. 지배적 레버는 connectivity distance이며, 현재 envelope은 실질적으로 하천 거리 버퍼에 가깝다.
+- 채택 판정: AOI 클립은 채택한다. 30m 해상도 재계산은 선택 규칙을 고친 뒤 재평가한다. 선택 규칙 재설계는 공식 Flood Extent 또는 Safemap raster 대조 검증 절차가 마련된 뒤에만 착수한다. 검증 기준 없이 파라미터를 조이는 것은 근거 없는 튜닝이다.
 - 근거 코드/산출물 경로: `data/processed/osong/osong_reconstruction_envelope_comparison.json`, `data/processed/osong/osong_sgis_admin_boundary_2023.geojson`, `data/scripts/create_osong_hand_reconstruction.py`
 - Residual risk / 남은 한계: 공식 vector Flood Extent가 없어 축소된 envelope도 정답과 대조 검증할 수 없다. 노출 KPI는 계속 `PENDING_FLOOD_EXTENT`로 유지한다.
 
