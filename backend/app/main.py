@@ -9,6 +9,8 @@ from .scenario_repository import create_scenario as save_scenario, get_scenario,
 from .schemas import (
     ClosureTimingRequest,
     ClosureTimingResult,
+    InflowDelayRequest,
+    InflowDelayResult,
     Intervention,
     ScenarioCreateRequest,
     ScenarioIntervention,
@@ -20,6 +22,7 @@ from .schemas import (
 from .services import (
     ReconstructionUnavailable,
     analyze_closure_timing,
+    analyze_inflow_delay,
     apply_intervention,
     calculate_baseline,
     run_scenario,
@@ -282,6 +285,23 @@ def closure_timing_analysis(event_id: str, request: ClosureTimingRequest):
     _require_event(event_id)
     try:
         return analyze_closure_timing(event_id, request.closure_times)
+    except ReconstructionUnavailable as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post(
+    "/api/events/{event_id}/analysis/inflow-delay",
+    response_model=InflowDelayResult,
+    tags=["analysis"],
+)
+def inflow_delay_analysis(event_id: str, request: InflowDelayRequest):
+    """What-if B: shift inflow and downstream milestones by an assumed delay."""
+
+    _require_event(event_id)
+    try:
+        return analyze_inflow_delay(event_id, request.delay_minutes)
     except ReconstructionUnavailable as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:

@@ -3,7 +3,7 @@ from .data import get_layers
 from .osong_repository import get_osong_reconstruction, get_osong_summary
 from .schemas import ExposureMetrics, Intervention, ScenarioRecord, ScenarioRunResult
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import lru_cache
 
 from shapely.geometry import shape
@@ -284,6 +284,79 @@ def analyze_closure_timing(event_id: str, closure_times: list[str]) -> dict:
             "Vehicles already inside the underpass at closure time are not estimated.",
             "No casualty, damage-cost, or exposure reduction is derived from these time windows.",
             "Underpass water depth is not computed; the 0.15 m detection threshold stays a rule-based trigger.",
+        ],
+    }
+
+
+def analyze_inflow_delay(event_id: str, delay_minutes: list[int]) -> dict:
+    """What-if B: shift underpass inflow and downstream milestones by ``Δt``.
+
+    This is an explicit timing assumption for a hypothetical inflow-reduction
+    measure. It does not calculate discharge, water depth, velocity, traffic,
+    or damage. The baseline timestamps remain the stored reconstruction values.
+    """
+
+    reconstruction = _reconstruction_for(event_id)
+    replay = reconstruction["replay"]
+    times = {entry["state"]: datetime.fromisoformat(entry["time"]) for entry in replay}
+    shifted_states = ("underpass_inflow", "unsafe_driving", "full_inundation")
+    missing = [state for state in shifted_states if state not in times]
+    if missing:
+        raise ReconstructionUnavailable(
+            f"Reconstruction timeline for {event_id} is missing required states: {missing}"
+        )
+
+    ordered_replay = sorted(replay, key=lambda entry: entry["time"])
+    baseline_times = {state: times[state] for state in shifted_states}
+    scenarios = []
+    for value in dict.fromkeys(delay_minutes):
+        if value < 0 or value > 180:
+            raise ValueError("delay_minutes values must be between 0 and 180")
+        shift = timedelta(minutes=value)
+        milestones = []
+        for entry in ordered_replay:
+            state = entry["state"]
+            if state not in shifted_states:
+                continue
+            baseline_time = baseline_times[state]
+            milestones.append(
+                {
+                    "state": state,
+                    "label": entry["label"],
+                    "baseline_time": baseline_time.isoformat(),
+                    "shifted_time": (baseline_time + shift).isoformat(),
+                    "shifted_by_min": value,
+                }
+            )
+        scenarios.append(
+            {
+                "delay_minutes": value,
+                "assumption": f"Hypothetical measure delays underpass inflow by {value} minutes.",
+                "milestones": milestones,
+                "minutes_gained_before_unsafe_driving": value,
+                "minutes_gained_before_full_inundation": value,
+            }
+        )
+
+    return {
+        "event_id": event_id,
+        "coverage_status": "fallback",
+        "coverage_note": (
+            "The delay is a user-supplied timing assumption. Baseline timestamps are reconstruction values "
+            "whose confidence is NEEDS_SOURCE_PAGE; shifted times are scenario arithmetic only."
+        ),
+        "shifted_states": list(shifted_states),
+        "scenarios": scenarios,
+        "assumptions": [
+            "The hypothetical measure delays underpass inflow by the requested Δt minutes.",
+            "Underpass inflow, unsafe driving, and full inundation milestones shift together; earlier milestones stay fixed.",
+            "The baseline timeline is held fixed and is not recalibrated by the intervention assumption.",
+        ],
+        "limitations": [
+            "This is a timeline-shift assumption, not a barrier hydraulics or inflow-volume calculation.",
+            "No discharge, flow cross-section, roughness, water depth, velocity, traffic, casualty, or damage estimate is produced.",
+            "The shifted milestones do not establish that the physical event would follow the same progression.",
+            "Underlying incident timestamps still need source-page evidence.",
         ],
     }
 

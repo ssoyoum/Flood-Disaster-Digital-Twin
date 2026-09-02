@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
@@ -193,5 +193,48 @@ class ClosureTimingResult(BaseModel):
     detection_trigger_basis: str
     milestones: list[ClosureTimingMilestone]
     scenarios: list[ClosureTimingScenario]
+    assumptions: list[str]
+    limitations: list[str]
+
+
+class InflowDelayRequest(BaseModel):
+    """What-if B: delay underpass inflow by a user-supplied time assumption.
+
+    The delay is a scenario parameter, not an estimate of barrier hydraulics or
+    discharge reduction. Downstream reconstruction milestones are shifted by
+    the requested number of minutes.
+    """
+
+    delay_minutes: list[Annotated[int, Field(ge=0, le=180)]] = Field(
+        default_factory=lambda: [5, 10, 15],
+        min_length=1,
+        max_length=10,
+    )
+
+
+class InflowDelayMilestone(BaseModel):
+    state: str
+    label: str
+    baseline_time: str
+    shifted_time: str
+    shifted_by_min: int
+
+
+class InflowDelayScenario(BaseModel):
+    delay_minutes: int
+    assumption: str
+    milestones: list[InflowDelayMilestone]
+    minutes_gained_before_unsafe_driving: int
+    minutes_gained_before_full_inundation: int
+
+
+class InflowDelayResult(BaseModel):
+    event_id: str
+    analysis: Literal["inflow_delay_whatif"] = "inflow_delay_whatif"
+    origin: Literal["TEMPORARY"] = "TEMPORARY"
+    coverage_status: CoverageStatus
+    coverage_note: str
+    shifted_states: list[str]
+    scenarios: list[InflowDelayScenario]
     assumptions: list[str]
     limitations: list[str]

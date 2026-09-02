@@ -257,3 +257,47 @@ def test_closure_timing_requires_connected_reconstruction():
     )
     assert response.status_code == 404
     assert "not connected" in response.json()["detail"]
+
+
+def test_inflow_delay_whatif_shifts_downstream_milestones():
+    response = client.post(
+        "/api/events/osong-2023/analysis/inflow-delay",
+        json={"delay_minutes": [0, 5, 10]},
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["analysis"] == "inflow_delay_whatif"
+    assert result["coverage_status"] == "fallback"
+    assert result["shifted_states"] == ["underpass_inflow", "unsafe_driving", "full_inundation"]
+
+    baseline, five_min, ten_min = result["scenarios"]
+    assert baseline["delay_minutes"] == 0
+    assert baseline["milestones"][0]["shifted_time"] == "2023-07-15T08:27:00+09:00"
+    assert five_min["delay_minutes"] == 5
+    assert five_min["milestones"][0]["shifted_time"] == "2023-07-15T08:32:00+09:00"
+    assert five_min["milestones"][2]["shifted_time"] == "2023-07-15T08:45:00+09:00"
+    assert five_min["minutes_gained_before_full_inundation"] == 5
+    assert ten_min["minutes_gained_before_unsafe_driving"] == 10
+
+
+def test_inflow_delay_whatif_rejects_unphysical_input_range():
+    response = client.post(
+        "/api/events/osong-2023/analysis/inflow-delay",
+        json={"delay_minutes": [-1]},
+    )
+    assert response.status_code == 422
+
+    response = client.post(
+        "/api/events/osong-2023/analysis/inflow-delay",
+        json={"delay_minutes": [181]},
+    )
+    assert response.status_code == 422
+
+
+def test_inflow_delay_whatif_requires_connected_reconstruction():
+    response = client.post(
+        "/api/events/seoul-2022/analysis/inflow-delay",
+        json={"delay_minutes": [5]},
+    )
+    assert response.status_code == 404
+    assert "not connected" in response.json()["detail"]
