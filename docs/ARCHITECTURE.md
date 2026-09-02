@@ -116,7 +116,9 @@ context; analysis workflows chain event context, reconstruction, and one
 analysis tool. The deterministic intent planner recognizes only these
 registered workflows and returns `NEEDS_CLARIFICATION` or `UNSUPPORTED` when
 it cannot select one safely. The wrapper does not read GIS files directly, call
-external APIs, or invent missing flood measurements.
+external APIs, or invent missing flood measurements. Workflow responses also
+promote provenance, coverage status, and coverage notes so the Agent/UI does
+not need to infer evidence from an opaque tool trace.
 
 - 실제 PostGIS Repository와 Migration은 아직 연결하지 않는다.
 - 과거 사건 자료는 저장된 snapshot을 사용하며 런타임마다 외부 API를 호출하지 않는다.

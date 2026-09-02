@@ -698,3 +698,20 @@
 남은 작업:
 - Agent 결과를 provenance/source별 연구자용 요약으로 재구성하는 표현 계층을 추가한다.
 - 대형 MapLibre 번들은 기능 안정화 이후 dynamic import/code splitting을 검토한다.
+
+## Agent workflow provenance propagation
+
+- 작업일: 2026-09-02
+
+주요 작업:
+- workflow 응답에 `provenance`, `coverage_status`, `coverage_note`를 추가했다.
+- closure-timing/inflow-delay는 연결된 reconstruction provenance를 전달한다.
+- exposure inventory는 envelope을 호출하지 않고 inventory source 목록을 provenance로 전달한다.
+- React 결과 카드에서 source/snapshot/status와 coverage 설명을 함께 표시한다.
+
+검증 결과:
+- Backend tests `36 passed, 1 warning`을 재확인했다.
+- `npm run build` 통과를 재확인했다.
+
+남은 작업:
+- provenance와 분석 결과를 연구 보고서 형식의 간결한 요약으로 변환하는 단계를 추가한다.
