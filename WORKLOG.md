@@ -680,3 +680,21 @@
 남은 작업:
 - Planner는 실행하지 않는 계획 단계이므로 React에서 계획 확인 후 workflow를 실행하는 UI 연결이 필요하다.
 - 실제 결과를 연구자용 요약으로 변환할 때 provenance와 limitations를 누락하지 않는 출력 단계를 추가한다.
+
+## React Agent plan/workflow integration
+
+- 작업일: 2026-09-02
+
+주요 작업:
+- `src/api.ts`에 Agent intent plan/workflow API client와 타입을 추가했다.
+- React 화면에 자연어 요청 입력, 계획 상태/파라미터/tool sequence 확인, 명시적 workflow 실행 버튼을 연결했다.
+- 실행 결과에는 tool trace와 서버가 반환한 assumptions/limitations를 표시한다.
+- 브라우저에서 침수 수치나 영향 지표를 계산하지 않고, 기존 FastAPI domain result를 그대로 표시한다.
+
+검증 결과:
+- `npm run build` 통과.
+- Vite는 MapLibre를 포함한 약 994KB JS chunk에 대해 code-splitting 권고 warning을 출력했지만 빌드는 성공했다.
+
+남은 작업:
+- Agent 결과를 provenance/source별 연구자용 요약으로 재구성하는 표현 계층을 추가한다.
+- 대형 MapLibre 번들은 기능 안정화 이후 dynamic import/code splitting을 검토한다.

@@ -104,6 +104,11 @@ POST /api/agent/workflows
   -> return tool-call trace and domain result
 ```
 
+The React client uses the same two-step boundary: it displays the plan from
+`/api/agent/plan` first, then runs `/api/agent/workflows` only after an explicit
+user action. It renders the returned tool trace, assumptions, and limitations;
+it does not calculate or rewrite domain metrics in the browser.
+
 The current registry includes event metadata, historical reconstruction,
 closure-timing What-if A, inflow-delay What-if B, and envelope-independent
 exposure inventory. The `situation` workflow returns event and reconstruction

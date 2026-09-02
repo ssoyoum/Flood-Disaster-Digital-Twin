@@ -12,7 +12,7 @@ Last Updated: 2026-09-02 23:31 KST
 
 - Status: Active
 - Last updated: 2026-09-02
-- Next action: Agent intent planning까지 연결됐다. 남은 것은 provenance 요약, React workflow 실행 연결, 연구 결과 요약 단계다.
+- Next action: Agent plan → workflow와 결과 한계 표시까지 연결됐다. 남은 것은 provenance 요약 고도화와 연구 결과 요약 단계다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
