@@ -44,6 +44,9 @@ def test_osong_layers_use_processed_files():
     assert layers["approx_flood_envelope"]["status"] == "TEMPORARY"
     assert layers["approx_flood_envelope"]["source_type"] == "DERIVED_APPROXIMATION"
     assert layers["approx_flood_envelope"]["feature_count"] > 0
+    assert layers["hand_reconstruction"]["status"] == "TEMPORARY"
+    assert layers["hand_reconstruction"]["source_type"] == "DERIVED_APPROXIMATION"
+    assert layers["hand_reconstruction"]["feature_count"] > layers["approx_flood_envelope"]["feature_count"]
     assert layers["facilities"]["feature_count"] == 386
     assert layers["underpass"]["feature_count"] == 1
     assert layers["underpass"]["data"]["features"][0]["geometry"]["type"] == "MultiLineString"
@@ -60,6 +63,7 @@ def test_osong_layers_ignore_current_osm_for_incident_analysis():
     assert layers["waterways"]["feature_count"] == 8
     assert layers["terrain"]["feature_count"] == 303
     assert layers["approx_flood_envelope"]["status"] == "TEMPORARY"
+    assert layers["hand_reconstruction"]["status"] == "TEMPORARY"
     assert layers["facilities"]["feature_count"] == 386
 
 
@@ -80,6 +84,7 @@ def test_osong_status_separates_source_types():
     assert status["dem"]["source_type"] == "DEM"
     assert status["dem"]["low_elevation_feature_count"] == 303
     assert status["layers"]["approx_flood_envelope"]["status"] == "TEMPORARY"
+    assert status["layers"]["hand_reconstruction"]["status"] == "TEMPORARY"
 
 
 def test_osong_timeline_uses_kma_observations():
@@ -102,6 +107,7 @@ def test_osong_summary_does_not_calculate_exposure_without_flood_extent():
     assert summary["waterway_count"] == 8
     assert summary["terrain_low_elevation_cells"] == 303
     assert summary["terrain_low_elevation_threshold_m"] == 30.03
+    assert summary["hand_reconstruction_features"] > 0
     assert summary["rainfall_records"] == 144
     assert summary["rainfall_peak_mm_per_hour"] is not None
     assert summary["water_level_peak_m"] is not None
@@ -126,6 +132,9 @@ def test_osong_reconstruction_serves_replay_and_rule_based_intervention():
     assert reconstruction["intervention"]["type"] == "ROAD_CLOSURE"
     assert reconstruction["intervention"]["trigger"] == "underpass_water_depth >= 0.15 m"
     assert reconstruction["intervention"]["available_response_window_min"] == 8
+    assert reconstruction["envelope_comparison"]["source_type"] == "DERIVED_COMPARISON"
+    assert len(reconstruction["envelope_comparison"]["rows"]) == 7
+    assert reconstruction["envelope_comparison"]["rows"][-1]["hand_area_km2"] > reconstruction["envelope_comparison"]["rows"][-1]["approx_area_km2"]
     assert any("not a calibrated 2D hydraulic model" in item for item in reconstruction["limitations"])
 
 
@@ -156,3 +165,41 @@ def test_road_closure_intervention_returns_rule_based_auto_closure():
     assert scenario["result"]["response_window_min"] == 8
     assert scenario["result"]["exposed_population"] == "PENDING_FLOOD_EXTENT"
     assert any("water-depth sensor" in item for item in scenario["assumptions"])
+
+
+def test_portfolio_scenario_can_be_created_and_run():
+    created = client.post(
+        "/api/scenarios",
+        json={
+            "name": "Osong building response drill",
+            "building_ids": [1, 2, 3],
+            "interventions": ["flood_barrier", "evacuation_support"],
+            "event_id": "osong-2023",
+        },
+    )
+    assert created.status_code == 200
+    scenario = created.json()
+    assert isinstance(scenario["scenario_id"], int)
+    assert scenario["status"] == "DRAFT"
+    assert scenario["building_ids"] == [1, 2, 3]
+
+    result_response = client.post(f"/api/scenarios/{scenario['scenario_id']}/run")
+    assert result_response.status_code == 200
+    result = result_response.json()
+    assert result["status"] == "COMPLETED"
+    assert result["before_priority_buildings"] >= result["after_priority_buildings"]
+    assert 0 <= result["risk_reduction"] <= 1
+    assert len(result["priority_building_ids_before"]) <= 3
+
+    fetched = client.get(f"/api/scenarios/{scenario['scenario_id']}")
+    assert fetched.status_code == 200
+    assert fetched.json()["status"] == "COMPLETED"
+
+
+def test_portfolio_scenario_rejects_unknown_building_id():
+    response = client.post(
+        "/api/scenarios",
+        json={"building_ids": [999999], "interventions": ["flood_barrier"]},
+    )
+    assert response.status_code == 422
+    assert "Unknown building_ids" in response.json()["detail"]

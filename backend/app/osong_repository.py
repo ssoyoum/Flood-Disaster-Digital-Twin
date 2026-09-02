@@ -401,6 +401,17 @@ def _read_dem_summary(path: Path) -> dict[str, Any]:
     }
 
 
+def _read_envelope_comparison(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {
+            "status": "UNAVAILABLE",
+            "source_type": "DERIVED_COMPARISON",
+            "role": "Compare approximate envelope methods.",
+            "rows": [],
+        }
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def get_safemap_floodmarks_overlay() -> dict[str, Any]:
     if not SAFEMAP_WMS_SNAPSHOT.exists():
         return {
@@ -500,6 +511,15 @@ def get_osong_repository(layer_year: int = 2023) -> dict[str, Any]:
             status="TEMPORARY",
             source_type="DERIVED_APPROXIMATION",
             source="KMA rainfall + Flood Control Office water level + Copernicus DEM + WAMIS river geometry + incident timeline",
+            snapshot="2023-07-15 incident timeline with 2023-07-14 through 2023-07-17 observations",
+        ),
+        "hand_reconstruction": _layer(
+            "hand_reconstruction",
+            "HAND Reconstruction Timeline",
+            OSONG_DIR / "osong_hand_flood_envelope_timeline.geojson",
+            status="TEMPORARY",
+            source_type="DERIVED_APPROXIMATION",
+            source="HAND-like relative elevation + WAMIS drainage connectivity + observed water-level rise + incident timeline",
             snapshot="2023-07-15 incident timeline with 2023-07-14 through 2023-07-17 observations",
         ),
         "facilities": _layer(
@@ -602,6 +622,7 @@ def get_osong_reconstruction() -> dict[str, Any]:
     response_window_min = _minutes_between(inflow_time, unsafe_time)
     full_inundation_window_min = _minutes_between(inflow_time, full_time)
     failure_to_inflow_min = _minutes_between(levee_failure_time, inflow_time)
+    envelope_comparison = _read_envelope_comparison(OSONG_DIR / "osong_reconstruction_envelope_comparison.json")
 
     return {
         "event_id": "osong-2023",
@@ -662,6 +683,12 @@ def get_osong_reconstruction() -> dict[str, Any]:
                 "status": repo["layers"]["approx_flood_envelope"].get("status"),
             },
             {
+                "source": repo["layers"]["hand_reconstruction"].get("source"),
+                "data_vintage": repo["layers"]["hand_reconstruction"].get("snapshot"),
+                "role": "HAND-based reconstruction envelope",
+                "status": repo["layers"]["hand_reconstruction"].get("status"),
+            },
+            {
                 "source": repo["layers"]["underpass"].get("source"),
                 "data_vintage": repo["layers"]["underpass"].get("snapshot"),
                 "role": "Transport Facility Geometry",
@@ -674,6 +701,7 @@ def get_osong_reconstruction() -> dict[str, Any]:
                 "status": repo["safemap_floodmarks"].get("status"),
             },
         ],
+        "envelope_comparison": envelope_comparison,
         "limitations": [
             "This MVP reconstructs the observed event timeline and intervention window; it is not a calibrated 2D hydraulic model.",
             "Underpass water depth is not computed from hydraulics. The 15 cm threshold is represented as a rule-based intervention trigger.",
@@ -703,6 +731,7 @@ def get_osong_summary() -> dict[str, Any]:
         "waterway_count": layers["waterways"]["feature_count"],
         "terrain_low_elevation_cells": layers["terrain"]["feature_count"],
         "terrain_low_elevation_threshold_m": repo["dem"].get("low_elevation_threshold_m"),
+        "hand_reconstruction_features": layers["hand_reconstruction"]["feature_count"],
         "rainfall_peak_mm_per_hour": repo["rainfall"].get("max_mm_per_hour"),
         "rainfall_peak_timestamp": repo["rainfall"].get("peak_timestamp"),
         "rainfall_peak_station_name": repo["rainfall"].get("peak_station_name"),

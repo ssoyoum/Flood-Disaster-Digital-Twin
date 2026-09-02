@@ -5,8 +5,17 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .data import EVENT_ID, EVENT_OBSERVATIONS, OBSERVATIONS, get_event, get_events, get_layers
 from .osong_repository import SAFEMAP_WMS_SNAPSHOT, get_osong_data_status, get_osong_reconstruction, get_osong_summary
-from .schemas import Intervention, ScenarioRequest, ScenarioResult
-from .services import apply_intervention, calculate_baseline
+from .scenario_repository import create_scenario as save_scenario, get_scenario, mark_completed
+from .schemas import (
+    Intervention,
+    ScenarioCreateRequest,
+    ScenarioIntervention,
+    ScenarioRecord,
+    ScenarioRequest,
+    ScenarioResult,
+    ScenarioRunResult,
+)
+from .services import apply_intervention, calculate_baseline, run_scenario, validate_scenario_buildings
 
 
 app = FastAPI(title="FloodOps API", version="0.1.0")
@@ -166,30 +175,88 @@ def baseline(event_id: str = EVENT_ID):
     return {"scenario_id": "baseline", "name": "Baseline Scenario", "result": calculate_baseline(event_id), "origin": "DERIVED"}
 
 
-@app.post("/api/scenarios", response_model=ScenarioResult)
-def create_scenario(request: ScenarioRequest):
+@app.post("/api/scenarios", response_model=ScenarioRecord | ScenarioResult, tags=["scenarios"])
+def create_scenario(request: ScenarioCreateRequest):
+    """Create a portfolio scenario without running it.
+
+    The original single-intervention MVP payload remains supported for the
+    existing UI. New clients should send ``building_ids`` and ``interventions``
+    and then call ``POST /api/scenarios/{scenario_id}/run``.
+    """
+
     _require_event(request.event_id)
-    labels = {
-        "EVACUATION": "Evacuation priority",
-        "ROAD_CLOSURE": "Road closure",
-        "SHELTER_OPEN": "Shelter opening",
-        "TEMPORARY_BARRIER": "Temporary barrier",
-        "LEVEE_IMPROVEMENT": "Levee improvement",
-        "INFRASTRUCTURE_PROTECTION": "Infrastructure protection",
+    legacy_intervention_map: dict[str, ScenarioIntervention] = {
+        "EVACUATION": "evacuation_support",
+        "ROAD_CLOSURE": "road_closure",
+        "SHELTER_OPEN": "evacuation_support",
+        "TEMPORARY_BARRIER": "flood_barrier",
+        "LEVEE_IMPROVEMENT": "levee_improvement",
+        "INFRASTRUCTURE_PROTECTION": "infrastructure_protection",
     }
-    intervention = {
-        "type": request.intervention_type,
-        "label": labels[request.intervention_type],
-        "description": "Future scenario metadata retained until official Flood Extent is connected.",
-    }
-    result, assumptions = apply_intervention(Intervention(**intervention), request.event_id)
-    baseline_result = calculate_baseline(request.event_id)
-    return ScenarioResult(
-        scenario_id=f"scenario-{request.intervention_type.lower()}",
+
+    # Backward-compatible path for the original UI and API contract.
+    if not request.building_ids and not request.interventions and request.intervention_type:
+        labels = {
+            "EVACUATION": "Evacuation priority",
+            "ROAD_CLOSURE": "Road closure",
+            "SHELTER_OPEN": "Shelter opening",
+            "TEMPORARY_BARRIER": "Temporary barrier",
+            "LEVEE_IMPROVEMENT": "Levee improvement",
+            "INFRASTRUCTURE_PROTECTION": "Infrastructure protection",
+        }
+        intervention = {
+            "type": request.intervention_type,
+            "label": labels[request.intervention_type],
+            "description": "Future scenario metadata retained until official Flood Extent is connected.",
+        }
+        result, assumptions = apply_intervention(Intervention(**intervention), request.event_id)
+        baseline_result = calculate_baseline(request.event_id)
+        return ScenarioResult(
+            scenario_id=f"scenario-{request.intervention_type.lower()}",
+            name=request.name or f"{labels[request.intervention_type]} scenario",
+            intervention=intervention,
+            baseline=baseline_result,
+            result=result,
+            reduction_percent=0.0,
+            assumptions=assumptions,
+        )
+
+    interventions = list(request.interventions)
+    if request.intervention_type:
+        interventions.append(legacy_intervention_map[request.intervention_type])
+    if not request.building_ids:
+        raise HTTPException(status_code=422, detail="building_ids must contain at least one building ID")
+    if not interventions:
+        raise HTTPException(status_code=422, detail="interventions must contain at least one intervention")
+    try:
+        validate_scenario_buildings(request.event_id, request.building_ids)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    return save_scenario(
         name=request.name,
-        intervention=intervention,
-        baseline=baseline_result,
-        result=result,
-        reduction_percent=0.0,
-        assumptions=assumptions,
+        event_id=request.event_id,
+        building_ids=request.building_ids,
+        interventions=interventions,
     )
+
+
+@app.get("/api/scenarios/{scenario_id}", response_model=ScenarioRecord, tags=["scenarios"])
+def scenario(scenario_id: int):
+    scenario_record = get_scenario(scenario_id)
+    if not scenario_record:
+        raise HTTPException(status_code=404, detail="Scenario not found")
+    return scenario_record
+
+
+@app.post("/api/scenarios/{scenario_id}/run", response_model=ScenarioRunResult, tags=["scenarios"])
+def run_created_scenario(scenario_id: int):
+    scenario_record = get_scenario(scenario_id)
+    if not scenario_record:
+        raise HTTPException(status_code=404, detail="Scenario not found")
+    try:
+        result = run_scenario(scenario_record)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    mark_completed(scenario_id)
+    return result

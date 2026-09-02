@@ -91,3 +91,54 @@ class ScenarioResult(BaseModel):
     reduction_percent: float
     assumptions: list[str]
     origin: Literal["TEMPORARY"] = "TEMPORARY"
+
+
+ScenarioIntervention = Literal[
+    "flood_barrier",
+    "evacuation_support",
+    "road_closure",
+    "levee_improvement",
+    "infrastructure_protection",
+]
+
+
+class ScenarioCreateRequest(BaseModel):
+    """Portfolio-facing scenario definition.
+
+    ``intervention_type`` is kept as a compatibility field for the original
+    single-intervention MVP endpoint. New clients should send ``interventions``.
+    """
+
+    name: str | None = Field(default=None, min_length=1, max_length=80)
+    event_id: str = "osong-2023"
+    building_ids: list[int] = Field(default_factory=list, max_length=500)
+    interventions: list[ScenarioIntervention] = Field(default_factory=list, max_length=10)
+    intervention_type: InterventionType | None = None
+
+
+class ScenarioRecord(BaseModel):
+    scenario_id: int
+    name: str
+    event_id: str
+    building_ids: list[int]
+    interventions: list[ScenarioIntervention]
+    status: Literal["DRAFT", "COMPLETED"]
+    created_at: str
+
+
+class ScenarioRunResult(BaseModel):
+    scenario_id: int
+    name: str
+    event_id: str
+    building_ids: list[int]
+    interventions: list[ScenarioIntervention]
+    status: Literal["COMPLETED"]
+    before_priority_buildings: int
+    after_priority_buildings: int
+    risk_reduction: float
+    before_risk_score: float
+    after_risk_score: float
+    priority_building_ids_before: list[int]
+    priority_building_ids_after: list[int]
+    assumptions: list[str]
+    origin: Literal["TEMPORARY"] = "TEMPORARY"
