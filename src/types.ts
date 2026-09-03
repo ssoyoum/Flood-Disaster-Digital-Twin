@@ -265,6 +265,21 @@ export type ScenarioResult = {
   origin: "TEMPORARY";
 };
 
+export type ExposureRing = { radius_m: number; area_km2: number; buildings: number; roads_km: number; facilities: number };
+
+export type ExposureInventory = {
+  event_id: string;
+  analysis: "exposure_inventory";
+  coverage_status: string;
+  coverage_note: string;
+  focus_feature: string;
+  focus_feature_layer: string;
+  focus_feature_source: string;
+  rings: ExposureRing[];
+  assumptions: string[];
+  limitations: string[];
+};
+
 export type AgentWorkflowName = "situation" | "closure_timing" | "inflow_delay" | "exposure_inventory";
 
 export type AgentIntentPlanResult = {

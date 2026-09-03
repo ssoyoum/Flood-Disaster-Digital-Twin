@@ -1,0 +1,629 @@
+import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
+import maplibregl, { type GeoJSONSource, type MapLayerMouseEvent } from "maplibre-gl";
+import * as api from "../api";
+import CrossSection from "./CrossSection";
+import type {
+  AgentIntentPlanResult,
+  AgentWorkflowName,
+  AgentWorkflowResult,
+  DataStatusResponse,
+  ExposureMetrics,
+  FloodEvent,
+  GeoJson,
+  LayersResponse,
+  ReconstructionResponse,
+} from "../types";
+import "./dark.css";
+
+/*
+ * 어두운 관제 화면.
+ *
+ * 기존 화면(App.tsx)과 같은 데이터·API 를 그대로 받아서 배치와 상호작용만 바꾼다.
+ *   [상단바: 현재 사건 단계 · 대응 여유 · 건물/도로/시설 수 · 시각]
+ *   [왼쪽: 판단 우선순위 · 사건 단계 · 시나리오 · 재고 · Agent] [중앙: 깨끗한 지도] [오른쪽: HAND 단면 · 관측 근거]
+ * 화면에 나오는 모든 수치는 API 가 준 값이다. 강수 시뮬레이션·침수 속도처럼 이 모델에 없는 값은
+ * 만들어 넣지 않았고, 그 자리에는 관측값(KMA 강우 피크, 홍수통제소 수위 피크)을 둔다.
+ */
+
+type ScenarioMode = "baseline" | "intervention";
+type LayerKey = keyof LayersResponse;
+type ConsoleView = "console" | "compare";
+
+const STAGE_TONE: Record<string, string> = {
+  warning: "#60a5fa",
+  hydraulic_warning: "#38bdf8",
+  overtopping: "#fbbf24",
+  levee_failure: "#fb923c",
+  underpass_inflow: "#f87171",
+  unsafe_driving: "#ef4444",
+  full_inundation: "#b91c1c",
+};
+
+const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas";
+const QUICK_REQUESTS = [
+  { label: "08:25 차단", message: "08:25에 지하차도를 차단했으면?" },
+  { label: "10분 유입 지연", message: "차수벽으로 유입이 10분 지연되면?" },
+  { label: "500m 재고", message: "지하차도 500m 안에 무엇이 있어?" },
+] as const;
+
+const clock = (value?: string | null) => (value && value.length >= 16 ? value.slice(11, 16) : "--:--");
+const num = (value: number | null | undefined) => (typeof value === "number" ? value.toLocaleString() : "—");
+const dec = (value: number | null | undefined, digits = 1) => (typeof value === "number" ? value.toFixed(digits) : "—");
+const escapeHtml = (value: unknown) =>
+  String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string));
+
+/** GeoJSON 안의 모든 좌표를 훑어 bbox 중심을 돌려준다. 형상 종류에 의존하지 않는다. */
+function centerOf(geojson: GeoJson): [number, number] | null {
+  let minX = Infinity; let minY = Infinity; let maxX = -Infinity; let maxY = -Infinity;
+  const walk = (coords: unknown) => {
+    if (!Array.isArray(coords)) return;
+    if (typeof coords[0] === "number" && typeof coords[1] === "number") {
+      const [x, y] = coords as [number, number];
+      minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
+      return;
+    }
+    coords.forEach(walk);
+  };
+  geojson.features.forEach((feature) => walk(feature.geometry.coordinates));
+  return Number.isFinite(minX) ? [(minX + maxX) / 2, (minY + maxY) / 2] : null;
+}
+
+const cardHtml = (title: string, rows: Array<[string, unknown]>, tone?: string) => `
+  <div class="dk-card">
+    <b style="${tone ? `color:${tone}` : ""}">${escapeHtml(title)}</b>
+    <dl>${rows
+      .filter(([, value]) => value !== undefined && value !== null && value !== "")
+      .map(([key, value]) => `<div><dt>${escapeHtml(key)}</dt><dd>${escapeHtml(value)}</dd></div>`)
+      .join("")}</dl>
+  </div>`;
+
+export default function DarkConsole({
+  eventData,
+  layers,
+  summary,
+  dataStatus,
+  reconstruction,
+  time,
+  setTime,
+  playing,
+  setPlaying,
+  scenario,
+  setScenario,
+  onSwitchBack,
+}: {
+  eventData: FloodEvent;
+  layers: LayersResponse;
+  summary: ExposureMetrics | null;
+  dataStatus: DataStatusResponse | null;
+  reconstruction: ReconstructionResponse | null;
+  time: number;
+  setTime: Dispatch<SetStateAction<number>>;
+  playing: boolean;
+  setPlaying: Dispatch<SetStateAction<boolean>>;
+  scenario: ScenarioMode;
+  setScenario: Dispatch<SetStateAction<ScenarioMode>>;
+  onSwitchBack: () => void;
+}) {
+  const mapElementRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
+  const markerRef = useRef<maplibregl.Marker | null>(null);
+  const hoverRef = useRef<maplibregl.Popup | null>(null);
+  const [ready, setReady] = useState(false);
+  const [now, setNow] = useState(() => new Date());
+  const [view, setView] = useState<ConsoleView>("console");
+  const [visible, setVisible] = useState<Record<LayerKey, boolean>>({
+    aoi: true, roads: true, buildings: true, waterways: true, terrain: false,
+    approx_flood_envelope: false, hand_reconstruction: true, facilities: false, underpass: true, flood_extent: false,
+  });
+  const [layersOpen, setLayersOpen] = useState(false);
+
+  const stages = reconstruction?.replay ?? [];
+  const current = stages[time];
+  const tone = STAGE_TONE[current?.state ?? ""] ?? "#38bdf8";
+  const underpassCenter = useMemo(() => centerOf(layers.underpass.data), [layers.underpass.data]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  // 지도 1회 초기화. 글리프가 필요한 symbol 레이어는 쓰지 않고 글자는 HTML 마커·팝업으로 올린다.
+  useEffect(() => {
+    if (!mapElementRef.current || mapRef.current) return undefined;
+    const map = new maplibregl.Map({
+      container: mapElementRef.current,
+      attributionControl: false,
+      style: {
+        version: 8,
+        sources: {
+          "esri-dark": {
+            type: "raster",
+            tiles: [`${ESRI}/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}`],
+            tileSize: 256,
+            maxzoom: 16,
+            attribution: "Tiles © Esri",
+          },
+          "esri-dark-ref": { type: "raster", tiles: [`${ESRI}/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}`], tileSize: 256, maxzoom: 16 },
+        },
+        layers: [
+          { id: "background", type: "background", paint: { "background-color": "#0b1220" } },
+          { id: "esri-dark", type: "raster", source: "esri-dark", paint: { "raster-opacity": 0.92 } },
+          { id: "esri-dark-ref", type: "raster", source: "esri-dark-ref", paint: { "raster-opacity": 0.75 } },
+        ],
+      },
+      center: underpassCenter ?? [127.31, 36.63],
+      zoom: 13.6,
+      maxZoom: 16,
+    });
+    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-left");
+
+    map.on("load", () => {
+      const add = (key: LayerKey) => map.addSource(key, { type: "geojson", data: layers[key].data as never });
+      add("aoi"); add("waterways"); add("roads"); add("buildings"); add("hand_reconstruction"); add("underpass");
+
+      map.addLayer({ id: "aoi-line", type: "line", source: "aoi", paint: { "line-color": "#22d3ee", "line-width": 1.2, "line-dasharray": [3, 3], "line-opacity": 0.55 } });
+      map.addLayer({ id: "buildings-fill", type: "fill", source: "buildings", paint: { "fill-color": "#3b4a63", "fill-opacity": ["case", ["boolean", ["feature-state", "hover"], false], 0.95, 0.55] } });
+      map.addLayer({ id: "roads-line", type: "line", source: "roads", paint: { "line-color": "#64748b", "line-width": 0.9, "line-opacity": 0.45 } });
+      // 하천은 넓은 흐린 선을 아래에 깔아 물빛이 번지는 느낌을 낸다.
+      map.addLayer({ id: "waterways-glow", type: "line", source: "waterways", paint: { "line-color": "#38bdf8", "line-width": 16, "line-blur": 12, "line-opacity": 0.28 } });
+      map.addLayer({ id: "waterways-fill", type: "fill", source: "waterways", paint: { "fill-color": "#1d6fa5", "fill-opacity": 0.45 } });
+      map.addLayer({ id: "waterways-line", type: "line", source: "waterways", paint: { "line-color": "#7dd3fc", "line-width": 1.2, "line-opacity": 0.9 } });
+      // HAND 재구성 envelope: 현재 단계 셀만. 기준 시나리오는 붉게, 개입 시나리오는 청록으로.
+      map.addLayer({
+        id: "hand-glow", type: "line", source: "hand_reconstruction",
+        filter: ["all", ["==", ["geometry-type"], "Polygon"], ["==", ["get", "stage_index"], time]],
+        paint: { "line-color": "#f87171", "line-width": 10, "line-blur": 8, "line-opacity": 0.22 },
+      });
+      map.addLayer({
+        id: "hand-fill", type: "fill", source: "hand_reconstruction",
+        filter: ["all", ["==", ["geometry-type"], "Polygon"], ["==", ["get", "stage_index"], time]],
+        paint: { "fill-color": "#f87171", "fill-opacity": ["interpolate", ["linear"], ["get", "hand_threshold_m"], 0, 0.18, 6, 0.42] },
+      });
+      map.addLayer({
+        id: "hand-flow", type: "line", source: "hand_reconstruction",
+        filter: ["all", ["==", ["geometry-type"], "LineString"], ["==", ["get", "stage_index"], time]],
+        paint: { "line-color": "#fbbf24", "line-width": 3, "line-dasharray": [1.2, 0.8], "line-opacity": 0.9 },
+      });
+      map.addLayer({ id: "underpass-glow", type: "line", source: "underpass", paint: { "line-color": "#ff3b30", "line-width": 18, "line-blur": 10, "line-opacity": 0.35 } });
+      map.addLayer({ id: "underpass-line", type: "line", source: "underpass", paint: { "line-color": "#ff6b6b", "line-width": 5, "line-opacity": 0.95 } });
+
+      let hoverId: string | number | undefined;
+      map.on("mousemove", "buildings-fill", (event: MapLayerMouseEvent) => {
+        const feature = event.features?.[0];
+        if (!feature) return;
+        if (hoverId !== undefined) map.setFeatureState({ source: "buildings", id: hoverId }, { hover: false });
+        hoverId = feature.id;
+        if (hoverId !== undefined) map.setFeatureState({ source: "buildings", id: hoverId }, { hover: true });
+        map.getCanvas().style.cursor = "pointer";
+        const props = feature.properties ?? {};
+        hoverRef.current?.remove();
+        hoverRef.current = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10, className: "dk-popup" })
+          .setLngLat(event.lngLat)
+          .setHTML(cardHtml("건축물", [["식별자", props.official_feature_id], ["출처", layers.buildings.source], ["기준", layers.buildings.snapshot]]))
+          .addTo(map);
+      });
+      map.on("mouseleave", "buildings-fill", () => {
+        if (hoverId !== undefined) map.setFeatureState({ source: "buildings", id: hoverId }, { hover: false });
+        hoverId = undefined;
+        map.getCanvas().style.cursor = "";
+        hoverRef.current?.remove(); hoverRef.current = null;
+      });
+      map.on("click", "hand-fill", (event: MapLayerMouseEvent) => {
+        const props = event.features?.[0]?.properties ?? {};
+        new maplibregl.Popup({ offset: 12, className: "dk-popup" })
+          .setLngLat(event.lngLat)
+          .setHTML(cardHtml(String(props.label ?? "HAND 재구성 셀"), [
+            ["단계", props.state], ["HAND", `${props.hand_m ?? "?"} m`], ["임계", `${props.hand_threshold_m ?? "?"} m`],
+            ["관측 수위", `${props.observed_water_level_m ?? "?"} m`], ["상태", `${props.status} · 공식 침수범위 아님`],
+          ], "#f87171"))
+          .addTo(map);
+      });
+      map.on("click", "waterways-fill", (event: MapLayerMouseEvent) => {
+        const props = event.features?.[0]?.properties ?? {};
+        new maplibregl.Popup({ offset: 12, className: "dk-popup" })
+          .setLngLat(event.lngLat)
+          .setHTML(cardHtml(String(props.RIVNM_2 ?? "하천"), [["등급", props.CLAS2], ["하천코드", props.RIVCD_2], ["출처", layers.waterways.source]], "#7dd3fc"))
+          .addTo(map);
+      });
+      setReady(true);
+    });
+
+    mapRef.current = map;
+    return () => { map.remove(); mapRef.current = null; markerRef.current = null; };
+    // 최초 1회만 만든다. 데이터 갱신은 아래 효과들이 setData/setFilter 로 처리한다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 지하차도 위치에 맥동 마커. 누르면 사건 시각 카드가 열린다.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready || !underpassCenter) return;
+    markerRef.current?.remove();
+    const element = document.createElement("button");
+    element.type = "button";
+    element.className = "dk-pulse";
+    element.setAttribute("aria-label", eventData.focus_feature);
+    element.style.setProperty("--tone", tone);
+    element.innerHTML = `<i></i><span>${escapeHtml(clock(current?.time))}</span>`;
+    // 마커 클릭이 캔버스까지 번지면 아래 envelope 셀 카드가 같이 열린다. 마커에서 끊는다.
+    element.addEventListener("click", (event) => event.stopPropagation());
+    const rows: Array<[string, unknown]> = reconstruction
+      ? [
+          ["현재 단계", `${clock(current?.time)} ${current?.label ?? ""}`],
+          ["제방붕괴→유입", `${reconstruction.baseline.failure_to_inflow_min}분`],
+          ["유입→주행불능", `${reconstruction.baseline.inflow_to_unsafe_min}분`],
+          ["유입→완전침수", `${reconstruction.baseline.inflow_to_full_inundation_min}분`],
+          ["개입 시나리오", reconstruction.intervention.name],
+        ]
+      : [["상태", "재구성 데이터 없음"]];
+    const popup = new maplibregl.Popup({ offset: 22, className: "dk-popup" }).setHTML(cardHtml(eventData.focus_feature, rows, tone));
+    markerRef.current = new maplibregl.Marker({ element, anchor: "center" }).setLngLat(underpassCenter).setPopup(popup).addTo(map);
+  }, [ready, underpassCenter, tone, current, eventData.focus_feature, reconstruction]);
+
+  // 단계·시나리오가 바뀌면 envelope 필터와 색만 바꾼다.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready) return;
+    const stageFilter = (geometry: string) => ["all", ["==", ["geometry-type"], geometry], ["==", ["get", "stage_index"], time]] as never;
+    const color = scenario === "intervention" ? "#2dd4bf" : "#f87171";
+    for (const id of ["hand-glow", "hand-fill"]) { if (map.getLayer(id)) map.setFilter(id, stageFilter("Polygon")); }
+    if (map.getLayer("hand-flow")) map.setFilter("hand-flow", stageFilter("LineString"));
+    if (map.getLayer("hand-glow")) map.setPaintProperty("hand-glow", "line-color", color);
+    if (map.getLayer("hand-fill")) map.setPaintProperty("hand-fill", "fill-color", color);
+  }, [ready, time, scenario]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready) return;
+    const groups: Partial<Record<LayerKey, string[]>> = {
+      aoi: ["aoi-line"], buildings: ["buildings-fill"], roads: ["roads-line"],
+      waterways: ["waterways-glow", "waterways-fill", "waterways-line"],
+      hand_reconstruction: ["hand-glow", "hand-fill", "hand-flow"], underpass: ["underpass-glow", "underpass-line"],
+    };
+    (Object.keys(groups) as LayerKey[]).forEach((key) => {
+      groups[key]?.forEach((id) => { if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", visible[key] ? "visible" : "none"); });
+    });
+  }, [ready, visible]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready) return;
+    (Object.keys(layers) as LayerKey[]).forEach((key) => {
+      const source = map.getSource(key) as GeoJSONSource | undefined;
+      if (source) source.setData(layers[key].data as never);
+    });
+  }, [ready, layers]);
+
+  const step = (delta: number) => {
+    if (!stages.length) return;
+    setPlaying(false);
+    setTime((index) => Math.min(stages.length - 1, Math.max(0, index + delta)));
+  };
+  const togglePlayback = () => {
+    if (!stages.length) return;
+    // 마지막 단계에서 다시 재생하면 처음부터 사건을 다시 보여준다.
+    if (!playing && time >= stages.length - 1) setTime(0);
+    setPlaying((value) => !value);
+  };
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.target as HTMLElement | null)?.closest?.("input, select, textarea")) return;
+      if (event.key === "ArrowRight") step(1);
+      if (event.key === "ArrowLeft") step(-1);
+      if (event.key === " ") { event.preventDefault(); togglePlayback(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stages.length, playing, time]);
+
+  const layerRows: LayerKey[] = ["hand_reconstruction", "waterways", "roads", "buildings", "underpass", "aoi"];
+  const layerNames: Record<LayerKey, string> = {
+    aoi: "행정경계(AOI)", roads: "도로", buildings: "건축물", waterways: "하천", terrain: "저지대", approx_flood_envelope: "근사 envelope",
+    hand_reconstruction: "HAND 재구성 envelope", facilities: "시설", underpass: eventData.focus_feature, flood_extent: "공식 침수범위",
+  };
+
+  return (
+    <div className="dk-root" style={{ ["--tone" as string]: tone }}>
+      <header className="dk-topbar">
+        <div className="dk-brand">
+          <span className="dk-brand-mark">▲</span>
+          <div>
+            <h1>{eventData.name}</h1>
+            <p>FLOOD DECISION DIGITAL TWIN · {eventData.location}</p>
+          </div>
+        </div>
+        <nav className="dk-view-tabs" aria-label="FloodOps 화면">
+          <button type="button" className={view === "console" ? "active" : ""} onClick={() => setView("console")}>관제 화면</button>
+          <button type="button" className={view === "compare" ? "active" : ""} onClick={() => setView("compare")}>Scenario 비교</button>
+        </nav>
+        <div className="dk-status">
+          <span className="dk-chip dk-chip-stage"><i /> <small>현재 단계</small>{current ? `${clock(current.time)} ${current.label}` : "—"}</span>
+          <span className="dk-chip" style={{ color: "#fbbf24" }}><i /><small>대응 여유</small>{reconstruction ? `${reconstruction.baseline.inflow_to_unsafe_min}분` : "—"}</span>
+          <span className="dk-chip" style={{ color: "#93c5fd" }}><i /><small>건물</small>{num(summary?.building_count)}</span>
+          <span className="dk-chip" style={{ color: "#a5b4fc" }}><i /><small>도로</small>{num(summary?.road_count)}</span>
+          <span className="dk-chip" style={{ color: "#6ee7b7" }}><i /><small>시설</small>{num(summary?.facility_count)}</span>
+        </div>
+        <div className="dk-topbar-right">
+          <span className="dk-clock">{now.toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })} {now.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} KST</span>
+          <button type="button" onClick={onSwitchBack}>기존 UI</button>
+        </div>
+      </header>
+
+      {view === "console" ? <div className="dk-body">
+        <aside className="dk-side">
+          <div className="dk-side-head"><p>Incident replay</p><h2>사건 단계 · {stages.length}단계</h2></div>
+          <section className="dk-priority" aria-label="판단 우선순위">
+            <div className="dk-priority-head"><p>Decision priority</p><span>자료 우선순위</span></div>
+            <ol>
+              <li className="primary"><b>01 · 대응 시점</b><span>{current ? `${clock(current.time)} ${current.label}` : "현재 단계 확인"} · 여유 {reconstruction?.baseline.inflow_to_unsafe_min ?? "—"}분</span></li>
+              <li><b>02 · 공간 상태</b><span>지하차도 중심 HAND 재구성 · 임시/근사 자료</span></li>
+            </ol>
+            <small>시간과 현재 시설 상태가 즉시 대응 판단에 가장 중요합니다. 반경별 재고는 Agent에서 필요할 때 조회합니다.</small>
+          </section>
+          <div className="dk-side-block dk-agent-block">
+            <AgentDock eventId={eventData.id} />
+          </div>
+          <ol className="dk-stages">
+            {stages.map((item, index) => (
+              <li key={`${item.time}-${item.state}`}>
+                <button
+                  type="button"
+                  className={index === time ? "active" : index < time ? "past" : ""}
+                  style={{ ["--tone" as string]: STAGE_TONE[item.state] ?? "#38bdf8" }}
+                  onClick={() => { setPlaying(false); setTime(index); }}
+                >
+                  <time>{clock(item.time)}</time>
+                  <b>{item.label}</b>
+                  <small>{item.role} · {item.confidence}</small>
+                </button>
+              </li>
+            ))}
+          </ol>
+          <div className="dk-side-block">
+            <button type="button" className="dk-collapse" aria-expanded={layersOpen} onClick={() => setLayersOpen((open) => !open)}>
+              <span><p>Layers</p><b>지도 레이어 표시 설정</b></span><strong>{layersOpen ? "닫기" : "열기"}</strong>
+            </button>
+            {layersOpen && <div className="dk-layer-list">
+              {layerRows.map((key) => (
+                <label key={key} className="dk-toggle">
+                  <input type="checkbox" checked={visible[key]} onChange={(event) => setVisible((state) => ({ ...state, [key]: event.target.checked }))} />
+                  <span>{layerNames[key]} <small>{num(layers[key].feature_count)} · {layers[key].status}</small></span>
+                </label>
+              ))}
+            </div>}
+          </div>
+        </aside>
+
+        <section className="dk-map-wrap" aria-label="지도">
+          <div ref={mapElementRef} className="dk-map" />
+          <button type="button" className="dk-nav prev" aria-label="이전 단계" title="이전 단계 (←)" onClick={() => step(-1)}>‹</button>
+          <button type="button" className="dk-nav next" aria-label="다음 단계" title="다음 단계 (→)" onClick={() => step(1)}>›</button>
+          <div className="dk-replay">
+            <button type="button" disabled={!stages.length} onClick={togglePlayback}>{playing ? "❚❚ 일시정지" : "▶ 재생"}</button>
+            <input type="range" min={0} max={Math.max(0, stages.length - 1)} value={time} onChange={(event) => { setPlaying(false); setTime(Number(event.target.value)); }} />
+            <span>{current ? `${clock(current.time)} · ${current.label}` : "재구성 없음"}</span>
+          </div>
+          <div className="dk-legend">
+            <p>Legend</p>
+            <span><i style={{ background: scenario === "intervention" ? "#2dd4bf" : "#f87171" }} />HAND 재구성 envelope (임시·근사)</span>
+            <span><i style={{ background: "#38bdf8" }} />하천</span>
+            <span><i style={{ background: "#ff6b6b" }} />{eventData.focus_feature}</span>
+            <span><i style={{ background: "#3b4a63" }} />건축물</span>
+          </div>
+          <div className="dk-hint">← → 단계 이동 · 스페이스 재생 · 지하차도 마커나 envelope 셀을 누르면 카드가 열립니다</div>
+        </section>
+
+        <aside className="dk-detail">
+          <div className="dk-detail-head"><p>Evidence & HAND section</p><h2>관측 근거 · {eventData.focus_feature} 단면</h2></div>
+          <div className="dk-detail-body">
+            {reconstruction && (
+              <CrossSection
+                hand={layers.hand_reconstruction.data}
+                center={underpassCenter}
+                stageIndex={time}
+                stageLabel={current?.label ?? ""}
+                stageTime={current ? clock(current.time) : "--:--"}
+                tone={tone}
+                focusName={eventData.focus_feature}
+              />
+            )}
+            <dl className="dk-evidence-list" aria-label="관측 근거">
+              <div><dt>강우 피크</dt><dd>{dec(summary?.rainfall_peak_mm_per_hour)} mm/h <small>{clock(summary?.rainfall_peak_timestamp)} · {summary?.rainfall_peak_station_name ?? "KMA"}</small></dd></div>
+              <div><dt>수위 피크</dt><dd>{dec(summary?.water_level_peak_m, 2)} m <small>{clock(summary?.water_level_peak_timestamp)} · {summary?.water_level_peak_station_name ?? "홍수통제소"}</small></dd></div>
+              <div><dt>관측 기간</dt><dd>{dataStatus?.rainfall?.period ?? "—"}</dd></div>
+              <div><dt>공식 침수범위</dt><dd className="dk-pending">{String(summary?.flooded_area_km2 ?? "PENDING")}</dd></div>
+            </dl>
+          </div>
+        </aside>
+      </div> : <ScenarioComparePage eventData={eventData} reconstruction={reconstruction} onBack={() => setView("console")} />}
+    </div>
+  );
+}
+
+function ScenarioComparePage({
+  eventData,
+  reconstruction,
+  onBack,
+}: {
+  eventData: FloodEvent;
+  reconstruction: ReconstructionResponse | null;
+  onBack: () => void;
+}) {
+  const states = reconstruction?.baseline.states ?? [];
+  const inflow = states.find((item) => item.state === "underpass_inflow");
+  const unsafe = states.find((item) => item.state === "unsafe_driving");
+  const full = states.find((item) => item.state === "full_inundation");
+  const intervention = reconstruction?.intervention;
+
+  if (!reconstruction || !intervention) {
+    return <main className="dk-compare dk-compare-empty"><strong>Scenario 비교 데이터를 불러오지 못했습니다.</strong><button type="button" onClick={onBack}>관제 화면으로 돌아가기</button></main>;
+  }
+
+  return (
+    <main className="dk-compare">
+      <div className="dk-compare-head">
+        <div>
+          <p>Counterfactual response analysis</p>
+          <h2>{eventData.focus_feature} 원시나리오 vs 개입 시나리오</h2>
+          <span>같은 2023 오송 사건 조건에서 진입 차단 조치만 바꿔 대응 가능 시간을 비교합니다.</span>
+        </div>
+        <button type="button" className="dk-compare-back" onClick={onBack}>관제 화면으로</button>
+      </div>
+
+      <div className="dk-compare-cards">
+        <section className="dk-compare-card baseline">
+          <div className="dk-compare-card-label"><i />원시나리오 · 관측 재현</div>
+          <h3>{reconstruction.baseline.name}</h3>
+          <p>{reconstruction.baseline.description}</p>
+          <dl>
+            <div><dt>유입 시작</dt><dd>{inflow ? `${clock(inflow.time)} · ${inflow.underpass_status}` : "—"}</dd></div>
+            <div><dt>주행불능까지</dt><dd>{reconstruction.baseline.inflow_to_unsafe_min}분</dd></div>
+            <div><dt>완전침수까지</dt><dd>{reconstruction.baseline.inflow_to_full_inundation_min}분</dd></div>
+          </dl>
+        </section>
+        <section className="dk-compare-card intervention">
+          <div className="dk-compare-card-label"><i />개입 시나리오 · 감지 자동차단</div>
+          <h3>{intervention.name}</h3>
+          <p>{intervention.closure_action}</p>
+          <dl>
+            <div><dt>개입 트리거</dt><dd>{clock(intervention.trigger_time)} · {intervention.trigger}</dd></div>
+            <div><dt>확보 대응 여유</dt><dd>{intervention.available_response_window_min}분</dd></div>
+            <div><dt>완전침수까지</dt><dd>{intervention.time_until_full_inundation_min}분</dd></div>
+          </dl>
+        </section>
+      </div>
+
+      <section className="dk-compare-panel">
+        <div className="dk-compare-panel-head"><p>Comparison matrix</p><span>무엇이 바뀌고, 무엇이 바뀌지 않는가</span></div>
+        <table className="dk-compare-table">
+          <thead><tr><th>항목</th><th>원시나리오</th><th>개입 시나리오</th><th>판정</th></tr></thead>
+          <tbody>
+            <tr><th>사건 진행</th><td>{inflow ? `${clock(inflow.time)} 유입 → ${clock(unsafe?.time)} 주행불능 → ${clock(full?.time)} 완전침수` : "관측 재생"}</td><td>동일한 사건 timeline</td><td className="dk-compare-muted">위험 진행 자체는 변경하지 않음</td></tr>
+            <tr><th>지하차도 상태</th><td>{inflow?.underpass_status ?? "open"} → {unsafe?.underpass_status ?? "unsafe"}</td><td>{clock(intervention.trigger_time)} 이후 신규 차량 진입 차단</td><td className="dk-compare-good">대응 상태 변경</td></tr>
+            <tr><th>유입 후 주행불능</th><td>{reconstruction.baseline.inflow_to_unsafe_min}분</td><td>{reconstruction.baseline.inflow_to_unsafe_min}분</td><td className="dk-compare-muted">수리·유량 모델이 없어 동일</td></tr>
+            <tr><th>유입 후 완전침수</th><td>{reconstruction.baseline.inflow_to_full_inundation_min}분</td><td>{intervention.time_until_full_inundation_min}분</td><td className="dk-compare-muted">침수 진행을 바꾼 결과가 아님</td></tr>
+            <tr><th>근거 수준</th><td>관측/사건 재구성</td><td>{intervention.result_status}</td><td className="dk-compare-warn">물리 시뮬레이션 아님</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <div className="dk-compare-callout">
+        <strong>핵심 인사이트</strong>
+        <span>이 개입은 물이 차오르는 속도나 침수범위를 줄였다고 말하는 모델이 아닙니다. {clock(intervention.trigger_time)}에 신규 진입을 막아, 같은 위험 진행 안에서 대응 상태를 바꾸는 규칙 기반 비교입니다.</span>
+      </div>
+      <small className="dk-compare-limit">근거: {intervention.trigger_basis} · {intervention.estimated_effect} · 공식 피해 감소율/사상자/실제 침수심은 산출하지 않습니다.</small>
+    </main>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Agent — 자연어 → 계획 → 실행 → 결과. 수치는 전부 도구 결과다.               */
+/* ------------------------------------------------------------------ */
+
+function AgentDock({ eventId }: { eventId: string }) {
+  const [message, setMessage] = useState("");
+  const [plan, setPlan] = useState<AgentIntentPlanResult | null>(null);
+  const [result, setResult] = useState<AgentWorkflowResult | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const planIntent = async () => {
+    if (!message.trim()) return;
+    setBusy(true); setError(null); setResult(null);
+    try { setPlan(await api.planAgentIntent(eventId, message.trim())); }
+    catch { setError("Agent planner API를 호출하지 못했습니다."); }
+    finally { setBusy(false); }
+  };
+  const run = async () => {
+    if (!plan?.workflow) return;
+    setBusy(true); setError(null);
+    try {
+      const { event_id: _ignored, ...parameters } = plan.parameters;
+      void _ignored;
+      setResult(await api.runAgentWorkflow(eventId, plan.workflow, parameters));
+    } catch { setError("계획된 workflow를 실행하지 못했습니다."); }
+    finally { setBusy(false); }
+  };
+
+  const status = busy ? "처리 중…" : result ? "다 됐습니다 — 결과와 근거를 아래에 표시했어요" : plan ? (plan.status === "READY" ? "계획이 준비됐습니다. 실행하세요" : plan.status === "UNSUPPORTED" ? "등록된 도구로 답할 수 없는 요청입니다" : "어느 분석인지 하나만 골라 다시 물어보세요") : "예: 08:25에 지하차도를 차단했으면?";
+
+  return (
+    <div className="dk-agent">
+      <div className="dk-agent-head"><p>Agent workflow</p><span className={`dk-agent-badge ${plan?.planner_used ?? ""}`}>{plan ? (plan.planner_used === "llm" ? "LLM PLAN" : "DETERMINISTIC PLAN") : "READY"}</span></div>
+      <div className="dk-agent-intro">자연어 질문을 등록된 분석 도구로 연결합니다. 결과 수치는 API 도구가 계산합니다.</div>
+      <div className="dk-agent-suggestions" aria-label="추천 질문">
+        {QUICK_REQUESTS.map((item) => <button key={item.label} type="button" onClick={() => { setMessage(item.message); setPlan(null); setResult(null); setError(null); }}>{item.label}</button>)}
+      </div>
+      <form className="dk-agent-bar" onSubmit={(event) => { event.preventDefault(); void planIntent(); }}>
+        <input aria-label="Agent request" value={message} onChange={(event) => setMessage(event.target.value)} placeholder="자연어로 질문 — 수치는 도구가 계산합니다" />
+        <button type="submit" disabled={busy || !message.trim()}>계획</button>
+        <button type="button" disabled={busy || plan?.status !== "READY" || !plan?.workflow} onClick={() => void run()}>실행</button>
+      </form>
+      <small className="dk-agent-status" aria-live="polite">{status}</small>
+      {plan && (
+        <div className={`dk-plan ${plan.status.toLowerCase()}`}>
+          <b>{plan.status} · {plan.workflow ?? "workflow 없음"}</b>
+          <span>{plan.reason}</span>
+          {plan.tool_names.length > 0 && <div className="dk-tools">{plan.tool_names.map((tool, index) => <em key={tool}>{index + 1}. {tool}</em>)}</div>}
+          {plan.planner_note && <small>{plan.planner_note}</small>}
+        </div>
+      )}
+      {result && (
+        <div className="dk-result">
+          <div className="dk-tools">{result.tool_calls.map((call) => <em key={call.order}>{call.order}. {call.tool_name}</em>)}</div>
+          <Findings workflow={result.workflow} result={result.result} />
+          {result.coverage_note && <small className="dk-note">coverage · {result.coverage_status} · {result.coverage_note}</small>}
+          {Array.isArray(result.result.limitations) && (result.result.limitations as string[]).slice(0, 3).map((item) => <small key={item} className="dk-note">한계 · {item}</small>)}
+        </div>
+      )}
+      {error && <small className="dk-error">{error}</small>}
+    </div>
+  );
+}
+
+const rows = (result: Record<string, unknown>, key: string) => (Array.isArray(result[key]) ? (result[key] as Array<Record<string, unknown>>) : []);
+
+function Findings({ workflow, result }: { workflow: AgentWorkflowName; result: Record<string, unknown> }) {
+  if (workflow === "closure_timing") {
+    const scenarios = rows(result, "scenarios");
+    return scenarios.length ? (
+      <table className="dk-table">
+        <thead><tr><th>차단</th><th>유입까지</th><th>주행불능</th><th>완전침수</th><th>감지차단 대비</th></tr></thead>
+        <tbody>{scenarios.map((row) => (
+          <tr key={String(row.closure_time)}><td>{clock(String(row.closure_time))}</td><td>{String(row.minutes_before_underpass_inflow)}분</td><td>{String(row.minutes_before_unsafe_driving)}분</td><td>{String(row.minutes_before_full_inundation)}분</td><td>{String(row.lead_time_vs_detection_trigger_min)}분</td></tr>
+        ))}</tbody>
+      </table>
+    ) : null;
+  }
+  if (workflow === "inflow_delay") {
+    const scenarios = rows(result, "scenarios");
+    return scenarios.length ? (
+      <div className="dk-findings-stack">{scenarios.map((scenario) => (
+        <table className="dk-table" key={String(scenario.delay_minutes)}>
+          <thead><tr><th colSpan={3}>유입 {String(scenario.delay_minutes)}분 지연 가정</th></tr></thead>
+          <tbody>{(Array.isArray(scenario.milestones) ? (scenario.milestones as Array<Record<string, unknown>>) : []).map((m) => (
+            <tr key={String(m.state)}><td>{String(m.label ?? m.state)}</td><td>{clock(String(m.baseline_time))}</td><td>→ {clock(String(m.shifted_time))}</td></tr>
+          ))}</tbody>
+        </table>
+      ))}</div>
+    ) : null;
+  }
+  if (workflow === "exposure_inventory") {
+    const rings = rows(result, "rings");
+    return rings.length ? (
+      <table className="dk-table">
+        <thead><tr><th>반경</th><th>건물</th><th>도로</th><th>시설</th></tr></thead>
+        <tbody>{rings.map((ring) => <tr key={String(ring.radius_m)}><td>{String(ring.radius_m)} m</td><td>{Number(ring.buildings).toLocaleString()}동</td><td>{String(ring.roads_km)} km</td><td>{String(ring.facilities)}</td></tr>)}</tbody>
+      </table>
+    ) : null;
+  }
+  const replay = rows(result, "replay");
+  return replay.length ? (
+    <table className="dk-table">
+      <thead><tr><th>시각</th><th>상태</th><th>근거</th></tr></thead>
+      <tbody>{replay.map((step) => <tr key={String(step.time)}><td>{clock(String(step.time))}</td><td>{String(step.label ?? step.state)}</td><td>{String(step.confidence ?? "-")}</td></tr>)}</tbody>
+    </table>
+  ) : null;
+}

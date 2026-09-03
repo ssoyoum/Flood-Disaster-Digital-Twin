@@ -2,6 +2,7 @@
 import maplibregl, { type GeoJSONSource, type MapLayerMouseEvent, type Map as MapLibreMap, type Popup } from "maplibre-gl";
 import { Activity, AlertTriangle, Bot, Building2, Check, CloudRain, Layers3, MapPin, Pause, Play, Route, Send, Waves } from "lucide-react";
 import * as api from "./api";
+import DarkConsole from "./dark/DarkConsole";
 import type { AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, DataStatusItem, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayerPayload, LayersResponse, ReconstructionResponse } from "./types";
 
 const emptyGeoJson: GeoJson = { type: "FeatureCollection", features: [] };
@@ -198,6 +199,7 @@ function MapPanel({
       container: mapContainer.current,
       style: {
         version: 8,
+        glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
         sources: {
           "osm-basemap": {
             type: "raster",
@@ -1054,6 +1056,14 @@ export default function App() {
     flood_extent: false,
   });
   const [showSafemapFloodmarks, setShowSafemapFloodmarks] = useState(true);
+  // 어두운 관제 화면 미리보기. 브라우저에 기억해 새로고침해도 유지된다.
+  const [uiMode, setUiMode] = useState<"light" | "dark">(() => {
+    try { return localStorage.getItem("floodops-ui") === "dark" ? "dark" : "light"; } catch { return "light"; }
+  });
+  const switchUi = (mode: "light" | "dark") => {
+    try { localStorage.setItem("floodops-ui", mode); } catch { /* 저장 못 해도 전환은 된다 */ }
+    setUiMode(mode);
+  };
 
   useEffect(() => {
     async function load() {
@@ -1102,6 +1112,25 @@ export default function App() {
   if (loading) return <div className="app-state"><Activity className="spin" /><strong>Loading FloodOps offline MVP</strong><span>Reading local processed Osong data.</span></div>;
   if (error || !eventData) return <div className="app-state error-state"><AlertTriangle /><strong>Unable to load MVP</strong><span>{error}</span></div>;
 
+  if (uiMode === "dark") {
+    return (
+      <DarkConsole
+        eventData={eventData}
+        layers={layers}
+        summary={summary}
+        dataStatus={dataStatus}
+        reconstruction={reconstruction}
+        time={time}
+        setTime={setTime}
+        playing={replayPlaying}
+        setPlaying={setReplayPlaying}
+        scenario={scenario}
+        setScenario={setScenario}
+        onSwitchBack={() => switchUi("light")}
+      />
+    );
+  }
+
   return (
     <div className="app-shell">
       <EventHeader eventData={eventData} />
@@ -1133,6 +1162,7 @@ export default function App() {
           <div className="analysis-panel">
             <div className="analysis-head">
               <div><div className="eyebrow">BASELINE DATA</div><h1>Osong 2023 processed data connection</h1><p>{"Repository -> API -> React/Vite -> MapLibre using local files only."}</p></div>
+              <button type="button" className="primary-button" onClick={() => switchUi("dark")}>다크 관제 UI 미리보기</button>
             </div>
             <div className="metrics-grid assignment-metrics">
               <Metric icon={Building2} label="Buildings in AOI" value={formatNumber(summary?.building_count)} note="Official GIS Building Integrated Information" />
