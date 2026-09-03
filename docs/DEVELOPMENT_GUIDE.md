@@ -2,6 +2,23 @@
 
 Last updated: 2026-09-01
 
+## Local Runtime Contract
+
+Local development uses fixed FloodOps endpoints:
+
+- Frontend: http://localhost:5173
+- Frontend fallback: http://127.0.0.1:5173
+- Backend Swagger: http://localhost:8033/docs
+- Backend health: http://localhost:8033/health
+
+Vite is configured with `port: 5173` and `strictPort: true`; it must not
+silently move to `5174` or another port. The local frontend API base is
+`VITE_API_BASE=http://localhost:8033`. If port 5173 is occupied, stop or
+diagnose the conflicting local process instead of changing the FloodOps URL.
+
+Docker is a separate exception and keeps its compose mapping of frontend
+`8080` and backend `8000`.
+
 ## Project Identity
 
 FloodOps is not a future flood prediction system.

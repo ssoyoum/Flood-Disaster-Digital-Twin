@@ -1,6 +1,6 @@
 # FloodOps TODO
 
-Last Updated: 2026-09-02 23:31 KST
+Last Updated: 2026-09-04 KST
 
 - Current identity: **Counterfactual Disaster Digital Twin PoC**
 - Current MVP: **Historical Disaster Reconstruction + What-if Intervention**
@@ -10,9 +10,9 @@ Last Updated: 2026-09-02 23:31 KST
 
 ## NOW
 
-- Status: Active
-- Last updated: 2026-09-02
-- Next action: LLM fallback, 한국어 평가셋, 제한적 scenario comparison까지 연결됐다. 남은 것은 연구 결과 요약 단계다.
+- Status: Active / presentation-ready MVP
+- Last updated: 2026-09-04
+- Next action: 브라우저 검증이 가능한 세션에서 다크 관제 UI를 확인한 후, 현재 변경분을 기능 단위로 커밋한다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
@@ -33,7 +33,7 @@ Last Updated: 2026-09-02 23:31 KST
   - HAND reconstruction은 HRFCO 수위 변화와 사건 stage를 relative stage pressure로 연결했다.
   - 남은 검증: 관측소 기준면, 제방 붕괴 위치/폭, 유량, 배수시설, CCTV/공식 조사 timestamp 근거 연결.
   - 수위값 자체를 DEM 절대 수면고나 공식 침수심으로 해석하지 않는다.
-- [ ] What-if 2~3개 구현
+- [x] What-if 2개 구현 + 1개 보류
   - [x] A: 차량 진입 차단 시각 변경, 예: 08:25 / 08:30 / 08:35
     - `POST /api/events/{event_id}/analysis/closure-timing` 연결 (`feature/agent-tools`)
     - 산출: 차단 시점 사건 상태, 유입/주행불능/완전침수까지 남은 분, Scenario A(08:27 감지 차단) 대비 선행 시간
@@ -64,9 +64,29 @@ Last Updated: 2026-09-02 23:31 KST
 - [x] Agent intent planner 한국어 평가셋
   - 15개 질문에 대해 기대 status, workflow, 파라미터, Tool sequence를 fixture로 고정했다.
   - 사망자·피해액·침수심·예측 요청은 다른 marker보다 우선해 `UNSUPPORTED`로 거부한다.
+- [x] Portfolio response scenario API
+  - `POST /api/scenarios`로 건물 ID와 복수 intervention을 DRAFT로 저장한다.
+  - `POST /api/scenarios/{scenario_id}/run`으로 대응 전후 priority building과 rule-based risk score를 비교한다.
+  - 현재는 HAND-like envelope 기반의 `TEMPORARY` 의사결정 보조 결과이며, 공식 피해 감소율이 아니다.
+- [ ] Dark console UI 미리보기 마감
+  - `ui/dark-console` 브랜치에 `src/dark/` 관제 화면, 단면도 시각화, exposure inventory 패널을 추가했다.
+  - `CrossSection`을 `hand_reconstruction` 레이어에 연결해 단계별 관측 수위 상승분과 HAND 임계를 시각화한다.
+  - 왼쪽 판단 탭에 대응 시점·공간 상태·반경별 재고·Agent를 중요도 순으로 배치하고, 지도 오버레이를 축소했다.
+  - 반경별 재고 표는 기본 화면에서 제거하고 Agent 질의로 전환했으며, Layers는 접이식 설정으로 유지했다.
+  - Agent를 왼쪽 판단 탭 상단으로 이동해 기본 화면에서 바로 보이게 했다.
+  - `Scenario 비교` 탭을 추가해 원시나리오와 감지 자동차단 개입을 별도 비교 화면에서 확인할 수 있게 했다.
+  - 비교 화면은 대응 상태 변화와 침수 진행이 변하지 않는 부분을 분리해서 표시한다.
+  - 기존 light UI와 backend/API를 재사용하는 presentation layer이며, 아직 미커밋 상태다.
+  - 반응형 CSS와 라이트 UI glyphs 설정은 반영했다.
+  - 남은 작업: 실제 브라우저 smoke test, 레이어 표시 확인, 결과 provenance·한계 문구 최종 점검.
+- [x] 로컬 런타임 포트 고정
+  - FloodOps FastAPI `8033`, Vite `5173`을 사용한다.
+  - 다른 프로젝트가 사용하는 `8000`으로 잘못 연결되어 `/api/events`가 404가 되던 문제를 해결했다.
+  - Vite는 `strictPort`로 설정해 5173이 사용 중이면 5174로 자동 이동하지 않는다.
 - [ ] Baseline vs Scenario 비교 고도화
   - 비교 가능: 대응 시작시점, 차단 상태, 위험구간 접근 가능 여부, 잠재 범람 envelope 차이
   - [x] `compare_scenarios` Tool 최소 구현: closure timing/inflow delay의 baseline 대비 시간 비교
+  - [x] UI `Scenario 비교` 탭: 원시나리오·개입 시나리오 카드와 비교 매트릭스
   - 금지: 피해액, 사상자, 실제 침수면적·침수심 감소율 추정
   - 금지: 사망자 감소, 피해액 감소, 실제 피해 감소율 임의 추정
 - [ ] Provenance와 한계 표시 점검
@@ -76,7 +96,7 @@ Last Updated: 2026-09-02 23:31 KST
 ## BLOCKED
 
 - Status: External dependency / missing validation material
-- Last updated: 2026-09-01
+- Last updated: 2026-09-04
 - Next action: Keep these as validation or future analysis inputs; do not let them block observed reconstruction MVP.
 
 - [ ] 2023 오송 실제 Flood Extent 공식 벡터 미확보
@@ -97,8 +117,14 @@ Last Updated: 2026-09-02 23:31 KST
 ## NEXT
 
 - Status: Ready after NOW
-- Last updated: 2026-09-01
-- Next action: Improve validation, error handling, and user-facing clarity after the MVP reconstruction loop is stable.
+- Last updated: 2026-09-04
+- Next action: Improve validation, error handling, provenance, and E2E coverage after the presentation-ready MVP.
+
+- [x] README/TODO implementation status synchronization
+  - Current MVP, Agent planner, scenario API, Swagger routes, and known limitations are documented.
+- [ ] Dark console UI 브라우저 검증 및 커밋
+  - 현재 변경 파일: `src/App.tsx`, `src/api.ts`, `src/types.ts`, `src/dark/*`
+  - 검증 전까지 발표용 미리보기 상태로 유지한다.
 
 - [ ] HAND reconstruction을 official validation material과 비교
   - Safemap WMS raster 및 향후 official vector Flood Extent와 시각/공간 유사도를 비교한다.
@@ -124,7 +150,7 @@ Last Updated: 2026-09-02 23:31 KST
 ## LATER
 
 - Status: Post-MVP
-- Last updated: 2026-09-01
+- Last updated: 2026-09-04
 - Next action: Re-scope after the Osong reconstruction MVP is stable.
 
 - [ ] HEC-RAS 2D 또는 LISFLOOD-FP 연계
@@ -155,7 +181,7 @@ Last Updated: 2026-09-02 23:31 KST
 ## DONE SUMMARY
 
 - Status: Reference
-- Last updated: 2026-09-01
+- Last updated: 2026-09-04
 - Next action: Detailed history remains in `WORKLOG.md`; dataset evidence remains in `data/manifests/` and processed validation reports.
 
 - [x] `osong-2023`을 대표 reference case로 설정
@@ -173,5 +199,8 @@ Last Updated: 2026-09-02 23:31 KST
 - [x] `approx_flood_envelope` temporary derived approximation 생성 및 지도 연결
 - [x] HAND-like reconstruction grid/timeline 생성 및 지도 연결
 - [x] approx_flood_envelope vs HAND reconstruction 시간별 method comparison 생성 및 Replay UI 연결
+- [x] closure-timing / inflow-delay What-if API와 `compare_scenarios` Tool 연결
+- [x] LLM intent planner, deterministic fallback, 한국어 평가셋 연결
+- [x] portfolio response scenario API와 Swagger contract 연결
 - [x] data-quality issue tracking 문서 추가
 - [x] README, Project Plan, Development Guide, Decision Records를 Counterfactual Disaster Digital Twin 정의에 맞춰 정리

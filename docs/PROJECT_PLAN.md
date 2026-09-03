@@ -1,6 +1,6 @@
 # FloodOps Project Plan
 
-Last updated: 2026-09-01
+Last updated: 2026-09-04
 
 ## Definition
 
@@ -58,6 +58,9 @@ Included:
 - Historical Replay
 - baseline scenario
 - one or more rule-based interventions
+- deterministic Agent workflows for situation, closure timing, inflow delay, and exposure inventory
+- optional LLM intent planner with deterministic fallback
+- portfolio response scenario API for building-level intervention comparison
 - provenance and limitations
 - temporary approximate flood envelope for visual reconstruction
 
@@ -68,6 +71,23 @@ Not included as validated claims:
 - measured velocity
 - final exposure KPIs without valid flood geometry
 - fatality, damage-cost, or official loss-reduction estimates
+
+## Current Implementation Snapshot
+
+As of 2026-09-04, the Osong MVP is presentation-ready at the backend and light
+frontend baseline. Historical Replay, HAND-like reconstruction, What-if A/B,
+Agent workflow orchestration, the optional LLM planner, and the portfolio
+scenario API are connected and covered by automated tests.
+
+The `ui/dark-console` branch contains an in-progress dark console presentation
+layer. It reuses the existing APIs and data, but still requires browser smoke
+testing, MapLibre warning cleanup, provenance/limitation review, and a focused
+commit before it is treated as complete.
+
+Current validation command results:
+
+- backend: `58 passed`
+- frontend: `npm run build` passed; Vite reported only the existing large-chunk warning
 
 ## Current Spatial Reconstruction
 

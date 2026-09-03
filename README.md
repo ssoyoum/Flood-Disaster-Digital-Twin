@@ -32,6 +32,43 @@ The current `approx_flood_envelope` layer is a temporary DEM-constrained derived
 
 Exposure KPIs that require valid flood geometry remain `PENDING_FLOOD_EXTENT`.
 
+## Agent and Scenario Layer
+
+FloodOps exposes deterministic analysis tools behind a small Agent workflow. An
+optional LLM planner only selects a registered workflow and extracts parameters;
+it never invents analysis values. If the SDK or credential is unavailable, the
+planner falls back to the deterministic planner.
+
+Available analysis flows include:
+
+- closure-timing what-if: compare hypothetical underpass closure times
+- inflow-delay what-if: shift downstream milestones by an explicit assumption
+- exposure inventory: count nearby buildings, roads, and facilities without claiming flood impact
+- portfolio scenario: select building IDs, apply interventions, and compare priority risk before/after
+
+Portfolio scenario example:
+
+```http
+POST /api/scenarios
+```
+
+```json
+{
+  "name": "Osong building response drill",
+  "event_id": "osong-2023",
+  "building_ids": [1, 2, 3],
+  "interventions": ["flood_barrier", "evacuation_support"]
+}
+```
+
+```http
+POST /api/scenarios/1/run
+```
+
+The current portfolio runner is a temporary, rule-based decision-support
+calculation based on the derived HAND-like envelope. It is not a calibrated
+hydraulic model, official flood extent, damage-cost model, or casualty model.
+
 ## What You Can See
 
 - Historical Replay of the 2023-07-15 Osong incident sequence
@@ -39,6 +76,9 @@ Exposure KPIs that require valid flood geometry remain `PENDING_FLOOD_EXTENT`.
 - MapLibre spatial layers for AOI, rivers, roads, buildings, DEM context, underpass, and approximate envelope
 - baseline versus intervention comparison
 - provenance and limitation notes for observed, derived, temporary, and reference data
+- Agent workflow planning with deterministic fallback
+- building-level response scenario API
+- optional dark control-room UI preview on the `ui/dark-console` branch
 
 ## Run Locally
 
@@ -49,13 +89,18 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r backend/requirements.txt
 $env:PYTHONPATH = "backend"
-uvicorn app.main:app --app-dir backend --reload --port 8000
+uvicorn app.main:app --app-dir backend --reload --port 8033
 ```
 
 Backend:
 
-- API docs: http://localhost:8000/docs
-- health check: http://localhost:8000/health
+- API docs: http://localhost:8033/docs
+- OpenAPI schema: http://localhost:8033/openapi.json
+- health check: http://localhost:8033/health
+
+The optional LLM planner works without a credential by using the deterministic
+fallback. To enable LLM routing, set `ANTHROPIC_API_KEY` in the repository
+`.env` file and check `GET /api/agent/planner-status`.
 
 ### Frontend
 
@@ -67,8 +112,12 @@ npm run dev
 Frontend:
 
 - http://localhost:5173
+- http://127.0.0.1:5173
 
-If the backend uses a different port:
+로컬 실행 포트는 FloodOps backend `8033`, Vite `5173`으로 고정한다. 다른 프로세스가
+해당 포트를 사용 중이면 Vite가 다른 포트로 이동하지 않고 시작 오류를 표시한다.
+
+Backend를 별도 포트로 실행해야 하는 예외 상황에는:
 
 ```powershell
 $env:VITE_API_BASE = "http://127.0.0.1:8001"

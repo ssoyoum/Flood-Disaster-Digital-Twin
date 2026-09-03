@@ -789,3 +789,178 @@
 - MapLibre 콘솔 경고: `layers.replay-risk-label.layout.text-field`가 스타일의 `glyphs` 속성을 요구한다. 리플레이 위험 라벨 레이어가 렌더되지 않는다. 별도 수정이 필요하다.
 - 프론트엔드는 `localhost:5173`으로만 접속된다. `127.0.0.1:5173`은 응답하지 않는다.
 
+## Dark console UI 진행 현황
+
+- 작업일: 2026-09-04
+- 브랜치: `ui/dark-console`
+- 상태: 진행 중 / 미커밋
+
+주요 작업:
+- `src/dark/DarkConsole.tsx`, `src/dark/CrossSection.tsx`, `src/dark/dark.css`를 추가해 어두운 관제 화면 미리보기를 구성했다.
+- `App.tsx`에 light/dark UI 전환과 `localStorage` 키 `floodops-ui`를 연결했다.
+- 기존 backend 데이터와 API를 재사용해 이벤트 단계, MapLibre 지도, exposure inventory, 단면도, Agent 결과를 한 화면에 배치했다.
+- `src/api.ts`와 `src/types.ts`에 반경별 exposure inventory 조회 client/type을 추가했다.
+- 기존 light UI는 유지하고 dark UI를 별도 presentation layer로 추가하는 방향으로 정리했다.
+
+현재 판단:
+- 핵심 MVP 기능(역사 재구성, What-if A/B, Agent workflow, LLM planner fallback, scenario API)은 구현 완료 상태다.
+- dark console은 시각화와 발표용 흐름을 보강하는 진행 중 작업이며, 기능 완료나 운영형 FloodOps로 표시하지 않는다.
+
+문서화 시점 검증:
+- `npm run build` 통과. Vite 번들 500 kB 초과 경고만 확인되었고 build는 성공했다.
+- `backend`에서 `pytest -q` 실행 결과 `58 passed`.
+- `git diff --check` 통과.
+
+남은 작업:
+- 실제 브라우저 smoke test로 dark UI의 지도/레이어/반응형 표시를 확인한다.
+- 기존 Agent 시연에서 확인된 MapLibre glyph 경고와 `localhost`/`127.0.0.1` 접속 차이를 정리한다.
+- provenance, coverage status, approximation/limitation 문구를 최종 점검한 뒤 UI 변경을 기능 단위로 커밋한다.
+
+추가 마감 작업:
+- 좁은 화면에서 side/map/detail을 세로로 전환하는 반응형 CSS를 `dark.css`에 추가했다.
+- 라이트 UI의 `replay-risk-label`이 사용할 glyphs URL을 MapLibre style에 연결했다. 실제 브라우저에서 네트워크 로딩까지 재확인하는 것은 남겨두었다.
+- `CrossSection.test.ts`를 추가해 지하차도 중심의 HAND 셀 매칭과 stage 값 전달, 매칭 셀 부재 처리를 검증했다.
+
+최종 검증:
+- `npm test -- --run`: 1 file, 2 tests passed.
+- `npm run build`: 통과. Vite large-chunk warning만 남아 있다.
+- backend `pytest -q`: 58 passed (문서화 시점 직전 실행 결과).
+
+현재 남은 작업:
+- 이 세션에서는 사용 가능한 브라우저가 없어 실제 화면 smoke test를 수행하지 못했다.
+- 브라우저 연결 후 dark console의 지도 렌더링, 단계 이동, 단면도 애니메이션, Agent 실행, 반응형 레이아웃을 확인한다.
+- 확인이 끝나면 `README`, `TODO`, `WORKLOG`, `PROJECT_PLAN`과 UI 소스를 함께 기능 단위로 커밋한다.
+
+## Dark console replay 동작 보완
+
+- 작업일: 2026-09-04
+
+주요 작업:
+- 다크 콘솔의 재생 버튼과 스페이스바가 공통 `App.tsx`의 `replayPlaying` 상태를 사용하도록 확인·보완했다.
+- 재생 중 `time`이 증가하면 사건 단계, HAND envelope 필터, 현재 마커, 단면도 수위/임계선이 함께 갱신된다.
+- 마지막 단계에서 재생을 다시 누르면 0단계부터 다시 시작하도록 `togglePlayback`을 추가했다.
+- 단계 버튼·좌우 이동·슬라이더 조작은 재생을 일시정지하도록 유지했다.
+
+검증 결과:
+- `npm test -- --run`: 1 file, 2 tests passed.
+- `npm run build`: 통과. Vite large-chunk warning만 남아 있다.
+- 실제 브라우저 자동 조작은 현재 세션에 브라우저가 없어 아직 수행하지 못했다.
+
+## HAND 단면도 실측값·파생값 구분 보완
+
+- 작업일: 2026-09-04
+
+확인 내용:
+- `observed_water_level_m`가 홍수통제소 관측 수위이며, 지하차도 중심 HAND 셀에서 단계별로 9.85 m, 9.96 m, 10.01 m, 10.01 m, 10.03 m로 확인된다.
+- `relative_water_level_rise_m`는 기준 관측 수위와의 차분이다. 마지막 단계 값은 2.34 m이며, 파란 영역은 이 값을 표현한다.
+- `hand_threshold_m`는 실측 수위가 아니다. 생성식 `relative_rise + breach_boost_m`에 따른 HAND 선택 임계이며, 마지막 단계 5.54 m는 `2.34 m + 3.20 m`이다.
+- `hand_m`는 DEM에서 계산한 배수 기준면 대비 셀 상대고도이고, `mean_elevation_m`/`local_drainage_elevation_m`는 DEM 표고 파생값이다.
+
+UI 보완:
+- 단면도에 실측 관측 수위, 실측값 차분, 선택 임계(파생), 임계 추가분(파생)을 별도 카드로 표시했다.
+- 파란 영역과 점선의 의미를 범례와 한계 문구에 명시했다.
+
+검증:
+- `npm test -- --run`: 2 passed.
+- `npm run build`: 통과.
+
+## Scenario 비교 탭 추가
+
+- 작업일: 2026-09-04
+
+주요 작업:
+- 정보량이 많은 관제 화면과 시나리오 해석 화면을 `관제 화면` / `Scenario 비교` 탭으로 분리했다.
+- 비교 화면에서 API의 baseline states와 intervention metadata를 사용해 원시나리오와 감지 자동차단 개입을 카드·비교 매트릭스로 표시한다.
+- 유입 시작, 주행불능, 완전침수까지의 시간과 개입 트리거를 함께 보여준다.
+- 같은 사건 조건을 유지하므로 침수 진행 자체는 바뀌지 않고, 개입 시나리오에서 신규 차량 진입 차단 상태가 바뀐다는 점을 명시했다.
+- 공식 침수범위, 침수심, 사상자, 피해액, 공식 피해 감소율은 비교 대상에서 제외했다.
+- 관제 화면에서는 기존 Scenario 토글을 제거해 지도와 Agent의 시각적 밀도를 낮췄다.
+
+검증:
+- `npm test -- --run`: 2 passed.
+- `npm run build`: 통과. Vite large-chunk warning만 남아 있다.
+
+## Dark console 판단 탭·지도 정리
+
+- 작업일: 2026-09-04
+
+주요 작업:
+- 왼쪽 패널을 `자료 우선순위 → 사건 단계 → 시나리오/레이어 → 반경별 노출 재고 → Agent workflow` 순서로 재구성했다.
+- 즉시 대응 판단에는 현재 단계와 대응 여유가 가장 중요하다고 판단하고, 그 다음 공간 상태(HAND 재구성), 마지막으로 반경별 재고를 배치했다.
+- 반경별 노출 재고는 500m를 우선 요약하고 전체 반경 표를 왼쪽에 넣었다. 해당 값은 반경 내 시설 재고이지 침수 영향 추정치가 아니다.
+- Agent를 오른쪽 하단의 보조 영역에서 왼쪽 판단 탭으로 이동하고, 차단 시각·유입 지연·500m 재고 추천 질문을 추가했다.
+- 지도 위 관측 조건 카드와 중복 Agent/재고 영역을 제거하고, 지도에는 재생 컨트롤·최소 범례·핵심 마커만 남겼다.
+- 오른쪽 상세 패널은 HAND 단면도와 관측 근거로 역할을 분리했다.
+
+검증:
+- `npm test -- --run`: 2 passed.
+- `npm run build`: 통과.
+- 브라우저 연결은 현재 세션에서 사용할 수 없어 실제 시각적 QA는 보류 상태다.
+
+## FloodOps 로컬 포트 고정 및 로딩 오류 해결
+
+- 작업일: 2026-09-04
+
+문제:
+- 기존 프론트 환경변수 `VITE_API_BASE=http://localhost:8000`가 다른 프로젝트의 Basement Flood Screening API를 가리키고 있었다.
+- 해당 서버에는 FloodOps `/api/events`가 없어 404가 발생했고, Vite는 5173 사용 시 5174로 자동 이동할 수 있었다.
+
+해결:
+- `vite.config.ts`에 `host: true`, `port: 5173`, `strictPort: true`를 고정했다.
+- 로컬 FloodOps API 주소를 `http://localhost:8033`으로 정리했다. `.env`와 `.env.example`, `src/api.ts` fallback, README 로컬 실행 안내를 동기화했다.
+- Docker 실행은 컨테이너 내부 구성상 기존 backend `8000` 매핑을 유지하고, 로컬 실행과 구분했다.
+
+검증:
+- `http://localhost:5173/` 응답 200.
+- Vite 변환 `src/api.ts`가 `localhost:8033`을 사용함을 확인.
+- `http://localhost:8033/health` 응답 200.
+- `http://localhost:8033/api/events` 응답 200, 사건 5건.
+
+## Scenario 비교 페이지 구현
+
+- 작업일: 2026-09-04
+
+주요 작업:
+- DarkConsole 상단에 `관제 화면` / `Scenario 비교` 탭을 추가했다.
+- 정보량이 많은 시나리오 설명을 별도 비교 화면으로 분리해 관제 지도 화면의 밀도를 낮췄다.
+- baseline states와 intervention metadata에서 유입·주행불능·완전침수 시각, 차단 트리거, 대응 여유를 읽어 비교 카드와 매트릭스를 구성했다.
+- 비교 화면에서 같은 사건 조건과 위험 진행은 유지되고 신규 차량 진입 차단 상태만 바뀐다는 판단을 명시했다.
+- 공식 침수범위, 침수심, 사상자, 피해액, 공식 피해 감소율은 계산하지 않는다.
+
+검증:
+- `npm test -- --run`: 2 passed.
+- `npm run build`: 통과. Vite large-chunk warning만 남아 있다.
+
+## Dark console Agent·레이어 정보 밀도 조정
+
+- 작업일: 2026-09-04
+
+주요 작업:
+- 기본 화면에서 `Exposure inventory · secondary` 표를 제거했다. 반경별 재고는 핵심 대응 판단보다 보조 자료이므로 Agent의 `500m 재고` 추천 질문으로 필요할 때 조회하도록 정리했다.
+- Layers 토글은 삭제하지 않고 `지도 레이어 표시 설정` 접이식으로 변경했으며 기본값은 닫힘이다.
+- Agent를 왼쪽 판단 탭의 우선순위 카드 바로 아래로 이동해 한 화면에서 접근하기 쉽게 했다.
+- 지도 위 관측 조건 오버레이를 유지하지 않고 왼쪽/오른쪽 근거 패널로 분산해 중앙 지도를 단순화했다.
+
+검증:
+- `npm test -- --run`: 2 passed.
+- `npm run build`: 통과.
+
+## Dark console HAND 단면도 연결
+
+- 작업일: 2026-09-04
+
+주요 작업:
+- `CrossSection.tsx`가 존재하지만 화면에서 렌더링되지 않던 누락을 확인하고 `DarkConsole.tsx` 우측 상세 패널에 연결했다.
+- `hand_reconstruction` 레이어의 `hand_m`, `hand_threshold_m`, `relative_water_level_rise_m`, `observed_water_level_m`, `mean_elevation_m`, `local_drainage_elevation_m`, `stage_hourly_rainfall_mm`를 단면도에 전달한다.
+- 단계 이동 시 관측 기준 대비 상승분과 선택 임계선이 전환되고, SVG 물 영역에 transition/wave animation을 적용했다.
+- 실제 침수심이나 DEM 절대 수면고로 오해하지 않도록 DQ-007 한계 문구를 단면도 안에 고정했다.
+
+검증 결과:
+- HAND API 응답: 총 2,565개 형상(Polygon 2,561개, LineString 4개).
+- 단면도 필수 속성 확인: `hand_m`, `hand_threshold_m`, `relative_water_level_rise_m`, 관측 수위·표고·강우 속성.
+- 지하차도 중심과 매칭되는 HAND 셀: 5개 단계.
+- `npm run build` 통과.
+
+남은 작업:
+- 브라우저 세션 연결 후 단면도 실제 렌더링, 단계 이동, 작은 화면 레이아웃을 확인한다.
+
