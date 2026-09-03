@@ -14,6 +14,7 @@ deterministic planner in ``agent_tools.py`` so behaviour never regresses.
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
@@ -68,9 +69,33 @@ class LlmPlan(BaseModel):
     reason: str = Field(min_length=1, max_length=300)
 
 
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+_env_file_loaded = False
+
+
+def _load_env_file_once() -> None:
+    """Make a local ``.env`` credential visible to the app.
+
+    uvicorn only reads ``.env`` when started with ``--env-file`` and pytest never
+    does, so a key pasted into ``.env`` would otherwise be invisible here. Real
+    environment variables always win over the file.
+    """
+
+    global _env_file_loaded
+    if _env_file_loaded:
+        return
+    _env_file_loaded = True
+    try:
+        from dotenv import load_dotenv
+    except ModuleNotFoundError:
+        return
+    load_dotenv(_REPO_ROOT / ".env", override=False)
+
+
 def llm_planner_status() -> dict[str, Any]:
     """Report whether the LLM planner can run, without calling the API."""
 
+    _load_env_file_once()
     try:
         import anthropic  # noqa: F401
     except ModuleNotFoundError:
