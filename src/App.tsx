@@ -2,7 +2,7 @@
 import maplibregl, { type GeoJSONSource, type MapLayerMouseEvent, type Map as MapLibreMap, type Popup } from "maplibre-gl";
 import { Activity, AlertTriangle, Bot, Building2, Check, CloudRain, Layers3, MapPin, Pause, Play, Route, Send, Waves } from "lucide-react";
 import * as api from "./api";
-import type { AgentIntentPlanResult, AgentWorkflowResult, DataStatusItem, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayerPayload, LayersResponse, ReconstructionResponse } from "./types";
+import type { AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, DataStatusItem, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayerPayload, LayersResponse, ReconstructionResponse } from "./types";
 
 const emptyGeoJson: GeoJson = { type: "FeatureCollection", features: [] };
 
@@ -824,6 +824,107 @@ function ScenarioToggle({
   );
 }
 
+const hhmm = (value: unknown) => (typeof value === "string" && value.length >= 16 ? value.slice(11, 16) : String(value ?? "-"));
+const rows = (result: Record<string, unknown>, key: string) => (Array.isArray(result[key]) ? (result[key] as Array<Record<string, unknown>>) : []);
+
+function AgentFindings({ workflow, result }: { workflow: AgentWorkflowName; result: Record<string, unknown> }) {
+  if (workflow === "closure_timing") {
+    const scenarios = rows(result, "scenarios");
+    if (!scenarios.length) return null;
+    return (
+      <div className="agent-findings">
+        <strong>분석 결과</strong>
+        <table>
+          <thead><tr><th>차단 시각</th><th>차단 시점 상태</th><th>유입까지</th><th>주행불능까지</th><th>완전침수까지</th><th>감지차단 대비</th></tr></thead>
+          <tbody>
+            {scenarios.map((row) => (
+              <tr key={String(row.closure_time)}>
+                <td>{hhmm(row.closure_time)}</td>
+                <td className="agent-findings-label">{String(row.classification ?? "-")}</td>
+                <td>{String(row.minutes_before_underpass_inflow ?? "-")}분</td>
+                <td>{String(row.minutes_before_unsafe_driving ?? "-")}분</td>
+                <td>{String(row.minutes_before_full_inundation ?? "-")}분</td>
+                <td>{String(row.lead_time_vs_detection_trigger_min ?? "-")}분</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
+  if (workflow === "inflow_delay") {
+    const scenarios = rows(result, "scenarios");
+    if (!scenarios.length) return null;
+    return (
+      <div className="agent-findings">
+        <strong>분석 결과</strong>
+        {scenarios.map((scenario) => (
+          <div key={String(scenario.delay_minutes)} className="agent-findings-block">
+            <em>유입 {String(scenario.delay_minutes)}분 지연 가정</em>
+            <table>
+              <thead><tr><th>사건 상태</th><th>기준 시각</th><th>이동 후</th></tr></thead>
+              <tbody>
+                {(Array.isArray(scenario.milestones) ? (scenario.milestones as Array<Record<string, unknown>>) : []).map((milestone) => (
+                  <tr key={String(milestone.state)}>
+                    <td className="agent-findings-label">{String(milestone.label ?? milestone.state)}</td>
+                    <td>{hhmm(milestone.baseline_time)}</td>
+                    <td>{hhmm(milestone.shifted_time)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (workflow === "exposure_inventory") {
+    const rings = rows(result, "rings");
+    if (!rings.length) return null;
+    return (
+      <div className="agent-findings">
+        <strong>분석 결과 · {String(result.focus_feature ?? "focus feature")} 기준</strong>
+        <table>
+          <thead><tr><th>반경</th><th>면적</th><th>건물</th><th>도로</th><th>시설</th></tr></thead>
+          <tbody>
+            {rings.map((ring) => (
+              <tr key={String(ring.radius_m)}>
+                <td>{String(ring.radius_m)} m</td>
+                <td>{String(ring.area_km2)} km²</td>
+                <td>{Number(ring.buildings).toLocaleString()}동</td>
+                <td>{String(ring.roads_km)} km</td>
+                <td>{String(ring.facilities)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
+  const replay = rows(result, "replay");
+  if (!replay.length) return null;
+  return (
+    <div className="agent-findings">
+      <strong>사건 재구성 타임라인</strong>
+      <table>
+        <thead><tr><th>시각</th><th>상태</th><th>근거 상태</th></tr></thead>
+        <tbody>
+          {replay.map((step) => (
+            <tr key={String(step.time)}>
+              <td>{hhmm(step.time)}</td>
+              <td className="agent-findings-label">{String(step.label ?? step.state)}</td>
+              <td>{String(step.confidence ?? "-")}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function AgentPanel({ eventId }: { eventId: string }) {
   const [message, setMessage] = useState("오송 지하차도 08:25와 08:35 차단 시각을 비교해줘");
   const [plan, setPlan] = useState<AgentIntentPlanResult | null>(null);
@@ -869,7 +970,9 @@ function AgentPanel({ eventId }: { eventId: string }) {
           <h2><Bot size={18} /> Agent workflow</h2>
           <p>등록된 분석 도구를 계획하고 실행합니다. 자연어 요청 자체로 수치를 계산하지 않습니다.</p>
         </div>
-        <span className="agent-status">DETERMINISTIC PLAN</span>
+        <span className="agent-status" title={plan?.planner_note ?? ""}>
+          {plan ? (plan.planner_used === "llm" ? "LLM PLAN" : "DETERMINISTIC PLAN") : "PLANNER READY"}
+        </span>
       </div>
       <form className="agent-form" onSubmit={(event) => { event.preventDefault(); void planIntent(); }}>
         <input
@@ -890,6 +993,7 @@ function AgentPanel({ eventId }: { eventId: string }) {
             <div><span>WORKFLOW</span><strong>{plan.workflow ?? "선택되지 않음"}</strong></div>
           </div>
           <p className="agent-reason">{plan.reason}</p>
+          {plan.planner_note && <small className="agent-assumption">{plan.planner_note}</small>}
           {plan.tool_names.length > 0 && <div className="agent-tools">{plan.tool_names.map((tool, index) => <span key={tool}>{index + 1}. {tool}</span>)}</div>}
           {Object.keys(plan.parameters).length > 1 && <pre className="agent-parameters">{JSON.stringify(plan.parameters, null, 2)}</pre>}
           {plan.assumptions.map((item) => <small className="agent-assumption" key={item}>{item}</small>)}
@@ -911,6 +1015,7 @@ function AgentPanel({ eventId }: { eventId: string }) {
               {workflowResult.provenance.map((item, index) => <small key={`${String(item.key ?? item.source ?? "source")}-${index}`}>{String(item.label ?? item.key ?? "source")} · {String(item.source ?? "source not recorded")} · {String(item.snapshot ?? item.data_vintage ?? item.status ?? "status not recorded")}</small>)}
             </div>
           )}
+          <AgentFindings workflow={workflowResult.workflow} result={workflowResult.result} />
           {workflowResult.coverage_note && <small className="agent-coverage">Coverage · {workflowResult.coverage_status ?? "not recorded"} · {workflowResult.coverage_note}</small>}
           <div className="agent-result-boundary">
             <strong>근거와 한계</strong>

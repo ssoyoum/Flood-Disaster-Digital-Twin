@@ -270,6 +270,8 @@ export type AgentWorkflowName = "situation" | "closure_timing" | "inflow_delay" 
 export type AgentIntentPlanResult = {
   status: "READY" | "NEEDS_CLARIFICATION" | "UNSUPPORTED";
   event_id: string;
+  planner_used: "deterministic" | "llm";
+  planner_note: string;
   workflow?: AgentWorkflowName | null;
   parameters: Record<string, unknown>;
   tool_names: string[];

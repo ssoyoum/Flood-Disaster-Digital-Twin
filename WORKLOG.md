@@ -764,3 +764,28 @@
 남은 작업:
 - `compare_scenarios`를 자연어 planner workflow까지 확장할지는 해커톤에서 실제 시연 흐름을 확인한 뒤 결정한다.
 
+## Agent 패널 브라우저 시연 검증 및 결과 표시 수정
+
+- 시작 시각: 2026-09-03 01:10 +09:00
+- 종료 시각: 2026-09-03 01:45 +09:00
+- 총 소요시간: 35분
+
+주요 작업:
+- 백엔드와 Vite dev 서버를 띄우고 실제 브라우저(Chromium)로 Agent 패널 전 구간을 조작해 검증했다.
+- 검증 결과 결과 패널에 provenance, coverage, 가정, 한계는 표시되지만 **분석 수치 자체가 표시되지 않는 문제**를 발견했다. 자연어 질문의 답이 화면에 없는 상태였다.
+- `AgentFindings` 컴포넌트를 추가해 workflow별 결과 표를 렌더링했다. closure_timing은 차단 시각별 잔여 시간, inflow_delay는 기준/이동 시각 대비, exposure_inventory는 반경별 재고, situation은 재구성 타임라인을 표시한다.
+- planner 배지가 `DETERMINISTIC PLAN`으로 하드코딩되어 있어 LLM planner 사용 시에도 결정론으로 표시되던 문제를 수정했다. `planner_used`에 따라 배지가 바뀌고 폴백 사유를 함께 노출한다.
+- `AgentIntentPlanResult` 타입에 `planner_used`, `planner_note`를 추가했다.
+
+검증 결과 (실제 브라우저):
+- closure_timing: 08:25 / 08:30 / 08:35 세 시각이 한 번에 추출되어 표로 표시된다. 08:25는 유입까지 2분, 완전침수까지 15분, 감지차단 대비 2분 선행이다.
+- inflow_delay: 10분 지연 가정 시 유입 08:27 -> 08:37, 주행불능 08:35 -> 08:45, 완전침수 08:40 -> 08:50으로 표시된다.
+- exposure_inventory: 반경 500m 건물 424동 도로 7.595km, 반경 1000m 건물 1,536동 도로 48.772km, 시설 4개.
+- situation: 재구성 타임라인 7단계가 근거 상태(NEEDS_SOURCE_PAGE)와 함께 표시된다.
+- 거절: "사망자가 몇 명 줄었을까" 질문은 UNSUPPORTED로 처리되고 실행 버튼이 나타나지 않는다.
+- 페이지 JS 오류 0건.
+
+남은 이슈:
+- MapLibre 콘솔 경고: `layers.replay-risk-label.layout.text-field`가 스타일의 `glyphs` 속성을 요구한다. 리플레이 위험 라벨 레이어가 렌더되지 않는다. 별도 수정이 필요하다.
+- 프론트엔드는 `localhost:5173`으로만 접속된다. `127.0.0.1:5173`은 응답하지 않는다.
+

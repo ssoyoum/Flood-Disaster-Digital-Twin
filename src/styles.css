@@ -738,3 +738,49 @@ h2 { margin: 4px 0 0; font-size: 17px; letter-spacing: -.3px; }
   .event-timeline { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
+.agent-findings {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(15, 118, 110, 0.25);
+  border-radius: 10px;
+  background: rgba(15, 118, 110, 0.04);
+}
+
+.agent-findings > strong {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  margin-bottom: 8px;
+}
+
+.agent-findings table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.agent-findings th {
+  text-align: left;
+  font-weight: 600;
+  color: #475569;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+  padding: 4px 8px 6px 0;
+  white-space: nowrap;
+}
+
+.agent-findings td {
+  padding: 5px 8px 5px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.agent-findings-label {
+  font-variant-numeric: normal;
+  white-space: normal;
+  color: #0f172a;
+}
+
+.agent-findings-block + .agent-findings-block { margin-top: 10px; }
+.agent-findings-block em { font-size: 12px; font-style: normal; font-weight: 600; }
+
