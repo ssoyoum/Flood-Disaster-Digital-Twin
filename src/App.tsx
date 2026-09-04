@@ -788,7 +788,7 @@ function ScenarioToggle({
   return (
     <div className="scenario-section">
       <div className="scenario-title">
-        <div><div className="eyebrow">BASELINE / INTERVENTION</div><h2>{scenario === "baseline" ? "Observed baseline replay" : "Rule-based auto-closure scenario"}</h2><p>No exposure KPI is calculated until official vector Flood Extent exists.</p></div>
+        <div><div className="eyebrow">BASELINE / INTERVENTION</div><h2>{scenario === "baseline" ? "Observed baseline replay" : "Observed-inflow closure comparison"}</h2><p>No intervention effect KPI is calculated until source-backed model output exists.</p></div>
         <div className="scenario-toggle" role="group" aria-label="Scenario toggle">
           <button type="button" className={scenario === "baseline" ? "active" : ""} onClick={() => setScenario("baseline")}>Baseline</button>
           <button type="button" className={scenario === "intervention" ? "active" : ""} onClick={() => setScenario("intervention")}>Intervention</button>

@@ -113,7 +113,6 @@ export default function CrossSection({
   const threshold = row?.threshold ?? 0;
   const derivedMargin = Math.max(0, threshold - rise);
   const handM = cell?.hand_m ?? 0;
-  const selected = profile.included.has(stageIndex);
   const groundX = 150; // 이 오른쪽이 셀(지하차도가 놓인 땅)
 
   return (
@@ -169,20 +168,6 @@ export default function CrossSection({
         <div><dt>임계 추가분(파생)</dt><dd style={{ color: tone }}>{row ? `${derivedMargin.toFixed(2)} m` : "—"}<small>실측 수위가 아님</small></dd></div>
         <div><dt>시간당 강우</dt><dd>{row?.rain != null ? `${row.rain.toFixed(1)} mm` : "—"}<small>KMA AWS</small></dd></div>
       </dl>
-      <p className={`dk-xs-status ${selected ? "on" : ""}`}>
-        {cell
-          ? selected
-            ? `이 단계에서 지하차도 셀이 envelope에 포함됩니다 (임계 ${threshold.toFixed(2)} m ≥ HAND ${handM.toFixed(2)} m)`
-            : row
-              ? `아직 미포함 (임계 ${threshold.toFixed(2)} m < HAND ${handM.toFixed(2)} m)`
-              : "단계 0 · 수위 상승 전"
-          : "지하차도 위치의 HAND 셀을 찾지 못했습니다"}
-      </p>
-      <small className="dk-note">
-        실측값은 홍수통제소의 관측 수위(절대 관측값)와 그 기준 대비 차분입니다.
-        파란 영역은 그 차분을 배수 기준면 위 높이로 표현한 것이며, 점선 임계와 추가분은 HAND 재구성용 파생값입니다.
-        수위는 DEM 절대 표고로 변환되지 않았고(DQ-007), 지하차도 내부 수심은 이 모델이 계산하지 않습니다.
-      </small>
     </div>
   );
 }

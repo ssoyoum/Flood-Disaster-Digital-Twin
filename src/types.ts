@@ -242,12 +242,12 @@ export type PortfolioScenarioRunResult = {
   event_id: string;
   building_ids: number[];
   interventions: ScenarioIntervention[];
-  status: "COMPLETED";
-  before_priority_buildings: number;
-  after_priority_buildings: number;
-  risk_reduction: number;
-  before_risk_score: number;
-  after_risk_score: number;
+  status: "COMPLETED" | "UNAVAILABLE";
+  before_priority_buildings: number | null;
+  after_priority_buildings: number | null;
+  risk_reduction: number | null;
+  before_risk_score: number | null;
+  after_risk_score: number | null;
   priority_building_ids_before: number[];
   priority_building_ids_after: number[];
   assumptions: string[];
@@ -260,7 +260,7 @@ export type ScenarioResult = {
   intervention: { type: InterventionType; label: string; description: string };
   baseline: ExposureMetrics;
   result: ExposureMetrics;
-  reduction_percent: number;
+  reduction_percent: number | null;
   assumptions: string[];
   origin: "TEMPORARY";
 };
