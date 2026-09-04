@@ -89,7 +89,7 @@ class ScenarioResult(BaseModel):
     intervention: Intervention
     baseline: ExposureMetrics
     result: ExposureMetrics
-    reduction_percent: float
+    reduction_percent: float | None
     assumptions: list[str]
     origin: Literal["TEMPORARY"] = "TEMPORARY"
 
@@ -123,7 +123,7 @@ class ScenarioRecord(BaseModel):
     event_id: str
     building_ids: list[int]
     interventions: list[ScenarioIntervention]
-    status: Literal["DRAFT", "COMPLETED"]
+    status: Literal["DRAFT", "COMPLETED", "UNAVAILABLE"]
     created_at: str
 
 
@@ -133,12 +133,12 @@ class ScenarioRunResult(BaseModel):
     event_id: str
     building_ids: list[int]
     interventions: list[ScenarioIntervention]
-    status: Literal["COMPLETED"]
-    before_priority_buildings: int
-    after_priority_buildings: int
-    risk_reduction: float
-    before_risk_score: float
-    after_risk_score: float
+    status: Literal["COMPLETED", "UNAVAILABLE"]
+    before_priority_buildings: int | None
+    after_priority_buildings: int | None
+    risk_reduction: float | None
+    before_risk_score: float | None
+    after_risk_score: float | None
     priority_building_ids_before: list[int]
     priority_building_ids_after: list[int]
     assumptions: list[str]

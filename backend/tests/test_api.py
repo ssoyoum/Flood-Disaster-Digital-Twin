@@ -132,7 +132,7 @@ def test_osong_reconstruction_serves_replay_and_rule_based_intervention():
     assert reconstruction["baseline"]["failure_to_inflow_min"] == 18
     assert reconstruction["baseline"]["inflow_to_unsafe_min"] == 8
     assert reconstruction["intervention"]["type"] == "ROAD_CLOSURE"
-    assert reconstruction["intervention"]["trigger"] == "underpass_water_depth >= 0.15 m"
+    assert reconstruction["intervention"]["trigger"].startswith("Not provided")
     assert reconstruction["intervention"]["available_response_window_min"] == 8
     assert reconstruction["envelope_comparison"]["source_type"] == "DERIVED_COMPARISON"
     assert len(reconstruction["envelope_comparison"]["rows"]) == 7
@@ -155,7 +155,7 @@ def test_baseline_uses_pending_exposure_metrics():
     assert result["exposed_population"] == "PENDING_FLOOD_EXTENT"
 
 
-def test_road_closure_intervention_returns_rule_based_auto_closure():
+def test_road_closure_intervention_returns_timeline_comparison_without_effect_kpi():
     response = client.post(
         "/api/scenarios",
         json={"name": "Auto closure", "intervention_type": "ROAD_CLOSURE", "event_id": "osong-2023"},
@@ -163,10 +163,11 @@ def test_road_closure_intervention_returns_rule_based_auto_closure():
     assert response.status_code == 200
     scenario = response.json()
     assert scenario["intervention"]["type"] == "ROAD_CLOSURE"
-    assert scenario["result"]["intervention_state"] == "Scenario A: water-depth sensor + automatic entrance closure"
+    assert scenario["result"]["intervention_state"] == "Intervention: underpass entrance closure"
     assert scenario["result"]["response_window_min"] == 8
     assert scenario["result"]["exposed_population"] == "PENDING_FLOOD_EXTENT"
-    assert any("water-depth sensor" in item for item in scenario["assumptions"])
+    assert scenario["reduction_percent"] is None
+    assert any("observed inflow timestamp" in item for item in scenario["assumptions"])
 
 
 def test_portfolio_scenario_can_be_created_and_run():
@@ -188,14 +189,16 @@ def test_portfolio_scenario_can_be_created_and_run():
     result_response = client.post(f"/api/scenarios/{scenario['scenario_id']}/run")
     assert result_response.status_code == 200
     result = result_response.json()
-    assert result["status"] == "COMPLETED"
-    assert result["before_priority_buildings"] >= result["after_priority_buildings"]
-    assert 0 <= result["risk_reduction"] <= 1
-    assert len(result["priority_building_ids_before"]) <= 3
+    assert result["status"] == "UNAVAILABLE"
+    assert result["before_priority_buildings"] is None
+    assert result["after_priority_buildings"] is None
+    assert result["risk_reduction"] is None
+    assert result["before_risk_score"] is None
+    assert "not zero" in result["assumptions"][-1]
 
     fetched = client.get(f"/api/scenarios/{scenario['scenario_id']}")
     assert fetched.status_code == 200
-    assert fetched.json()["status"] == "COMPLETED"
+    assert fetched.json()["status"] == "UNAVAILABLE"
 
 
 def test_portfolio_scenario_rejects_unknown_building_id():

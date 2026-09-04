@@ -12,7 +12,7 @@ from .agent_tools import (
 from .llm_planner import MODEL_ID as LLM_PLANNER_MODEL, LlmPlannerUnavailable, llm_planner_status, plan_with_llm
 from .data import EVENT_ID, EVENT_OBSERVATIONS, OBSERVATIONS, get_event, get_events, get_layers
 from .osong_repository import SAFEMAP_WMS_SNAPSHOT, get_osong_data_status, get_osong_reconstruction, get_osong_summary
-from .scenario_repository import create_scenario as save_scenario, get_scenario, mark_completed
+from .scenario_repository import create_scenario as save_scenario, get_scenario, mark_completed, mark_unavailable
 from .schemas import (
     ClosureTimingRequest,
     ClosureTimingResult,
@@ -245,7 +245,7 @@ def create_scenario(request: ScenarioCreateRequest):
             intervention=intervention,
             baseline=baseline_result,
             result=result,
-            reduction_percent=0.0,
+            reduction_percent=None,
             assumptions=assumptions,
         )
 
@@ -286,7 +286,10 @@ def run_created_scenario(scenario_id: int):
         result = run_scenario(scenario_record)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
-    mark_completed(scenario_id)
+    if result.status == "COMPLETED":
+        mark_completed(scenario_id)
+    else:
+        mark_unavailable(scenario_id)
     return result
 
 

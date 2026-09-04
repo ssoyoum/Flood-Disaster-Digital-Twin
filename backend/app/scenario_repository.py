@@ -48,3 +48,9 @@ def mark_completed(scenario_id: int) -> ScenarioRecord:
     scenario = _SCENARIOS[scenario_id]
     scenario.status = "COMPLETED"
     return deepcopy(scenario)
+
+
+def mark_unavailable(scenario_id: int) -> ScenarioRecord:
+    scenario = _SCENARIOS[scenario_id]
+    scenario.status = "UNAVAILABLE"
+    return deepcopy(scenario)
