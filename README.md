@@ -44,7 +44,7 @@ Available analysis flows include:
 - closure-timing what-if: compare hypothetical underpass closure times
 - inflow-delay what-if: shift downstream milestones by an explicit assumption
 - exposure inventory: count nearby buildings, roads, and facilities without claiming flood impact
-- portfolio scenario: select building IDs, apply interventions, and compare priority risk before/after
+- portfolio scenario: validate selected building IDs and report whether source-backed intervention outputs are available
 
 Portfolio scenario example:
 
@@ -65,16 +65,18 @@ POST /api/scenarios
 POST /api/scenarios/1/run
 ```
 
-The current portfolio runner is a temporary, rule-based decision-support
-calculation based on the derived HAND-like envelope. It is not a calibrated
-hydraulic model, official flood extent, damage-cost model, or casualty model.
+The portfolio runner currently validates connected building IDs but does not
+calculate intervention effects. Because no source-backed intervention model,
+traffic/vehicle exposure, vulnerability data, or verified flood extent is
+connected, `/run` returns `UNAVAILABLE` with null effect metrics instead of
+inventing a before/after risk reduction.
 
 ## What You Can See
 
 - Historical Replay of the 2023-07-15 Osong incident sequence
 - observed rainfall and water-level context
 - MapLibre spatial layers for AOI, rivers, roads, buildings, DEM context, underpass, and approximate envelope
-- baseline versus intervention comparison
+- baseline versus observed-inflow closure timing comparison
 - provenance and limitation notes for observed, derived, temporary, and reference data
 - Agent workflow planning with deterministic fallback
 - building-level response scenario API

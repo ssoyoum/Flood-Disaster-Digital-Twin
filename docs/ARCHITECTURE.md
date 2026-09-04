@@ -67,8 +67,8 @@ POST /api/scenarios
   -> validate event and building IDs
   -> save a DRAFT scenario
   -> POST /api/scenarios/{scenario_id}/run
-  -> calculate portfolio priority change
-  -> return before/after metrics and assumptions
+  -> validate whether source-backed intervention outputs exist
+  -> return UNAVAILABLE when no intervention model is connected
 ```
 
 Example request:
@@ -82,11 +82,13 @@ Example request:
 }
 ```
 
-The current runner uses the latest derived HAND-like envelope as a spatial
-proxy and rule-based intervention factors. It is intentionally marked
-`TEMPORARY`; it is not calibrated hydraulics, official Flood Extent, or a
-damage-cost model. Swagger is available at `/docs` when the FastAPI server is
-running, and the machine-readable contract is `/openapi.json`.
+The connected Osong data can validate building IDs and can support a separate
+closure-timing calculation from observed timestamps. It cannot calculate an
+intervention-specific flood extent, depth, traffic exposure, vulnerability, or
+damage reduction. The portfolio runner therefore returns `UNAVAILABLE` with
+null before/after effect metrics instead of applying unsupported coefficients.
+Swagger is available at `/docs` when the FastAPI server is running, and the
+machine-readable contract is `/openapi.json`.
 
 ## Agent Tool Boundary
 

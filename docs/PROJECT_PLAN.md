@@ -60,7 +60,7 @@ Included:
 - one or more rule-based interventions
 - deterministic Agent workflows for situation, closure timing, inflow delay, and exposure inventory
 - optional LLM intent planner with deterministic fallback
-- portfolio response scenario API for building-level intervention comparison
+- portfolio response scenario API for building-ID validation and source-backed availability reporting
 - provenance and limitations
 - temporary approximate flood envelope for visual reconstruction
 
@@ -77,7 +77,7 @@ Not included as validated claims:
 As of 2026-09-04, the Osong MVP is presentation-ready at the backend and light
 frontend baseline. Historical Replay, HAND-like reconstruction, What-if A/B,
 Agent workflow orchestration, the optional LLM planner, and the portfolio
-scenario API are connected and covered by automated tests.
+scenario availability boundary are connected and covered by automated tests.
 
 The `ui/dark-console` branch contains an in-progress dark console presentation
 layer. It reuses the existing APIs and data, but still requires browser smoke
