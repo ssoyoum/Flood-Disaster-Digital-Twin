@@ -574,7 +574,7 @@ function MapPanel({
 function EventHeader({ eventData }: { eventData: FloodEvent }) {
   return (
     <header className="topbar">
-      <div className="brand"><div className="brand-mark"><Waves size={19} /></div><div><strong>FloodOps</strong><span>REACT ASSIGNMENT</span></div></div>
+      <div className="brand"><div className="brand-mark"><Waves size={19} /></div><div><strong>FloodOps</strong><span>DECISION SUPPORT PoC</span></div></div>
       <div className="topbar-context"><span className="status-dot" /> Historical Disaster Reconstruction <span className="divider" /> representative event: {eventData.id}</div>
     </header>
   );
@@ -1195,7 +1195,7 @@ export default function App() {
               <div><div className="eyebrow">BASELINE DATA</div><h1>Osong 2023 processed data connection</h1><p>{"Repository -> API -> React/Vite -> MapLibre using local files only."}</p></div>
               <button type="button" className="primary-button" onClick={() => switchUi("dark")}>다크 관제 UI 미리보기</button>
             </div>
-            <div className="metrics-grid assignment-metrics">
+            <div className="metrics-grid summary-metrics">
               <Metric icon={Building2} label="Buildings in AOI" value={formatNumber(summary?.building_count)} note="Official GIS Building Integrated Information" />
               <Metric icon={Route} label="Road objects" value={formatNumber(summary?.road_count)} note="OSM historical snapshot" />
               <Metric icon={CloudRain} label="Peak hourly rainfall" value={`${formatDecimal(summary?.rainfall_peak_mm_per_hour)} mm`} note={`${formatNumber(summary?.rainfall_records)} KMA AWS records`} />

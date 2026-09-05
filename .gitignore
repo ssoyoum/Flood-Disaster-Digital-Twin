@@ -17,8 +17,7 @@ data/processed/seoul_rainfall_2022_event.csv
 data/processed/osong/*_buildings_*.geojson
 data/processed/osong/*_roads_*.geojson
 data/processed/osong/osong_building_qa_official_osm_2023.geojson
-# Local-only working notes (not part of the submitted repository).
+# Local-only working notes and drafts. TODO.md and WORKLOG.md stay tracked so
+# parallel tools can sync on repository state.
 docs/AGENT_GUIDE.md
-
-# Submission form stays local; TODO.md and WORKLOG.md remain tracked for cross-tool state sync.
-docs/NAIS_공모전_제출서식.md
+docs/local/

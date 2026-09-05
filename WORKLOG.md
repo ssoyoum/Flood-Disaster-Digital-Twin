@@ -453,14 +453,14 @@
 - 문제: 초기 구현은 replay 목록만 표시해 Historical Replay로 보기 부족했음. 해결: 재생/정지 버튼과 timeline slider를 추가.
 - 문제: 기존 backend dev server가 이전 코드로 떠 있어 `/reconstruction`이 404를 반환함. 해결: 8000번 backend를 재시작해 새 endpoint 응답 확인.
 
-## React 과제 제출 브랜치 구조 정리
+## 프론트엔드 컴포넌트 구조 정리
 
 - 시작 시각: 2026-09-01 00:00:00 +09:00
 - 종료 시각: 2026-09-01 00:05:00 +09:00
 - 총 소요시간: 5분
 
 주요 작업:
-- `react-assignment` 브랜치를 생성하고 React 과제용 컴포넌트 구조를 정리했다.
+- 별도 브랜치에서 프론트엔드 컴포넌트 구조를 정리했다.
 - `App`은 `time`, `scenario`, `layers`, `eventData` 상태를 관리하고 `EventHeader`, `MapPanel`, `Timeline`, `HydrometPanel`, `ScenarioToggle`, `ProvenancePanel`을 조립하도록 정리했다.
 - 기존 오송 Historical Replay와 Baseline/Intervention 기능은 유지했다.
 
@@ -488,13 +488,13 @@
 문제/해결:
 - 문제: Play 시 카드만 강조되고 지도는 정적으로 유지됨. 해결: MapLibre `replay-risk` source를 시간 상태에 따라 갱신하도록 연결.
 
-## React 과제 UI 간결화 및 Replay 의미 명시
+## UI 간결화 및 Replay 의미 명시
 
 - 시작 시각: 2026-09-01 09:14 +09:00
 - 종료 시각: 2026-09-01 09:21 +09:00
 - 총 소요시간: 7분
 주요 작업:
-- 과제 화면의 기본 KPI를 4개로 줄이고, 기본 지도 레이어를 AOI/하천/도로/건물/지하차도 중심으로 정리했다.
+- 기본 화면의 KPI를 4개로 줄이고, 기본 지도 레이어를 AOI/하천/도로/건물/지하차도 중심으로 정리했다.
 - 사이드바 provenance 설명을 짧은 Map meaning 안내로 바꾸고, 지도 영역과 Timeline 가독성을 개선했다.
 - Replay 지도 표시는 실제 침수 확장 범위가 아니라 사건 상태 marker임을 화면에 명시했다.
 
@@ -502,7 +502,7 @@
 - Frontend build: 통과
 
 문제/해결:
-- 문제: 과제용 화면이 본 프로젝트 데이터 설명까지 모두 보여줘 복잡했음. 해결: 제출용 핵심 흐름 중심으로 UI 밀도를 낮춤.
+- 문제: 기본 화면이 데이터 설명까지 모두 보여줘 복잡했음. 해결: 핵심 흐름 중심으로 UI 밀도를 낮춤.
 
 ## 오송 approximate flood envelope 생성 및 연결
 
@@ -762,7 +762,7 @@
 - Agent 관련 선택 테스트 `33 passed`를 확인했다.
 
 남은 작업:
-- `compare_scenarios`를 자연어 planner workflow까지 확장할지는 해커톤에서 실제 시연 흐름을 확인한 뒤 결정한다.
+- `compare_scenarios`를 자연어 planner workflow까지 확장할지는 실제 시연 흐름을 확인한 뒤 결정한다.
 
 ## Agent 패널 브라우저 시연 검증 및 결과 표시 수정
 
