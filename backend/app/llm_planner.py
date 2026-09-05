@@ -19,11 +19,18 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from .agent_tools import suggestions_for
 from .schemas import AgentIntentPlanRequest
 
 
 MODEL_ID = "claude-opus-5"
 MAX_TOKENS = 4000
+
+# A demo runs on whatever network the venue provides. Without a bound, an
+# unreachable API makes the request hang instead of falling back, so the rule
+# planner never gets its turn. Fail fast and let the fallback answer.
+DEFAULT_TIMEOUT_SECONDS = 10.0
+MAX_RETRIES = 0
 
 _WORKFLOW_TOOLS: dict[str, list[str]] = {
     "closure_timing": ["get_event", "get_reconstruction", "analyze_closure_timing"],
@@ -92,6 +99,19 @@ def _load_env_file_once() -> None:
     load_dotenv(_REPO_ROOT / ".env", override=False)
 
 
+def _timeout_seconds() -> float:
+    """Read the request timeout after ``.env`` has had its chance to load."""
+
+    raw = os.environ.get("AGENT_LLM_TIMEOUT_SECONDS")
+    if not raw:
+        return DEFAULT_TIMEOUT_SECONDS
+    try:
+        value = float(raw)
+    except ValueError:
+        return DEFAULT_TIMEOUT_SECONDS
+    return value if value > 0 else DEFAULT_TIMEOUT_SECONDS
+
+
 def llm_planner_status() -> dict[str, Any]:
     """Report whether the LLM planner can run, without calling the API."""
 
@@ -101,8 +121,16 @@ def llm_planner_status() -> dict[str, Any]:
     except ModuleNotFoundError:
         return {"available": False, "reason": "The anthropic SDK is not installed."}
     if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN")):
-        return {"available": False, "reason": "No Anthropic API credential is configured."}
-    return {"available": True, "reason": f"Ready on {MODEL_ID}."}
+        return {
+            "available": False,
+            "reason": "No Anthropic API credential is configured.",
+            "timeout_seconds": _timeout_seconds(),
+        }
+    return {
+        "available": True,
+        "reason": f"Ready on {MODEL_ID}.",
+        "timeout_seconds": _timeout_seconds(),
+    }
 
 
 def _client():
@@ -111,7 +139,7 @@ def _client():
         raise LlmPlannerUnavailable(status["reason"])
     import anthropic
 
-    return anthropic.Anthropic()
+    return anthropic.Anthropic(timeout=_timeout_seconds(), max_retries=MAX_RETRIES)
 
 
 def _validated_parameters(plan: LlmPlan, event_id: str) -> dict[str, Any]:
@@ -169,6 +197,7 @@ def plan_with_llm(request: AgentIntentPlanRequest) -> dict[str, Any]:
             "parameters": {"event_id": request.event_id},
             "tool_names": [],
             "reason": plan.reason,
+            "suggestions": suggestions_for(),
             "assumptions": [],
             "limitations": limitations,
         }
@@ -186,6 +215,7 @@ def plan_with_llm(request: AgentIntentPlanRequest) -> dict[str, Any]:
         "parameters": parameters,
         "tool_names": _WORKFLOW_TOOLS[plan.workflow],
         "reason": plan.reason,
+        "suggestions": [],
         "assumptions": assumptions,
         "limitations": limitations,
     }

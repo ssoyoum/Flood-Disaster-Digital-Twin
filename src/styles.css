@@ -262,6 +262,12 @@ h2 { margin: 4px 0 0; font-size: 17px; letter-spacing: -.3px; }
   letter-spacing: .7px;
 }
 .agent-plan-title strong { color: #253d49; font-size: 12px; }
+.agent-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.agent-chips button { padding: 5px 11px; border: 1px solid #cfd8d5; border-radius: 999px; background: #fff; color: #40554f; font-size: 12px; cursor: pointer; text-align: left; }
+.agent-chips button:hover { border-color: #4b9e88; color: #2f6d5c; }
+.agent-suggestions { display: grid; gap: 6px; margin-top: 10px; }
+.agent-suggestions > span { color: #6b7d78; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.agent-suggestions .agent-chips { margin-bottom: 0; }
 .agent-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .agent-tools span {
   border: 1px solid #d7e5e2;

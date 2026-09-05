@@ -647,3 +647,103 @@ def test_llm_planner_routes_through_deterministic_tools(monkeypatch):
     assert executed.status_code == 200
     result = executed.json()["result"]
     assert result["scenarios"][0]["minutes_before_underpass_inflow"] == 2
+
+
+def test_agent_examples_are_answerable_by_the_deterministic_planner():
+    """Starter chips must never seed a question the system then refuses."""
+
+    examples = client.get("/api/agent/examples").json()
+    assert len(examples) >= 3
+
+    for example in examples:
+        plan = client.post(
+            "/api/agent/plan",
+            json={
+                "event_id": "osong-2023",
+                "message": example["question"],
+                "planner": "deterministic",
+            },
+        ).json()
+        assert plan["status"] == "READY", example["question"]
+        assert plan["workflow"] == example["workflow"], example["question"]
+
+
+def test_agent_refusal_offers_answerable_questions():
+    plan = client.post(
+        "/api/agent/plan",
+        json={
+            "event_id": "osong-2023",
+            "message": "사망자가 몇 명 줄었을까?",
+            "planner": "deterministic",
+        },
+    ).json()
+
+    assert plan["status"] == "UNSUPPORTED"
+    questions = {example["question"] for example in client.get("/api/agent/examples").json()}
+    assert plan["suggestions"]
+    assert set(plan["suggestions"]) <= questions
+
+
+def test_agent_clarification_offers_only_the_detected_candidates():
+    plan = client.post(
+        "/api/agent/plan",
+        json={
+            "event_id": "osong-2023",
+            "message": "차단하고 유입 지연도 같이 봐줘",
+            "planner": "deterministic",
+        },
+    ).json()
+
+    assert plan["status"] == "NEEDS_CLARIFICATION"
+    examples = {
+        example["workflow"]: example["question"]
+        for example in client.get("/api/agent/examples").json()
+    }
+    assert plan["suggestions"] == [examples["closure_timing"], examples["inflow_delay"]]
+
+
+def test_agent_ready_plan_carries_no_suggestions():
+    plan = client.post(
+        "/api/agent/plan",
+        json={
+            "event_id": "osong-2023",
+            "message": "08:25에 지하차도를 통제했다면?",
+            "planner": "deterministic",
+        },
+    ).json()
+
+    assert plan["status"] == "READY"
+    assert plan["suggestions"] == []
+
+
+def test_agent_plan_falls_back_when_the_llm_planner_is_unreachable(monkeypatch):
+    """A venue network failure must not take the planner down with it."""
+
+    import app.main as main
+
+    def unreachable(_request):
+        raise RuntimeError("Connection error.")
+
+    monkeypatch.setattr(main, "plan_with_llm", unreachable)
+
+    plan = client.post(
+        "/api/agent/plan",
+        json={
+            "event_id": "osong-2023",
+            "message": "08:25에 지하차도를 통제했다면?",
+            "planner": "auto",
+        },
+    ).json()
+
+    assert plan["status"] == "READY"
+    assert plan["planner_used"] == "deterministic"
+    assert "Connection error." in plan["planner_note"]
+    assert plan["workflow"] == "closure_timing"
+    assert plan["parameters"]["closure_times"] == ["08:25"]
+
+
+def test_agent_planner_status_reports_a_bounded_timeout():
+    status = client.get("/api/agent/planner-status").json()
+
+    assert status["fallback"] == "deterministic"
+    assert 0 < status["timeout_seconds"] <= 60

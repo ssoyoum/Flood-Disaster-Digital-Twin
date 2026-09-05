@@ -3,7 +3,7 @@ import maplibregl, { type GeoJSONSource, type MapLayerMouseEvent, type Map as Ma
 import { Activity, AlertTriangle, Bot, Building2, Check, CloudRain, Layers3, MapPin, Pause, Play, Route, Send, Waves } from "lucide-react";
 import * as api from "./api";
 import DarkConsole from "./dark/DarkConsole";
-import type { AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, DataStatusItem, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayerPayload, LayersResponse, ReconstructionResponse } from "./types";
+import type { AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, DataStatusItem, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayerPayload, LayersResponse, ReconstructionResponse } from "./types";
 
 const emptyGeoJson: GeoJson = { type: "FeatureCollection", features: [] };
 
@@ -933,6 +933,22 @@ function AgentPanel({ eventId }: { eventId: string }) {
   const [workflowResult, setWorkflowResult] = useState<AgentWorkflowResult | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [examples, setExamples] = useState<AgentExampleQuestion[]>([]);
+
+  useEffect(() => {
+    let live = true;
+    api.getAgentExamples()
+      .then((items) => { if (live) setExamples(items); })
+      .catch(() => { /* chips are optional; the free-text box still works */ });
+    return () => { live = false; };
+  }, []);
+
+  const ask = (question: string) => {
+    setMessage(question);
+    setPlan(null);
+    setWorkflowResult(null);
+    setError(null);
+  };
 
   const planIntent = async () => {
     if (!message.trim()) return;
@@ -976,6 +992,13 @@ function AgentPanel({ eventId }: { eventId: string }) {
           {plan ? (plan.planner_used === "llm" ? "LLM PLAN" : "DETERMINISTIC PLAN") : "PLANNER READY"}
         </span>
       </div>
+      {examples.length > 0 && (
+        <div className="agent-chips" aria-label="답할 수 있는 예시 질문">
+          {examples.map((item) => (
+            <button key={item.workflow} type="button" title={item.question} onClick={() => ask(item.question)}>{item.label}</button>
+          ))}
+        </div>
+      )}
       <form className="agent-form" onSubmit={(event) => { event.preventDefault(); void planIntent(); }}>
         <input
           aria-label="Agent request"
@@ -999,6 +1022,14 @@ function AgentPanel({ eventId }: { eventId: string }) {
           {plan.tool_names.length > 0 && <div className="agent-tools">{plan.tool_names.map((tool, index) => <span key={tool}>{index + 1}. {tool}</span>)}</div>}
           {Object.keys(plan.parameters).length > 1 && <pre className="agent-parameters">{JSON.stringify(plan.parameters, null, 2)}</pre>}
           {plan.assumptions.map((item) => <small className="agent-assumption" key={item}>{item}</small>)}
+          {plan.suggestions.length > 0 && (
+            <div className="agent-suggestions">
+              <span>이렇게는 답할 수 있어요</span>
+              <div className="agent-chips">
+                {plan.suggestions.map((item) => <button key={item} type="button" onClick={() => ask(item)}>{item}</button>)}
+              </div>
+            </div>
+          )}
           {plan.status === "READY" && plan.workflow && (
             <button className="primary-button agent-run" type="button" onClick={() => void runWorkflow()} disabled={busy}>
               <Play size={13} /> {busy ? "실행 중..." : "계획 실행"}

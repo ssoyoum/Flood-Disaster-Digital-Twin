@@ -3,6 +3,7 @@ import maplibregl, { type GeoJSONSource, type MapLayerMouseEvent } from "maplibr
 import * as api from "../api";
 import CrossSection from "./CrossSection";
 import type {
+  AgentExampleQuestion,
   AgentIntentPlanResult,
   AgentWorkflowName,
   AgentWorkflowResult,
@@ -53,11 +54,13 @@ function replaySeverity(state?: string) {
 }
 
 const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas";
-const QUICK_REQUESTS = [
-  { label: "08:25 차단", message: "08:25에 지하차도를 차단했으면?" },
-  { label: "10분 유입 지연", message: "차수벽으로 유입이 10분 지연되면?" },
-  { label: "500m 재고", message: "지하차도 500m 안에 무엇이 있어?" },
-] as const;
+// Offline fallback only. The live chips come from GET /api/agent/examples so the
+// starter questions and the suggestions attached to a refusal share one source.
+const FALLBACK_EXAMPLES: AgentExampleQuestion[] = [
+  { workflow: "closure_timing", label: "08:25 통제", question: "08:25에 지하차도를 통제했다면 어떻게 되나요?" },
+  { workflow: "inflow_delay", label: "유입 30분 지연", question: "차수벽으로 유입이 30분 늦어졌다면 어떻게 되나요?" },
+  { workflow: "exposure_inventory", label: "반경 500m 재고", question: "지하차도 반경 500m 안에 건물이 몇 개인가요?" },
+];
 
 const clock = (value?: string | null) => (value && value.length >= 16 ? value.slice(11, 16) : "--:--");
 const num = (value: number | null | undefined) => (typeof value === "number" ? value.toLocaleString() : "—");
@@ -888,6 +891,19 @@ function AgentDock({ eventId, compact = false }: { eventId: string; compact?: bo
   const [result, setResult] = useState<AgentWorkflowResult | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [examples, setExamples] = useState<AgentExampleQuestion[]>(FALLBACK_EXAMPLES);
+
+  useEffect(() => {
+    let live = true;
+    api.getAgentExamples()
+      .then((items) => { if (live && items.length) setExamples(items); })
+      .catch(() => { /* keep the offline fallback chips */ });
+    return () => { live = false; };
+  }, []);
+
+  const ask = (question: string) => {
+    setMessage(question); setPlan(null); setResult(null); setError(null);
+  };
 
   const planIntent = async () => {
     if (!message.trim()) return;
@@ -914,7 +930,7 @@ function AgentDock({ eventId, compact = false }: { eventId: string; compact?: bo
       <div className="dk-agent-head"><p>Agent workflow</p><span className={`dk-agent-badge ${plan?.planner_used ?? ""}`}>{plan ? (plan.planner_used === "llm" ? "LLM PLAN" : "DETERMINISTIC PLAN") : "READY"}</span></div>
       {!compact && <div className="dk-agent-intro">자연어 질문을 등록된 분석 도구로 연결합니다. 결과 수치는 API 도구가 계산합니다.</div>}
       {!compact && <div className="dk-agent-suggestions" aria-label="추천 질문">
-        {QUICK_REQUESTS.map((item) => <button key={item.label} type="button" onClick={() => { setMessage(item.message); setPlan(null); setResult(null); setError(null); }}>{item.label}</button>)}
+        {examples.map((item) => <button key={item.workflow} type="button" title={item.question} onClick={() => ask(item.question)}>{item.label}</button>)}
       </div>}
       <form className="dk-agent-bar" onSubmit={(event) => { event.preventDefault(); void planIntent(); }}>
         <input aria-label="Agent request" value={message} onChange={(event) => setMessage(event.target.value)} placeholder="예: 08:25에 지하차도를 차단했으면?" />
@@ -927,6 +943,12 @@ function AgentDock({ eventId, compact = false }: { eventId: string; compact?: bo
           <b>{plan.status} · {plan.workflow ?? "workflow 없음"}</b>
           <span>{plan.reason}</span>
           {plan.tool_names.length > 0 && <div className="dk-tools">{plan.tool_names.map((tool, index) => <em key={tool}>{index + 1}. {tool}</em>)}</div>}
+          {plan.suggestions.length > 0 && (
+            <div className="dk-plan-suggestions">
+              <span>이렇게는 답할 수 있어요</span>
+              <div>{plan.suggestions.map((item) => <button key={item} type="button" onClick={() => ask(item)}>{item}</button>)}</div>
+            </div>
+          )}
           {plan.planner_note && <small>{plan.planner_note}</small>}
         </div>
       )}

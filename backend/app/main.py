@@ -7,6 +7,7 @@ from .agent_tools import (
     execute_agent_tool,
     execute_agent_workflow,
     list_agent_tools,
+    list_example_questions,
     plan_agent_intent,
 )
 from .llm_planner import MODEL_ID as LLM_PLANNER_MODEL, LlmPlannerUnavailable, llm_planner_status, plan_with_llm
@@ -17,6 +18,7 @@ from .schemas import (
     ClosureTimingRequest,
     ClosureTimingResult,
     ExposureInventoryResult,
+    AgentExampleQuestion,
     AgentIntentPlanRequest,
     AgentIntentPlanResult,
     AgentToolCallRequest,
@@ -427,6 +429,21 @@ def exposure_inventory(
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get(
+    "/api/agent/examples",
+    response_model=list[AgentExampleQuestion],
+    tags=["agent"],
+)
+def agent_examples():
+    """Starter questions the registered tools can actually answer.
+
+    The UI seeds its chips from here so an empty input box never invites a
+    request the system has to refuse.
+    """
+
+    return list_example_questions()
 
 
 @app.get("/api/agent/planner-status", tags=["agent"])

@@ -372,6 +372,11 @@
 .dk-agent-bar button[type="submit"] { border-color: var(--dk-accent); color: var(--dk-accent); }
 .dk-agent-bar button:disabled { opacity: .45; cursor: default; }
 .dk-agent-status { color: var(--dk-muted); font-size: 11.5px; }
+.dk-plan-suggestions { display: grid; gap: 5px; margin-top: 2px; }
+.dk-plan-suggestions > span { color: var(--dk-muted); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+.dk-plan-suggestions > div { display: flex; flex-wrap: wrap; gap: 5px; }
+.dk-plan-suggestions button { padding: 4px 9px; border: 1px solid var(--dk-accent); border-radius: 999px; background: rgba(184, 155, 94, .08); color: var(--dk-accent); font-size: 10.5px; text-align: left; }
+.dk-plan-suggestions button:hover { background: rgba(184, 155, 94, .18); }
 .dk-plan { display: grid; gap: 4px; padding: 10px 12px; border: 1px solid var(--dk-line); border-left: 3px solid var(--dk-accent); border-radius: 10px; background: var(--dk-panel-2); font-size: 12px; }
 .dk-plan.unsupported { border-left-color: #f87171; }
 .dk-plan.needs_clarification { border-left-color: #fbbf24; }

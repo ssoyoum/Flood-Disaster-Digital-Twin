@@ -291,8 +291,15 @@ export type AgentIntentPlanResult = {
   parameters: Record<string, unknown>;
   tool_names: string[];
   reason: string;
+  suggestions: string[];
   assumptions: string[];
   limitations: string[];
+};
+
+export type AgentExampleQuestion = {
+  workflow: AgentWorkflowName;
+  label: string;
+  question: string;
 };
 
 export type AgentWorkflowResult = {

@@ -1,6 +1,6 @@
 # FloodOps Decisions
 
-Last updated: 2026-09-01
+Last updated: 2026-09-06
 
 This document records important design and data decisions. Detailed daily work belongs in `WORKLOG.md`; current priorities belong in `TODO.md`.
 
@@ -148,3 +148,24 @@ This document records important design and data decisions. Detailed daily work b
   - 노출 재고는 침수 영향 추정이 아니다. "반경 안에 무엇이 있는가"이지 "무엇이 침수됐는가"가 아니라는 점을 API와 UI에서 명시한다.
   - 노출 KPI는 계속 PENDING_FLOOD_EXTENT로 유지한다.
   - 경로 B는 Safemap WMS raster 대조 검증 절차를 만든 뒤 재검토한다.
+
+## D-015 A Refusal Must Offer an Answerable Question
+
+- Date: 2026-09-06
+- Decision: 등록된 도구로 답할 수 없는 요청은 거절하되, 응답에 답할 수 있는 질문 목록을 `suggestions`로 함께 반환한다. 시작 질문 칩과 거절 시 제안은 `GET /api/agent/examples` 한 곳을 출처로 쓴다.
+- Reason: 거절만 하고 끝나면 사용자는 이 시스템이 무엇을 답할 수 있는지 알 방법이 없다. 또 칩 문구와 제안 문구를 따로 관리하면 UI가 권한 질문이 정작 거절당하는 상태로 갈라진다.
+- Impact:
+  - `UNSUPPORTED`는 전체 목록, `NEEDS_CLARIFICATION`은 감지된 후보 워크플로만, `READY`는 빈 배열을 반환한다.
+  - 규칙 플래너와 LLM 플래너 두 경로 모두 같은 목록을 쓴다.
+  - 칩 문구가 실제로 워크플로에 라우팅되는지를 테스트로 고정한다. 답할 수 없는 문구를 칩에 넣으면 테스트가 실패한다.
+
+## D-016 Bound the LLM Planner and Fall Back to Rules
+
+- Date: 2026-09-06
+- Decision: LLM 의도 해석 요청에 명시적 timeout(기본 10초)과 재시도 0회를 적용한다. 실패하면 규칙 기반 플래너로 폴백하고, 폴백 사유를 응답 `planner_note`에 남긴다.
+- Reason: SDK 기본값은 timeout 10분에 재시도 2회다. 네트워크가 불통이면 폴백이 도는 것이 아니라 요청 자체가 멈춘다. 폴백 로직이 있어도 도달하지 못하면 없는 것과 같다.
+- Impact:
+  - `AGENT_LLM_TIMEOUT_SECONDS`로 조정한다. 불통 주소를 향해 timeout 3초로 설정했을 때 3.4초 내에 규칙 플래너 결과가 반환되는 것을 확인했다.
+  - 자격증명이 없거나 네트워크가 없는 환경에서도 서비스가 그대로 동작한다. 폐쇄망 적용의 전제이기도 하다.
+  - LLM은 워크플로 선택과 파라미터 추출만 담당한다. 분석 수치는 어떤 경로에서도 결정론 도구 계층에서만 나온다.
+

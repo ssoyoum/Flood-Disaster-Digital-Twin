@@ -263,6 +263,14 @@ class AgentToolCallResult(BaseModel):
     result: dict
 
 
+class AgentExampleQuestion(BaseModel):
+    """An answerable starter question, offered as a chip before anything is typed."""
+
+    workflow: str
+    label: str
+    question: str
+
+
 AgentWorkflowName = Literal[
     "situation",
     "closure_timing",
@@ -322,6 +330,7 @@ class AgentIntentPlanResult(BaseModel):
     parameters: dict[str, Any] = Field(default_factory=dict)
     tool_names: list[str] = Field(default_factory=list)
     reason: str
+    suggestions: list[str] = Field(default_factory=list)
     assumptions: list[str] = Field(default_factory=list)
     limitations: list[str] = Field(default_factory=list)
 

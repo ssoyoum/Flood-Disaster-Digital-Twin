@@ -1,4 +1,4 @@
-import type { ExposureInventory, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
+import type { ExposureInventory, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8033";
 
@@ -61,6 +61,8 @@ export const testSafetyDataApi = (serviceKey: string) =>
 
 export const getExposureInventory = (eventId: string, radii: number[] = [300, 500, 1000, 2000]) =>
   request<ExposureInventory>(`/api/events/${eventId}/exposure-inventory?${radii.map((radius) => `radii_m=${radius}`).join("&")}`);
+
+export const getAgentExamples = () => request<AgentExampleQuestion[]>("/api/agent/examples");
 
 export const planAgentIntent = (eventId: string, message: string) =>
   request<AgentIntentPlanResult>("/api/agent/plan", {

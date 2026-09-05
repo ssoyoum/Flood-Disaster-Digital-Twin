@@ -290,6 +290,53 @@ _SITUATION_MARKERS = (
     "조회",
 )
 
+# Answerable questions, in the wording the deterministic planner actually routes.
+# One source for the UI starter chips and for the suggestions attached to a refusal,
+# so the two can never drift apart.
+_EXAMPLE_QUESTIONS: tuple[dict[str, str], ...] = (
+    {
+        "workflow": "closure_timing",
+        "label": "08:25 통제",
+        "question": "08:25에 지하차도를 통제했다면 어떻게 되나요?",
+    },
+    {
+        "workflow": "inflow_delay",
+        "label": "유입 30분 지연",
+        "question": "차수벽으로 유입이 30분 늦어졌다면 어떻게 되나요?",
+    },
+    {
+        "workflow": "exposure_inventory",
+        "label": "반경 500m 재고",
+        "question": "지하차도 반경 500m 안에 건물이 몇 개인가요?",
+    },
+    {
+        "workflow": "situation",
+        "label": "상황 타임라인",
+        "question": "오송 침수 상황을 타임라인으로 보여주세요.",
+    },
+)
+
+
+def list_example_questions() -> list[dict[str, str]]:
+    """Return the answerable starter questions the UI offers as chips."""
+
+    return [dict(example) for example in _EXAMPLE_QUESTIONS]
+
+
+def suggestions_for(workflows: tuple[str, ...] | None = None) -> list[str]:
+    """Questions this system can actually answer.
+
+    A refusal that only says "no" is a dead end for the person asking. Every
+    non-executable verdict carries these so the next step is one click away.
+    ``workflows`` narrows the list to specific candidates; ``None`` offers all.
+    """
+
+    return [
+        example["question"]
+        for example in _EXAMPLE_QUESTIONS
+        if workflows is None or example["workflow"] in workflows
+    ]
+
 
 def _contains_marker(text: str, markers: tuple[str, ...]) -> bool:
     return any(marker in text for marker in markers)
@@ -370,6 +417,7 @@ def plan_agent_intent(request: AgentIntentPlanRequest) -> dict[str, Any]:
         "event_id": request.event_id,
         "parameters": {"event_id": request.event_id},
         "tool_names": [],
+        "suggestions": [],
         "assumptions": [],
         "limitations": [
             "This plan selects registered deterministic tools; it does not execute them.",
@@ -382,6 +430,7 @@ def plan_agent_intent(request: AgentIntentPlanRequest) -> dict[str, Any]:
             **base,
             "status": "UNSUPPORTED",
             "reason": "The request asks for an unregistered impact or forecast quantity.",
+            "suggestions": suggestions_for(),
         }
 
     if len(actionable) > 1:
@@ -389,6 +438,7 @@ def plan_agent_intent(request: AgentIntentPlanRequest) -> dict[str, Any]:
             **base,
             "status": "NEEDS_CLARIFICATION",
             "reason": "Multiple analysis intents were detected; choose one workflow.",
+            "suggestions": suggestions_for(tuple(actionable)),
             "limitations": base["limitations"] + [
                 f"Candidate workflows: {', '.join(actionable)}."
             ],
@@ -447,4 +497,5 @@ def plan_agent_intent(request: AgentIntentPlanRequest) -> dict[str, Any]:
         **base,
         "status": "UNSUPPORTED",
         "reason": "No registered FloodOps workflow matched the request.",
+        "suggestions": suggestions_for(),
     }
