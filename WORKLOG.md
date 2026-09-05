@@ -1057,3 +1057,80 @@ UI 보완:
 - 화면 순서를 `대형 2분할 지도 → 원시/개입 요약 카드 → 비교 매트릭스 → 해석`으로 재배치했다.
 - 두 지도는 데스크톱에서 화면 높이의 절반 이상을 사용하고, 모바일에서는 한 지도씩 세로로 크게 표시한다.
 - 지도 아래 정보는 카드·표·콜아웃으로 계층화해, 공간 차이를 먼저 보고 수치와 해석을 이어서 확인하도록 조정했다.
+
+## Agent 거절 응답에 인접 질문 추가 및 LLM 폴백 시간 제한
+
+- 작업일: 2026-09-06
+- 커밋: `ab333d0`
+
+주요 작업:
+- `AgentIntentPlanResult`에 `suggestions` 필드를 추가하고, `UNSUPPORTED`는 전체 목록을 `NEEDS_CLARIFICATION`은 감지된 후보 워크플로만 제시하도록 했다. `READY`는 빈 배열이다.
+- `GET /api/agent/examples`를 신설해 UI 시작 칩과 거절 시 제안이 같은 목록을 쓰도록 단일 출처화했다.
+- LLM 요청에 `timeout` 10초(`AGENT_LLM_TIMEOUT_SECONDS`)와 `max_retries=0`을 적용했다.
+- `App.tsx`와 `DarkConsole.tsx`에 시작 칩과 제안 칩을 연결하고, 하드코딩돼 있던 `QUICK_REQUESTS`는 오프라인 폴백으로만 남겼다.
+
+검증 결과:
+- Backend tests: `64 passed` (기존 58에서 6개 추가)
+- Frontend build: 통과
+- 예시 질문 4개가 각각 `closure_timing` / `inflow_delay` / `exposure_inventory` / `situation`으로 라우팅되는 것을 확인
+- 불통 주소(`10.255.255.1:81`)를 향해 `AGENT_LLM_TIMEOUT_SECONDS=3`으로 띄운 뒤 `/api/agent/plan` 응답까지 3,379ms 측정. `planner_used`가 `deterministic`으로 폴백됨
+
+문제/해결:
+- 문제: 거절 응답이 `reason`만 주고 끝나 사용자가 무엇을 물어야 하는지 알 수 없었다. 본선 시연에서 심사위원이 임의 문장을 입력하면 `UNSUPPORTED`만 뜨고 막다른 길이 된다.
+  해결: `suggestions`를 함께 반환하고 UI에서 클릭 가능한 칩으로 표시했다. 칩 문구가 실제로 라우팅되는지를 테스트로 고정해, 답할 수 없는 문구를 칩에 넣으면 CI가 막도록 했다.
+- 문제: 규칙 플래너 폴백 로직은 이미 있었는데 망이 끊기면 동작하지 않았다. anthropic SDK 기본값이 timeout 10분 + 재시도 2회여서, 폴백에 도달하기 전에 요청이 멈춘 채로 남는다. 폴백 코드가 있어도 도달하지 못하면 없는 것과 같다.
+  해결: 명시적 timeout과 재시도 0회를 적용했다. 기본 10초로 두고 현장 네트워크가 불안하면 환경변수로 낮춘다.
+- 검토했다가 버린 방법: 칩 문구를 프론트엔드에 그대로 하드코딩하는 안. 백엔드 `suggestions`와 두 곳에서 관리하게 되어 문구가 갈라질 수 있어 버렸다. 대신 엔드포인트 하나를 늘렸다.
+
+## 공개 저장소에서 과제·초안 맥락 제거
+
+- 작업일: 2026-09-06
+- 커밋: `25ddd7e`
+
+주요 작업:
+- 헤더 브랜드 라벨을 `REACT ASSIGNMENT`에서 `DECISION SUPPORT PoC`로 교체했다.
+- CSS 규칙이 없던 `assignment-metrics` 클래스명을 `summary-metrics`로 정리했다.
+- `.gitignore`가 로컬 초안을 파일명 대신 `docs/local/` 디렉터리 단위로 제외하도록 바꾸고, 제출서식 문서를 그 아래로 옮겼다.
+- `WORKLOG.md`와 `docs/report-insights.md`의 과제·시연 맥락 문구를 일반 표현으로 교체했다.
+
+검증 결과:
+- 추적 파일 전수 검색에서 공모전·과제 관련 어휘 0건
+- Backend tests: `64 passed`, Frontend build: 통과
+
+문제/해결:
+- 문제: 화면 좌상단에 `REACT ASSIGNMENT` 배지가 실제로 렌더링되고 있었다. 문서가 아니라 UI 문자열이라 시연 첫 화면에서 그대로 보인다.
+  해결: 제품 정체에 맞는 라벨로 교체했다.
+- 문제: `.gitignore`에 제외 대상 파일명이 그대로 적혀 있어, 파일은 막았는데 "그런 문서가 존재한다"는 사실이 공개됐다.
+  해결: 디렉터리 단위 규칙으로 바꿔 파일명을 노출하지 않도록 했다.
+- 검토했다가 버린 방법: Agent 기능을 저장소에서 통째로 제거하는 안. 공모전 서류심사 기준이 "공모전 취지 적합성"이고 공모 이름 자체가 AI·디지털 기반이라, Agent를 빼면 첫 관문에서 불리하다고 판단해 폐기했다.
+- 남은 사항: 과거 커밋에는 이 문구들이 그대로 남아 있다. 이력 재작성은 하지 않기로 했다.
+
+## 로컬 지침 문서 유실
+
+- 작업일: 2026-09-06
+
+문제/해결:
+- 문제: `docs/AGENT_GUIDE.md`(359줄)를 확인 없이 덮어써 원본을 잃었다. 이 파일은 `.gitignore` 대상이라 object database에 한 번도 들어간 적이 없어 `git`으로 복구할 수 없다.
+  해결: 복구 실패. `git rev-list --all --objects` 검색, dangling blob 전수 대조, reflog, VS Code Local History(`AppData/Roaming/Code/User/History`)를 모두 확인했으나 없었다. OneDrive 백업이 꺼져 있어 서버 버전도 없다.
+- 재발 방지: 추적되지 않는 파일을 덮어쓰기 전에 사본을 먼저 만든다. gitignore 대상 문서는 git 이력이 없으므로 실수 한 번이 곧 영구 유실이다.
+
+## 브랜치 4개를 main 하나로 정리
+
+- 작업일: 2026-09-06
+
+주요 작업:
+- `main`을 `ui/dark-console`로 fast-forward 병합했다(`e5bb6ba` → `d57a1e4`, 31커밋).
+- `origin/ui/dark-console`을 삭제하고, 로컬 `ui/dark-console` · `feature/agent-tools` · `backup/pre-reword-20260904-215259`를 삭제했다.
+
+검증 결과:
+- 삭제 전 세 브랜치 모두 `git log --cherry-pick --right-only main...<branch>` 결과가 0건임을 확인(고유 변경 없음)
+- 병합 후 Backend tests `64 passed`, Frontend build 통과
+- 최종: 로컬 `main` 1개, 원격 `origin/main` 1개
+
+문제/해결:
+- 문제: 브랜치가 4개로 늘고 `main`이 31커밋 뒤처져 있었다. GitHub 기본 화면이 `main`이라, 저장소를 열면 9월 2일 상태만 보이고 최신 작업이 전혀 드러나지 않았다.
+  해결: fast-forward로 병합하고 나머지 브랜치를 삭제했다. `main`이 `ui/dark-console`의 조상이어서 병합 커밋 없이 포인터 이동만으로 끝났다.
+- 문제: `feature/agent-tools`와 `ui/dark-console`에 내용이 같고 해시만 다른 커밋이 양쪽에 있었다. 9월 4일 메시지 재작성 때 생긴 중복이다.
+  해결: 고유 변경이 없음을 확인하고 옛 브랜치를 삭제했다. 트레일러가 붙은 커밋 6개도 함께 정리됐다.
+- 남은 사항: `e5bb6ba`는 `main` 이력 안에 있어 트레일러가 남는다. 제거하려면 그 위 31커밋을 다시 만들어야 해서 하지 않기로 했다.
+

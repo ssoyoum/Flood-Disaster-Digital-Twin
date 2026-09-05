@@ -1,6 +1,6 @@
 # FloodOps TODO
 
-Last Updated: 2026-09-04 KST
+Last Updated: 2026-09-06 KST
 
 - Current identity: **Counterfactual Disaster Digital Twin PoC**
 - Current MVP: **Historical Disaster Reconstruction + What-if Intervention**
@@ -11,8 +11,9 @@ Last Updated: 2026-09-04 KST
 ## NOW
 
 - Status: Active / presentation-ready MVP
-- Last updated: 2026-09-04
-- Next action: 브라우저 검증이 가능한 세션에서 다크 관제 UI를 확인한 후, 현재 변경분을 기능 단위로 커밋한다.
+- Last updated: 2026-09-06
+- Branch: 모든 작업은 `main` 하나에서 진행한다. 2026-09-06에 브랜치 4개를 `main`으로 정리했다.
+- Next action: LLM planner 경로에도 거부 게이트를 적용한다. 현재 거부 마커 검사가 규칙 planner에만 있어, `ANTHROPIC_API_KEY`를 설정하는 순간 오탐 경로가 열린다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
@@ -35,12 +36,12 @@ Last Updated: 2026-09-04 KST
   - 수위값 자체를 DEM 절대 수면고나 공식 침수심으로 해석하지 않는다.
 - [x] What-if 2개 구현 + 1개 보류
   - [x] A: 차량 진입 차단 시각 변경, 예: 08:25 / 08:30 / 08:35
-    - `POST /api/events/{event_id}/analysis/closure-timing` 연결 (`feature/agent-tools`)
+    - `POST /api/events/{event_id}/analysis/closure-timing` 연결
     - 산출: 차단 시점 사건 상태, 유입/주행불능/완전침수까지 남은 분, Scenario A(08:27 감지 차단) 대비 선행 시간
     - 08:25 차단 시 유입 2분 전, 완전침수 15분 전 확보. 08:35는 이미 주행불능 시점이라 선행 시간 -8분.
     - 관측 timestamp 간 산술만 수행한다. 차량 수, 사상자, 피해액은 산출하지 않는다.
   - [x] B: 차수벽 설치 여부 또는 간단한 유입 감소 가정
-    - `POST /api/events/{event_id}/analysis/inflow-delay` 연결 (`feature/agent-tools`)
+    - `POST /api/events/{event_id}/analysis/inflow-delay` 연결
     - 구현 형태: `delay_minutes`를 사용자 입력 가정으로 받아 `underpass_inflow` 이후 timeline을 shift한다.
     - 0~180분 범위를 검증하며, 물리 계산이 아님을 응답의 assumptions/limitations에 명시한다.
     - 차수벽 높이에서 유입량을 계산할 유량/통수단면/조도가 없다.
@@ -61,6 +62,20 @@ Last Updated: 2026-09-04 KST
   - SDK/자격증명 부재나 검증 실패 시 결정론 planner로 폴백한다. `planner=llm` 명시 시에만 503으로 실패를 노출한다.
   - `GET /api/agent/planner-status`로 API 호출 없이 가용성을 조회한다.
   - 모델: `claude-opus-5`. `ANTHROPIC_API_KEY` 미설정 시에도 서비스는 정상 동작한다.
+- [x] Agent 거절 응답에 인접 질문 제시
+  - `AgentIntentPlanResult.suggestions`로 답할 수 있는 질문을 함께 반환한다.
+  - `UNSUPPORTED`는 전체, `NEEDS_CLARIFICATION`은 감지된 후보 워크플로만, `READY`는 빈 배열이다.
+  - `GET /api/agent/examples`가 시작 칩과 제안 문구의 단일 출처다. 문구 4개가 실제로 라우팅되는지 테스트로 고정했다.
+- [x] LLM planner 오프라인 폴백 시간 제한
+  - `timeout` 기본 10초(`AGENT_LLM_TIMEOUT_SECONDS`), `max_retries=0`.
+  - SDK 기본값(timeout 10분·재시도 2회)에서는 망 불통 시 폴백에 도달하지 못하고 요청이 멈춘다.
+  - 불통 주소에서 timeout 3초로 재현해 3,379ms 내 규칙 planner 폴백을 확인했다.
+- [ ] LLM planner 경로에 거부 게이트 적용
+  - 현재 거부 마커 검사가 `plan_agent_intent`(규칙 planner)에만 있다.
+  - `plan_with_llm` 결과는 재검사 없이 그대로 계획으로 승격된다. 모델이 스스로 `unsupported`를 고르기를 기대하는 구조다.
+  - 검사 대상은 모델 출력이 아니라 **사용자 원문**이어야 한다. 모델이 표현을 바꾸는 것만으로 게이트를 우회하면 안 된다.
+- [ ] `situation` 워크플로 응답 계약 결손 보정
+  - 다른 워크플로와 달리 `coverage_status`가 `null`이고 `assumptions`가 비어 있다.
 - [x] Agent intent planner 한국어 평가셋
   - 15개 질문에 대해 기대 status, workflow, 파라미터, Tool sequence를 fixture로 고정했다.
   - 사망자·피해액·침수심·예측 요청은 다른 marker보다 우선해 `UNSUPPORTED`로 거부한다.
@@ -69,14 +84,14 @@ Last Updated: 2026-09-04 KST
   - `POST /api/scenarios/{scenario_id}/run`으로 대응 전후 priority building과 rule-based risk score를 비교한다.
   - 현재는 HAND-like envelope 기반의 `TEMPORARY` 의사결정 보조 결과이며, 공식 피해 감소율이 아니다.
 - [ ] Dark console UI 미리보기 마감
-  - `ui/dark-console` 브랜치에 `src/dark/` 관제 화면, 단면도 시각화, exposure inventory 패널을 추가했다.
+  - `src/dark/`에 관제 화면, 단면도 시각화, exposure inventory 패널을 추가했다.
   - `CrossSection`을 `hand_reconstruction` 레이어에 연결해 단계별 관측 수위 상승분과 HAND 임계를 시각화한다.
   - 왼쪽 판단 탭에 대응 시점·공간 상태·반경별 재고·Agent를 중요도 순으로 배치하고, 지도 오버레이를 축소했다.
   - 반경별 재고 표는 기본 화면에서 제거하고 Agent 질의로 전환했으며, Layers는 접이식 설정으로 유지했다.
   - Agent를 왼쪽 판단 탭 상단으로 이동해 기본 화면에서 바로 보이게 했다.
   - `Scenario 비교` 탭을 추가해 원시나리오와 감지 자동차단 개입을 별도 비교 화면에서 확인할 수 있게 했다.
   - 비교 화면은 대응 상태 변화와 침수 진행이 변하지 않는 부분을 분리해서 표시한다.
-  - 기존 light UI와 backend/API를 재사용하는 presentation layer이며, 아직 미커밋 상태다.
+  - 기존 light UI와 backend/API를 재사용하는 presentation layer이다. 2026-09-06에 `main`으로 병합됐다.
   - 반응형 CSS와 라이트 UI glyphs 설정은 반영했다.
   - 남은 작업: 실제 브라우저 smoke test, 레이어 표시 확인, 결과 provenance·한계 문구 최종 점검.
 - [x] 로컬 런타임 포트 고정
