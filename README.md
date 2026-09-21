@@ -4,6 +4,21 @@ FloodOps is not a future flood prediction system.
 
 FloodOps is a disaster decision-support Digital Twin PoC that reconstructs real historical disaster events with observed and spatial data, then compares counterfactual interventions under the same event conditions.
 
+## At a glance
+
+**Historical replay · Counterfactual scenarios · Traceable evidence · Deterministic analysis tools**
+
+```mermaid
+flowchart LR
+    A["Observed rainfall & water level"] --> B["Osong event replay"]
+    C["Spatial layers & provenance"] --> B
+    B --> D["Baseline / intervention comparison"]
+    D --> E["Map and evidence panel"]
+    F["Agent: workflow selection"] --> D
+```
+
+The [architecture](docs/ARCHITECTURE.md) and [data guide](docs/DATA_GUIDE.md) explain what each layer can support. The approximate flood envelope is a temporary reconstruction aid; flood exposure metrics remain pending until validated geometry is available.
+
 Current reference case:
 
 > 2023 Osong Underpass Flood - Miho River and Gungpyeong 2 Underpass
