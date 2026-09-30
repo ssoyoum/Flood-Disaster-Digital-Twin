@@ -118,7 +118,7 @@ export default function CrossSection({
   return (
     <div className="dk-xs" style={{ ["--tone" as string]: tone }}>
       <div className="dk-xs-head">
-        <p>Cell cross-section</p>
+        <p>셀 단면</p>
         <h3>{focusName} 셀 단면 · {stageTime} {stageLabel}</h3>
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="배수 기준면 대비 관측 수위 상승과 셀 HAND 비교">
@@ -166,7 +166,7 @@ export default function CrossSection({
         <div><dt>실측값 차분</dt><dd style={{ color: "#7dd3fc" }}>{rise.toFixed(2)} m<small>기준 관측 대비 상승분</small></dd></div>
         <div><dt>선택 임계(파생)</dt><dd style={{ color: tone }}>{row ? `${threshold.toFixed(2)} m` : "—"}<small>상승분 + 재구성 가중분</small></dd></div>
         <div><dt>임계 추가분(파생)</dt><dd style={{ color: tone }}>{row ? `${derivedMargin.toFixed(2)} m` : "—"}<small>실측 수위가 아님</small></dd></div>
-        <div><dt>시간당 강우</dt><dd>{row?.rain != null ? `${row.rain.toFixed(1)} mm` : "—"}<small>KMA AWS</small></dd></div>
+        <div><dt>시간당 강우</dt><dd>{row?.rain != null ? `${row.rain.toFixed(1)} mm` : "—"}<small>기상청 AWS</small></dd></div>
       </dl>
     </div>
   );
