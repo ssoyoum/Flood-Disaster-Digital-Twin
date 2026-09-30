@@ -5,8 +5,11 @@ from pathlib import Path
 from typing import Any
 
 from pyproj import Transformer
+from collections import deque
+
 from shapely.geometry import LineString, mapping, shape
 from shapely.ops import nearest_points, transform, unary_union
+from shapely.strtree import STRtree
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -21,6 +24,15 @@ RAINFALL_FILE = OSONG_DIR / "osong_kma_aws_rainfall_2023-07-14_17.csv"
 HAND_GRID_FILE = OSONG_DIR / "osong_hand_reconstruction_grid.geojson"
 HAND_TIMELINE_FILE = OSONG_DIR / "osong_hand_flood_envelope_timeline.geojson"
 HAND_REPORT_FILE = OSONG_DIR / "osong_hand_reconstruction_validation.json"
+HAND_REFERENCE_FILE = OSONG_DIR / "osong_hand_reference_other_drainage.geojson"
+
+# The incident is a Miho River temporary-levee breach. Only the Miho River gauge
+# drives the stage threshold, so only cells reachable from the Miho side count
+# as the incident envelope.
+PRIMARY_RIVER_NAME = "미호천"
+PRIMARY_SEED_DISTANCE_M = 250
+# Cells sharing an edge longer than this are neighbours (4-neighbour grid).
+NEIGHBOUR_EDGE_MIN_M = 1.0
 
 TO_METERS = Transformer.from_crs("EPSG:4326", "EPSG:5179", always_xy=True).transform
 TO_WGS84 = Transformer.from_crs("EPSG:5179", "EPSG:4326", always_xy=True).transform
@@ -159,6 +171,15 @@ def build_hand_grid() -> tuple[dict[str, Any], list[dict[str, Any]], LineString,
     underpass = read_geojson(UNDERPASS_FILE)
 
     river_union = unary_union([transform(TO_METERS, shape(feature["geometry"])) for feature in rivers["features"]])
+    primary_river = unary_union(
+        [
+            transform(TO_METERS, shape(feature["geometry"]))
+            for feature in rivers["features"]
+            if feature["properties"].get("RIVNM_2") == PRIMARY_RIVER_NAME
+        ]
+    )
+    if primary_river.is_empty:
+        raise RuntimeError(f"{PRIMARY_RIVER_NAME} polygon not found in {RIVER_FILE}")
     underpass_union = unary_union([transform(TO_METERS, shape(feature["geometry"])) for feature in underpass["features"]])
     underpass_center = underpass_union.centroid
     breach_point = nearest_points(river_union, underpass_center)[0]
@@ -179,6 +200,7 @@ def build_hand_grid() -> tuple[dict[str, Any], list[dict[str, Any]], LineString,
                 "centroid": centroid,
                 "elevation_m": elevation,
                 "distance_to_river_m": distance_to_river,
+                "distance_to_primary_river_m": centroid.distance(primary_river),
                 "distance_to_underpass_m": distance_to_underpass,
                 "distance_to_flow_path_m": distance_to_flow_path,
             }
@@ -188,12 +210,18 @@ def build_hand_grid() -> tuple[dict[str, Any], list[dict[str, Any]], LineString,
     if not drainage_cells:
         drainage_cells = sorted(cells, key=lambda cell: cell["distance_to_river_m"])[:20]
 
+    primary_drainage_cells = [cell for cell in cells if cell["distance_to_primary_river_m"] <= PRIMARY_SEED_DISTANCE_M]
+    if not primary_drainage_cells:
+        raise RuntimeError(f"No DEM cell lies within {PRIMARY_SEED_DISTANCE_M} m of {PRIMARY_RIVER_NAME}")
+
     hand_features = []
     hand_values = []
     for cell in cells:
         local_drainage = min(drainage_cells, key=lambda candidate: candidate["centroid"].distance(cell["centroid"]))
         drainage_elevation = local_drainage["elevation_m"]
         hand_m = max(0.0, cell["elevation_m"] - drainage_elevation)
+        primary_drainage = min(primary_drainage_cells, key=lambda candidate: candidate["centroid"].distance(cell["centroid"]))
+        hand_primary_m = max(0.0, cell["elevation_m"] - primary_drainage["elevation_m"])
         hand_values.append(hand_m)
         properties = dict(cell["source_feature"]["properties"])
         properties.update(
@@ -206,7 +234,10 @@ def build_hand_grid() -> tuple[dict[str, Any], list[dict[str, Any]], LineString,
                 "local_drainage_elevation_m": round(drainage_elevation, 2),
                 "hand_m": round(hand_m, 2),
                 "hand_class": classify_hand(hand_m),
+                "primary_drainage_elevation_m": round(primary_drainage["elevation_m"], 2),
+                "hand_primary_m": round(hand_primary_m, 2),
                 "distance_to_river_m": round(cell["distance_to_river_m"], 1),
+                "distance_to_primary_river_m": round(cell["distance_to_primary_river_m"], 1),
                 "distance_to_underpass_m": round(cell["distance_to_underpass_m"], 1),
                 "distance_to_flow_path_m": round(cell["distance_to_flow_path_m"], 1),
                 "not_official_flood_extent": True,
@@ -226,6 +257,7 @@ def build_hand_grid() -> tuple[dict[str, Any], list[dict[str, Any]], LineString,
         "max_hand_m": round(max(hand_values), 2),
         "mean_hand_m": round(sum(hand_values) / len(hand_values), 2),
         "drainage_cell_count": len(drainage_cells),
+        "primary_drainage_cell_count": len(primary_drainage_cells),
     }
     output = {
         "type": "FeatureCollection",
@@ -245,27 +277,72 @@ def build_hand_grid() -> tuple[dict[str, Any], list[dict[str, Any]], LineString,
         },
         "features": hand_features,
     }
-    return output, cells, flow_path, stats
+    breach_cell = min(range(len(cells)), key=lambda index: cells[index]["geometry_m"].distance(breach_point))
+    return output, cells, flow_path, stats, build_neighbours(cells), breach_cell
 
 
-def create_timeline(hand_grid: dict[str, Any], water_rows: list[dict[str, str]], rain_rows: list[dict[str, str]], flow_path: LineString) -> tuple[dict[str, Any], dict[str, int], list[dict[str, Any]]]:
+def build_neighbours(cells: list[dict[str, Any]]) -> list[list[int]]:
+    geometries = [cell["geometry_m"] for cell in cells]
+    tree = STRtree(geometries)
+    neighbours: list[list[int]] = []
+    for index, geometry in enumerate(geometries):
+        found = []
+        for other in tree.query(geometry.buffer(0.5)):
+            other = int(other)
+            if other == index:
+                continue
+            shared = geometry.boundary.intersection(geometries[other].boundary)
+            if shared.length > NEIGHBOUR_EDGE_MIN_M:
+                found.append(other)
+        neighbours.append(found)
+    return neighbours
+
+
+def breach_connected(candidates: set[int], seeds: set[int], neighbours: list[list[int]]) -> set[int]:
+    """Grow from Miho-side seeds through adjacent candidate cells only."""
+
+    reached = set(seeds & candidates)
+    queue = deque(reached)
+    while queue:
+        current = queue.popleft()
+        for other in neighbours[current]:
+            if other in candidates and other not in reached:
+                reached.add(other)
+                queue.append(other)
+    return reached
+
+
+def create_timeline(
+    hand_grid: dict[str, Any],
+    water_rows: list[dict[str, str]],
+    rain_rows: list[dict[str, str]],
+    flow_path: LineString,
+    neighbours: list[list[int]],
+    breach_cell: int,
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, int], list[dict[str, Any]]]:
     levels = [nearest_water_level(water_rows, stage["time"]) for stage in EVENT_STAGES]
     baseline_level = levels[0]["water_level_m"]
     max_relative_rise = max(level["water_level_m"] - baseline_level for level in levels)
     features = []
+    reference_features = []
     stage_counts: dict[str, int] = {}
     stage_contexts = []
+    grid = hand_grid["features"]
 
     for stage, level in zip(EVENT_STAGES, levels):
         relative_rise = max(0.0, level["water_level_m"] - baseline_level)
         threshold = max(0.25, relative_rise + stage["breach_boost_m"])
         rain = rainfall_context(rain_rows, stage["time"])
         count = 0
+        candidate_count = 0
+        reference_count = 0
         if stage["stage_index"] > 0:
-            for feature in hand_grid["features"]:
+            candidates: set[int] = set()
+            legacy_candidates: set[int] = set()
+            for index, feature in enumerate(grid):
                 props = feature["properties"]
                 hand_m = float(props["hand_m"])
-                connected = (
+                near_drainage = (
                     float(props["distance_to_river_m"]) <= stage["connectivity_distance_m"]
                     or float(props["distance_to_flow_path_m"]) <= stage["flow_corridor_m"]
                     or (
@@ -273,25 +350,55 @@ def create_timeline(hand_grid: dict[str, Any], water_rows: list[dict[str, str]],
                         and float(props["distance_to_underpass_m"]) <= stage["connectivity_distance_m"] * 0.9
                     )
                 )
-                if connected and hand_m <= threshold:
-                    properties = dict(props)
-                    properties.update(
-                        {
-                            "layer_role": "hand_flood_envelope",
-                            "stage_index": stage["stage_index"],
-                            "time": stage["time"],
-                            "state": stage["state"],
-                            "label": stage["label"],
-                            "observed_water_level_m": level["water_level_m"],
-                            "water_level_timestamp_kst": level["timestamp_kst"],
-                            "relative_water_level_rise_m": round(relative_rise, 2),
-                            "hand_threshold_m": round(threshold, 2),
-                            "stage_hourly_rainfall_mm": rain["max_hourly_rainfall_mm"],
-                            "event_peak_hourly_rainfall_mm": rain["event_peak_hourly_rainfall_mm"],
-                        }
-                    )
-                    features.append({"type": "Feature", "properties": properties, "geometry": feature["geometry"]})
-                    count += 1
+                if near_drainage and hand_m <= threshold:
+                    legacy_candidates.add(index)
+                # The threshold comes from the Miho River gauge, so height is measured against Miho drainage.
+                if near_drainage and float(props["hand_primary_m"]) <= threshold:
+                    candidates.add(index)
+            seeds = {
+                index for index in candidates
+                if float(grid[index]["properties"]["distance_to_primary_river_m"]) <= PRIMARY_SEED_DISTANCE_M
+            }
+            if stage["stage_index"] >= 3:
+                seeds.add(breach_cell)
+            reached = breach_connected(candidates, seeds, neighbours)
+            candidate_count = len(legacy_candidates)
+            for index in sorted(legacy_candidates - reached):
+                properties = dict(grid[index]["properties"])
+                properties.update(
+                    {
+                        "layer_role": "hand_reference_other_drainage",
+                        "stage_index": stage["stage_index"],
+                        "time": stage["time"],
+                        "state": stage["state"],
+                        "hand_threshold_m": round(threshold, 2),
+                        "reason": "Low relative to its nearest drainage line (legacy rule) but above the Miho-referenced threshold or not grid-connected to the Miho River side.",
+                    }
+                )
+                reference_features.append({"type": "Feature", "properties": properties, "geometry": grid[index]["geometry"]})
+                reference_count += 1
+            for index in sorted(reached):
+                feature = grid[index]
+                props = feature["properties"]
+                properties = dict(props)
+                properties.update(
+                    {
+                        "layer_role": "hand_flood_envelope",
+                        "connectivity": "grid-connected to Miho River side or breach cell",
+                        "stage_index": stage["stage_index"],
+                        "time": stage["time"],
+                        "state": stage["state"],
+                        "label": stage["label"],
+                        "observed_water_level_m": level["water_level_m"],
+                        "water_level_timestamp_kst": level["timestamp_kst"],
+                        "relative_water_level_rise_m": round(relative_rise, 2),
+                        "hand_threshold_m": round(threshold, 2),
+                        "stage_hourly_rainfall_mm": rain["max_hourly_rainfall_mm"],
+                        "event_peak_hourly_rainfall_mm": rain["event_peak_hourly_rainfall_mm"],
+                    }
+                )
+                features.append({"type": "Feature", "properties": properties, "geometry": feature["geometry"]})
+                count += 1
             if stage["stage_index"] >= 3:
                 features.append(
                     {
@@ -322,6 +429,8 @@ def create_timeline(hand_grid: dict[str, Any], water_rows: list[dict[str, str]],
                 "relative_water_level_rise_m": round(relative_rise, 2),
                 "hand_threshold_m": round(threshold, 2),
                 "selected_feature_count": count,
+                "legacy_rule_count": candidate_count,
+                "reference_other_drainage_count": reference_count,
             }
         )
 
@@ -335,35 +444,54 @@ def create_timeline(hand_grid: dict[str, Any], water_rows: list[dict[str, str]],
             "source_type": "DERIVED_APPROXIMATION",
             "role": "HAND-based historical reconstruction envelope; visual comparison only",
             "data_vintage": "2023-07-15 incident timeline with 2023-07-14 through 2023-07-17 observations",
-            "method": "HAND-like relative elevation grid filtered by WAMIS drainage connectivity and observed water-level rise by incident stage.",
+            "method": "Height above the nearest Miho River drainage cell, thresholded by observed Miho River water-level rise per incident stage, keeping only cells grid-connected (4-neighbour) to the Miho River side or the breach cell.",
             "limitations": [
                 "Observed gauge level is used as relative stage change, not absolute DEM water-surface elevation.",
+                "Grid connectivity uses about 280 m DEM cells, so levees, road embankments, and drains narrower than a cell are not represented.",
                 "No discharge, breach geometry, roughness, depth, velocity, or drainage structure simulation is computed.",
                 "Do not use for final official exposure KPI counts.",
             ],
         },
         "features": features,
     }
-    return output, stage_counts, stage_contexts
+    reference = {
+        "type": "FeatureCollection",
+        "name": "osong_hand_reference_other_drainage",
+        "crs": {"type": "name", "properties": {"name": "urn:ogc:def:crs:OGC:1.3:CRS84"}},
+        "metadata": {
+            "event_id": "osong-2023",
+            "status": "REFERENCE_ONLY",
+            "source_type": "DERIVED_APPROXIMATION",
+            "role": "Low-lying cells near other drainage lines; excluded from the Miho breach envelope",
+            "limitations": [
+                "The stage threshold comes from the Miho River gauge; no gauge evidence exists for the other drainage lines.",
+                "Not a flood extent and not used for exposure counts.",
+            ],
+        },
+        "features": reference_features,
+    }
+    return output, reference, stage_counts, stage_contexts
 
 
 def main() -> None:
-    hand_grid, _, flow_path, hand_stats = build_hand_grid()
+    hand_grid, _, flow_path, hand_stats, neighbours, breach_cell = build_hand_grid()
     water_rows = read_csv(WATER_LEVEL_FILE)
     rain_rows = read_csv(RAINFALL_FILE)
-    timeline, stage_counts, stage_contexts = create_timeline(hand_grid, water_rows, rain_rows, flow_path)
+    timeline, reference, stage_counts, stage_contexts = create_timeline(hand_grid, water_rows, rain_rows, flow_path, neighbours, breach_cell)
 
     HAND_GRID_FILE.write_text(json.dumps(hand_grid, ensure_ascii=False, indent=2), encoding="utf-8")
     HAND_TIMELINE_FILE.write_text(json.dumps(timeline, ensure_ascii=False, indent=2), encoding="utf-8")
+    HAND_REFERENCE_FILE.write_text(json.dumps(reference, ensure_ascii=False, indent=2), encoding="utf-8")
 
     report = {
         "created_at": datetime.now(timezone.utc).isoformat(),
         "status": "TEMPORARY",
         "source_type": "DERIVED_APPROXIMATION",
-        "method": "HAND-like relative elevation and drainage connectivity reconstruction.",
+        "method": "Miho-referenced HAND-like height with Miho-side grid connectivity (4-neighbour flood fill from Miho River cells and the breach cell).",
         "output_files": [
             str(HAND_GRID_FILE.relative_to(REPO_ROOT)).replace("\\", "/"),
             str(HAND_TIMELINE_FILE.relative_to(REPO_ROOT)).replace("\\", "/"),
+            str(HAND_REFERENCE_FILE.relative_to(REPO_ROOT)).replace("\\", "/"),
         ],
         "input_files": [
             str(DEM_GRID_FILE.relative_to(REPO_ROOT)).replace("\\", "/"),
@@ -378,6 +506,8 @@ def main() -> None:
         "timeline_geometry_types": sorted({feature["geometry"]["type"] for feature in timeline["features"]}),
         "hand_stats": hand_stats,
         "stage_counts": stage_counts,
+        "reference_other_drainage_feature_count": len(reference["features"]),
+        "breach_cell_id": hand_grid["features"][breach_cell]["properties"].get("cell_id"),
         "stage_contexts": stage_contexts,
         "validity_assessment": {
             "appropriate_use": "Historical reconstruction visualization using observed water-level timing and terrain connectivity.",

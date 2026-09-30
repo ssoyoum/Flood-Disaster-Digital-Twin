@@ -222,6 +222,7 @@ osong_safemap_floodmarks_wms:
   data_role: "hazard_layer_visual_verification"
   status: "VERIFIED"
   data_vintage: "2024 collection"
+  license: "Korea Public Nuri Type 4: attribution; commercial use and modification prohibited (checked 2026-09-30 on the Safemap dataset page)"
   request_snapshot: "2026-08-31"
   raw_file: "data/raw/flood_extent/osong/safemap_if_0092_wms/osong_bbox_4326_layers.png"
   image_format: "image/png"
@@ -232,6 +233,22 @@ osong_safemap_floodmarks_wms:
     - "Safemap WMS returned a non-empty flood marks raster for the Osong bbox."
     - "This raster confirms an official Safemap flood marks overlay exists around the target area, but it is not vector geometry."
     - "Do not use the WMS image directly for final building/road exposure counts unless it is explicitly vectorized and recorded as a derived raster/vector product, or an official vector flood extent is obtained."
+    - "2026-09-30: GetFeatureInfo returned HTTP 400 and the IF_0092 record API returned NO_OPENAPI_SERVICE_ERROR, so year/attribute filtering and vector geometry are not available. The overlay mixes flood marks from several years."
+    - "Type 4 forbids modification: use the image only for internal visual/overlap checks; do not publish a vectorized or edited copy."
+
+osong_small_streams:
+  source_candidates:
+    - name: "국토교통부_하천망"
+      source_url: "https://www.data.go.kr/data/15058825/openapi.do"
+      license: "Korea Public Nuri Type 1"
+      note: "Basin-unit river network API; small-stream coverage is not stated."
+    - name: "전국하천표준데이터"
+      source_url: "https://www.data.go.kr/data/15139206/standard.do"
+      note: "Standard river attribute data including small streams; geometry availability not confirmed."
+  status: "source_identified_not_acquired"
+  checked_at: "2026-09-30"
+  notes:
+    - "The WAMIS layer used for Osong covers national and local rivers only (8 polygons); designated small streams are not represented."
 
 osong_rainfall_and_water_level:
   source: "KMA AWS rainfall observation + Flood Control Office water-level OpenAPI"
