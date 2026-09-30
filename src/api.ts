@@ -1,6 +1,7 @@
-import type { ExposureInventory, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
+import type { ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8033";
+const configuredApiBase = import.meta.env.VITE_API_BASE;
+const API_BASE = configuredApiBase === "same-origin" ? "" : configuredApiBase ?? (import.meta.env.PROD ? "" : "http://localhost:8033");
 
 export const assetUrl = (path?: string | null) => {
   if (!path) return "";
@@ -11,7 +12,9 @@ export const assetUrl = (path?: string | null) => {
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, options);
   if (!response.ok) {
-    throw new Error(`API ${response.status}: ${path}`);
+    // FastAPI puts a readable reason in `detail`; rate limits (429) rely on it.
+    const detail = await response.json().then((body) => (typeof body?.detail === "string" ? body.detail : "")).catch(() => "");
+    throw new Error(`API ${response.status}: ${detail || path}`);
   }
   return response.json() as Promise<T>;
 }
@@ -64,6 +67,13 @@ export const getExposureInventory = (eventId: string, radii: number[] = [300, 50
 
 export const getAgentExamples = () => request<AgentExampleQuestion[]>("/api/agent/examples");
 
+export const askAgent = (eventId: string, message: string, history: Array<{ role: "user" | "assistant"; content: string }> = []) =>
+  request<AgentAskResult>("/api/agent/ask", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event_id: eventId, message, history }),
+  });
+
 export const planAgentIntent = (eventId: string, message: string) =>
   request<AgentIntentPlanResult>("/api/agent/plan", {
     method: "POST",
@@ -76,4 +86,18 @@ export const runAgentWorkflow = (eventId: string, workflow: AgentWorkflowName, p
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ event_id: eventId, workflow, ...parameters }),
+  });
+
+export const getClosureTiming = (eventId: string, closureTimes: string[]) =>
+  request<ClosureTimingResult>(`/api/events/${eventId}/analysis/closure-timing`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ closure_times: closureTimes }),
+  });
+
+export const getHandThreshold = (eventId: string, reductionM: number) =>
+  request<HandThresholdResult>(`/api/events/${eventId}/analysis/hand-threshold`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ reduction_m: reductionM }),
   });

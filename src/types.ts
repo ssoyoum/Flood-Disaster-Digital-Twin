@@ -317,3 +317,68 @@ export type AgentWorkflowResult = {
   coverage_status?: string | null;
   coverage_note?: string | null;
 };
+
+export type AgentAskResult = {
+  event_id: string;
+  status: "ANSWERED" | "NEEDS_DATA" | "UNAVAILABLE";
+  answer: string;
+  model: string | null;
+  evidence_calls: number[];
+  limitations: string[];
+  follow_ups?: string[];
+  tool_calls: Array<{
+    order: number;
+    tool_name: string;
+    reason: string;
+    parameters: Record<string, unknown>;
+    result: Record<string, unknown>;
+  }>;
+};
+
+export interface ClosureTimingScenario {
+  closure_time: string;
+  state_at_closure: string | null;
+  label_at_closure: string | null;
+  classification: string;
+  entry_blocked_before_inflow: boolean;
+  minutes_before_underpass_inflow: number;
+  minutes_before_unsafe_driving: number;
+  minutes_before_full_inundation: number;
+  lead_time_vs_detection_trigger_min: number;
+}
+
+export type HandThresholdStage = {
+  stage_index: number;
+  state: string;
+  time: string;
+  baseline_threshold_m: number;
+  scenario_threshold_m: number;
+  baseline_cell_count: number;
+  scenario_cell_count: number;
+  removed_cell_count: number;
+  selected_grid_ids: string[];
+  removed_grid_ids: string[];
+};
+
+export type HandThresholdResult = {
+  event_id: string;
+  analysis: "hand_threshold_sensitivity";
+  reduction_m: number;
+  coverage_status: string;
+  coverage_note: string;
+  stages: HandThresholdStage[];
+  assumptions: string[];
+  limitations: string[];
+};
+
+export interface ClosureTimingResult {
+  event_id: string;
+  coverage_status: string;
+  coverage_note: string;
+  detection_trigger_time: string;
+  detection_trigger_basis: string;
+  milestones: Array<{ state: string; label: string; time: string }>;
+  scenarios: ClosureTimingScenario[];
+  assumptions: string[];
+  limitations: string[];
+}
