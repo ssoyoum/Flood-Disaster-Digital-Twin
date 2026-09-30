@@ -9,7 +9,8 @@ import re
 from typing import Any
 
 from .data import get_event
-from .osong_repository import get_osong_reconstruction
+from .hand_sensitivity import analyze_hand_threshold
+from .osong_repository import get_osong_reconstruction, get_osong_summary
 from .schemas import (
     AgentToolCallRequest,
     AgentIntentPlanRequest,
@@ -47,6 +48,12 @@ _TOOL_CATALOG: tuple[dict[str, Any], ...] = (
         "output": "historical reconstruction response",
     },
     {
+        "name": "get_observation_summary",
+        "description": "Get observed rainfall and river water-level peaks (value, time, station), observation period, and connected layer counts for the event.",
+        "input_fields": ["event_id"],
+        "output": "observed hydromet peaks and data counts, not a forecast",
+    },
+    {
         "name": "analyze_closure_timing",
         "description": "Compare hypothetical underpass closure times with observed reconstruction milestones.",
         "input_fields": ["event_id", "closure_times"],
@@ -70,6 +77,12 @@ _TOOL_CATALOG: tuple[dict[str, Any], ...] = (
         "input_fields": ["event_id", "comparison_type", "closure_times", "delay_minutes"],
         "output": "baseline versus scenario timing comparison, not damage reduction",
     },
+    {
+        "name": "analyze_hand_threshold",
+        "description": "Compare HAND envelope grid cells after a user-defined reduction in its selection threshold. This is sensitivity only, not a verified barrier or levee effect.",
+        "input_fields": ["event_id", "reduction_m"],
+        "output": "selected and removed HAND cell IDs by incident stage",
+    },
 )
 
 
@@ -91,6 +104,24 @@ def _get_reconstruction(event_id: str, _: AgentToolCallRequest) -> dict[str, Any
     return get_osong_reconstruction()
 
 
+_SUMMARY_KEYS = (
+    "rainfall_peak_mm_per_hour", "rainfall_peak_timestamp", "rainfall_peak_station_name", "rainfall_records",
+    "water_level_peak_m", "water_level_peak_timestamp", "water_level_peak_station_name",
+    "response_window_min", "time_until_full_inundation_min",
+    "building_count", "road_count", "waterway_count", "official_population", "official_population_unit",
+)
+
+
+def _get_observation_summary(event_id: str, _: AgentToolCallRequest) -> dict[str, Any]:
+    if event_id != "osong-2023":
+        raise ReconstructionUnavailable(f"Observations are not connected for {event_id}")
+    summary = get_osong_summary()
+    return {
+        **{key: summary.get(key) for key in _SUMMARY_KEYS if key in summary},
+        "coverage_note": "Observed KMA AWS rainfall and flood-control-office water level; peaks are from the stored 2023-07-14~17 records.",
+    }
+
+
 def _analyze_closure_timing(event_id: str, request: AgentToolCallRequest) -> dict[str, Any]:
     closure_times = request.closure_times or ClosureTimingRequest().closure_times
     return ClosureTimingResult.model_validate(
@@ -103,6 +134,12 @@ def _analyze_inflow_delay(event_id: str, request: AgentToolCallRequest) -> dict[
     return InflowDelayResult.model_validate(
         analyze_inflow_delay(event_id, delay_minutes)
     ).model_dump()
+
+
+def _analyze_hand_threshold(event_id: str, request: AgentToolCallRequest) -> dict[str, Any]:
+    if request.reduction_m is None:
+        raise ValueError("reduction_m is required for HAND threshold sensitivity")
+    return analyze_hand_threshold(event_id, request.reduction_m)
 
 
 def _get_exposure_inventory(event_id: str, request: AgentToolCallRequest) -> dict[str, Any]:
@@ -176,8 +213,10 @@ def _compare_scenarios(event_id: str, request: AgentToolCallRequest) -> dict[str
 _HANDLERS: dict[str, ToolHandler] = {
     "get_event": _get_event,
     "get_reconstruction": _get_reconstruction,
+    "get_observation_summary": _get_observation_summary,
     "analyze_closure_timing": _analyze_closure_timing,
     "analyze_inflow_delay": _analyze_inflow_delay,
+    "analyze_hand_threshold": _analyze_hand_threshold,
     "get_exposure_inventory": _get_exposure_inventory,
     "compare_scenarios": _compare_scenarios,
 }
@@ -297,7 +336,7 @@ _EXAMPLE_QUESTIONS: tuple[dict[str, str], ...] = (
     {
         "workflow": "closure_timing",
         "label": "08:25 통제",
-        "question": "08:25에 지하차도를 통제했다면 어떻게 되나요?",
+        "question": "08:25에 지하차도를 통제했다면 유입까지 몇 분 남나요?",
     },
     {
         "workflow": "inflow_delay",
@@ -399,7 +438,9 @@ def plan_agent_intent(request: AgentIntentPlanRequest) -> dict[str, Any]:
 
     text = " ".join(request.message.lower().split())
     has_closure = _contains_marker(text, _CLOSURE_MARKERS)
-    has_inflow = _contains_marker(text, _INFLOW_MARKERS)
+    # "유입까지" names the milestone to compare a closure against; it is not
+    # a request to delay the water inflow itself.
+    has_inflow = _contains_marker(text.replace("유입까지", ""), _INFLOW_MARKERS)
     has_exposure = _contains_marker(text, _EXPOSURE_MARKERS)
     has_situation = _contains_marker(text, _SITUATION_MARKERS)
     actionable = [

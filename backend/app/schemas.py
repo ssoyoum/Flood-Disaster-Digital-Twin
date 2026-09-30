@@ -254,6 +254,7 @@ class AgentToolCallRequest(BaseModel):
     closure_times: list[str] | None = None
     delay_minutes: list[Annotated[int, Field(ge=0, le=180)]] | None = None
     radii_m: list[Annotated[int, Field(ge=50, le=20000)]] | None = None
+    reduction_m: Annotated[float, Field(ge=0, le=2.5)] | None = None
     comparison_type: Literal["closure_timing", "inflow_delay"] = "closure_timing"
 
 
@@ -261,6 +262,34 @@ class AgentToolCallResult(BaseModel):
     tool_name: str
     event_id: str
     result: dict
+
+
+class HandThresholdRequest(BaseModel):
+    reduction_m: Annotated[float, Field(ge=0, le=2.5)] = 1.5
+
+
+class HandThresholdStage(BaseModel):
+    stage_index: int
+    state: str
+    time: str
+    baseline_threshold_m: float
+    scenario_threshold_m: float
+    baseline_cell_count: int
+    scenario_cell_count: int
+    removed_cell_count: int
+    selected_grid_ids: list[str]
+    removed_grid_ids: list[str]
+
+
+class HandThresholdResult(BaseModel):
+    event_id: str
+    analysis: Literal["hand_threshold_sensitivity"]
+    reduction_m: float
+    coverage_status: str
+    coverage_note: str
+    stages: list[HandThresholdStage]
+    assumptions: list[str]
+    limitations: list[str]
 
 
 class AgentExampleQuestion(BaseModel):
@@ -333,6 +362,36 @@ class AgentIntentPlanResult(BaseModel):
     suggestions: list[str] = Field(default_factory=list)
     assumptions: list[str] = Field(default_factory=list)
     limitations: list[str] = Field(default_factory=list)
+
+
+class AgentConversationTurn(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=1500)
+
+
+class AgentAskRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=1000)
+    event_id: str = "osong-2023"
+    history: list[AgentConversationTurn] = Field(default_factory=list, max_length=6)
+
+
+class AgentAskToolTrace(BaseModel):
+    order: int
+    tool_name: str
+    reason: str
+    parameters: dict[str, Any]
+    result: dict[str, Any]
+
+
+class AgentAskResult(BaseModel):
+    event_id: str
+    status: Literal["ANSWERED", "NEEDS_DATA", "UNAVAILABLE"]
+    answer: str
+    tool_calls: list[AgentAskToolTrace] = Field(default_factory=list)
+    evidence_calls: list[int] = Field(default_factory=list)
+    limitations: list[str] = Field(default_factory=list)
+    follow_ups: list[str] = Field(default_factory=list)
+    model: str | None = None
 
 
 class ScenarioComparisonResult(BaseModel):

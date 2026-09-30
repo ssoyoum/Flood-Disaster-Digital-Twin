@@ -13,6 +13,99 @@ from app.main import app
 client = TestClient(app)
 
 
+def test_agent_ask_uses_observations_to_choose_multiple_tools(monkeypatch):
+    from app import agent_runner
+
+    decisions = iter([
+        agent_runner.AgentAction(action="tool", tool_name="analyze_closure_timing", parameters={"closure_times": ["08:25"]}),
+        agent_runner.AgentAction(action="tool", tool_name="analyze_inflow_delay", parameters={"delay_minutes": [10]}),
+        agent_runner.AgentAction(action="final", answer="08:25 통제 가정은 유입 2분 전입니다 [1]. 유입 10분 지연은 별도 가정입니다 [2].", evidence_calls=[1, 2]),
+    ])
+    observations_seen = []
+
+    def decide(context):
+        observations_seen.append(len(context["observations"]))
+        return next(decisions)
+
+    monkeypatch.setattr(agent_runner, "_gemini_action", decide)
+    response = client.post("/api/agent/ask", json={
+        "event_id": "osong-2023",
+        "message": "08:25 통제와 유입 10분 지연을 같이 비교해 줘",
+    })
+    assert response.status_code == 200
+    result = response.json()
+    assert result["status"] == "ANSWERED"
+    assert [call["tool_name"] for call in result["tool_calls"]] == ["analyze_closure_timing", "analyze_inflow_delay"]
+    assert result["evidence_calls"] == [1, 2]
+    assert observations_seen == [0, 1, 2]
+    assert "출처 페이지 확인 전" in result["answer"]
+
+
+def test_agent_ask_rejects_a_time_the_user_did_not_supply(monkeypatch):
+    from app import agent_runner
+
+    decisions = iter([
+        agent_runner.AgentAction(action="tool", tool_name="analyze_closure_timing", parameters={"closure_times": ["08:20"]}),
+        agent_runner.AgentAction(action="final", answer="08:20 통제 결과입니다."),
+        agent_runner.AgentAction(action="final", answer="08:20 통제 결과입니다."),
+    ])
+    monkeypatch.setattr(agent_runner, "_gemini_action", lambda _context: next(decisions))
+    response = client.post("/api/agent/ask", json={"message": "08:25에 통제했다면?"})
+    assert response.status_code == 200
+    result = response.json()
+    assert result["status"] == "NEEDS_DATA"
+    assert "analyze_closure_timing" not in [call["tool_name"] for call in result["tool_calls"]]
+    assert "08:20" not in result["answer"]
+
+
+def test_agent_ask_accepts_registered_event_id_in_model_tool_parameters(monkeypatch):
+    from app import agent_runner
+
+    decisions = iter([
+        agent_runner.AgentAction(action="tool", tool_name="get_event", parameters={"event_id": "osong-2023"}),
+        agent_runner.AgentAction(action="final", answer="오송 사건이 등록돼 있습니다 [1].", evidence_calls=[1]),
+    ])
+    monkeypatch.setattr(agent_runner, "_gemini_action", lambda _context: next(decisions))
+    response = client.post("/api/agent/ask", json={"message": "오송 사건 정보를 알려줘"})
+    assert response.status_code == 200
+    assert response.json()["status"] == "ANSWERED"
+    assert response.json()["tool_calls"][0]["parameters"] == {"event_id": "osong-2023"}
+
+
+def test_hand_threshold_changes_connected_cells_without_changing_timeline():
+    baseline = client.post("/api/events/osong-2023/analysis/hand-threshold", json={"reduction_m": 0})
+    changed = client.post("/api/events/osong-2023/analysis/hand-threshold", json={"reduction_m": 1.5})
+    assert baseline.status_code == changed.status_code == 200
+    before = baseline.json()["stages"][4]
+    after = changed.json()["stages"][4]
+    assert (before["baseline_cell_count"], before["scenario_cell_count"]) == (306, 306)
+    assert (after["baseline_cell_count"], after["scenario_cell_count"], after["removed_cell_count"]) == (306, 283, 23)
+    assert set(after["selected_grid_ids"]).isdisjoint(after["removed_grid_ids"])
+    assert set(after["selected_grid_ids"]) | set(after["removed_grid_ids"]) == set(before["selected_grid_ids"])
+    assert before["time"] == after["time"]
+    assert "not official Flood Extent" in changed.json()["coverage_note"]
+
+
+def test_hand_threshold_is_available_as_an_agent_tool(monkeypatch):
+    from app import agent_runner
+
+    decisions = iter([
+        agent_runner.AgentAction(action="tool", tool_name="analyze_hand_threshold", parameters={"event_id": "osong-2023", "reduction_m": 1.5}),
+        agent_runner.AgentAction(action="final", answer="HAND 임계를 1.5m 낮추면 해당 단계에서 23개 셀이 제외됩니다 [1].", evidence_calls=[1]),
+    ])
+    monkeypatch.setattr(agent_runner, "_gemini_action", lambda _context: next(decisions))
+    response = client.post("/api/agent/ask", json={"message": "HAND 임계를 1.5m 낮추면 어떤 셀이 달라지나요?"})
+    assert response.status_code == 200
+    result = response.json()
+    assert result["status"] == "ANSWERED"
+    assert result["tool_calls"][0]["result"]["stages"][4]["removed_cell_count"] == 23
+
+
+def test_hand_threshold_rejects_unconnected_event_and_out_of_range_value():
+    assert client.post("/api/events/osong-2023/analysis/hand-threshold", json={"reduction_m": 3}).status_code == 422
+    assert client.post("/api/events/seoul-2022/analysis/hand-threshold", json={"reduction_m": 1}).status_code == 404
+
+
 def test_health_check():
     response = client.get("/health")
     assert response.status_code == 200
@@ -315,15 +408,20 @@ def test_agent_tools_expose_only_registered_domain_tools():
     assert [tool["name"] for tool in tools] == [
         "get_event",
         "get_reconstruction",
+        "get_observation_summary",
         "analyze_closure_timing",
         "analyze_inflow_delay",
         "get_exposure_inventory",
         "compare_scenarios",
+        "analyze_hand_threshold",
     ]
-    assert "closure_times" in tools[2]["input_fields"]
-    assert "delay_minutes" in tools[3]["input_fields"]
-    assert "radii_m" in tools[4]["input_fields"]
-    assert "comparison_type" in tools[5]["input_fields"]
+    fields = {tool["name"]: tool["input_fields"] for tool in tools}
+    assert fields["get_observation_summary"] == ["event_id"]
+    assert "closure_times" in fields["analyze_closure_timing"]
+    assert "delay_minutes" in fields["analyze_inflow_delay"]
+    assert "radii_m" in fields["get_exposure_inventory"]
+    assert "comparison_type" in fields["compare_scenarios"]
+    assert "reduction_m" in fields["analyze_hand_threshold"]
 
 
 def test_agent_tool_dispatches_inflow_delay_with_domain_result():
@@ -564,15 +662,21 @@ def test_exposure_inventory_requires_focus_feature_layer():
 
 
 def test_planner_status_reports_llm_availability_without_calling_the_api():
+    from app.llm_planner import llm_planner_model_id
+
     response = client.get("/api/agent/planner-status")
     assert response.status_code == 200
     status = response.json()
-    assert status["model"] == "claude-opus-5"
+    assert status["model"] == llm_planner_model_id()
     assert status["fallback"] == "deterministic"
     assert isinstance(status["available"], bool)
 
 
-def test_plan_falls_back_to_deterministic_planner_without_llm_credentials():
+def test_plan_falls_back_to_deterministic_planner_without_llm_credentials(monkeypatch):
+    from app import llm_planner
+
+    monkeypatch.setattr(llm_planner, "_env_file_loaded", True)
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     response = client.post(
         "/api/agent/plan",
         json={"event_id": "osong-2023", "message": "08:25에 지하차도를 차단했으면?", "planner": "auto"},
@@ -584,16 +688,49 @@ def test_plan_falls_back_to_deterministic_planner_without_llm_credentials():
     assert plan["parameters"]["closure_times"] == ["08:25"]
 
 
-def test_plan_with_explicit_llm_planner_reports_unavailable_instead_of_guessing():
+def test_plan_with_explicit_llm_planner_reports_unavailable_instead_of_guessing(monkeypatch):
+    from app import llm_planner
+
+    monkeypatch.setattr(llm_planner, "_env_file_loaded", True)
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     response = client.post(
         "/api/agent/plan",
         json={"event_id": "osong-2023", "message": "08:25에 차단했으면?", "planner": "llm"},
     )
-    if response.status_code == 200:
-        assert response.json()["planner_used"] == "llm"
-    else:
-        assert response.status_code == 503
-        assert "LLM planner unavailable" in response.json()["detail"]
+    assert response.status_code == 503
+    assert "No Gemini API credential" in response.json()["detail"]
+
+
+def test_gemini_planner_routes_json_without_putting_key_in_url(monkeypatch):
+    from app import llm_planner
+    from app.schemas import AgentIntentPlanRequest
+
+    monkeypatch.setattr(llm_planner, "_env_file_loaded", True)
+    monkeypatch.setenv("GEMINI_API_KEY", "test-secret")
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
+
+    class FakeResponse:
+        status_code = 200
+
+        def json(self):
+            return {"candidates": [{"content": {"parts": [{"text": '{"workflow":"closure_timing","closure_times":["08:25"],"reason":"Closure time request"}'}]}}]}
+
+    def fake_post(url, *, headers, json, timeout):
+        assert "test-secret" not in url
+        assert url.endswith("/gemini-3.5-flash-lite:generateContent")
+        assert headers["x-goog-api-key"] == "test-secret"
+        assert json["generationConfig"]["responseMimeType"] == "application/json"
+        assert timeout > 0
+        return FakeResponse()
+
+    monkeypatch.setattr(llm_planner.httpx, "post", fake_post)
+    plan = llm_planner.plan_with_llm(
+        AgentIntentPlanRequest(
+            event_id="osong-2023", message="08:25에 지하차도를 통제했다면?", planner="llm"
+        )
+    )
+    assert plan["workflow"] == "closure_timing"
+    assert plan["parameters"]["closure_times"] == ["08:25"]
 
 
 def test_llm_plan_parameters_are_revalidated_against_tool_ranges():
@@ -612,6 +749,16 @@ def test_llm_plan_parameters_are_revalidated_against_tool_ranges():
     ):
         with pytest.raises(ValueError):
             _validated_parameters(bad, "osong-2023")
+
+    missing_time = LlmPlan(workflow="closure_timing", reason="closure request")
+    assert _validated_parameters(
+        missing_time, "osong-2023", "08:25에 지하차도를 통제했다면?"
+    )["closure_times"] == ["08:25"]
+    invented_time = LlmPlan(
+        workflow="closure_timing", closure_times=["08:20"], reason="closure request"
+    )
+    with pytest.raises(ValueError, match="absent from the question"):
+        _validated_parameters(invented_time, "osong-2023", "08:25에 지하차도를 통제했다면?")
 
 
 def test_llm_planner_routes_through_deterministic_tools(monkeypatch):

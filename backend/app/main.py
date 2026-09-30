@@ -1,3 +1,4 @@
+
 import httpx
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
@@ -10,7 +11,9 @@ from .agent_tools import (
     list_example_questions,
     plan_agent_intent,
 )
-from .llm_planner import MODEL_ID as LLM_PLANNER_MODEL, LlmPlannerUnavailable, llm_planner_status, plan_with_llm
+from .agent_runner import ask_agent
+from .hand_sensitivity import analyze_hand_threshold
+from .llm_planner import LlmPlannerUnavailable, llm_planner_model_id, llm_planner_status, plan_with_llm
 from .data import EVENT_ID, EVENT_OBSERVATIONS, OBSERVATIONS, get_event, get_events, get_layers
 from .osong_repository import SAFEMAP_WMS_SNAPSHOT, get_osong_data_status, get_osong_reconstruction, get_osong_summary
 from .scenario_repository import create_scenario as save_scenario, get_scenario, mark_completed, mark_unavailable
@@ -19,6 +22,8 @@ from .schemas import (
     ClosureTimingResult,
     ExposureInventoryResult,
     AgentExampleQuestion,
+    AgentAskRequest,
+    AgentAskResult,
     AgentIntentPlanRequest,
     AgentIntentPlanResult,
     AgentToolCallRequest,
@@ -28,6 +33,8 @@ from .schemas import (
     AgentWorkflowResult,
     InflowDelayRequest,
     InflowDelayResult,
+    HandThresholdRequest,
+    HandThresholdResult,
     Intervention,
     ScenarioCreateRequest,
     ScenarioIntervention,
@@ -329,6 +336,23 @@ def inflow_delay_analysis(event_id: str, request: InflowDelayRequest):
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
+@app.post(
+    "/api/events/{event_id}/analysis/hand-threshold",
+    response_model=HandThresholdResult,
+    tags=["analysis"],
+)
+def hand_threshold_analysis(event_id: str, request: HandThresholdRequest):
+    """Compare temporary HAND cells after an explicit threshold reduction."""
+
+    _require_event(event_id)
+    try:
+        return analyze_hand_threshold(event_id, request.reduction_m)
+    except ReconstructionUnavailable as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
 @app.get("/api/agent/tools", response_model=list[AgentToolDescriptor], tags=["agent"])
 def agent_tools():
     """List the deterministic tools currently available to the Agent layer."""
@@ -357,6 +381,18 @@ def run_agent_tool(tool_name: str, request: AgentToolCallRequest):
 
 
 @app.post(
+    "/api/agent/ask",
+    response_model=AgentAskResult,
+    tags=["agent"],
+)
+def ask_agent_question(request: AgentAskRequest):
+    """Let Gemini choose registered tools iteratively and explain their evidence."""
+
+    _require_event(request.event_id)
+    return ask_agent(request)
+
+
+@app.post(
     "/api/agent/plan",
     response_model=AgentIntentPlanResult,
     tags=["agent"],
@@ -378,7 +414,7 @@ def plan_agent(request: AgentIntentPlanRequest):
                 **plan,
                 "planner_used": "llm",
                 "planner_note": (
-                    f"Routed by {LLM_PLANNER_MODEL}. The model only selected the workflow and "
+                    f"Routed by {llm_planner_model_id()}. The model only selected the workflow and "
                     "extracted parameters; every reported value comes from the tool layer."
                 ),
             }
@@ -453,7 +489,7 @@ def agent_planner_status():
     status = llm_planner_status()
     return {
         **status,
-        "model": LLM_PLANNER_MODEL,
+        "model": llm_planner_model_id(),
         "fallback": "deterministic",
         "note": (
             "The LLM only routes a request to a registered workflow and extracts parameters. "

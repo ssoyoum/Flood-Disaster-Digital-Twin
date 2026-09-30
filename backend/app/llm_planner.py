@@ -6,7 +6,7 @@ produces an analysis number - every value the caller finally shows comes from
 the deterministic Tool layer in ``services.py``.
 
 Anything the model returns is re-validated against the registered workflow
-names and the same parameter ranges the analysis endpoints enforce. If the SDK,
+names and the same parameter ranges the analysis endpoints enforce. If the API,
 the credential, or the validation fails, the caller falls back to the
 deterministic planner in ``agent_tools.py`` so behaviour never regresses.
 """
@@ -14,23 +14,25 @@ deterministic planner in ``agent_tools.py`` so behaviour never regresses.
 from __future__ import annotations
 
 import os
+import re
 from pathlib import Path
 from typing import Any, Literal
+from urllib.parse import quote
 
+import httpx
 from pydantic import BaseModel, Field
 
-from .agent_tools import suggestions_for
+from .agent_tools import _extract_clock_times, _extract_minutes, _extract_radii, suggestions_for
 from .schemas import AgentIntentPlanRequest
 
 
-MODEL_ID = "claude-opus-5"
+MODEL_ID = "gemini-3.5-flash-lite"
 MAX_TOKENS = 4000
 
 # A demo runs on whatever network the venue provides. Without a bound, an
 # unreachable API makes the request hang instead of falling back, so the rule
 # planner never gets its turn. Fail fast and let the fallback answer.
 DEFAULT_TIMEOUT_SECONDS = 10.0
-MAX_RETRIES = 0
 
 _WORKFLOW_TOOLS: dict[str, list[str]] = {
     "closure_timing": ["get_event", "get_reconstruction", "analyze_closure_timing"],
@@ -63,7 +65,7 @@ Rules:
 
 
 class LlmPlannerUnavailable(RuntimeError):
-    """The Anthropic SDK or an API credential is not available."""
+    """The Gemini API cannot be used for this request."""
 
 
 class LlmPlan(BaseModel):
@@ -112,54 +114,114 @@ def _timeout_seconds() -> float:
     return value if value > 0 else DEFAULT_TIMEOUT_SECONDS
 
 
+def llm_planner_model_id() -> str:
+    """Use the configured Gemini model while keeping the default explicit."""
+
+    _load_env_file_once()
+    return (os.environ.get("GEMINI_MODEL") or MODEL_ID).strip()
+
+
 def llm_planner_status() -> dict[str, Any]:
     """Report whether the LLM planner can run, without calling the API."""
 
     _load_env_file_once()
-    try:
-        import anthropic  # noqa: F401
-    except ModuleNotFoundError:
-        return {"available": False, "reason": "The anthropic SDK is not installed."}
-    if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN")):
+    model = llm_planner_model_id()
+    if not re.fullmatch(r"[A-Za-z0-9._-]+", model):
         return {
             "available": False,
-            "reason": "No Anthropic API credential is configured.",
+            "reason": "GEMINI_MODEL is not a valid model ID.",
+            "timeout_seconds": _timeout_seconds(),
+        }
+    if not os.environ.get("GEMINI_API_KEY", "").strip():
+        return {
+            "available": False,
+            "reason": "No Gemini API credential is configured.",
             "timeout_seconds": _timeout_seconds(),
         }
     return {
         "available": True,
-        "reason": f"Ready on {MODEL_ID}.",
+        "reason": f"Ready on {model}.",
         "timeout_seconds": _timeout_seconds(),
     }
 
 
-def _client():
+def _gemini_plan(message: str) -> LlmPlan:
+    """Ask Gemini for JSON routing data; never send an analysis tool result."""
+
     status = llm_planner_status()
     if not status["available"]:
         raise LlmPlannerUnavailable(status["reason"])
-    import anthropic
+    model = llm_planner_model_id()
+    url = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"{quote(model, safe='')}:generateContent"
+    )
+    payload = {
+        "systemInstruction": {"parts": [{"text": _SYSTEM_PROMPT}]},
+        "contents": [{"role": "user", "parts": [{"text": message}]}],
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "temperature": 0,
+            "maxOutputTokens": MAX_TOKENS,
+        },
+    }
+    try:
+        response = httpx.post(
+            url,
+            headers={"x-goog-api-key": os.environ["GEMINI_API_KEY"].strip()},
+            json=payload,
+            timeout=_timeout_seconds(),
+        )
+    except httpx.HTTPError as exc:
+        raise LlmPlannerUnavailable(f"Gemini connection failed: {type(exc).__name__}.") from exc
+    if response.status_code != 200:
+        raise LlmPlannerUnavailable(f"Gemini API returned HTTP {response.status_code}.")
+    try:
+        candidates = response.json()["candidates"]
+        parts = candidates[0]["content"]["parts"]
+        text = "".join(part.get("text", "") for part in parts)
+        return LlmPlan.model_validate_json(text)
+    except (KeyError, IndexError, TypeError, ValueError) as exc:
+        raise ValueError("Gemini returned no valid routing plan.") from exc
 
-    return anthropic.Anthropic(timeout=_timeout_seconds(), max_retries=MAX_RETRIES)
 
-
-def _validated_parameters(plan: LlmPlan, event_id: str) -> dict[str, Any]:
-    """Re-check the model's parameters against the analysis endpoint ranges."""
+def _validated_parameters(
+    plan: LlmPlan, event_id: str, message: str | None = None
+) -> dict[str, Any]:
+    """Keep only literal question values and re-check the tool ranges."""
 
     parameters: dict[str, Any] = {"event_id": event_id}
-    if plan.workflow == "closure_timing" and plan.closure_times:
+    if plan.workflow == "closure_timing":
+        model_times: list[str] = []
         for value in plan.closure_times:
             hour, _, minute = value.partition(":")
             if not (hour.isdigit() and minute.isdigit() and int(hour) < 24 and int(minute) < 60):
                 raise ValueError(f"LLM returned an invalid closure time: {value!r}")
-        parameters["closure_times"] = plan.closure_times
-    elif plan.workflow == "inflow_delay" and plan.delay_minutes:
+            model_times.append(f"{int(hour):02d}:{int(minute):02d}")
+        literal = _extract_clock_times(message.lower()) if message is not None else None
+        if literal is not None and any(value not in literal for value in model_times):
+            raise ValueError("LLM returned a closure time absent from the question.")
+        values = literal if literal is not None else model_times
+        if values:
+            parameters["closure_times"] = values
+    elif plan.workflow == "inflow_delay":
         if any(not 0 <= minutes <= 180 for minutes in plan.delay_minutes):
             raise ValueError(f"LLM returned an out-of-range delay: {plan.delay_minutes}")
-        parameters["delay_minutes"] = plan.delay_minutes
-    elif plan.workflow == "exposure_inventory" and plan.radii_m:
+        literal = _extract_minutes(message.lower()) if message is not None else None
+        if literal is not None and any(value not in literal for value in plan.delay_minutes):
+            raise ValueError("LLM returned a delay absent from the question.")
+        values = literal if literal is not None else plan.delay_minutes
+        if values:
+            parameters["delay_minutes"] = values
+    elif plan.workflow == "exposure_inventory":
         if any(not 50 <= radius <= 20000 for radius in plan.radii_m):
             raise ValueError(f"LLM returned an out-of-range radius: {plan.radii_m}")
-        parameters["radii_m"] = plan.radii_m
+        literal = _extract_radii(message.lower()) if message is not None else None
+        if literal is not None and any(value not in literal for value in plan.radii_m):
+            raise ValueError("LLM returned a radius absent from the question.")
+        values = literal if literal is not None else plan.radii_m
+        if values:
+            parameters["radii_m"] = values
     return parameters
 
 
@@ -171,17 +233,7 @@ def plan_with_llm(request: AgentIntentPlanRequest) -> dict[str, Any]:
     caller treats both as a reason to fall back, never as an analysis result.
     """
 
-    client = _client()
-    response = client.messages.parse(
-        model=MODEL_ID,
-        max_tokens=MAX_TOKENS,
-        system=_SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": request.message}],
-        output_format=LlmPlan,
-    )
-    plan = response.parsed_output
-    if plan is None:
-        raise ValueError("The model returned no parsable plan.")
+    plan = _gemini_plan(request.message)
 
     limitations = [
         "This plan selects registered deterministic tools; it does not execute them.",
@@ -202,7 +254,7 @@ def plan_with_llm(request: AgentIntentPlanRequest) -> dict[str, Any]:
             "limitations": limitations,
         }
 
-    parameters = _validated_parameters(plan, request.event_id)
+    parameters = _validated_parameters(plan, request.event_id, request.message)
     assumptions = []
     if len(parameters) == 1:
         assumptions.append(

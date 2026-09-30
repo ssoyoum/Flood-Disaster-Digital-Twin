@@ -47,13 +47,13 @@ def apply_intervention(intervention: Intervention, event_id: str = EVENT_ID) -> 
                 "intervention_state": reconstruction["intervention"]["name"],
                 "response_window_min": reconstruction["intervention"]["available_response_window_min"],
                 "time_until_full_inundation_min": reconstruction["intervention"]["time_until_full_inundation_min"],
-                "data_status": "Rule-based auto-closure scenario connected. Exposure KPIs remain PENDING_FLOOD_EXTENT.",
+                "data_status": "Rule-based closure timing comparison connected. Exposure KPIs remain PENDING_FLOOD_EXTENT.",
             }
         )
         return result, [
-            "The intervention is represented as underpass entrance closure after the observed inflow timestamp.",
+            "The intervention assumes effective underpass entrance closure at the chosen time; enforcement and compliance are not verified.",
             "No validated underpass-depth trigger threshold is connected; only the observed inflow timestamp is available for timeline comparison.",
-            "The intervention blocks new entries after detected inflow and does not estimate vehicles already inside.",
+            "Only hypothetical new-entry control is represented; vehicles already inside and casualty outcomes are not estimated.",
             "Exposure reduction is not calculated until vector Flood Extent or calibrated intervention simulation output is available.",
         ]
     return baseline, [
@@ -226,7 +226,7 @@ def analyze_closure_timing(event_id: str, closure_times: list[str]) -> dict:
         ],
         "scenarios": scenarios,
         "assumptions": [
-            "Closure blocks new vehicle entry from the given time onward.",
+            "The scenario assumes an effective entrance closure from the given time onward; actual compliance is not modeled.",
             "Observed milestone times are held fixed; only the closure time changes.",
             "A positive minutes_before_* value means the closure happens before that milestone.",
             "lead_time_vs_detection_trigger_min compares against the observed-inflow closure reference.",
