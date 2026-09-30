@@ -1,11 +1,14 @@
 import json
+import os
 from functools import lru_cache
+from pathlib import Path
 
 import httpx
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from .agent_tools import (
     execute_agent_tool,
@@ -510,3 +513,11 @@ def agent_planner_status():
             "Analysis values always come from the deterministic tool layer."
         ),
     }
+
+
+_static_dir = os.getenv("FLOODOPS_STATIC_DIR")
+if _static_dir:
+    static_path = Path(_static_dir)
+    if not (static_path / "index.html").is_file():
+        raise RuntimeError(f"FLOODOPS_STATIC_DIR has no index.html: {static_path}")
+    app.mount("/", StaticFiles(directory=static_path, html=True), name="frontend")
