@@ -343,6 +343,7 @@ osong_rainfall_primary:
   source_type: "OBSERVATION"
   data_role: "primary_event_source"
   source_url: "https://data.kma.go.kr/"
+  license: "Korea Public Nuri Type 1 (KMA open data portal default; checked 2026-09-30)"
   coverage: "stations matched to Osong and Miho River event area"
   data_year: 2023
   event_date: "2023-07-15"

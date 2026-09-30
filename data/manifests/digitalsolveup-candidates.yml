@@ -1,0 +1,129 @@
+schema_version: "1.0"
+source: "민관협력 지원 플랫폼 공공데이터 카탈로그"
+catalog_api: "https://digitalsolveup.kr/api/v1/public-data/data"
+detail_api_template: "https://digitalsolveup.kr/api/v1/public-data/data/{id}"
+checked_at: "2026-09-30"
+catalog_total: 609
+flood_category_total: 62
+status: "candidate; resource application not submitted"
+notes:
+  - "Most entries are catalog links to the original provider API (HRFCO, KMA, Seoul Open API, data.go.kr). Service keys are issued by those providers or through the platform application."
+  - "Catalog license value is 'public'. It is not a Korea Public Nuri type; check the original provider page before use."
+  - "'Real-time' APIs must be checked for historical query ranges covering 2022 Seoul and 2023 Osong before they are used for event replay."
+
+candidates:
+  - no: 39
+    id: a331e8c0-4262-11ef-9a98-6baba7805cbb
+    title: "위기 관련(침수 위험지역) 시공간 데이터"
+    provider: NIA
+    use: "flood warning and dam discharge events with affectArea polygons for the event timeline"
+  - no: 573
+    id: 0fcf0f10-8015-11ed-8dc0-ed64b4d7ae61
+    title: "한강홍수통제소_실시간 수위"
+    provider: 한강홍수통제소
+    use: "water-level replay; same origin as the current Osong HRFCO series"
+  - no: 276
+    id: e69f5b50-92a0-11ee-a326-17a4d94ef6ac
+    title: "한강홍수통제소_수위 관측소"
+    provider: 한강홍수통제소
+    use: "station metadata (datum, warning levels)"
+  - no: 275
+    id: 61a2f1d0-92a2-11ee-a1d6-e7a4973156d6
+    title: "한강홍수통제소_실시간 강수량"
+    provider: 한강홍수통제소
+    use: "rainfall replay"
+  - no: 274
+    id: a455fcc0-92a2-11ee-928b-0f81abbde154
+    title: "한강홍수통제소_강수량 관측소"
+    provider: 한강홍수통제소
+    use: "rain gauge metadata"
+  - no: 271
+    id: cefcf440-92a4-11ee-adf3-c51f732da936
+    title: "한강홍수통제소_홍수예보발령"
+    provider: 한강홍수통제소
+    use: "flood forecast issuance times for the event timeline"
+  - no: 574
+    id: d51c2980-8013-11ed-9a8c-11efe8299d22
+    title: "한강홍수통제소_실시간 댐자료"
+    provider: 한강홍수통제소
+    use: "upstream dam discharge condition"
+  - no: 93
+    id: bb141ac0-94c1-11ee-9ede-c550904646f0
+    title: "한국수자원공사_다목적댐 운영 정보"
+    provider: 한국수자원공사
+    use: "dam inflow/outflow condition"
+  - no: 485
+    id: 9bff0b10-8f51-11ee-be8a-9109b51fe98e
+    title: "한국수자원공사_우량수위 관측정보"
+    provider: 한국수자원공사
+    use: "supplementary rainfall and water-level gauges"
+  - no: 82
+    id: ceab9c60-94c7-11ee-a1d6-e7a4973156d6
+    title: "기상청_레이더강수량(전국)조회"
+    provider: 기상청
+    use: "spatial rainfall"
+  - no: 593
+    id: 123f33b0-7cff-11ed-849e-cb8044ba60e6
+    title: "기상청_기상특보 조회서비스"
+    provider: 기상청
+    use: "heavy-rain warning times for the event timeline"
+  - no: 600
+    id: 443f69b0-7b75-11ed-9a86-b528c338ee34
+    title: "행정안전부_상황전파메세지정보"
+    provider: 행정안전부
+    use: "alert timeline; alternative to DSSP-IF-00247 which returned SERVICE ACCESS DENIED"
+  - no: 601
+    id: ecd7ecb0-7b74-11ed-8dc0-ed64b4d7ae61
+    title: "행정안전부_재난문자방송 발령현황(지역별)"
+    provider: 행정안전부
+    use: "alert timeline"
+  - no: 282
+    id: 59eb9c70-927b-11ee-adf3-c51f732da936
+    title: "서울시 수방 침수흔적도(2013년) 공간정보"
+    provider: 서울특별시
+    use: "past Seoul flood footprint comparison"
+  - no: 284
+    id: 0bcc86d0-927b-11ee-a326-17a4d94ef6ac
+    title: "서울시 풍수해 침수예상도 공간정보"
+    provider: 서울특별시
+    use: "planned flood-risk layer for Seoul impact analysis"
+  - no: 111
+    id: b01a2510-94bc-11ee-a326-17a4d94ef6ac
+    title: "서울시 수해대피소 공간정보"
+    provider: 서울특별시
+    use: "shelter-opening intervention"
+  - no: 114
+    id: 47699b90-94bc-11ee-9430-79bcaba91a25
+    title: "서울시 풍수해 대피경로 공간정보"
+    provider: 서울특별시
+    use: "evacuation-route intervention"
+  - no: 101
+    id: 17f47d60-94be-11ee-be8a-9109b51fe98e
+    title: "서울시 배수펌프장 정보"
+    provider: 서울특별시
+    use: "drainage facility status"
+  - no: 294
+    id: 47d61500-9277-11ee-9ede-c550904646f0
+    title: "서울시 하천 수위 현황"
+    provider: 서울특별시
+    use: "Seoul stream levels with flood and control thresholds"
+  - no: 297
+    id: b8e96830-9274-11ee-9b22-fdcad1971019
+    title: "서울시 홍수관리구역 정보"
+    provider: 서울특별시
+    use: "flood management zones"
+  - no: 310
+    id: 976e5bf0-925d-11ee-a326-17a4d94ef6ac
+    title: "충청북도_읍면동 지역별 재난 대응 데이터"
+    provider: 충청북도
+    use: "Osong shelters and expected capacity"
+  - no: 224
+    id: 8af88d10-9347-11ee-9b22-fdcad1971019
+    title: "행정안전부_통계연보_지역별 하천 및 해안지역 인명피해 우려지역"
+    provider: 행정안전부
+    use: "regional risk context"
+  - no: 227
+    id: 236e4600-9345-11ee-9430-79bcaba91a25
+    title: "행정안전부_통계연보_지역별 자연재해위험개선지구 지정"
+    provider: 행정안전부
+    use: "regional risk context"
