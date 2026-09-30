@@ -1,160 +1,119 @@
 # FloodOps
 
-FloodOps is not a future flood prediction system.
+**과거 홍수 사건을 재구성하고 대응 조건을 비교하는 의사결정 지원 PoC**입니다. 미래 침수나 인명피해를 예측하는 시스템은 아닙니다. 관측·공간 자료로 사건을 다시 살펴보고, 등록된 분석으로 답할 수 있는 질문과 아직 답할 수 없는 질문을 구분합니다.
 
-FloodOps is a disaster decision-support Digital Twin PoC that reconstructs real historical disaster events with observed and spatial data, then compares counterfactual interventions under the same event conditions.
+**공개 시연:** [floodops.duckdns.org](https://floodops.duckdns.org/) · **현재 분석 사례:** 2023 오송 궁평2지하차도
 
-Current reference case:
+> 2026-10-01 확인: 공개 서버의 `/health`는 200이고 Gemini 키가 설정되어 자유 질의 Agent가 동작합니다. Agent 호출은 IP당 분당 6회·하루 60회, 서비스 전체 하루 500회로 제한됩니다. 공개 배포본은 수동으로 다시 빌드해야 로컬 수정이 반영됩니다([배포 기록](docs/DEPLOY_AWS.md)).
 
-> 2023 Osong Underpass Flood - Miho River and Gungpyeong 2 Underpass
+## 현재 구현 범위
 
-Core question:
+| 사례 | 화면·자료 상태 |
+| --- | --- |
+| 2023 오송 지하차도 | 관제·사건 재생·시나리오 비교 가능 |
+| 2022 서울 도시 침수 | 사건 목록 등록, 관제 자료 연결 예정 |
+| 2022 포항 침수 | 사건 목록 등록, 관제 자료 연결 예정 |
+| 2024 익산 극한호우 | 사건 목록 등록, 관제 자료 연결 예정 |
+| 2026 안동·의성 복합재난 | 사건 목록 등록, 관제 자료 연결 예정 |
 
-> What happened during the Osong flood, and how might the situation have changed if a different intervention had been applied?
+접속 흐름은 **소개 → 사례 선택 → 오송 관제**입니다. 관제 화면에서 7단계 사건 재생, 지도 레이어와 관측 근거, 시나리오 비교, Agent 질의를 볼 수 있습니다. 나머지 네 사례는 빈 관제 화면이 열리지 않도록 잠겨 있습니다. 사건 목록 등록을 분석 자료 연결 완료로 해석하면 안 됩니다.
 
-## Current MVP
+### 오송에서 할 수 있는 일
 
-FloodOps 1.0 is a Historical Disaster Reconstruction Digital Twin MVP.
+- **사건 재구성:** 강우·수위 관측, 사건 단계, 도로·건물·하천·지형 자료와 임시 HAND 침수 추정 셀을 같은 지도에서 검토합니다.
+- **지하차도 통제 시각 비교:** 지정 시각부터 신규 진입을 막았다는 가정 아래, 유입·주행불능 등 재구성 시각까지 남은 시간을 비교합니다. 물의 진행이나 이미 진입한 차량의 결과는 바꾸지 않습니다.
+- **HAND 판정 기준 민감도:** 선택 임계를 0~2.5 m 낮추고 같은 사건 단계의 지도 셀을 다시 선택합니다. 08:27 단계에서 1.5 m 감소 예시는 기준 306셀, 변경 후 283셀, 제외 23셀입니다. 이 수치는 지도 선택 규칙의 변화이며 제방 증고·차수벽 설치의 물리적 효과가 아닙니다.
+- **주변 시설 재고:** 지하차도 주변의 연결된 건물·도로·시설을 반경별로 집계합니다. 재고 수를 침수 피해량으로 해석하지 않습니다.
+- **Agent 질의:** Gemini가 등록된 읽기 전용 도구를 선택하고 결과를 확인한 뒤 근거 번호와 도구 호출 내역을 보여줍니다. 최대 4회 도구 호출을 허용하며, 도구명과 사용자 입력값을 서버에서 검증합니다.
+
+## Agent가 답하는 범위
+
+로컬 서버에 유효한 `GEMINI_API_KEY`가 있을 때 관제 화면은 `POST /api/agent/ask`를 사용합니다. 질문, 최근 대화, 도구 결과가 Gemini에 전달됩니다. Agent는 사건 조회·재구성, 통제 시각, 명시한 유입 지연, 주변 시설 재고, 기준 시나리오 비교, HAND 임계 민감도 등 **등록된 7개 도구** 중에서 선택합니다. 답변에는 호출 결과와 `[1]` 같은 근거 번호를 남기며, 후속 질문을 제안할 수 있습니다.
+
+예를 들어 다음처럼 물어볼 수 있습니다.
 
 ```text
-KMA observed rainfall
--> HRFCO observed water level
--> official incident timeline
--> levee / overflow / breach events
--> Gungpyeong 2 underpass risk state
--> counterfactual intervention
--> baseline versus scenario comparison
+08:25에 지하차도를 통제했다면 유입까지 몇 분 남나요?
+HAND 선택 임계를 1.5m 낮추면 단계별 붉은 셀이 어떻게 바뀌나요?
+지하차도 반경 500m 안에 건물이 몇 개인가요?
 ```
 
-Spatial context is provided by WAMIS rivers, SGIS boundary data, Copernicus DEM, official GIS Building Integrated Information, OSM historical snapshots, and local processed Osong layers.
+`제방을 3미터 올린다면?`은 자연어로 해석할 수 있어도 **실제 수위·침수 범위 변화는 계산할 수 없습니다.** 제방 단면과 변경 위치, 유량·수위 경계조건, 검증된 수리모형이 연결되지 않았습니다. 서버는 제방 높이를 HAND 임계 변경량으로 대입하지 않으며, 계산할 수 없는 효과는 `NEEDS_DATA`와 구체적인 한계로 돌려줍니다. Gemini 연결 실패나 키 부재는 `UNAVAILABLE`입니다. 사용법 질문은 등록된 예시로 안내할 수 있습니다.
 
-The current `approx_flood_envelope` layer is a temporary DEM-constrained derived approximation. It is used to visualize a time-changing historical reconstruction state. It is not official Flood Extent, measured flood depth, measured velocity, or a validated hydraulic simulation.
+이전의 `POST /api/agent/plan`과 `POST /api/agent/workflows`도 남아 있습니다. `/plan`은 Gemini가 없으면 규칙 기반 계획으로 전환하지만, **주 Agent 질의인 `/ask`에는 이 전환이 적용되지 않습니다.** Agent 없이도 시나리오 비교 화면에서 통제 시각과 HAND 기준을 직접 조절할 수 있습니다.
 
-Exposure KPIs that require valid flood geometry remain `PENDING_FLOOD_EXTENT`.
+## 자료와 해석 기준
 
-## Agent and Scenario Layer
-
-FloodOps exposes deterministic analysis tools behind a small Agent workflow. An
-optional LLM planner only selects a registered workflow and extracts parameters;
-it never invents analysis values. If the SDK or credential is unavailable, the
-planner falls back to the deterministic planner.
-
-Available analysis flows include:
-
-- closure-timing what-if: compare hypothetical underpass closure times
-- inflow-delay what-if: shift downstream milestones by an explicit assumption
-- exposure inventory: count nearby buildings, roads, and facilities without claiming flood impact
-- portfolio scenario: validate selected building IDs and report whether source-backed intervention outputs are available
-
-Portfolio scenario example:
-
-```http
-POST /api/scenarios
+```text
+관측·원자료 → 출처와 품질 확인 → 오송 사건 재구성 → 등록된 분석 도구
+                                            ├─ 관제·지도·시나리오 비교
+                                            └─ Gemini Agent의 도구 호출과 근거 답변
 ```
 
-```json
-{
-  "name": "Osong building response drill",
-  "event_id": "osong-2023",
-  "building_ids": [1, 2, 3],
-  "interventions": ["flood_barrier", "evacuation_support"]
-}
-```
+`approx_flood_envelope`와 HAND 셀은 지형을 이용한 **임시 근사 재구성**입니다. 공식 침수범위, 실측 침수심·유속 또는 검증된 수리해석 결과가 아닙니다. 공식 침수 도형이 필요한 노출·피해 지표는 `PENDING_FLOOD_EXTENT`로 남겨 둡니다. 일부 사건 단계 시각에는 원문 페이지 재확인이 필요한 `NEEDS_SOURCE_PAGE` 상태가 표시됩니다. 시나리오 결과에서 사망 예방, 피해액 감소, 침수심 변화 같은 효과를 산출하지 않습니다.
 
-```http
-POST /api/scenarios/1/run
-```
+데이터 출처·이용 조건과 가용 상태는 [`data/manifests/`](data/manifests/) 및 [데이터 품질 기록](docs/data-quality.md)에 정리되어 있습니다. 시나리오 저장은 현재 메모리 기반이고 PostGIS 연계는 보류 상태입니다.
 
-The portfolio runner currently validates connected building IDs but does not
-calculate intervention effects. Because no source-backed intervention model,
-traffic/vehicle exposure, vulnerability data, or verified flood extent is
-connected, `/run` returns `UNAVAILABLE` with null effect metrics instead of
-inventing a before/after risk reduction.
+## 로컬 실행
 
-## What You Can See
+Python과 Node.js가 필요합니다. 저장소 루트에서 두 터미널을 사용합니다.
 
-- Historical Replay of the 2023-07-15 Osong incident sequence
-- observed rainfall and water-level context
-- MapLibre spatial layers for AOI, rivers, roads, buildings, DEM context, underpass, and approximate envelope
-- baseline versus observed-inflow closure timing comparison
-- provenance and limitation notes for observed, derived, temporary, and reference data
-- Agent workflow planning with deterministic fallback
-- building-level response scenario API
-- optional dark control-room UI preview on the `ui/dark-console` branch
-
-## Run Locally
-
-### Backend
+**1. API 서버**
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r backend/requirements.txt
-$env:PYTHONPATH = "backend"
 uvicorn app.main:app --app-dir backend --reload --port 8033
 ```
 
-Backend:
+API 확인: [상태](http://localhost:8033/health) · [Swagger UI](http://localhost:8033/docs) · [Agent 설정 상태](http://localhost:8033/api/agent/planner-status)
 
-- API docs: http://localhost:8033/docs
-- OpenAPI schema: http://localhost:8033/openapi.json
-- health check: http://localhost:8033/health
+자유 질의를 사용하려면 저장소 루트의 `.env`에 실제 `GEMINI_API_KEY`를 설정합니다. `GEMINI_MODEL`은 선택 사항입니다. 예시 파일의 `REPLACE_ME`를 그대로 키로 사용하지 마세요. 키는 프런트엔드 환경 변수에 넣지 않습니다. 키가 없어도 사건 재생과 직접 시나리오 비교는 사용할 수 있습니다.
 
-The optional LLM planner works without a credential by using the deterministic
-fallback. To enable LLM routing, set `ANTHROPIC_API_KEY` in the repository
-`.env` file and check `GET /api/agent/planner-status`.
-
-### Frontend
+**2. 웹 화면**
 
 ```powershell
-npm install
+npm ci
 npm run dev
 ```
 
-Frontend:
-
-- http://localhost:5173
-- http://127.0.0.1:5173
-
-로컬 실행 포트는 FloodOps backend `8033`, Vite `5173`으로 고정한다. 다른 프로세스가
-해당 포트를 사용 중이면 Vite가 다른 포트로 이동하지 않고 시작 오류를 표시한다.
-
-Backend를 별도 포트로 실행해야 하는 예외 상황에는:
+[http://localhost:5173](http://localhost:5173)에서 엽니다. Vite는 5173 포트가 사용 중이면 다른 포트로 자동 이동하지 않습니다. API를 다른 포트에서 실행한다면 웹 서버를 시작하기 전에 다음 값을 설정합니다.
 
 ```powershell
-$env:VITE_API_BASE = "http://127.0.0.1:8001"
+$env:VITE_API_BASE = "http://127.0.0.1:8035"
 npm run dev
 ```
 
-### Docker
+`docker-compose.yml`은 프런트엔드·API·PostGIS 개발 구성입니다. 현재 백엔드 이미지는 사건 가공 데이터를 포함하지 않으므로 **오송 전체 시연용 배포 이미지와는 구성이 다릅니다.** 프런트엔드와 오송 가공 자료를 함께 포함하는 단일 컨테이너 정의는 [`Dockerfile.aws`](Dockerfile.aws)입니다.
+
+## 주요 API
+
+| 경로 | 용도 |
+| --- | --- |
+| `GET /api/events` | 5개 사건 목록과 자료 상태 |
+| `GET /api/events/osong-2023/reconstruction` | 오송 사건 단계와 출처 |
+| `GET /api/events/osong-2023/layers` | 지도 레이어 |
+| `POST /api/events/osong-2023/analysis/closure-timing` | 통제 시각 비교 |
+| `POST /api/events/osong-2023/analysis/hand-threshold` | HAND 선택 셀 민감도 |
+| `GET /api/events/osong-2023/exposure-inventory` | 반경별 시설 재고 |
+| `GET /api/agent/examples` | 등록 도구로 답할 수 있는 예시 질문 |
+| `POST /api/agent/ask` | Gemini의 연속 도구 호출과 근거 답변 |
+
+건물별 개입 시나리오 API(`POST /api/scenarios`, `POST /api/scenarios/{id}/run`)는 건물 ID와 자료 연결 상태를 검사합니다. 검증된 개입 모델이 없어 효과 지표는 `UNAVAILABLE`로 반환하며 전후 위험도 감소를 만들어 내지 않습니다.
+
+## 검증
 
 ```powershell
-docker compose up --build
-```
-
-Default Docker services:
-
-- frontend: http://localhost:8080
-- backend: http://localhost:8000
-- PostGIS: localhost:5432
-
-## Tests
-
-```powershell
-$env:PYTHONPATH = "backend"
-python -m pytest backend/tests
+python -m pytest backend/tests -q
+npm test
 npm run build
 ```
 
-## Documentation
+2026-10-01에 백엔드 테스트 79개가 통과했습니다. 이후 코드 변경은 별도로 재검증해야 합니다.
 
-- [Project Plan](docs/PROJECT_PLAN.md)
-- [Development Guide](docs/DEVELOPMENT_GUIDE.md)
-- [Data Guide](docs/DATA_GUIDE.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Decision Records](docs/DECISIONS.md)
-- [Data Quality Issues](docs/data-quality.md)
-- [Current TODO](TODO.md)
-- [Data Folder Guide](data/README.md)
+## 관련 문서
 
-Dataset provenance and availability are tracked under `data/manifests/`.
+- [프로젝트 계획](docs/PROJECT_PLAN.md) · [개발 가이드](docs/DEVELOPMENT_GUIDE.md) · [아키텍처](docs/ARCHITECTURE.md)
+- [데이터 가이드](docs/DATA_GUIDE.md) · [데이터 폴더](data/README.md) · [데이터 품질 기록](docs/data-quality.md)
+- [의사결정 기록](docs/DECISIONS.md) · [작업 기록](WORKLOG.md) · [현재 TODO](TODO.md)
