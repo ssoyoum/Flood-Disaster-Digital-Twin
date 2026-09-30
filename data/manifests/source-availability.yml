@@ -1010,9 +1010,12 @@ osong_nasa_power_precipitation:
 osong_event_report:
   source: "Construction and Infrastructure Development Information System (CODIL)"
   source_url: "https://www.codil.or.kr/filebank/original/RK/OTKCRK240265/OTKCRK240265.pdf"
-  coverage: "2023 Osong underpass flood incident context"
+  title: "고속도로 유지관리 공사 형태에 따른 안전관리 개선 방안 연구 (한국도로공사 도로교통연구원, 2023년도 연구보고서)"
+  coverage: "Highway maintenance safety study; section 6.5.3 (pp. 66-67) mentions the Osong underpass flood only as a Serious Civic Accident Act example"
   data_year: 2023
-  status: "acquired; reference document"
+  status: "acquired; not an Osong incident report"
+  usage_note: "Do not cite for the incident timeline or damage figures. The timeline source is the Office for Government Policy Coordination inspection result (2023-07-28)."
+  timeline_source: "국무조정실, 「오송 궁평2지하차도 침수사고 감찰 조사결과」, 2023-07-28, https://www.korea.kr/briefing/policyBriefingView.do?newsId=156582908"
   acquired_at: "2026-08-30"
   raw_file: "data/raw/osong/osong_2023_event_report_codIL.pdf"
   processed_file: "data/processed/osong/osong_2023_event_report_codIL.txt"
