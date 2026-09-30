@@ -1,6 +1,6 @@
 
 import httpx
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -13,6 +13,7 @@ from .agent_tools import (
 )
 from .agent_runner import ask_agent
 from .hand_sensitivity import analyze_hand_threshold
+from .rate_limit import agent_limiter, client_key
 from .llm_planner import LlmPlannerUnavailable, llm_planner_model_id, llm_planner_status, plan_with_llm
 from .data import EVENT_ID, EVENT_OBSERVATIONS, OBSERVATIONS, get_event, get_events, get_layers
 from .osong_repository import SAFEMAP_WMS_SNAPSHOT, get_osong_data_status, get_osong_reconstruction, get_osong_summary
@@ -385,10 +386,11 @@ def run_agent_tool(tool_name: str, request: AgentToolCallRequest):
     response_model=AgentAskResult,
     tags=["agent"],
 )
-def ask_agent_question(request: AgentAskRequest):
+def ask_agent_question(request: AgentAskRequest, http_request: Request):
     """Let Gemini choose registered tools iteratively and explain their evidence."""
 
     _require_event(request.event_id)
+    agent_limiter.check(client_key(http_request))
     return ask_agent(request)
 
 
@@ -397,12 +399,13 @@ def ask_agent_question(request: AgentAskRequest):
     response_model=AgentIntentPlanResult,
     tags=["agent"],
 )
-def plan_agent(request: AgentIntentPlanRequest):
+def plan_agent(request: AgentIntentPlanRequest, http_request: Request):
     """Convert supported natural-language intent into a non-executing plan."""
 
     _require_event(request.event_id)
 
     if request.planner in {"auto", "llm"}:
+        agent_limiter.check(client_key(http_request))
         try:
             plan = plan_with_llm(request)
         except (LlmPlannerUnavailable, ValueError) as exc:
