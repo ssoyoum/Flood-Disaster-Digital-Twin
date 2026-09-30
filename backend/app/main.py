@@ -1,7 +1,10 @@
+import json
+from functools import lru_cache
 
 import httpx
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import FileResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from .agent_tools import (
@@ -70,6 +73,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Layer payloads are tens of MB of GeoJSON; compressing them cuts transfer several times over.
+app.add_middleware(GZipMiddleware, minimum_size=1024)
 
 
 def _require_event(event_id: str) -> None:
@@ -135,10 +140,16 @@ def timeline(event_id: str):
     return EVENT_OBSERVATIONS.get(event_id, OBSERVATIONS)
 
 
+@lru_cache(maxsize=8)
+def _layers_json(event_id: str, layer_year: int) -> bytes:
+    # get_layers deep-copies ~30 MB of GeoJSON; serialising it once keeps repeat requests from blocking others.
+    return json.dumps(get_layers(event_id, layer_year), ensure_ascii=False).encode("utf-8")
+
+
 @app.get("/api/events/{event_id}/layers")
 def event_layers(event_id: str, layer_year: int = 2023):
     _require_event(event_id)
-    return get_layers(event_id, layer_year)
+    return Response(content=_layers_json(event_id, layer_year), media_type="application/json")
 
 
 @app.get("/api/events/{event_id}/summary")
