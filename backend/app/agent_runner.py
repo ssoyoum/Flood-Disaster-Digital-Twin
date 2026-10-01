@@ -25,6 +25,7 @@ from .agent_tools import (
     suggestions_for,
 )
 from .llm_planner import LlmPlannerUnavailable, _load_env_file_once, _timeout_seconds, llm_planner_model_id, llm_planner_status
+from .osong_repository import get_osong_reconstruction
 from .schemas import AgentAskRequest, AgentToolCallRequest
 from .services import ReconstructionUnavailable
 
@@ -197,7 +198,7 @@ def _validated_tool_request(action: AgentAction, request: AgentAskRequest, calls
     supplied = " ".join([request.message, *(turn.content for turn in request.history if turn.role == "user")]).lower()
     if "closure_times" in params:
         values = params["closure_times"]
-        allowed = set(_extract_clock_times(supplied)) | _milestone_clocks(calls or [])
+        allowed = set(_extract_clock_times(supplied)) | _milestone_clocks(calls or []) | set(_relative_closure_clocks(supplied, request.event_id))
         if not isinstance(values, list) or not values or len(values) > 10 or not all(isinstance(v, str) and v in allowed for v in values):
             raise ValueError("Closure times must appear in the user's question or be a recorded milestone time.")
     if "delay_minutes" in params:
@@ -343,6 +344,41 @@ _HAND_WORDS = re.compile(r"HAND|셀|판정 기준|선택 임계", re.IGNORECASE)
 _OBSERVATION_WORDS = re.compile(r"비가|강우|강수|비는|수위|rain|water level", re.IGNORECASE)
 
 
+_EARLIER = re.compile(r"(\d{1,3})\s*분\s*(?:더\s*)?(?:일찍|먼저|빨리|앞당|이르게|일러)")
+_LATER = re.compile(r"(\d{1,3})\s*분\s*(?:더\s*)?(?:늦게|늦춰|늦추|미뤄|뒤에)")
+
+
+def _baseline_closure_clock(event_id: str) -> str | None:
+    """The registered comparison closure time (anchored to the observed inflow), as HH:MM."""
+
+    try:
+        trigger = get_osong_reconstruction()["intervention"]["trigger_time"] if event_id == "osong-2023" else None
+    except (KeyError, TypeError):
+        return None
+    match = re.search(r"T(\d{2}):(\d{2})", str(trigger or ""))
+    return f"{match.group(1)}:{match.group(2)}" if match else None
+
+
+def _relative_closure_clocks(message: str, event_id: str = "osong-2023") -> list[str]:
+    """Resolve "10분 일찍 차단" style phrases against the registered baseline closure time."""
+
+    if not _CLOSURE_WORDS.search(message):
+        return []
+    base = _baseline_closure_clock(event_id)
+    if not base:
+        return []
+    hour, minute = (int(part) for part in base.split(":"))
+    clocks = []
+    for pattern, sign in ((_EARLIER, -1), (_LATER, 1)):
+        for match in pattern.finditer(message):
+            total = hour * 60 + minute + sign * int(match.group(1))
+            if 0 <= total < 24 * 60:
+                clock = f"{total // 60:02d}:{total % 60:02d}"
+                if clock not in clocks:
+                    clocks.append(clock)
+    return clocks
+
+
 def _router_hints(message: str) -> list[dict[str, Any]]:
     """Registered tools whose required values are literally present in the question.
 
@@ -355,10 +391,20 @@ def _router_hints(message: str) -> list[dict[str, Any]]:
     delays = _extract_minutes(text)
     times = _extract_clock_times(text)
     radii = _extract_radii(text)
-    if delays and _DELAY_WORDS.search(text) and not _is_physical_effect_question(text):
+    closure = bool(_CLOSURE_WORDS.search(text))
+    relative = _relative_closure_clocks(text)
+    inflow_named = bool(re.search(r"유입|지연|delay", text, re.IGNORECASE))
+    if delays and _DELAY_WORDS.search(text) and not _is_physical_effect_question(text) and (inflow_named or not closure):
         hints.append({"tool_name": "analyze_inflow_delay", "parameters": {"delay_minutes": delays}})
-    if times and _CLOSURE_WORDS.search(text):
+    if times and closure:
         hints.append({"tool_name": "analyze_closure_timing", "parameters": {"closure_times": times}})
+    elif relative:
+        base = _baseline_closure_clock("osong-2023")
+        hints.append({
+            "tool_name": "analyze_closure_timing",
+            "parameters": {"closure_times": relative},
+            "note": f"Relative closure time resolved from the registered baseline closure {base} (anchored to the observed underpass inflow). Say this base in the answer.",
+        })
     if radii and _EXPOSURE_WORDS.search(text):
         hints.append({"tool_name": "get_exposure_inventory", "parameters": {"radii_m": radii}})
     if _HAND_WORDS.search(text) and not _is_physical_effect_question(text):

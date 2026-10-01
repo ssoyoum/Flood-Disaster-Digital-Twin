@@ -120,3 +120,15 @@ def test_model_number_formats_are_normalised_before_validation(monkeypatch):
     result = _ask("유입이 10분 늦춰졌다면 주행불능 시각은 언제인가요?").json()
     assert result["status"] == "ANSWERED"
     assert result["tool_calls"][0]["tool_name"] == "analyze_inflow_delay"
+
+
+def test_relative_closure_phrase_resolves_against_the_registered_baseline(monkeypatch):
+    decisions = iter([
+        agent_runner.AgentAction(action="tool", tool_name="analyze_closure_timing", parameters={"closure_times": ["08:17"]}),
+        agent_runner.AgentAction(action="final", answer="기준 통제 시각 08:27보다 10분 이른 08:17에 차단하면 유입보다 10분 앞섭니다 [1].", evidence_calls=[1]),
+    ])
+    monkeypatch.setattr(agent_runner, "_gemini_action", lambda _context: next(decisions))
+    result = _ask("차단을 10분 일찍한다면?").json()
+    assert result["status"] == "ANSWERED"
+    assert result["tool_calls"][0]["parameters"]["closure_times"] == ["08:17"]
+    assert result["tool_calls"][0]["result"]["scenarios"][0]["minutes_before_underpass_inflow"] == 10
