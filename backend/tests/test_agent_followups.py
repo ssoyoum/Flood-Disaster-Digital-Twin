@@ -132,3 +132,10 @@ def test_relative_closure_phrase_resolves_against_the_registered_baseline(monkey
     assert result["status"] == "ANSWERED"
     assert result["tool_calls"][0]["parameters"]["closure_times"] == ["08:17"]
     assert result["tool_calls"][0]["result"]["scenarios"][0]["minutes_before_underpass_inflow"] == 10
+
+
+def test_kilometre_radii_are_understood():
+    from app.agent_tools import _extract_radii
+
+    assert _extract_radii("지하차도 1km 안에 건물 몇 개야?") == [1000]
+    assert _extract_radii("1.5 킬로 반경") == [1500]

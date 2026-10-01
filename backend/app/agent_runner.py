@@ -67,7 +67,7 @@ def _is_physical_effect_question(message: str) -> bool:
 
 _SYSTEM_PROMPT = """You are FloodOps, an analyst helping a local disaster or road officer review a past flood event. Read the user's question in natural Korean, work out what they actually want to know, and answer it as helpfully as the registered read-only tools allow.
 
-Tool catalogue is provided in the user content. Return exactly one JSON object per turn:
+Tool catalogue is provided in the user content. Each tool lists use_when, parameters, can_say, cannot_say and examples: pick tools by use_when, fill parameters as described, and keep the answer within can_say. Return exactly one JSON object per turn:
 - {"action":"tool","tool_name":"registered name","parameters":{},"reason":"why this result is needed"}
 - {"action":"final","answer":"Korean answer with [1], [2] citations","evidence_calls":[1],"follow_ups":["..."],"reason":"why enough evidence"}
 - {"action":"final","gap_kind":"physical_intervention|missing_parameter|unconnected_data|outside_scope","answer":"Korean explanation","follow_ups":["..."],"reason":"..."} when the requested computation is unavailable.
@@ -547,7 +547,7 @@ def ask_agent(request: AgentAskRequest) -> dict[str, Any]:
                 # The model's own explanation is kept when it adds no unsourced numbers;
                 # otherwise the fixed limitation text is used.
                 if not effect_claim and _uncited_answer_ok(action.answer, request):
-                    answer = action.answer
+                    answer = action.answer if calls else re.sub(r"\s*\[\d+\](?:,\s*\[\d+\])*", "", action.answer)
                     if physical and "수리모형" not in answer:
                         answer = f"{answer}\n{_PHYSICAL_CAVEAT}"
                     limitation = _PHYSICAL_CAVEAT if physical else "No registered analysis tool computes the requested value."
