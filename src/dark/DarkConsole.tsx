@@ -159,7 +159,7 @@ export default function DarkConsole({
     approx_flood_envelope: false, hand_reconstruction: true, facilities: false, underpass: true, flood_extent: false,
   });
   const [layersOpen, setLayersOpen] = useState(false);
-  const [panelWidths, setPanelWidths] = useState({ left: 290, right: 360 });
+  const [panelWidths, setPanelWidths] = useState({ left: 250, right: 360 });
   const resizeRef = useRef<{ side: "left" | "right"; startX: number; startWidth: number } | null>(null);
 
   const stages = reconstruction?.replay ?? [];
@@ -185,7 +185,7 @@ export default function DarkConsole({
     const delta = side === "left" ? (key === "ArrowRight" ? 16 : -16) : (key === "ArrowLeft" ? 16 : -16);
     setPanelWidths((currentWidths) => ({
       ...currentWidths,
-      [side]: clamp(currentWidths[side] + delta, side === "left" ? 220 : 260, side === "left" ? 460 : 520),
+      [side]: clamp(currentWidths[side] + delta, side === "left" ? 200 : 260, side === "left" ? 460 : 520),
     }));
   };
 
@@ -197,7 +197,7 @@ export default function DarkConsole({
       const width = resize.side === "right" ? resize.startWidth - delta : resize.startWidth + delta;
       setPanelWidths((currentWidths) => ({
         ...currentWidths,
-        [resize.side]: clamp(width, resize.side === "left" ? 220 : 260, resize.side === "left" ? 460 : 520),
+        [resize.side]: clamp(width, resize.side === "left" ? 200 : 260, resize.side === "left" ? 460 : 520),
       }));
     };
     const onEnd = () => {

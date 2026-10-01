@@ -60,7 +60,7 @@
 .dk-clock { font-variant-numeric: tabular-nums; }
 
 /* 본문 3열 + 좌우 패널 너비 조절 핸들 */
-.dk-body { display: grid; grid-template-columns: var(--dk-left-width, 290px) 8px minmax(0, 1fr) 8px var(--dk-right-width, 360px); min-height: 0; }
+.dk-body { display: grid; grid-template-columns: var(--dk-left-width, 250px) 8px minmax(0, 1fr) 8px var(--dk-right-width, 360px); min-height: 0; }
 .dk-side, .dk-detail { display: flex; flex-direction: column; min-height: 0; overflow-y: auto; background: var(--dk-panel); }
 .dk-side { border-right: 1px solid var(--dk-line); scrollbar-width: none; }
 .dk-side::-webkit-scrollbar { display: none; }
@@ -412,7 +412,7 @@
 }
 
 @media (max-width: 1200px) {
-  .dk-body { --dk-left-width: 240px; --dk-right-width: 320px; }
+  .dk-body { --dk-left-width: 220px; --dk-right-width: 320px; }
   .dk-header-agent { min-width: 220px; max-width: none; }
   .dk-status { display: none; }
 }
