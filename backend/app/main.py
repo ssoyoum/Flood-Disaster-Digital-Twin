@@ -1,4 +1,6 @@
+import gzip
 import json
+import threading
 import os
 from functools import lru_cache
 from pathlib import Path
@@ -76,8 +78,23 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# Layer payloads are tens of MB of GeoJSON; compressing them cuts transfer several times over.
-app.add_middleware(GZipMiddleware, minimum_size=1024)
+
+
+class _GZipExceptLayers:
+    """Compress JSON responses, except layers, which are served pre-compressed."""
+
+    def __init__(self, app):
+        self.app = app
+        self.gzip = GZipMiddleware(app, minimum_size=1024)
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http" and scope["path"].endswith("/layers"):
+            await self.app(scope, receive, send)
+            return
+        await self.gzip(scope, receive, send)
+
+
+app.add_middleware(_GZipExceptLayers)
 
 
 def _require_event(event_id: str) -> None:
@@ -149,9 +166,27 @@ def _layers_json(event_id: str, layer_year: int) -> bytes:
     return json.dumps(get_layers(event_id, layer_year), ensure_ascii=False).encode("utf-8")
 
 
+@lru_cache(maxsize=8)
+def _layers_gzip(event_id: str, layer_year: int) -> bytes:
+    # Compressing ~30 MB takes seconds on the 1 vCPU demo server, so do it once per layer set.
+    return gzip.compress(_layers_json(event_id, layer_year), compresslevel=6)
+
+
+@app.on_event("startup")
+def _warm_layer_cache() -> None:
+    # Build the default layer payload in the background so the first visitor after a restart does not wait.
+    threading.Thread(target=_layers_gzip, args=(EVENT_ID, 2023), daemon=True).start()
+
+
 @app.get("/api/events/{event_id}/layers")
-def event_layers(event_id: str, layer_year: int = 2023):
+def event_layers(event_id: str, request: Request, layer_year: int = 2023):
     _require_event(event_id)
+    if "gzip" in request.headers.get("accept-encoding", "").lower():
+        return Response(
+            content=_layers_gzip(event_id, layer_year),
+            media_type="application/json",
+            headers={"Content-Encoding": "gzip", "Vary": "Accept-Encoding"},
+        )
     return Response(content=_layers_json(event_id, layer_year), media_type="application/json")
 
 

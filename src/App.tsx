@@ -16,6 +16,18 @@ function readRoute(): Route {
   return { page: "intro" };
 }
 
+// The layer payload is large; a slow or restarting server deserves a couple more tries before an error.
+async function withRetry<T>(load: () => Promise<T>, attempts = 3): Promise<T> {
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      return await load();
+    } catch (error) {
+      if (attempt >= attempts) throw error;
+      await new Promise((resolve) => window.setTimeout(resolve, 2000 * attempt));
+    }
+  }
+}
+
 function go(hash: string) {
   window.location.hash = hash;
 }
@@ -72,9 +84,9 @@ function EventConsole({ eventId }: { eventId: string }) {
   useEffect(() => {
     async function load() {
       try {
-        const nextEvent = await api.getEvent(eventId);
+        const nextEvent = await withRetry(() => api.getEvent(eventId));
         const [nextLayers, nextSummary, nextStatus, nextReconstruction] = await Promise.all([
-          api.getLayers(eventId, nextEvent.data_year),
+          withRetry(() => api.getLayers(eventId, nextEvent.data_year)),
           api.getSummary(eventId),
           api.getStatus(eventId),
           api.getReconstruction(eventId),
