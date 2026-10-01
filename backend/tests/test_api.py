@@ -53,8 +53,9 @@ def test_agent_ask_rejects_a_time_the_user_did_not_supply(monkeypatch):
     response = client.post("/api/agent/ask", json={"message": "08:25에 통제했다면?"})
     assert response.status_code == 200
     result = response.json()
-    assert result["status"] == "NEEDS_DATA"
-    assert "analyze_closure_timing" not in [call["tool_name"] for call in result["tool_calls"]]
+    # The invented 08:20 is never executed; the server runs the user's own 08:25 instead.
+    closure_calls = [call for call in result["tool_calls"] if call["tool_name"] == "analyze_closure_timing"]
+    assert [call["parameters"]["closure_times"] for call in closure_calls] in ([], [["08:25"]])
     assert "08:20" not in result["answer"]
 
 

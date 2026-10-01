@@ -81,3 +81,42 @@ def test_invented_time_is_still_rejected_without_a_matching_milestone(monkeypatc
     monkeypatch.setattr(agent_runner, "_gemini_action", lambda _context: next(decisions))
     result = _ask("좀 더 일찍 막았으면?").json()
     assert "analyze_closure_timing" not in [call["tool_name"] for call in result["tool_calls"]]
+
+
+def test_supported_delay_question_runs_the_tool_even_if_the_model_declines(monkeypatch):
+    decisions = iter([
+        agent_runner.AgentAction(action="final", gap_kind="outside_scope", answer="지연 시뮬레이션 기능이 없어 계산할 수 없습니다."),
+        agent_runner.AgentAction(action="final", answer="유입이 10분 늦춰지면 주행불능은 08:45입니다 [1].", evidence_calls=[1]),
+    ])
+    contexts = []
+
+    def decide(context):
+        contexts.append(context)
+        return next(decisions)
+
+    monkeypatch.setattr(agent_runner, "_gemini_action", decide)
+    result = _ask("유입이 10분 늦춰졌다면 주행불능 시각은 언제인가요?").json()
+    assert contexts[0]["suggested_tools"][0] == {"tool_name": "analyze_inflow_delay", "parameters": {"delay_minutes": [10]}}
+    assert [call["tool_name"] for call in result["tool_calls"]] == ["analyze_inflow_delay"]
+    assert result["status"] == "ANSWERED"
+    assert "08:45" in result["answer"]
+
+
+def test_tools_named_in_the_question_still_run_when_gemini_is_unavailable():
+    # conftest removes GEMINI_API_KEY, so the planner reports itself unavailable.
+    result = _ask("유입이 10분 늦춰졌다면 주행불능 시각은 언제인가요?").json()
+    assert result["status"] == "ANSWERED"
+    assert [call["tool_name"] for call in result["tool_calls"]] == ["analyze_inflow_delay"]
+    assert result["tool_calls"][0]["parameters"] == {"delay_minutes": [10]}
+    assert any("No Gemini" in item or "credential" in item.lower() for item in result["limitations"])
+
+
+def test_model_number_formats_are_normalised_before_validation(monkeypatch):
+    decisions = iter([
+        agent_runner.AgentAction(action="tool", tool_name="analyze_inflow_delay", parameters={"delay_minutes": [10.0]}),
+        agent_runner.AgentAction(action="final", answer="유입이 10분 늦춰지면 주행불능은 08:45입니다 [1].", evidence_calls=[1]),
+    ])
+    monkeypatch.setattr(agent_runner, "_gemini_action", lambda _context: next(decisions))
+    result = _ask("유입이 10분 늦춰졌다면 주행불능 시각은 언제인가요?").json()
+    assert result["status"] == "ANSWERED"
+    assert result["tool_calls"][0]["tool_name"] == "analyze_inflow_delay"

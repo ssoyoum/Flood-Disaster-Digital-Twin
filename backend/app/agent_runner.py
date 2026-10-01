@@ -30,6 +30,19 @@ from .services import ReconstructionUnavailable
 
 
 MAX_TOOL_CALLS = 4
+DEFAULT_ASK_TIMEOUT_SECONDS = 25.0
+
+
+def _ask_timeout_seconds() -> float:
+    """Each loop step sends tool results back to Gemini, which can exceed the planner's short bound."""
+
+    import os
+
+    try:
+        value = float(os.environ.get("AGENT_ASK_TIMEOUT_SECONDS", DEFAULT_ASK_TIMEOUT_SECONDS))
+    except ValueError:
+        return DEFAULT_ASK_TIMEOUT_SECONDS
+    return value if value > 0 else DEFAULT_ASK_TIMEOUT_SECONDS
 MAX_MODEL_STEPS = 6
 _PARAMETERS: dict[str, set[str]] = {
     "get_event": set(),
@@ -106,7 +119,7 @@ def _gemini_action(context: dict[str, Any]) -> AgentAction:
                     "contents": [{"role": "user", "parts": [{"text": json.dumps(context, ensure_ascii=False, default=str)}]}],
                     "generationConfig": {"responseMimeType": "application/json", "temperature": 0, "maxOutputTokens": 1800},
                 },
-                timeout=_timeout_seconds(),
+                timeout=_ask_timeout_seconds(),
             )
         except httpx.HTTPError as exc:
             raise LlmPlannerUnavailable(f"Gemini connection failed: {type(exc).__name__}.") from exc
@@ -136,6 +149,31 @@ def _milestone_clocks(calls: list[dict[str, Any]]) -> set[str]:
     return clocks
 
 
+def _as_int_list(values: Any) -> Any:
+    if not isinstance(values, list):
+        values = [values]
+    out = []
+    for value in values:
+        if isinstance(value, bool):
+            return values
+        if isinstance(value, float) and value.is_integer():
+            value = int(value)
+        elif isinstance(value, str) and value.strip().isdigit():
+            value = int(value.strip())
+        out.append(value)
+    return out
+
+
+def _as_clock_list(values: Any) -> Any:
+    if not isinstance(values, list):
+        values = [values]
+    out = []
+    for value in values:
+        match = re.fullmatch(r"\s*(\d{1,2}):(\d{2})\s*", str(value))
+        out.append(f"{int(match.group(1)):02d}:{match.group(2)}" if match else value)
+    return out
+
+
 def _validated_tool_request(action: AgentAction, request: AgentAskRequest, calls: list[dict[str, Any]] | None = None) -> AgentToolCallRequest:
     name = action.tool_name or ""
     if name not in _PARAMETERS:
@@ -146,6 +184,16 @@ def _validated_tool_request(action: AgentAction, request: AgentAskRequest, calls
         raise ValueError("The model selected a different event ID.")
     if set(params) - _PARAMETERS[name]:
         raise ValueError("The model supplied unsupported tool parameters.")
+    for key in ("delay_minutes", "radii_m"):
+        if key in params:
+            params[key] = _as_int_list(params[key])
+    if "closure_times" in params:
+        params["closure_times"] = _as_clock_list(params["closure_times"])
+    if isinstance(params.get("reduction_m"), str):
+        try:
+            params["reduction_m"] = float(params["reduction_m"])
+        except ValueError:
+            pass
     supplied = " ".join([request.message, *(turn.content for turn in request.history if turn.role == "user")]).lower()
     if "closure_times" in params:
         values = params["closure_times"]
@@ -288,6 +336,41 @@ def _reply(request: AgentAskRequest, status: str, answer: str, calls: list[dict[
     }
 
 
+_DELAY_WORDS = re.compile(r"유입|늦춰|늦어|늦게|지연|delay", re.IGNORECASE)
+_CLOSURE_WORDS = re.compile(r"통제|막았|막으면|막는|막아|차단|폐쇄|close", re.IGNORECASE)
+_EXPOSURE_WORDS = re.compile(r"반경|주변|건물|도로|시설|학교|병원", re.IGNORECASE)
+_HAND_WORDS = re.compile(r"HAND|셀|판정 기준|선택 임계", re.IGNORECASE)
+_OBSERVATION_WORDS = re.compile(r"비가|강우|강수|비는|수위|rain|water level", re.IGNORECASE)
+
+
+def _router_hints(message: str) -> list[dict[str, Any]]:
+    """Registered tools whose required values are literally present in the question.
+
+    The model sometimes declines a question a tool can answer; these hints, built
+    only from the user's own words, tell it (and the server) what to run first.
+    """
+
+    text = message
+    hints: list[dict[str, Any]] = []
+    delays = _extract_minutes(text)
+    times = _extract_clock_times(text)
+    radii = _extract_radii(text)
+    if delays and _DELAY_WORDS.search(text) and not _is_physical_effect_question(text):
+        hints.append({"tool_name": "analyze_inflow_delay", "parameters": {"delay_minutes": delays}})
+    if times and _CLOSURE_WORDS.search(text):
+        hints.append({"tool_name": "analyze_closure_timing", "parameters": {"closure_times": times}})
+    if radii and _EXPOSURE_WORDS.search(text):
+        hints.append({"tool_name": "get_exposure_inventory", "parameters": {"radii_m": radii}})
+    if _HAND_WORDS.search(text) and not _is_physical_effect_question(text):
+        written = [float(v) for v in re.findall(r"(?<!\d)(\d+(?:\.\d+)?)\s*(?:m|미터)", text)]
+        written = [v for v in written if 0 <= v <= 2.5]
+        if written:
+            hints.append({"tool_name": "analyze_hand_threshold", "parameters": {"reduction_m": written[0]}})
+    if _OBSERVATION_WORDS.search(text):
+        hints.append({"tool_name": "get_observation_summary", "parameters": {}})
+    return hints
+
+
 def _is_capability_question(message: str) -> bool:
     """Recognize requests about what this Agent can answer, not incident facts."""
 
@@ -331,11 +414,18 @@ def ask_agent(request: AgentAskRequest) -> dict[str, Any]:
         "observations": [],
         "remaining_tool_calls": MAX_TOOL_CALLS,
     }
-    if hypothetical:
+    hints = _router_hints(request.message)
+    if hints:
+        context["suggested_tools"] = hints
         context["guidance"] = (
-            "This is a what-if question. Before answering, call get_reconstruction and cite the real milestones "
-            "that the hypothetical would change (rainfall, water level, overtopping, levee failure, inflow). "
-            "Then state plainly which part is not computable and offer follow_ups with explicit values."
+            "suggested_tools are registered tools whose required values the user wrote. Call them first and answer "
+            "from their results. Do not say the question cannot be computed when one of them answers it."
+        )
+    elif hypothetical:
+        context["guidance"] = (
+            "This is a what-if question. If any registered analysis tool covers the assumption, call it. Otherwise call "
+            "get_reconstruction, cite the real milestones the hypothetical would change, say which part is not "
+            "computable, and offer follow_ups with explicit values."
         )
     calls: list[dict[str, Any]] = []
     seen: set[str] = set()
@@ -347,25 +437,48 @@ def ask_agent(request: AgentAskRequest) -> dict[str, Any]:
         try:
             action = _gemini_action(context)
         except LlmPlannerUnavailable as exc:
+            called = {call["tool_name"] for call in calls}
+            for hint in [h for h in hints if h["tool_name"] not in called][: MAX_TOOL_CALLS - len(calls)]:
+                try:
+                    tool_request = AgentToolCallRequest(event_id=request.event_id, **hint["parameters"])
+                    result = execute_agent_tool(hint["tool_name"], request.event_id, tool_request)
+                except (ValueError, ReconstructionUnavailable, KeyError):
+                    continue
+                calls.append({"order": len(calls) + 1, "tool_name": hint["tool_name"], "reason": "질문에 적힌 값으로 등록 도구 실행",
+                              "parameters": hint["parameters"], "result": result})
+            if calls:
+                return _reply(
+                    request, "ANSWERED",
+                    "AI 응답이 늦어 설명 문장은 만들지 못했지만, 질문에 적힌 값으로 분석 도구를 실행했습니다. 아래 결과 표를 확인해 주세요.",
+                    calls, [str(exc), *limitations], _follow_ups(last_action),
+                )
             return _reply(
                 request, "UNAVAILABLE", "Agent 응답을 완료하지 못했습니다. 아래 원인을 확인하고 다시 시도해 주세요.",
                 calls, [str(exc)], _follow_ups(None),
             )
         last_action = action
-        if action.action == "final" and hypothetical and not calls and not anchored:
-            # A what-if answer should stand on the real sequence it changes, so fetch it once.
+        called = {call["tool_name"] for call in calls}
+        missing = [hint for hint in hints if hint["tool_name"] not in called]
+        if action.action == "final" and not anchored and (missing or (hypothetical and not calls)):
+            # The model tried to finish without the evidence the question needs: run it once on the user's values.
             anchored = True
-            try:
-                result = execute_agent_tool("get_reconstruction", request.event_id, AgentToolCallRequest(event_id=request.event_id))
-            except (ReconstructionUnavailable, KeyError) as exc:
-                limitations.append(str(exc))
-            else:
-                trace = {"order": 1, "tool_name": "get_reconstruction", "reason": "가정 질문의 기준이 되는 실제 사건 경과 확인", "parameters": {}, "result": result}
+            todo = missing or [{"tool_name": "get_reconstruction", "parameters": {}}]
+            for hint in todo[: MAX_TOOL_CALLS - len(calls)]:
+                try:
+                    tool_request = AgentToolCallRequest(event_id=request.event_id, **hint["parameters"])
+                    result = execute_agent_tool(hint["tool_name"], request.event_id, tool_request)
+                except (ValueError, ReconstructionUnavailable, KeyError) as exc:
+                    limitations.append(str(exc))
+                    continue
+                trace = {"order": len(calls) + 1, "tool_name": hint["tool_name"], "reason": "질문에 적힌 값으로 등록 도구 실행",
+                         "parameters": hint["parameters"], "result": result}
                 calls.append(trace)
+                seen.add(json.dumps([hint["tool_name"], tool_request.model_dump()], sort_keys=True))
                 context["observations"].append(trace)
+            if calls:
                 context["guidance"] = (
-                    "Tool call 1 (get_reconstruction) was run for you. Answer now: cite the relevant real milestones with [1], "
-                    "say which part of the what-if is not computable, and give follow_ups."
+                    "The listed tool results were run for you on the user's own values. Answer now from them with [n] "
+                    "citations; do not claim the question cannot be computed if a result answers it. Give follow_ups."
                 )
                 continue
         if action.action == "final":
@@ -424,6 +537,23 @@ def ask_agent(request: AgentAskRequest) -> dict[str, Any]:
             context["observations"].append({**trace, "result": compact})
         else:
             context["observations"].append(trace)
+    called = {call["tool_name"] for call in calls}
+    added = False
+    for hint in [h for h in hints if h["tool_name"] not in called][: MAX_TOOL_CALLS - len(calls)]:
+        try:
+            tool_request = AgentToolCallRequest(event_id=request.event_id, **hint["parameters"])
+            result = execute_agent_tool(hint["tool_name"], request.event_id, tool_request)
+        except (ValueError, ReconstructionUnavailable, KeyError):
+            continue
+        calls.append({"order": len(calls) + 1, "tool_name": hint["tool_name"], "reason": "질문에 적힌 값으로 등록 도구 실행",
+                      "parameters": hint["parameters"], "result": result})
+        added = True
+    if added:
+        return _reply(
+            request, "ANSWERED",
+            "AI가 근거 있는 설명을 완성하지 못해, 질문에 적힌 값으로 분석 도구를 실행한 결과를 보여 드립니다. 아래 결과 표를 확인해 주세요.",
+            calls, limitations, _follow_ups(last_action),
+        )
     if physical:
         answer, limitation = _unavailable_answer(AgentAction(action="final", gap_kind="physical_intervention"), request)
         return _reply(request, "NEEDS_DATA", answer, calls, [limitation, *limitations], _follow_ups(last_action))
