@@ -22,7 +22,14 @@ from urllib.parse import quote
 import httpx
 from pydantic import BaseModel, Field
 
-from .agent_tools import _extract_clock_times, _extract_minutes, _extract_radii, suggestions_for
+from .agent_tools import (
+    _UNSUPPORTED_MARKERS,
+    _contains_marker,
+    _extract_clock_times,
+    _extract_minutes,
+    _extract_radii,
+    suggestions_for,
+)
 from .schemas import AgentIntentPlanRequest
 
 
@@ -232,6 +239,27 @@ def plan_with_llm(request: AgentIntentPlanRequest) -> dict[str, Any]:
     ``ValueError`` when the model returns something the registry rejects. The
     caller treats both as a reason to fall back, never as an analysis result.
     """
+
+    # Checked against the user's raw message, not the model's output. The
+    # model is asked to self-select "unsupported", but it can be worded
+    # around; rephrasing the same request must not open a path the
+    # deterministic planner would have refused.
+    text = " ".join(request.message.lower().split())
+    if _contains_marker(text, _UNSUPPORTED_MARKERS):
+        return {
+            "status": "UNSUPPORTED",
+            "event_id": request.event_id,
+            "workflow": None,
+            "parameters": {"event_id": request.event_id},
+            "tool_names": [],
+            "reason": "The request asks for an unregistered impact or forecast quantity.",
+            "suggestions": suggestions_for(),
+            "assumptions": [],
+            "limitations": [
+                "This plan selects registered deterministic tools; it does not execute them.",
+                "The Agent must present the selected tool result and its provenance/limitations.",
+            ],
+        }
 
     plan = _gemini_plan(request.message)
 

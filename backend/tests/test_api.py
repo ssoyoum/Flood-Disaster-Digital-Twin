@@ -734,6 +734,36 @@ def test_gemini_planner_routes_json_without_putting_key_in_url(monkeypatch):
     assert plan["parameters"]["closure_times"] == ["08:25"]
 
 
+def test_llm_planner_rejects_unsupported_requests_without_asking_the_model(monkeypatch):
+    """The gate checks the user's raw message, not the model's choice.
+
+    A model asked to self-select "unsupported" can be talked out of it by
+    rewording. This must refuse before the question ever reaches the model,
+    so a differently-worded request cannot route around the rule planner's
+    refusal.
+    """
+
+    from app import llm_planner
+    from app.schemas import AgentIntentPlanRequest
+
+    monkeypatch.setattr(llm_planner, "_env_file_loaded", True)
+    monkeypatch.setenv("GEMINI_API_KEY", "test-secret")
+
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("the model must not be called for an unsupported request")
+
+    monkeypatch.setattr(llm_planner.httpx, "post", fail_if_called)
+
+    plan = llm_planner.plan_with_llm(
+        AgentIntentPlanRequest(
+            event_id="osong-2023", message="이번 사고로 사망자가 몇 명이야?", planner="llm"
+        )
+    )
+    assert plan["status"] == "UNSUPPORTED"
+    assert plan["workflow"] is None
+    assert plan["suggestions"]
+
+
 def test_llm_plan_parameters_are_revalidated_against_tool_ranges():
     from app.llm_planner import LlmPlan, _validated_parameters
 

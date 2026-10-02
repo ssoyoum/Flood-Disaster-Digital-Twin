@@ -1,6 +1,6 @@
 # FloodOps TODO
 
-Last Updated: 2026-09-06 KST
+Last Updated: 2026-10-02 KST
 
 - Current identity: **Counterfactual Disaster Digital Twin PoC**
 - Current MVP: **Historical Disaster Reconstruction + What-if Intervention**
@@ -11,9 +11,9 @@ Last Updated: 2026-09-06 KST
 ## NOW
 
 - Status: Active / presentation-ready MVP
-- Last updated: 2026-09-06
+- Last updated: 2026-10-02
 - Branch: 모든 작업은 `main` 하나에서 진행한다. 2026-09-06에 브랜치 4개를 `main`으로 정리했다.
-- Next action: LLM planner 경로에도 거부 게이트를 적용한다. 현재 거부 마커 검사가 규칙 planner에만 있어, `ANTHROPIC_API_KEY`를 설정하는 순간 오탐 경로가 열린다.
+- Next action: 인트로 화면 변경을 포함해 Dark console UI 브라우저 smoke test를 마무리한다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
@@ -70,10 +70,9 @@ Last Updated: 2026-09-06 KST
   - `timeout` 기본 10초(`AGENT_LLM_TIMEOUT_SECONDS`), `max_retries=0`.
   - SDK 기본값(timeout 10분·재시도 2회)에서는 망 불통 시 폴백에 도달하지 못하고 요청이 멈춘다.
   - 불통 주소에서 timeout 3초로 재현해 3,379ms 내 규칙 planner 폴백을 확인했다.
-- [ ] LLM planner 경로에 거부 게이트 적용
-  - 현재 거부 마커 검사가 `plan_agent_intent`(규칙 planner)에만 있다.
-  - `plan_with_llm` 결과는 재검사 없이 그대로 계획으로 승격된다. 모델이 스스로 `unsupported`를 고르기를 기대하는 구조다.
-  - 검사 대상은 모델 출력이 아니라 **사용자 원문**이어야 한다. 모델이 표현을 바꾸는 것만으로 게이트를 우회하면 안 된다.
+- [x] LLM planner 경로에 거부 게이트 적용
+  - `plan_with_llm`이 `_UNSUPPORTED_MARKERS`를 사용자 원문에 먼저 검사하고, 걸리면 모델 호출 전에 `UNSUPPORTED`로 반환한다.
+  - 모델이 표현을 바꿔 거부를 피해가는 경로를 막는다. 검사는 모델 출력이 아니라 원문 기준이다.
 - [ ] `situation` 워크플로 응답 계약 결손 보정
   - 다른 워크플로와 달리 `coverage_status`가 `null`이고 `assumptions`가 비어 있다.
 - [x] Agent intent planner 한국어 평가셋
