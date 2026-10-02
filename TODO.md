@@ -13,7 +13,7 @@ Last Updated: 2026-10-02 KST
 - Status: Active / presentation-ready MVP
 - Last updated: 2026-10-02
 - Branch: 모든 작업은 `main` 하나에서 진행한다. 2026-09-06에 브랜치 4개를 `main`으로 정리했다.
-- Next action: 인트로 화면 변경을 포함해 Dark console UI 브라우저 smoke test를 마무리한다.
+- Next action: HRFCO `gdt`로 미호강교 수위를 해발 수면고로 환산하고 DEM 수직 기준 차이를 정리한다. 06:40/06:50 계획홍수위 도달 시각 불일치를 먼저 확인한다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
@@ -25,14 +25,17 @@ Last Updated: 2026-10-02 KST
   - 금지: 실제 침수범위, 공식 Flood Extent, 실제 수심, 실제 유속, 정확한 침수예측으로 표현하지 않는다.
   - 현재 생성 결과: total 1,127 features; stage counts 36 / 96 / 182 / 241 / 270 / 298
 - [x] HAND reconstruction 검증 및 비교
-  - 현재 생성 결과: HAND grid 1,280 features; timeline 2,565 features
-  - stage counts: 278 / 341 / 418 / 476 / 508 / 540
-  - approx vs HAND comparison 생성 완료: final stage area 30.0194 km2 vs 54.3915 km2
+  - 현재 생성 결과(2026-09-30 미호천 기준 높이·연결 조건 적용 후): HAND grid 1,280 features; timeline 1,619 features
+  - stage counts: 152 / 209 / 266 / 306 / 330 / 352 (이전 278 / 341 / 418 / 476 / 508 / 540)
+  - approx vs HAND comparison(`osong_reconstruction_envelope_comparison.json`)은 2026-09-01 생성본 그대로라 09-30 이전 HAND 기준이다. final stage area 30.0194 km2 vs 54.3915 km2는 옛 값이며 재생성이 필요하다.
   - 수위 관측값은 DEM 절대 수면고가 아니라 relative stage pressure로만 사용한다.
   - 공식 Flood Extent, depth, velocity, final exposure KPI로 사용하지 않는다.
 - [ ] 실제 수위와 공간상태 연결 검증 보강
   - HAND reconstruction은 HRFCO 수위 변화와 사건 stage를 relative stage pressure로 연결했다.
-  - 남은 검증: 관측소 기준면, 제방 붕괴 위치/폭, 유량, 배수시설, CCTV/공식 조사 timestamp 근거 연결.
+  - 관측소 기준면은 이미 확보돼 있다: `data/raw/water_level/osong/hrfco_waterlevel_info.xml`의 미호강교(3011665) `gdt` 19.643 m, `pfh` 9.38 m → 계획홍수위 EL 29.023 m(국무조정실 발표 29.02 m와 일치). API 조회 시점 메타데이터라 2023년 당시 값과 같은지는 미확인.
+  - 유량은 수위 CSV의 `fw_raw`에 있다(미호강교 08:00 6792.86). 관계곡선 환산값으로 보이며 단위 확인 필요.
+  - 남은 검증: DEM(EGM2008)과 국내 표고 기준 차이, 제방 붕괴 위치/폭, 배수시설, CCTV/공식 조사 timestamp 근거 연결.
+  - 확인 필요: 수위 CSV에서 미호강교가 9.38 m에 닿는 시각은 06:50인데 timeline의 "계획홍수위 도달"은 06:40이다.
   - 수위값 자체를 DEM 절대 수면고나 공식 침수심으로 해석하지 않는다.
 - [x] What-if 2개 구현 + 1개 보류
   - [x] A: 차량 진입 차단 시각 변경, 예: 08:25 / 08:30 / 08:35
@@ -47,14 +50,15 @@ Last Updated: 2026-10-02 KST
     - 차수벽 높이에서 유입량을 계산할 유량/통수단면/조도가 없다.
     - 구현 가능한 형태: "유입 지연 Δt분"을 사용자 입력 가정으로 받아 timeline을 shift한다. 물리 계산이 아님을 응답에 명시한다.
   - [ ] C: 제방 조건 변경은 계산 근거가 충분할 때만 적용한다.
-    - 붕괴 위치/폭/유량 미확보로 현재 보류 유지.
+    - 붕괴 위치/폭 미확보로 현재 보류 유지.
+    - 제방고는 언론 보도뿐이고 서로 어긋난다: 기존 제방 31.3 m·임시제방 29.7 m(노컷뉴스), "법정기준보다 1.14 m, 기존 제방보다 3.3 m 낮게"(대법원 2025도289 판결 보도). 판결문 원문(열람 신청 필요)으로 확정해야 한다.
 - [ ] DQ-008 대응: envelope 기반 영향 지표 설계
   - [x] envelope 중첩 대신 사건 초점 시설 반경별 exposure inventory API와 Agent workflow를 연결했다.
   - exposure inventory는 침수 영향 추정이 아니라 반경 안의 건물·도로·시설 재고이며 `PENDING_FLOOD_EXTENT` 경계를 유지한다.
-  - HAND final stage 54.392 km2 = AOI 40.557 km2의 1.34배. AOI 클립 후에도 읍 면적의 47.9%.
-  - 그대로 중첩하면 건물 45.8%, 도로 50.5%가 영향으로 집계되어 근거로 제시할 수 없다.
+  - (09-30 이전 HAND 기준) final stage 54.392 km2 = AOI 40.557 km2의 1.34배. 그대로 중첩하면 건물 45.8%, 도로 50.5%가 영향으로 집계되어 근거로 제시할 수 없었다.
   - 비파괴 경로: stage별 증분 지표 + 궁평2지하차도 중심 반경 제한 집계, `coverage_status` 명시.
-  - envelope 자체 개선(붕괴 지점 기준 연결 성분 제약, AOI 클립)은 DECISIONS 기록 후 별도 branch에서 수행한다.
+  - [x] envelope 개선 1차: 미호천 기준 높이 + 미호천·붕괴 셀 연결 조건(2026-09-30). final stage 540 → 352셀.
+  - [ ] AOI 클립과 개선 후 envelope의 면적·중첩 비율 재산출.
 - [x] LLM intent planner 최소 연결
   - `backend/app/llm_planner.py` 신규. `POST /api/agent/plan`에 `planner: auto|deterministic|llm` 선택 추가.
   - LLM은 등록된 workflow 선택과 파라미터 추출만 수행한다. 분석 수치는 전부 결정론 Tool 결과를 사용한다.
@@ -73,8 +77,11 @@ Last Updated: 2026-10-02 KST
 - [x] LLM planner 경로에 거부 게이트 적용
   - `plan_with_llm`이 `_UNSUPPORTED_MARKERS`를 사용자 원문에 먼저 검사하고, 걸리면 모델 호출 전에 `UNSUPPORTED`로 반환한다.
   - 모델이 표현을 바꿔 거부를 피해가는 경로를 막는다. 검사는 모델 출력이 아니라 원문 기준이다.
-- [ ] `situation` 워크플로 응답 계약 결손 보정
-  - 다른 워크플로와 달리 `coverage_status`가 `null`이고 `assumptions`가 비어 있다.
+- [x] `situation` 워크플로 응답 계약 결손 보정
+  - 워크플로 결과에 `coverage_status: fallback`과 재구성 시각이 `NEEDS_SOURCE_PAGE`라는 `coverage_note`를 붙였다.
+  - 계획 단계 `assumptions`에 저장된 재구성 시각만 보여준다는 점과 HAND 근사 envelope임을 명시했다.
+- [x] 지도 출처 표시
+  - 관제·비교 지도에 OSM(ODbL)·국토교통부 GIS건물통합정보·WAMIS 출처를 접지 않은 상태로 표시한다.
 - [x] Agent intent planner 한국어 평가셋
   - 15개 질문에 대해 기대 status, workflow, 파라미터, Tool sequence를 fixture로 고정했다.
   - 사망자·피해액·침수심·예측 요청은 다른 marker보다 우선해 `UNSUPPORTED`로 거부한다.
@@ -82,7 +89,7 @@ Last Updated: 2026-10-02 KST
   - `POST /api/scenarios`로 건물 ID와 복수 intervention을 DRAFT로 저장한다.
   - `POST /api/scenarios/{scenario_id}/run`으로 대응 전후 priority building과 rule-based risk score를 비교한다.
   - 현재는 HAND-like envelope 기반의 `TEMPORARY` 의사결정 보조 결과이며, 공식 피해 감소율이 아니다.
-- [ ] Dark console UI 미리보기 마감
+- [x] Dark console UI 미리보기 마감
   - `src/dark/`에 관제 화면, 단면도 시각화, exposure inventory 패널을 추가했다.
   - `CrossSection`을 `hand_reconstruction` 레이어에 연결해 단계별 관측 수위 상승분과 HAND 임계를 시각화한다.
   - 왼쪽 판단 탭에 대응 시점·공간 상태·반경별 재고·Agent를 중요도 순으로 배치하고, 지도 오버레이를 축소했다.
@@ -92,7 +99,7 @@ Last Updated: 2026-10-02 KST
   - 비교 화면은 대응 상태 변화와 침수 진행이 변하지 않는 부분을 분리해서 표시한다.
   - 기존 light UI와 backend/API를 재사용하는 presentation layer이다. 2026-09-06에 `main`으로 병합됐다.
   - 반응형 CSS와 라이트 UI glyphs 설정은 반영했다.
-  - 남은 작업: 실제 브라우저 smoke test, 레이어 표시 확인, 결과 provenance·한계 문구 최종 점검.
+  - 2026-10-02 Edge 브라우저 smoke test: 인트로(1280×720 스크롤 없음) → 사례 선택 → 관제 화면 7단계 재생·레이어 설정 → 시나리오 비교(지도 2개) → 인사이트까지 콘솔 오류 0건, API 4xx/5xx 0건.
 - [x] 로컬 런타임 포트 고정
   - FloodOps FastAPI `8033`, Vite `5173`을 사용한다.
   - 다른 프로젝트가 사용하는 `8000`으로 잘못 연결되어 `/api/events`가 404가 되던 문제를 해결했다.
@@ -103,9 +110,9 @@ Last Updated: 2026-10-02 KST
   - [x] UI `Scenario 비교` 탭: 원시나리오·개입 시나리오 카드와 비교 매트릭스
   - 금지: 피해액, 사상자, 실제 침수면적·침수심 감소율 추정
   - 금지: 사망자 감소, 피해액 감소, 실제 피해 감소율 임의 추정
-- [ ] Provenance와 한계 표시 점검
-  - Event Year, Data Vintage, Source, Role을 분리해 표시한다.
-  - `approx_flood_envelope`는 공식 자료가 아닌 임시 파생 근사임을 UI에서 숨기지 않는다.
+- [x] Provenance와 한계 표시 점검
+  - 2026-10-02 화면 확인: timeline 단계마다 "출처 쪽수 확인 필요", 공간 상태에 "HAND 근사", 단면 임계에 "실측 수위가 아님", 비교 화면에 "실제 침수 위험 감소가 아님"이 표시된다.
+  - Event Year·Data Vintage·Source·Role 분리 고도화는 NEXT의 provenance 화면 고도화로 이어간다.
 
 ## BLOCKED
 
@@ -136,9 +143,6 @@ Last Updated: 2026-10-02 KST
 
 - [x] README/TODO implementation status synchronization
   - Current MVP, Agent planner, scenario API, Swagger routes, and known limitations are documented.
-- [ ] Dark console UI 브라우저 검증 및 커밋
-  - 현재 변경 파일: `src/App.tsx`, `src/api.ts`, `src/types.ts`, `src/dark/*`
-  - 검증 전까지 발표용 미리보기 상태로 유지한다.
 
 - [ ] HAND reconstruction을 official validation material과 비교
   - Safemap WMS raster 및 향후 official vector Flood Extent와 시각/공간 유사도를 비교한다.
