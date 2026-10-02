@@ -329,6 +329,12 @@ def execute_agent_workflow(request: AgentWorkflowRequest) -> dict[str, Any]:
     if not isinstance(provenance, list):
         provenance = []
 
+    if request.workflow == "situation":
+        coverage_status, coverage_note = "fallback", _SITUATION_COVERAGE_NOTE
+    else:
+        coverage_status = analysis_result.get("coverage_status")
+        coverage_note = analysis_result.get("coverage_note")
+
     return {
         "workflow": request.workflow,
         "event_id": request.event_id,
@@ -336,8 +342,8 @@ def execute_agent_workflow(request: AgentWorkflowRequest) -> dict[str, Any]:
         "tool_calls": tool_calls,
         "result": analysis_result,
         "provenance": provenance,
-        "coverage_status": analysis_result.get("coverage_status"),
-        "coverage_note": analysis_result.get("coverage_note"),
+        "coverage_status": coverage_status,
+        "coverage_note": coverage_note,
     }
 
 
@@ -360,6 +366,10 @@ _UNSUPPORTED_MARKERS = (
     "damage cost",
     "flood depth",
     "inundated area",
+)
+_SITUATION_COVERAGE_NOTE = (
+    "Incident timestamps are reconstruction values whose confidence is NEEDS_SOURCE_PAGE. "
+    "The spatial envelope is a derived approximation, not an official flood extent."
 )
 _SITUATION_MARKERS = (
     "상황",
@@ -580,6 +590,10 @@ def plan_agent_intent(request: AgentIntentPlanRequest) -> dict[str, Any]:
             "workflow": "situation",
             "tool_names": ["get_event", "get_reconstruction"],
             "reason": "Detected a historical situation or replay request.",
+            "assumptions": [
+                "The replay shows stored reconstruction timestamps; no new value is computed.",
+                "Spatial state comes from a derived HAND-like envelope, not an official flood extent.",
+            ],
         }
 
     return {

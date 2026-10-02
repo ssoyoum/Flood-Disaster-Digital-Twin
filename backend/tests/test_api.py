@@ -501,6 +501,7 @@ def test_agent_plan_supports_situation_replay_and_rejects_unknown_intent():
     payload = response.json()
     assert payload["workflow"] == "situation"
     assert payload["tool_names"] == ["get_event", "get_reconstruction"]
+    assert payload["assumptions"]
 
     response = client.post(
         "/api/agent/plan",
@@ -522,6 +523,8 @@ def test_agent_situation_workflow_returns_reconstruction_context():
         "get_reconstruction",
     ]
     assert payload["result"]["event_id"] == "osong-2023"
+    assert payload["coverage_status"] == "fallback"
+    assert "NEEDS_SOURCE_PAGE" in payload["coverage_note"]
 
 
 def test_agent_workflow_chains_context_and_analysis_tools():
