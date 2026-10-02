@@ -80,7 +80,7 @@
   position: relative; overflow: hidden;
   padding: 18px 20px;
   background: var(--fo-panel); border: 1px solid var(--fo-line); border-radius: 10px;
-  animation: fo-float 6s ease-in-out infinite, fo-edge 6s ease-in-out infinite;
+  animation: fo-edge 6s ease-in-out infinite;
 }
 /* soft light sweep across each card */
 .fo-features article::after {
@@ -90,7 +90,6 @@
   animation: fo-sheen 6s ease-in-out infinite;
   animation-delay: inherit;
 }
-@keyframes fo-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
 @keyframes fo-edge { 0%, 100% { border-color: var(--fo-line); } 50% { border-color: rgba(56, 189, 248, .55); } }
 @keyframes fo-sheen { 0% { background-position: 120% 0; } 60%, 100% { background-position: -30% 0; } }
 @media (prefers-reduced-motion: reduce) {
@@ -101,6 +100,24 @@
 .fo-features p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--fo-muted); }
 
 .fo-footnote { margin: auto 0 0; font-size: 12px; color: var(--fo-muted); }
+
+/* Keep the introduction within a standard laptop viewport. */
+.fo-intro { min-height: 100dvh; padding: 18px 48px 16px; gap: 18px; }
+.fo-intro .fo-brand .fo-logo { width: 34px; height: 34px; }
+.fo-intro .fo-brand strong { font-size: 18px; }
+.fo-intro .fo-hero { flex: 1; gap: 40px; }
+.fo-intro .fo-hero h1 { font-size: clamp(32px, 2.8vw, 40px); line-height: 1.18; }
+.fo-intro .fo-lead { margin: 16px 0 20px; font-size: 16px; line-height: 1.6; }
+.fo-intro .fo-features article { padding: 14px 18px; }
+.fo-intro .fo-features strong { margin: 7px 0 4px; }
+
+@media (max-height: 720px) {
+  .fo-intro { padding-block: 12px; gap: 12px; }
+  .fo-intro .fo-hero h1 { font-size: 32px; }
+  .fo-intro .fo-lead { margin: 12px 0 14px; font-size: 15px; line-height: 1.5; }
+  .fo-intro .fo-schematic { padding: 12px; }
+  .fo-intro .fo-features article { padding: 10px 14px; }
+}
 
 .fo-cases-head { display: flex; align-items: flex-end; gap: 20px; }
 .fo-cases-head h2 { margin: 0; font-size: 26px; letter-spacing: -.5px; }

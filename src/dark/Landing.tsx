@@ -113,7 +113,7 @@ export function IntroPage({ onStart }: { onStart: () => void }) {
     { icon: Bot, title: "에이전트 질의", text: "질문을 분석 계획으로 바꾸고, 담당자 승인 후에만 도구를 실행합니다." },
   ];
   return (
-    <main className="fo-landing">
+    <main className="fo-landing fo-intro">
       <Brand />
       <section className="fo-hero">
         <div className="fo-hero-copy">
