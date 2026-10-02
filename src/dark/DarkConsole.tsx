@@ -69,6 +69,12 @@ function replaySeverity(state?: string) {
 }
 
 const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas";
+// ODbL requires the OSM credit to be visible on the map itself, so the control is not collapsed.
+const DATA_ATTRIBUTION = [
+  '도로 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>',
+  "건축물 © 국토교통부 GIS건물통합정보",
+  "하천 WAMIS",
+];
 // Offline fallback only. The live chips come from GET /api/agent/examples so the
 // starter questions and the suggestions attached to a refusal share one source.
 const FALLBACK_EXAMPLES: AgentExampleQuestion[] = [
@@ -243,7 +249,7 @@ export default function DarkConsole({
       zoom: 13.6,
       maxZoom: 16,
     });
-    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+    map.addControl(new maplibregl.AttributionControl({ compact: false, customAttribution: DATA_ATTRIBUTION }), "bottom-right");
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-left");
 
     map.on("load", () => {
@@ -584,7 +590,7 @@ function ScenarioMap({
       zoom: 13.6,
       maxZoom: 16,
     });
-    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+    map.addControl(new maplibregl.AttributionControl({ compact: false, customAttribution: DATA_ATTRIBUTION }), "bottom-right");
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-left");
     sync.maps.push(map);
     // 한쪽 지도를 움직이면 다른 비교 지도도 같은 중심·배율로 맞춘다.
