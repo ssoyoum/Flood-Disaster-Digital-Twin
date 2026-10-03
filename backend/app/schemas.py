@@ -470,3 +470,11 @@ class StorageCaptureRequest(BaseModel):
     capacity_mm_per_hour: float = Field(default=95.0, gt=0, le=200)
     catchment_area_km2: float | None = Field(default=None, gt=0, le=200)
     runoff_coefficient: float = Field(default=1.0, gt=0, le=1.0)
+
+
+class ResponseTimingRequest(BaseModel):
+    """Timeline cases: move one response action (parking entry ban, evacuation order, alert) to other times."""
+
+    intervention_id: str
+    action_times: list[str] = Field(default_factory=list, max_length=10)
+

@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from .osong_repository import get_osong_event, get_osong_layers, get_osong_observations
+from .timeline_cases import get_timeline_event, get_timeline_layers, is_timeline_case
 from .seoul_repository import SEOUL_EVENT_ID, get_seoul_event, get_seoul_layers, get_seoul_observations
 
 
@@ -30,33 +31,17 @@ def _pending_event(event_id: str, name: str, location: str, data_year: int, them
 EVENTS = [
     get_osong_event(),
     get_seoul_event(),
-    _pending_event(
-        "pohang-2022",
-        "2022 Pohang Typhoon Flood",
-        "Naengcheon, Pohang",
-        2022,
-        "Typhoon + River Flood",
-        "Industrial facilities",
-        "Typhoon -> Naengcheon overflow -> apartments, underground parking, industrial facilities",
-    ),
+    get_timeline_event("pohang-2022"),
     _pending_event(
         "iksan-2024",
         "2024 Iksan Extreme Rainfall Flood",
-        "Hamra, Iksan",
+        "Sanbukcheon basin (Nangsan, Mangseong), Iksan",
         2024,
         "Extreme Rain / Rural",
         "Farmland",
         "Extreme rainfall -> drainage and small stream capacity exceedance -> rural housing, farmland, roads",
     ),
-    _pending_event(
-        "andong-uiseong-2026",
-        "2026 Andong-Uiseong Compound Flood",
-        "Gwimi and Gugye, Andong-Uiseong",
-        2026,
-        "Compound Disaster",
-        "Temporary housing and wildfire damaged areas",
-        "Wildfire damaged area -> rainfall -> temporary housing, roads, water supply, repeated displacement",
-    ),
+    get_timeline_event("andong-uiseong-2026"),
 ]
 
 
@@ -87,6 +72,8 @@ def get_layers(event_id: str = EVENT_ID, layer_year: int = 2023) -> dict:
         return deepcopy(get_osong_layers(layer_year))
     if event_id == SEOUL_EVENT_ID:
         return deepcopy(get_seoul_layers())
+    if is_timeline_case(event_id):
+        return deepcopy(get_timeline_layers(event_id))
     return {
         "aoi": {"data": EMPTY_FEATURE_COLLECTION, "status": "UNAVAILABLE", "feature_count": 0},
         "roads": {"data": EMPTY_FEATURE_COLLECTION, "status": "UNAVAILABLE", "feature_count": 0},

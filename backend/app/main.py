@@ -33,9 +33,17 @@ from .seoul_repository import (
     get_seoul_status,
     get_seoul_summary,
 )
+from .timeline_cases import (
+    analyze_response_timing,
+    get_timeline_reconstruction,
+    get_timeline_status,
+    get_timeline_summary,
+    is_timeline_case,
+)
 from .scenario_repository import create_scenario as save_scenario, get_scenario, mark_completed, mark_unavailable
 from .schemas import (
     AlertTimingRequest,
+    ResponseTimingRequest,
     StorageCaptureRequest,
     ClosureTimingRequest,
     ClosureTimingResult,
@@ -149,6 +157,8 @@ def event_status(event_id: str):
         return get_osong_data_status()
     if event_id == SEOUL_EVENT_ID:
         return get_seoul_status()
+    if is_timeline_case(event_id):
+        return get_timeline_status(event_id)
     return {"status": "UNAVAILABLE", "message": "Processed data is not connected for this event."}
 
 
@@ -209,6 +219,8 @@ def event_summary(event_id: str):
         return get_osong_summary()
     if event_id == SEOUL_EVENT_ID:
         return get_seoul_summary()
+    if is_timeline_case(event_id):
+        return get_timeline_summary(event_id)
     return {
         "event_id": event_id,
         "origin": "UNAVAILABLE",
@@ -223,6 +235,8 @@ def event_reconstruction(event_id: str):
         return get_osong_reconstruction()
     if event_id == SEOUL_EVENT_ID:
         return get_seoul_reconstruction()
+    if is_timeline_case(event_id):
+        return get_timeline_reconstruction(event_id)
     raise HTTPException(status_code=404, detail="Reconstruction is not connected for this event")
 
 
@@ -449,6 +463,19 @@ def storage_capture_analysis(event_id: str, request: StorageCaptureRequest):
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
+@app.post("/api/events/{event_id}/analysis/response-timing", tags=["analysis"])
+def response_timing_analysis(event_id: str, request: ResponseTimingRequest):
+    """Timeline cases: minutes between an assumed response time and the reported milestones that followed."""
+
+    _require_event(event_id)
+    if not is_timeline_case(event_id):
+        raise HTTPException(status_code=404, detail="Response-timing analysis is connected for pohang-2022 and andong-uiseong-2026")
+    try:
+        return analyze_response_timing(event_id, request.intervention_id, request.action_times)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
 @app.get("/api/agent/tools", response_model=list[AgentToolDescriptor], tags=["agent"])
 def agent_tools():
     """List the deterministic tools currently available to the Agent layer."""
@@ -557,8 +584,8 @@ def exposure_inventory(
     """
 
     _require_event(event_id)
-    if event_id == SEOUL_EVENT_ID:
-        # Seoul has no single focus feature, and its building layer holds only trace-overlay buildings.
+    if event_id == SEOUL_EVENT_ID or is_timeline_case(event_id):
+        # Seoul and the timeline cases have no single focus feature, and its building layer holds only trace-overlay buildings.
         raise HTTPException(
             status_code=404,
             detail="No focus feature is defined for seoul-2022; use the official flood-trace exposure in /reconstruction instead",
