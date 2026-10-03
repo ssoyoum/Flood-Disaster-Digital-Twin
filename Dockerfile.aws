@@ -15,6 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/app ./backend/app
 COPY data/processed/osong ./data/processed/osong
 COPY data/processed/seoul_2022 ./data/processed/seoul_2022
+COPY data/processed/pohang_2022 ./data/processed/pohang_2022
+COPY data/processed/andong_uiseong_2026 ./data/processed/andong_uiseong_2026
 COPY --from=frontend-build /web/dist ./dist
 ENV PYTHONPATH=/app/backend \
     FLOODOPS_STATIC_DIR=/app/dist
