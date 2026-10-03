@@ -178,6 +178,25 @@ Open data-quality issues count: 3
 - 검증 방법: CSV에서 `station_id=3011665` 06:30~07:00 행을 읽어 9.20 / 9.30 / 9.38 / 9.47 m를 확인한다.
 - Residual risk / 남은 한계: 감찰 결과 원문 PDF의 쪽수, 그리고 발표에 쓰인 수위 자료의 종류(실시간/보정, 1분/10분)를 확인해야 확정할 수 있다. `gdt`는 API 조회 시점 메타데이터라 2023년 당시 값과 같은지 확인하지 못했다.
 
+### DQ-010: Seoul 2022 case mixes official traces, a later building snapshot, and press-reported times
+
+- Status: Accepted limitation
+- Impact: Medium
+- 발견일: 2026-10-03
+- 대상 데이터셋: `data/processed/seoul_2022/*`, `data/scripts/process_seoul_2022_dorimcheon.py`
+- 증상: 서울 사례는 근거 수준이 다른 자료를 한 화면에 올린다. 침수범위는 공식 침수흔적도(관측)다. 건축물은 2026-08-09 스냅샷이다. 사건 시각은 강우계 임계(관측) 3개와 언론 보도 4개가 섞여 있다.
+- 원인:
+  - 2022년 시점 OSM 건물은 범위 안에 3,817동뿐이라 노출 집계에 쓸 수 없었다. 같은 범위의 공식 건물은 66,146동이다.
+  - 2022년 당시 공식 건물 스냅샷은 확보하지 못했다.
+  - 신림동 사고·재난문자 시각의 공식 원문을 찾지 못했다.
+- 분석 결과에 미치는 영향:
+  - 2026년 스냅샷을 사용승인일로 걸러도 2022~2026년에 철거된 건물은 빠진다. 사용승인일이 빈 10,659동은 포함했다.
+  - 동작구청 강우계는 2022-08-08 23:12 이후 값이 없다(08-09 행 없음). 동작구 일 강수량 비교에서 과소로 보일 수 있다.
+  - 공식 침수흔적도의 `damage_type`에 "교육부-학자금-특성화고(국공립)-특급지(서울)" 같은 입력 오류값이 1건 있다.
+- 해결 방법: 화면과 API에 출처 등급(관측 / 언론 보도)을 단계마다 표시한다. 건축물 기준일과 필터 조건을 노출 패널에 적는다. 흔적도의 상세 주소(`F_ZONE_NM`)와 건축물 지번은 처리 단계에서 버린다.
+- 검증 방법: `python data/scripts/process_seoul_2022_dorimcheon.py`를 다시 실행해 `seoul_dorimcheon_summary.json` 수치가 같은지 확인한다. `backend/tests/test_seoul_case.py`가 흔적 10,468건, 겹친 건축물 13,015동, 주소 필드 부재를 고정한다.
+- Residual risk / 남은 한계: 침수흔적에는 시각이 없어 사건 단계별 공간 확산을 재생할 수 없다. 반사실 저류 계산의 면적은 bbox 면적(28.69 km2)이고 도림천 실제 유역면적이 아니다.
+
 ## Open issues / watchlist
 
 - DSSP-IF-00117 또는 대체 공식 vector Flood Extent 확보 시 DQ-001, DQ-002를 재검증한다.
