@@ -1093,22 +1093,23 @@ function HandScenarioView({
 /* Agent — 질문 → 도구 선택 → 관찰 → 추가 도구 또는 근거 답변.                   */
 /* ------------------------------------------------------------------ */
 
-function AgentDock({ eventId, compact = false }: { eventId: string; compact?: boolean }) {
+export function AgentDock({ eventId, compact = false }: { eventId: string; compact?: boolean }) {
   const [message, setMessage] = useState("");
   const [turns, setTurns] = useState<Array<{ question: string; response: AgentAskResult }>>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [examples, setExamples] = useState<AgentExampleQuestion[]>(FALLBACK_EXAMPLES);
+  const isOsong = eventId === "osong-2023";
+  const [examples, setExamples] = useState<AgentExampleQuestion[]>(isOsong ? FALLBACK_EXAMPLES : []);
 
   useEffect(() => { setTurns([]); setMessage(""); setError(null); }, [eventId]);
 
   useEffect(() => {
     let live = true;
-    api.getAgentExamples()
+    api.getAgentExamples(eventId)
       .then((items) => { if (live && items.length) setExamples(items); })
       .catch(() => { /* keep the offline fallback chips */ });
     return () => { live = false; };
-  }, []);
+  }, [eventId]);
 
   const ask = async (question: string) => {
     const text = question.trim();
@@ -1134,16 +1135,17 @@ function AgentDock({ eventId, compact = false }: { eventId: string; compact?: bo
     finally { setBusy(false); }
   };
 
-  const status = busy ? "자료를 확인하고 다음 도구를 판단하는 중…" : turns.length ? "다른 조건이나 후속 질문을 이어서 물어보세요." : "예: HAND 임계를 1.5m 낮추면 붉은 셀이 어떻게 바뀌나요?";
+  const idleHint = isOsong ? "예: HAND 임계를 1.5m 낮추면 붉은 셀이 어떻게 바뀌나요?" : examples[0] ? `예: ${examples[0].question}` : "사건과 대응 조건을 물어보세요.";
+  const status = busy ? "자료를 확인하고 다음 도구를 판단하는 중…" : turns.length ? "다른 조건이나 후속 질문을 이어서 물어보세요." : idleHint;
 
   return (
     <div className={`dk-agent${compact ? " dk-agent-compact" : ""}`}>
       <div className="dk-agent-head"><p>FloodOps 에이전트</p><span className="dk-agent-badge llm">Gemini + 분석 도구</span></div>
       {!compact && <div className="dk-agent-intro">질문에 따라 등록된 분석 도구를 차례로 호출하고 결과를 읽어 답합니다. 질문·대화 기록·도구 결과는 Gemini에 전송됩니다. 도구로 확인할 수 없는 피해 효과는 추정하지 않습니다.</div>}
       {!compact && <div className="dk-agent-suggestions" aria-label="추천 질문">
-        <button type="button" disabled={busy} onClick={() => void ask("HAND 선택 임계를 1.5m 낮추면 붉은 셀이 단계별로 어떻게 바뀌나요?")}>HAND 붉은 셀 변화</button>
-        <button type="button" disabled={busy} onClick={() => void ask("08:25 통제와 유입 10분 지연을 함께 비교하면 무엇이 다르고, 무엇은 알 수 없나요?")}>통제 + 유입 지연 함께</button>
-        {examples.map((item) => <button key={item.workflow} type="button" title={item.question} disabled={busy} onClick={() => void ask(item.question)}>{item.label}</button>)}
+        {isOsong && <button type="button" disabled={busy} onClick={() => void ask("HAND 선택 임계를 1.5m 낮추면 붉은 셀이 단계별로 어떻게 바뀌나요?")}>HAND 붉은 셀 변화</button>}
+        {isOsong && <button type="button" disabled={busy} onClick={() => void ask("08:25 통제와 유입 10분 지연을 함께 비교하면 무엇이 다르고, 무엇은 알 수 없나요?")}>통제 + 유입 지연 함께</button>}
+        {examples.map((item) => <button key={item.label} type="button" title={item.question} disabled={busy} onClick={() => void ask(item.question)}>{item.label}</button>)}
       </div>}
       <form className="dk-agent-bar" onSubmit={(event) => { event.preventDefault(); void ask(message); }}>
         <input aria-label="Agent request" value={message} onChange={(event) => setMessage(event.target.value)} placeholder="사건과 개입 조건을 자유롭게 물어보세요" />
@@ -1166,7 +1168,7 @@ function AgentDock({ eventId, compact = false }: { eventId: string; compact?: bo
               <summary>[{call.order}] {call.tool_name} · 호출 결과 보기</summary>
               {call.reason && <small className="dk-note">선택 이유 · {call.reason}</small>}
               {Object.keys(call.parameters).length > 0 && <small className="dk-note">입력 · {JSON.stringify(call.parameters)}</small>}
-              <Findings workflow={call.tool_name === "analyze_hand_threshold" ? "hand_threshold" : call.tool_name === "analyze_closure_timing" ? "closure_timing" : call.tool_name === "analyze_inflow_delay" ? "inflow_delay" : call.tool_name === "get_exposure_inventory" ? "exposure_inventory" : "situation"} result={call.result} />
+              <Findings workflow={FINDINGS_BY_TOOL[call.tool_name] ?? "situation"} result={call.result} />
               {typeof call.result.coverage_note === "string" && <small className="dk-note">{call.result.coverage_note}</small>}
               {Array.isArray(call.result.limitations) && (call.result.limitations as string[]).slice(0, 3).map((item) => <small key={item} className="dk-note">한계 · {item}</small>)}
               <details className="dk-agent-raw"><summary>도구 원본 데이터</summary><pre>{JSON.stringify(call.result, null, 2)}</pre></details>
@@ -1180,9 +1182,57 @@ function AgentDock({ eventId, compact = false }: { eventId: string; compact?: bo
   );
 }
 
+type FindingsKind = AgentWorkflowName | "hand_threshold" | "alert_timing" | "storage_capture" | "response_timing";
+
+const FINDINGS_BY_TOOL: Record<string, FindingsKind> = {
+  analyze_hand_threshold: "hand_threshold",
+  analyze_closure_timing: "closure_timing",
+  analyze_inflow_delay: "inflow_delay",
+  get_exposure_inventory: "exposure_inventory",
+  analyze_alert_timing: "alert_timing",
+  analyze_storage_capture: "storage_capture",
+  analyze_response_timing: "response_timing",
+};
+
 const rows = (result: Record<string, unknown>, key: string) => (Array.isArray(result[key]) ? (result[key] as Array<Record<string, unknown>>) : []);
 
-function Findings({ workflow, result }: { workflow: AgentWorkflowName | "hand_threshold"; result: Record<string, unknown> }) {
+function Findings({ workflow, result }: { workflow: FindingsKind; result: Record<string, unknown> }) {
+  if (workflow === "alert_timing") {
+    return (
+      <table className="dk-table">
+        <thead><tr><th>가정한 경보</th><th>시각</th><th>첫 구조 신고까지</th><th>실제 문자보다</th></tr></thead>
+        <tbody>{rows(result, "scenarios").map((row) => (
+          <tr key={String(row.label)}><td>{String(row.label)}</td><td>{row.alert_time ? clock(String(row.alert_time)) : "도달 안 함"}</td><td>{String(row.minutes_before_first_rescue_call ?? "—")}분</td><td>{String(row.minutes_earlier_than_actual_alert ?? "—")}분</td></tr>
+        ))}</tbody>
+      </table>
+    );
+  }
+  if (workflow === "storage_capture") {
+    return (
+      <table className="dk-table">
+        <tbody>
+          <tr><td>처리 능력 초과 부피</td><td>{Number(result.excess_volume_m3).toLocaleString()} m³</td></tr>
+          <tr><td>저류량 · 비율</td><td>{Number(result.storage_m3).toLocaleString()} m³ · {String(result.captured_share_pct)}%</td></tr>
+          <tr><td>가득 차는 시각</td><td>{result.storage_full_time ? clock(String(result.storage_full_time)) : "가득 차지 않음"}</td></tr>
+        </tbody>
+      </table>
+    );
+  }
+  if (workflow === "response_timing") {
+    const milestones = rows(result, "milestones");
+    return (
+      <table className="dk-table">
+        <thead><tr><th>대응 시각</th><th>실제보다</th>{milestones.map((m) => <th key={String(m.state)}>{String(m.label)}까지</th>)}</tr></thead>
+        <tbody>{rows(result, "scenarios").map((row) => (
+          <tr key={String(row.action_time)}>
+            <td>{clock(String(row.action_time))}{row.is_actual ? " (실제)" : ""}</td>
+            <td>{String(row.minutes_earlier_than_actual)}분</td>
+            {milestones.map((m) => <td key={String(m.state)}>{String((row.minutes_before_milestones as Record<string, number>)?.[String(m.state)] ?? "—")}분</td>)}
+          </tr>
+        ))}</tbody>
+      </table>
+    );
+  }
   if (workflow === "hand_threshold") {
     const stages = rows(result, "stages");
     return <table className="dk-table"><thead><tr><th>단계</th><th>기준 셀</th><th>변경 후</th><th>제외</th></tr></thead><tbody>{stages.map((stage) => <tr key={String(stage.stage_index)}><td>{clock(String(stage.time))}</td><td>{String(stage.baseline_cell_count)}</td><td>{String(stage.scenario_cell_count)}</td><td>{String(stage.removed_cell_count)}</td></tr>)}</tbody></table>;

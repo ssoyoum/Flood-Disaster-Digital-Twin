@@ -65,7 +65,7 @@ export const testSafetyDataApi = (serviceKey: string) =>
 export const getExposureInventory = (eventId: string, radii: number[] = [300, 500, 1000, 2000]) =>
   request<ExposureInventory>(`/api/events/${eventId}/exposure-inventory?${radii.map((radius) => `radii_m=${radius}`).join("&")}`);
 
-export const getAgentExamples = () => request<AgentExampleQuestion[]>("/api/agent/examples");
+export const getAgentExamples = (eventId = "osong-2023") => request<AgentExampleQuestion[]>(`/api/agent/examples?event_id=${encodeURIComponent(eventId)}`);
 
 export const askAgent = (eventId: string, message: string, history: Array<{ role: "user" | "assistant"; content: string }> = []) =>
   request<AgentAskResult>("/api/agent/ask", {

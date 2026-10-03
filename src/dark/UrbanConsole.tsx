@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import maplibregl, { type MapLayerMouseEvent } from "maplibre-gl";
 import * as api from "../api";
 import type { AlertTimingResult, FloodEvent, LayersResponse, StorageCaptureResult, UrbanReconstructionResponse } from "../types";
+import { AgentDock } from "./DarkConsole";
 import { FloodOpsLogo } from "./Landing";
 import { CONFIDENCE_KO, ROLE_KO, localizeEvent, stageKo } from "./ko";
 import "./dark.css";
@@ -152,6 +153,10 @@ function UrbanConsoleView({ eventData, layers, reconstruction }: { eventData: Fl
           <button type="button" className={view === "console" ? "active" : ""} onClick={() => setView("console")}>관제 화면</button>
           <button type="button" className={view === "compare" ? "active" : ""} onClick={() => { setPlaying(false); setView("compare"); }}>반사실 비교</button>
         </nav>
+        <div className="dk-header-agent">
+          <div className="dk-header-agent-title"><span><strong>대응 에이전트</strong><small>근거 기반 조치 질의</small></span></div>
+          <AgentDock eventId={eventData.id} compact />
+        </div>
         <div className="dk-status">
           <span className="dk-chip dk-chip-stage"><i />{current ? `${clock(current.time)} ${current.label}` : "—"}</span>
           <span className="dk-chip">침수흔적 <small>{num(reconstruction.exposure.traces.count)}건</small></span>
