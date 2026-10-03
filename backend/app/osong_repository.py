@@ -93,6 +93,18 @@ def _read_geojson(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _valid_feature_collection(data: Any) -> bool:
+    if not isinstance(data, dict) or data.get("type") != "FeatureCollection":
+        return False
+    features = data.get("features")
+    return isinstance(features, list) and all(
+        isinstance(feature, dict)
+        and isinstance(feature.get("geometry"), dict)
+        and isinstance(feature["geometry"].get("type"), str)
+        for feature in features
+    )
+
+
 def _feature_count(data: dict[str, Any]) -> int:
     return len(data.get("features", []))
 
@@ -111,7 +123,22 @@ def _layer(
     source: str,
     snapshot: str | None = None,
 ) -> dict[str, Any]:
+    error_code = None
     if not path.exists():
+        error_code = "MISSING_PROCESSED_FILE"
+    else:
+        try:
+            data = _read_geojson(path)
+            if not _valid_feature_collection(data):
+                error_code = "MALFORMED_PROCESSED_FILE"
+        except FileNotFoundError:
+            error_code = "MISSING_PROCESSED_FILE"
+        except OSError:
+            error_code = "UNREADABLE_PROCESSED_FILE"
+        except (UnicodeError, json.JSONDecodeError):
+            error_code = "MALFORMED_PROCESSED_FILE"
+
+    if error_code:
         return {
             "key": key,
             "label": label,
@@ -123,9 +150,9 @@ def _layer(
             "feature_count": 0,
             "geometry_types": [],
             "data": EMPTY_FEATURE_COLLECTION,
+            "error_code": error_code,
         }
 
-    data = _read_geojson(path)
     return {
         "key": key,
         "label": label,

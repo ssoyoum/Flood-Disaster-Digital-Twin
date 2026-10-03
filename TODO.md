@@ -13,7 +13,7 @@ Last Updated: 2026-10-03 KST
 - Status: Active / presentation-ready MVP
 - Last updated: 2026-10-02
 - Branch: 모든 작업은 `main` 하나에서 진행한다. 2026-09-06에 브랜치 4개를 `main`으로 정리했다.
-- Next action: NEXT의 API 오류 상태 테스트(missing layer, unavailable dataset, malformed processed file)로 넘어간다. 수위 기준면(DQ-007·DQ-009)과 DQ-008 재산출은 끝났다.
+- Next action: NEXT의 Playwright E2E로 넘어간다. API 오류 상태 테스트와 수위 기준면(DQ-007·DQ-009), DQ-008 재산출은 끝났다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
@@ -195,8 +195,10 @@ Last Updated: 2026-10-03 KST
 - [ ] 궁평2지하차도 별도 시설 모델링 보강
   - 공식 시설명, 노선, 관리기관, 위치, 시설 종류와 OSM geometry 결합 상태 점검
   - 차량별 노출/교통량 모델링은 아직 하지 않는다.
-- [ ] API 오류 상태 테스트
-  - missing layer, unavailable dataset, malformed processed file 상태를 테스트한다.
+- [x] API 오류 상태 테스트 (2026-10-03)
+  - 누락된 오송 레이어는 `UNAVAILABLE`/`MISSING_PROCESSED_FILE`, 손상된 GeoJSON은 `UNAVAILABLE`/`MALFORMED_PROCESSED_FILE`로 반환하고 빈 FeatureCollection을 제공한다.
+  - 연결되지 않은 익산 데이터셋은 `UNAVAILABLE`, 등록되지 않은 사건은 404로 응답하는 것을 확인했다.
+  - `python -m pytest backend/tests -q`: 116개 통과.
 - [ ] Playwright E2E
   - `osong-2023` 진입, replay 실행, scenario 변경, layer toggle, provenance 표시를 검증한다.
 - [ ] provenance 화면 고도화

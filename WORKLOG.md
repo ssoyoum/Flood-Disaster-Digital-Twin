@@ -2320,3 +2320,22 @@ UI 보완:
 - 문제: 포항·안동의 사건 시각은 공식 상황보고에 하나도 적혀 있지 않았다.
   해결: 언론 출처를 유지했다. 확인 경로(홍수통제소 Open API, 산사태정보시스템, 긴급재난문자 이력, 판결문 열람)를 DQ-011에 남겼다.
 
+## API 오류 상태 검증 및 손상 레이어 처리
+
+- 작업일: 2026-10-03
+
+주요 작업:
+- 오송 processed GeoJSON의 파일 누락, JSON 구문 오류, FeatureCollection 구조 오류를 레이어별 `UNAVAILABLE` 상태로 처리했습니다.
+- 누락은 `MISSING_PROCESSED_FILE`, 손상은 `MALFORMED_PROCESSED_FILE` 코드로 구분하고 빈 FeatureCollection을 반환하도록 했습니다.
+- 익산 미연결 데이터셋의 `UNAVAILABLE` 상태와 미등록 사건의 404 응답을 포함해 API 오류 상태 테스트 4개를 추가했습니다.
+
+검증 결과:
+- `python -m pytest backend/tests/test_api_error_states.py -q`: 4개 통과.
+- `python -m pytest backend/tests -q`: 116개 통과. FastAPI `on_event` 폐기 예정 경고 2개가 출력됐습니다.
+- 누락·손상 레이어에서 `/api/events/osong-2023/layers`는 200으로 응답하고, `/api/events/osong-2023/status`에도 같은 오류 코드가 표시되는 것을 확인했습니다.
+
+문제/해결:
+- 문제: 누락된 processed 레이어는 빈 데이터로 처리됐지만 원인 코드가 없었고, 손상된 GeoJSON은 파싱 예외로 `/layers` 요청 전체가 실패할 수 있었습니다.
+  해결: 파일 누락과 JSON·FeatureCollection 손상을 레이어 단위로 판별해 `UNAVAILABLE`과 원인 코드를 반환했습니다. 다른 정상 레이어는 계속 제공되도록 유지했습니다.
+- 문제: 미연결 익산 데이터셋과 미등록 사건의 API 응답 계약이 오류 상태 테스트로 고정되지 않았습니다.
+  해결: 익산 레이어의 `UNAVAILABLE`/0건과 미등록 사건의 404를 테스트에 포함했습니다.
