@@ -154,6 +154,13 @@ Open data-quality issues count: 3
 - 원인 분해 (V3, 30m, stage 6): 하천 1350m 이내 66.9%, flow corridor 660m 5.4%, 지하차도 1215m 11.4%, connectivity 합집합 69.0%, hand <= 5.54m 63.1%, 최종 교집합 51.6%. AOI가 미호강 범람원이라 두 조건 모두 구분력이 낮다. 30m HAND 값의 p50은 0.45 m다.
 - 민감도: connectivity 150m에서는 hand 임계를 5.54 m에서 0.5 m로 11배 조여도 15.1%에서 15.0%로만 바뀐다. 지배적 레버는 connectivity distance이며, 현재 envelope은 실질적으로 하천 거리 버퍼에 가깝다.
 - 채택 판정: AOI 클립은 채택한다. 30m 해상도 재계산은 선택 규칙을 고친 뒤 재평가한다. 선택 규칙 재설계는 공식 Flood Extent 또는 Safemap raster 대조 검증 절차가 마련된 뒤에만 착수한다. 검증 기준 없이 파라미터를 조이는 것은 근거 없는 튜닝이다.
+- 재산출 (2026-10-03, 09-30 개선 HAND 기준): `data/scripts/compare_osong_reconstruction_envelopes.py`에 AOI 클립 면적과 건물·도로 중첩을 넣어 다시 만들 수 있게 했다.
+  - 분모 정정: 건물·도로 파일은 오송읍보다 넓은 범위를 담고 있다(25,283동 중 AOI 안 9,748동, 1,305.2 km 중 AOI 안 368.1 km). 09-02의 45.8% / 50.5%는 클립하지 않은 envelope을 전체 건물·도로로 나눈 값이다. 같은 방식으로 approx final을 계산하면 22.6% / 26.3%가 그대로 재현된다.
+  - HAND final stage: 35.458 km2(이전 54.392), AOI 클립 15.434 km2 = AOI의 38.1%(이전 V1 48.2%). AOI 안 건물 4,746동(48.7%), 도로 159.6 km(43.3%).
+  - HAND 첫 stage(`hydraulic_warning`): AOI 클립 5.362 km2(13.2%), 건물 694동(7.1%), 도로 64.3 km(17.5%).
+  - approx final stage: AOI의 36.2%, 건물 4,382동(45.0%), 도로 41.1%.
+  - 판정: 면적은 줄었지만 final stage가 여전히 AOI 안 건물의 절반 가까이를 덮는다. 절대 노출 카운트로 쓸 수 없다는 결론은 바뀌지 않는다. Status를 유지한다.
+  - 클립하지 않은 HAND final 기준(이전 방식): 건물 8,642동 / 25,283동(34.2%), 도로 388.4 km / 1,305.2 km(29.8%).
 - 근거 코드/산출물 경로: `data/processed/osong/osong_reconstruction_envelope_comparison.json`, `data/processed/osong/osong_sgis_admin_boundary_2023.geojson`, `data/scripts/create_osong_hand_reconstruction.py`
 - Residual risk / 남은 한계: 공식 vector Flood Extent가 없어 축소된 envelope도 정답과 대조 검증할 수 없다. 노출 KPI는 계속 `PENDING_FLOOD_EXTENT`로 유지한다.
 

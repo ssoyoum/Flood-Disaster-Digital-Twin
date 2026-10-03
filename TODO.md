@@ -13,7 +13,7 @@ Last Updated: 2026-10-03 KST
 - Status: Active / presentation-ready MVP
 - Last updated: 2026-10-02
 - Branch: 모든 작업은 `main` 하나에서 진행한다. 2026-09-06에 브랜치 4개를 `main`으로 정리했다.
-- Next action: DQ-008 AOI 클립 면적·중첩 비율을 09-30 HAND 기준으로 재산출하고 `osong_reconstruction_envelope_comparison.json`을 재생성한다. 수위 기준면 정리는 DQ-007·DQ-009로 끝났다.
+- Next action: NEXT의 API 오류 상태 테스트(missing layer, unavailable dataset, malformed processed file)로 넘어간다. 수위 기준면(DQ-007·DQ-009)과 DQ-008 재산출은 끝났다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
@@ -27,7 +27,7 @@ Last Updated: 2026-10-03 KST
 - [x] HAND reconstruction 검증 및 비교
   - 현재 생성 결과(2026-09-30 미호천 기준 높이·연결 조건 적용 후): HAND grid 1,280 features; timeline 1,619 features
   - stage counts: 152 / 209 / 266 / 306 / 330 / 352 (이전 278 / 341 / 418 / 476 / 508 / 540)
-  - approx vs HAND comparison(`osong_reconstruction_envelope_comparison.json`)은 2026-09-01 생성본 그대로라 09-30 이전 HAND 기준이다. final stage area 30.0194 km2 vs 54.3915 km2는 옛 값이며 재생성이 필요하다.
+  - approx vs HAND comparison(`osong_reconstruction_envelope_comparison.json`)을 2026-10-03에 09-30 HAND 기준으로 재생성했다. final stage area 30.0194 km2 vs 35.4577 km2(이전 54.3915).
   - 수위 관측값은 DEM 절대 수면고가 아니라 relative stage pressure로만 사용한다.
   - 공식 Flood Extent, depth, velocity, final exposure KPI로 사용하지 않는다.
 - [ ] 실제 수위와 공간상태 연결 검증 보강
@@ -59,7 +59,7 @@ Last Updated: 2026-10-03 KST
   - (09-30 이전 HAND 기준) final stage 54.392 km2 = AOI 40.557 km2의 1.34배. 그대로 중첩하면 건물 45.8%, 도로 50.5%가 영향으로 집계되어 근거로 제시할 수 없었다.
   - 비파괴 경로: stage별 증분 지표 + 궁평2지하차도 중심 반경 제한 집계, `coverage_status` 명시.
   - [x] envelope 개선 1차: 미호천 기준 높이 + 미호천·붕괴 셀 연결 조건(2026-09-30). final stage 540 → 352셀.
-  - [ ] AOI 클립과 개선 후 envelope의 면적·중첩 비율 재산출.
+  - [x] AOI 클립과 개선 후 envelope의 면적·중첩 비율 재산출(2026-10-03): HAND final AOI 클립 15.434 km2 = AOI의 38.1%, AOI 안 건물 4,746/9,748동(48.7%), 도로 159.6/368.1 km(43.3%). 여전히 절대 노출 카운트로 쓸 수 없다. 09-02 비율은 AOI 밖 건물·도로까지 분모에 넣은 값이었다.
 - [x] LLM intent planner 최소 연결
   - `backend/app/llm_planner.py` 신규. `POST /api/agent/plan`에 `planner: auto|deterministic|llm` 선택 추가.
   - LLM은 등록된 workflow 선택과 파라미터 추출만 수행한다. 분석 수치는 전부 결정론 Tool 결과를 사용한다.

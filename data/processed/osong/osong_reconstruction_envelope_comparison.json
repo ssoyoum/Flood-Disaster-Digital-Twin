@@ -1,18 +1,28 @@
 {
-  "created_at": "2026-09-01T05:43:21.232380+00:00",
+  "created_at": "2026-10-03T05:31:06.845121+00:00",
   "event_id": "osong-2023",
   "status": "TEMPORARY",
   "source_type": "DERIVED_COMPARISON",
   "role": "Compare old low-elevation approximation with HAND-like reconstruction.",
   "inputs": [
     "data/processed/osong/osong_approx_flood_envelope_timeline.geojson",
-    "data/processed/osong/osong_hand_flood_envelope_timeline.geojson"
+    "data/processed/osong/osong_hand_flood_envelope_timeline.geojson",
+    "data/processed/osong/osong_sgis_admin_boundary_2023.geojson",
+    "data/processed/osong/osong_official_buildings_2023.geojson",
+    "data/processed/osong/osong_osm_roads_2023.geojson"
   ],
   "area_crs": "EPSG:5179",
+  "aoi": {
+    "area_km2": 40.557,
+    "official_buildings_in_aoi": 9748,
+    "osm_road_km_in_aoi": 368.1,
+    "inventory_note": "Inventory files cover a wider bbox (25283 buildings, 1305.2 road km); overlap shares use in-AOI totals."
+  },
   "data_warning": [
     "Areas are method-comparison areas, not official inundation area.",
     "HAND uses relative water-level change and drainage-relative elevation, not absolute water-surface elevation.",
-    "Do not use this comparison as exposure KPI evidence."
+    "Do not use this comparison as exposure KPI evidence.",
+    "AOI overlap counts show how much of Osong-eup an envelope covers (DQ-008); they are not affected-building or affected-road counts."
   ],
   "methods": {
     "approx_flood_envelope": "Existing simple approximation using low-elevation DEM cells and distance thresholds.",
@@ -27,67 +37,165 @@
       "hand_features": 0,
       "hand_area_km2": 0.0,
       "hand_minus_approx_area_km2": 0.0,
-      "hand_to_approx_area_ratio": null
+      "hand_to_approx_area_ratio": null,
+      "approx_aoi_overlap": null,
+      "hand_aoi_overlap": null
     },
     {
       "stage": "hydraulic_warning",
       "label": "Design flood level reached",
       "approx_features": 36,
       "approx_area_km2": 3.6275,
-      "hand_features": 278,
-      "hand_area_km2": 28.0008,
-      "hand_minus_approx_area_km2": 24.3733,
-      "hand_to_approx_area_ratio": 7.72
+      "hand_features": 152,
+      "hand_area_km2": 15.3109,
+      "hand_minus_approx_area_km2": 11.6834,
+      "hand_to_approx_area_ratio": 4.22,
+      "approx_aoi_overlap": {
+        "aoi_clipped_area_km2": 1.44,
+        "aoi_clipped_share_pct": 3.6,
+        "buildings_intersecting": 50,
+        "buildings_intersecting_pct": 0.5,
+        "road_km_inside": 7.3,
+        "road_km_inside_pct": 2.0
+      },
+      "hand_aoi_overlap": {
+        "aoi_clipped_area_km2": 5.3621,
+        "aoi_clipped_share_pct": 13.2,
+        "buildings_intersecting": 694,
+        "buildings_intersecting_pct": 7.1,
+        "road_km_inside": 64.3,
+        "road_km_inside_pct": 17.5
+      }
     },
     {
       "stage": "overtopping",
       "label": "Overtopping begins",
       "approx_features": 96,
       "approx_area_km2": 9.6726,
-      "hand_features": 341,
-      "hand_area_km2": 34.3466,
-      "hand_minus_approx_area_km2": 24.674,
-      "hand_to_approx_area_ratio": 3.55
+      "hand_features": 209,
+      "hand_area_km2": 21.0524,
+      "hand_minus_approx_area_km2": 11.3798,
+      "hand_to_approx_area_ratio": 2.18,
+      "approx_aoi_overlap": {
+        "aoi_clipped_area_km2": 5.5673,
+        "aoi_clipped_share_pct": 13.7,
+        "buildings_intersecting": 958,
+        "buildings_intersecting_pct": 9.8,
+        "road_km_inside": 54.7,
+        "road_km_inside_pct": 14.9
+      },
+      "hand_aoi_overlap": {
+        "aoi_clipped_area_km2": 8.5113,
+        "aoi_clipped_share_pct": 21.0,
+        "buildings_intersecting": 1576,
+        "buildings_intersecting_pct": 16.2,
+        "road_km_inside": 91.5,
+        "road_km_inside_pct": 24.9
+      }
     },
     {
       "stage": "levee_failure",
       "label": "Temporary levee failure",
       "approx_features": 182,
       "approx_area_km2": 18.3358,
-      "hand_features": 418,
-      "hand_area_km2": 42.1027,
-      "hand_minus_approx_area_km2": 23.7669,
-      "hand_to_approx_area_ratio": 2.3
+      "hand_features": 266,
+      "hand_area_km2": 26.794,
+      "hand_minus_approx_area_km2": 8.4582,
+      "hand_to_approx_area_ratio": 1.46,
+      "approx_aoi_overlap": {
+        "aoi_clipped_area_km2": 10.4141,
+        "aoi_clipped_share_pct": 25.7,
+        "buildings_intersecting": 1795,
+        "buildings_intersecting_pct": 18.4,
+        "road_km_inside": 108.3,
+        "road_km_inside_pct": 29.4
+      },
+      "hand_aoi_overlap": {
+        "aoi_clipped_area_km2": 11.2709,
+        "aoi_clipped_share_pct": 27.8,
+        "buildings_intersecting": 2103,
+        "buildings_intersecting_pct": 21.6,
+        "road_km_inside": 115.3,
+        "road_km_inside_pct": 31.3
+      }
     },
     {
       "stage": "underpass_inflow",
       "label": "Underpass inflow starts",
       "approx_features": 241,
       "approx_area_km2": 24.2784,
-      "hand_features": 476,
-      "hand_area_km2": 47.9448,
-      "hand_minus_approx_area_km2": 23.6664,
-      "hand_to_approx_area_ratio": 1.97
+      "hand_features": 306,
+      "hand_area_km2": 30.8235,
+      "hand_minus_approx_area_km2": 6.5451,
+      "hand_to_approx_area_ratio": 1.27,
+      "approx_aoi_overlap": {
+        "aoi_clipped_area_km2": 12.5489,
+        "aoi_clipped_share_pct": 30.9,
+        "buildings_intersecting": 2653,
+        "buildings_intersecting_pct": 27.2,
+        "road_km_inside": 129.2,
+        "road_km_inside_pct": 35.1
+      },
+      "hand_aoi_overlap": {
+        "aoi_clipped_area_km2": 13.6888,
+        "aoi_clipped_share_pct": 33.8,
+        "buildings_intersecting": 3399,
+        "buildings_intersecting_pct": 34.9,
+        "road_km_inside": 139.3,
+        "road_km_inside_pct": 37.8
+      }
     },
     {
       "stage": "unsafe_driving",
       "label": "Unsafe driving condition",
       "approx_features": 270,
       "approx_area_km2": 27.1991,
-      "hand_features": 508,
-      "hand_area_km2": 51.1678,
-      "hand_minus_approx_area_km2": 23.9687,
-      "hand_to_approx_area_ratio": 1.88
+      "hand_features": 330,
+      "hand_area_km2": 33.2413,
+      "hand_minus_approx_area_km2": 6.0422,
+      "hand_to_approx_area_ratio": 1.22,
+      "approx_aoi_overlap": {
+        "aoi_clipped_area_km2": 13.1882,
+        "aoi_clipped_share_pct": 32.5,
+        "buildings_intersecting": 2820,
+        "buildings_intersecting_pct": 28.9,
+        "road_km_inside": 133.9,
+        "road_km_inside_pct": 36.4
+      },
+      "hand_aoi_overlap": {
+        "aoi_clipped_area_km2": 14.326,
+        "aoi_clipped_share_pct": 35.3,
+        "buildings_intersecting": 3624,
+        "buildings_intersecting_pct": 37.2,
+        "road_km_inside": 146.7,
+        "road_km_inside_pct": 39.9
+      }
     },
     {
       "stage": "full_inundation",
       "label": "Full inundation",
       "approx_features": 298,
       "approx_area_km2": 30.0194,
-      "hand_features": 540,
-      "hand_area_km2": 54.3915,
-      "hand_minus_approx_area_km2": 24.3721,
-      "hand_to_approx_area_ratio": 1.81
+      "hand_features": 352,
+      "hand_area_km2": 35.4577,
+      "hand_minus_approx_area_km2": 5.4383,
+      "hand_to_approx_area_ratio": 1.18,
+      "approx_aoi_overlap": {
+        "aoi_clipped_area_km2": 14.6698,
+        "aoi_clipped_share_pct": 36.2,
+        "buildings_intersecting": 4382,
+        "buildings_intersecting_pct": 45.0,
+        "road_km_inside": 151.3,
+        "road_km_inside_pct": 41.1
+      },
+      "hand_aoi_overlap": {
+        "aoi_clipped_area_km2": 15.4342,
+        "aoi_clipped_share_pct": 38.1,
+        "buildings_intersecting": 4746,
+        "buildings_intersecting_pct": 48.7,
+        "road_km_inside": 159.6,
+        "road_km_inside_pct": 43.3
+      }
     }
   ]
 }
