@@ -4,16 +4,18 @@ import * as api from "./api";
 import DarkConsole from "./dark/DarkConsole";
 import UrbanConsole from "./dark/UrbanConsole";
 import TimelineConsole from "./dark/TimelineConsole";
+import CaseComparePage from "./dark/CaseCompare";
 import { CaseSelectPage, IntroPage } from "./dark/Landing";
 import { localizeEvent, localizeReconstruction } from "./dark/ko";
 import type { DataStatusResponse, ExposureMetrics, FloodEvent, LayersResponse, ReconstructionResponse } from "./types";
 
 // Hash routes keep the browser back button working: "" intro, "#cases", "#event/<id>".
-type Route = { page: "intro" } | { page: "cases" } | { page: "event"; id: string };
+type Route = { page: "intro" } | { page: "cases" } | { page: "compare" } | { page: "event"; id: string };
 
 function readRoute(): Route {
   const hash = window.location.hash.replace(/^#\/?/, "");
   if (hash === "cases") return { page: "cases" };
+  if (hash === "compare") return { page: "compare" };
   if (hash.startsWith("event/")) return { page: "event", id: decodeURIComponent(hash.slice(6)) };
   return { page: "intro" };
 }
@@ -58,8 +60,9 @@ export default function App() {
   if (route.page === "cases") {
     if (eventsError) return <ErrorState message="사례 목록을 불러오지 못했습니다. 백엔드 API 연결을 확인하세요." />;
     if (!events) return <LoadingState label="사례 목록을 불러오는 중" />;
-    return <CaseSelectPage events={events} onSelect={(id) => go(`event/${encodeURIComponent(id)}`)} onBack={() => go("")} />;
+    return <CaseSelectPage events={events} onSelect={(id) => go(`event/${encodeURIComponent(id)}`)} onBack={() => go("")} onCompare={() => go("compare")} />;
   }
+  if (route.page === "compare") return <CaseComparePage onBack={() => go("cases")} onOpen={(id) => go(`event/${encodeURIComponent(id)}`)} />;
   // Rainfall-driven urban cases have no levee or underpass, so they use their own console.
   if (route.id === "seoul-2022") return <UrbanConsole key={route.id} eventId={route.id} />;
   // Cases connected only through reported incident times share a lighter timeline console.

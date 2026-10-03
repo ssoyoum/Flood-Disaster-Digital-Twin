@@ -1,4 +1,4 @@
-import type { ResponseTimingResult, TimelineReconstructionResponse, AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
+import type { CaseLeadTimes, ResponseTimingResult, TimelineReconstructionResponse, AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
 
 const configuredApiBase = import.meta.env.VITE_API_BASE;
 const API_BASE = configuredApiBase === "same-origin" ? "" : configuredApiBase ?? (import.meta.env.PROD ? "" : "http://localhost:8033");
@@ -130,3 +130,4 @@ export const getResponseTiming = (eventId: string, interventionId: string, actio
     body: JSON.stringify({ intervention_id: interventionId, action_times: actionTimes }),
   });
 
+export const getCaseLeadTimes = () => request<CaseLeadTimes>("/api/cases/lead-times");

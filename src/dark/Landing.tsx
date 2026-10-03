@@ -150,7 +150,7 @@ export function IntroPage({ onStart }: { onStart: () => void }) {
   );
 }
 
-export function CaseSelectPage({ events, onSelect, onBack }: { events: FloodEvent[]; onSelect: (id: string) => void; onBack: () => void }) {
+export function CaseSelectPage({ events, onSelect, onBack, onCompare }: { events: FloodEvent[]; onSelect: (id: string) => void; onBack: () => void; onCompare?: () => void }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const activeIndex = events.length ? selectedIndex % events.length : 0;
@@ -190,6 +190,7 @@ export function CaseSelectPage({ events, onSelect, onBack }: { events: FloodEven
           <p className="fo-eyebrow">CASE LIBRARY</p>
           <h2>분석할 홍수 사례를 선택하세요</h2>
         </div>
+        {onCompare && <button className="fo-ghost fo-cases-compare" type="button" onClick={onCompare}><GitCompare size={16} /> 사례 간 비교</button>}
       </header>
       <section className="fo-case-library" aria-label="홍수 사례 목록">
         <div

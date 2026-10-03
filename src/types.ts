@@ -498,3 +498,17 @@ export type ResponseTimingResult = {
   }>;
   assumptions: string[];
 };
+
+export type CaseLeadTimes = {
+  measure: string;
+  cases: Array<{
+    event_id: string;
+    case: string;
+    response: string;
+    milestone: string;
+    actual: { time: string | null; lead_min: number | null; label: string };
+    counterfactual: { time: string; lead_min: number | null; label: string };
+    evidence: string;
+  }>;
+  limitations: string[];
+};
