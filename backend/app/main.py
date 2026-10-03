@@ -33,6 +33,7 @@ from .seoul_repository import (
     get_seoul_status,
     get_seoul_summary,
 )
+from .case_comparison import get_case_lead_times
 from .timeline_cases import (
     analyze_response_timing,
     get_timeline_reconstruction,
@@ -474,6 +475,13 @@ def response_timing_analysis(event_id: str, request: ResponseTimingRequest):
         return analyze_response_timing(event_id, request.intervention_id, request.action_times)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/api/cases/lead-times", tags=["analysis"])
+def case_lead_times():
+    """Actual versus one registered counterfactual response time for every connected case."""
+
+    return get_case_lead_times()
 
 
 @app.get("/api/agent/tools", response_model=list[AgentToolDescriptor], tags=["agent"])

@@ -49,3 +49,12 @@ def test_response_timing_rejects_bad_requests():
     bad_time = {"intervention_id": "parking_entry_ban", "action_times": ["25:00"]}
     assert client.post("/api/events/pohang-2022/analysis/response-timing", json=bad_time).status_code == 422
     assert client.get("/api/events/iksan-2024/reconstruction").status_code == 404
+
+
+def test_case_lead_times_reuse_each_case_calculation():
+    cases = {item["event_id"]: item for item in client.get("/api/cases/lead-times").json()["cases"]}
+    assert cases["osong-2023"]["actual"]["lead_min"] is None
+    assert cases["osong-2023"]["counterfactual"]["lead_min"] == 107
+    assert (cases["seoul-2022"]["actual"]["lead_min"], cases["seoul-2022"]["counterfactual"]["lead_min"]) == (-20, 10)
+    assert (cases["pohang-2022"]["actual"]["lead_min"], cases["pohang-2022"]["counterfactual"]["lead_min"]) == (7, 37)
+    assert (cases["andong-uiseong-2026"]["actual"]["lead_min"], cases["andong-uiseong-2026"]["counterfactual"]["lead_min"]) == (30, 50)
