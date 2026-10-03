@@ -197,6 +197,34 @@ Open data-quality issues count: 3
 - 검증 방법: `python data/scripts/process_seoul_2022_dorimcheon.py`를 다시 실행해 `seoul_dorimcheon_summary.json` 수치가 같은지 확인한다. `backend/tests/test_seoul_case.py`가 흔적 10,468건, 겹친 건축물 13,015동, 주소 필드 부재를 고정한다.
 - Residual risk / 남은 한계: 침수흔적에는 시각이 없어 사건 단계별 공간 확산을 재생할 수 없다. 반사실 저류 계산의 면적은 bbox 면적(28.69 km2)이고 도림천 실제 유역면적이 아니다.
 
+### DQ-011: Pohang and Andong-Uiseong cases rest on press-reported times only
+
+- Status: Accepted limitation
+- Impact: High
+- 발견일: 2026-10-03
+- 대상 데이터셋: `backend/app/timeline_cases.py`, `data/processed/pohang_2022/*`, `data/processed/andong_uiseong_2026/*`
+- 증상: 두 사례의 사건 시각은 전부 언론·경찰·기업 발표 보도에서 왔다.
+  - 포항 05:20 재방송은 관리소장 본인 주장이다.
+  - 안동 00:30은 관측이 아니라 경보 발령 당시의 예측 시각이다.
+  - 안동 대피명령은 매체에 따라 7/18 자정 또는 7/19 00:00으로 표기된다.
+- 원인:
+  - 기상청 AWS 원자료는 자료개방포털 수동 다운로드가 필요하다.
+  - 냉천에는 2022년 당시 국가 수위관측소가 없었을 가능성이 높다(2023-03 문덕3교 신설 보도).
+  - 공식 침수흔적은 확인되지 않았다.
+- 분석 결과에 미치는 영향:
+  - 반사실 결과는 보도 시각 사이의 산술일 뿐이다. 보도 시각이 바뀌면 결과도 그대로 바뀐다.
+  - 사건일 OSM 건축물은 포항 66동, 안동·의성 23동뿐이라 노출 집계를 하지 않는다.
+- 해결 방법:
+  - 화면과 API에 단계별 확신도를 "언론 보도", "당사자 주장", "예측 보도"로 구분해 표시한다.
+  - 보도 수치는 "모델 계산이 아님" 패널에 출처와 함께만 둔다.
+  - 초점 지점은 교량·마을 중심점으로 두고, 사고 주택이나 단지 위치는 표시하지 않는다.
+- 검증 방법: `backend/tests/test_timeline_cases.py`가 다음을 고정한다.
+  - 06:00 진입 금지 안내: 침수 시작 37분, 완전 침수 45분 전
+  - 23:40 대피명령: 경보 수위 도달 예측까지 50분
+  - 자정을 넘는 시각 해석
+  - 모든 단계에 출처 URL이 있음
+- Residual risk / 남은 한계: 익산 2024는 시각 근거가 없어 연결하지 않았다. 카탈로그 위치만 산북천 유역으로 바로잡았다.
+
 ## Open issues / watchlist
 
 - DSSP-IF-00117 또는 대체 공식 vector Flood Extent 확보 시 DQ-001, DQ-002를 재검증한다.
