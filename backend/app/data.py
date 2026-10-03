@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from .osong_repository import get_osong_event, get_osong_layers, get_osong_observations
+from .seoul_repository import SEOUL_EVENT_ID, get_seoul_event, get_seoul_layers, get_seoul_observations
 
 
 EVENT_ID = "osong-2023"
@@ -28,15 +29,7 @@ def _pending_event(event_id: str, name: str, location: str, data_year: int, them
 
 EVENTS = [
     get_osong_event(),
-    _pending_event(
-        "seoul-2022",
-        "2022 Seoul Urban Flood",
-        "Gangnam and Sillim, Seoul",
-        2022,
-        "Urban Flood",
-        "Basement and underground spaces",
-        "Rainfall -> drainage exceedance -> lowland flooding -> buildings, population, underground spaces, vulnerable groups",
-    ),
+    get_seoul_event(),
     _pending_event(
         "pohang-2022",
         "2022 Pohang Typhoon Flood",
@@ -77,7 +70,7 @@ INFRASTRUCTURE = _legacy_layer("infrastructure")
 SHELTERS = _legacy_layer("shelters")
 
 
-EVENT_OBSERVATIONS = {EVENT_ID: get_osong_observations()}
+EVENT_OBSERVATIONS = {EVENT_ID: get_osong_observations(), SEOUL_EVENT_ID: get_seoul_observations()}
 OBSERVATIONS = []
 
 
@@ -92,6 +85,8 @@ def get_event(event_id: str = EVENT_ID) -> dict:
 def get_layers(event_id: str = EVENT_ID, layer_year: int = 2023) -> dict:
     if event_id == EVENT_ID:
         return deepcopy(get_osong_layers(layer_year))
+    if event_id == SEOUL_EVENT_ID:
+        return deepcopy(get_seoul_layers())
     return {
         "aoi": {"data": EMPTY_FEATURE_COLLECTION, "status": "UNAVAILABLE", "feature_count": 0},
         "roads": {"data": EMPTY_FEATURE_COLLECTION, "status": "UNAVAILABLE", "feature_count": 0},

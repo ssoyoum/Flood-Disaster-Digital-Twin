@@ -1,6 +1,6 @@
 from typing import Any, Annotated, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 DataOrigin = Literal["VERIFIED", "DERIVED", "REANALYSIS", "TEMPORARY", "UNAVAILABLE"]
@@ -445,3 +445,28 @@ class ExposureInventoryResult(BaseModel):
     rings: list[ExposureRing]
     assumptions: list[str]
     limitations: list[str]
+
+
+class AlertTimingRequest(BaseModel):
+    """Seoul what-if: send the low-lying flood alert when a rain gauge crosses a threshold or at a fixed time."""
+
+    station: str = "신림P"
+    thresholds_mm_per_hour: list[float] = Field(default_factory=lambda: [30.0, 50.0, 95.0], max_length=10)
+    alert_times: list[str] = Field(default_factory=list, max_length=10)
+
+    @field_validator("thresholds_mm_per_hour")
+    @classmethod
+    def _thresholds_in_range(cls, values: list[float]) -> list[float]:
+        if any(value <= 0 or value > 200 for value in values):
+            raise ValueError("thresholds_mm_per_hour must be within (0, 200]")
+        return values
+
+
+class StorageCaptureRequest(BaseModel):
+    """Seoul what-if: how much rain above the drainage capacity an assumed storage tunnel could hold."""
+
+    station: str = "신림P"
+    storage_m3: float = Field(default=400_000, gt=0, le=5_000_000)
+    capacity_mm_per_hour: float = Field(default=95.0, gt=0, le=200)
+    catchment_area_km2: float | None = Field(default=None, gt=0, le=200)
+    runoff_coefficient: float = Field(default=1.0, gt=0, le=1.0)

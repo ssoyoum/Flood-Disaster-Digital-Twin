@@ -25,8 +25,18 @@ from .rate_limit import agent_limiter, client_key
 from .llm_planner import LlmPlannerUnavailable, llm_planner_model_id, llm_planner_status, plan_with_llm
 from .data import EVENT_ID, EVENT_OBSERVATIONS, OBSERVATIONS, get_event, get_events, get_layers
 from .osong_repository import SAFEMAP_WMS_SNAPSHOT, get_osong_data_status, get_osong_reconstruction, get_osong_summary
+from .seoul_repository import (
+    SEOUL_EVENT_ID,
+    analyze_alert_timing,
+    analyze_storage_capture,
+    get_seoul_reconstruction,
+    get_seoul_status,
+    get_seoul_summary,
+)
 from .scenario_repository import create_scenario as save_scenario, get_scenario, mark_completed, mark_unavailable
 from .schemas import (
+    AlertTimingRequest,
+    StorageCaptureRequest,
     ClosureTimingRequest,
     ClosureTimingResult,
     ExposureInventoryResult,
@@ -137,6 +147,8 @@ def event_status(event_id: str):
     _require_event(event_id)
     if event_id == EVENT_ID:
         return get_osong_data_status()
+    if event_id == SEOUL_EVENT_ID:
+        return get_seoul_status()
     return {"status": "UNAVAILABLE", "message": "Processed data is not connected for this event."}
 
 
@@ -195,6 +207,8 @@ def event_summary(event_id: str):
     _require_event(event_id)
     if event_id == EVENT_ID:
         return get_osong_summary()
+    if event_id == SEOUL_EVENT_ID:
+        return get_seoul_summary()
     return {
         "event_id": event_id,
         "origin": "UNAVAILABLE",
@@ -207,6 +221,8 @@ def event_reconstruction(event_id: str):
     _require_event(event_id)
     if event_id == EVENT_ID:
         return get_osong_reconstruction()
+    if event_id == SEOUL_EVENT_ID:
+        return get_seoul_reconstruction()
     raise HTTPException(status_code=404, detail="Reconstruction is not connected for this event")
 
 
@@ -403,6 +419,36 @@ def hand_threshold_analysis(event_id: str, request: HandThresholdRequest):
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
+def _require_seoul(event_id: str) -> None:
+    _require_event(event_id)
+    if event_id != SEOUL_EVENT_ID:
+        raise HTTPException(status_code=404, detail="This analysis is only connected for seoul-2022")
+
+
+@app.post("/api/events/{event_id}/analysis/alert-timing", tags=["analysis"])
+def alert_timing_analysis(event_id: str, request: AlertTimingRequest):
+    """Seoul what-if: alert lead time before the first rescue call under rainfall-threshold or fixed-time alerts."""
+
+    _require_seoul(event_id)
+    try:
+        return analyze_alert_timing(request.station, request.thresholds_mm_per_hour, request.alert_times)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post("/api/events/{event_id}/analysis/storage-capture", tags=["analysis"])
+def storage_capture_analysis(event_id: str, request: StorageCaptureRequest):
+    """Seoul what-if: rain volume above drainage capacity that an assumed storage tunnel could hold."""
+
+    _require_seoul(event_id)
+    try:
+        return analyze_storage_capture(
+            request.station, request.storage_m3, request.capacity_mm_per_hour, request.catchment_area_km2, request.runoff_coefficient
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
 @app.get("/api/agent/tools", response_model=list[AgentToolDescriptor], tags=["agent"])
 def agent_tools():
     """List the deterministic tools currently available to the Agent layer."""
@@ -511,6 +557,12 @@ def exposure_inventory(
     """
 
     _require_event(event_id)
+    if event_id == SEOUL_EVENT_ID:
+        # Seoul has no single focus feature, and its building layer holds only trace-overlay buildings.
+        raise HTTPException(
+            status_code=404,
+            detail="No focus feature is defined for seoul-2022; use the official flood-trace exposure in /reconstruction instead",
+        )
     try:
         return build_exposure_inventory(event_id, radii_m)
     except ReconstructionUnavailable as exc:
