@@ -9,6 +9,13 @@ export const STAGE_KO: Record<string, string> = {
   underpass_inflow: "지하차도 유입 시작",
   unsafe_driving: "차량 통행 위험",
   full_inundation: "지하차도 완전 침수",
+  rain_warning: "호우경보 발령",
+  heavy_rain: "시간당 50mm 도달",
+  design_exceeded: "설계강우 95mm/h 초과",
+  rescue_call: "첫 구조 신고 (신림동)",
+  public_alert: "첫 저지대 침수 문자",
+  national_escalation: "중대본 2단계",
+  responders_arrive: "소방 현장 도착",
 };
 
 export const ROLE_KO: Record<string, string> = {
@@ -22,6 +29,7 @@ export const CONFIDENCE_KO: Record<string, string> = {
   NEEDS_SOURCE_PAGE: "출처 쪽수 확인 필요",
   OBSERVED: "관측",
   DERIVED: "파생",
+  PRESS_REPORT: "언론 보도",
 };
 
 export const STATUS_KO: Record<string, string> = {
@@ -33,6 +41,7 @@ export const STATUS_KO: Record<string, string> = {
 
 const EVENT_KO: Record<string, Pick<FloodEvent, "name" | "location" | "focus_feature">> = {
   "osong-2023": { name: "2023 오송 궁평2지하차도 침수", location: "충북 청주시 흥덕구 오송읍", focus_feature: "궁평2지하차도" },
+  "seoul-2022": { name: "2022 서울 도림천 유역 침수", location: "서울 관악·동작·영등포 (도림천 유역)", focus_feature: "도림천 유역 저지대" },
 };
 
 export const stageKo = (state: unknown, fallback: unknown) => STAGE_KO[String(state)] ?? String(fallback ?? state ?? "");

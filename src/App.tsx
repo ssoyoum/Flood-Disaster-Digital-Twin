@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Activity, AlertTriangle } from "lucide-react";
 import * as api from "./api";
 import DarkConsole from "./dark/DarkConsole";
+import UrbanConsole from "./dark/UrbanConsole";
 import { CaseSelectPage, IntroPage } from "./dark/Landing";
 import { localizeEvent, localizeReconstruction } from "./dark/ko";
 import type { DataStatusResponse, ExposureMetrics, FloodEvent, LayersResponse, ReconstructionResponse } from "./types";
@@ -58,6 +59,8 @@ export default function App() {
     if (!events) return <LoadingState label="사례 목록을 불러오는 중" />;
     return <CaseSelectPage events={events} onSelect={(id) => go(`event/${encodeURIComponent(id)}`)} onBack={() => go("")} />;
   }
+  // Rainfall-driven urban cases have no levee or underpass, so they use their own console.
+  if (route.id === "seoul-2022") return <UrbanConsole key={route.id} eventId={route.id} />;
   return <EventConsole key={route.id} eventId={route.id} />;
 }
 

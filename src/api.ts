@@ -1,4 +1,4 @@
-import type { ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
+import type { AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
 
 const configuredApiBase = import.meta.env.VITE_API_BASE;
 const API_BASE = configuredApiBase === "same-origin" ? "" : configuredApiBase ?? (import.meta.env.PROD ? "" : "http://localhost:8033");
@@ -101,3 +101,23 @@ export const getHandThreshold = (eventId: string, reductionM: number) =>
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ reduction_m: reductionM }),
   });
+
+export const getUrbanReconstruction = (eventId: string) => request<UrbanReconstructionResponse>(`/api/events/${eventId}/reconstruction`);
+
+export const getAlertTiming = (eventId: string, body: { station?: string; thresholds_mm_per_hour?: number[]; alert_times?: string[] }) =>
+  request<AlertTimingResult>(`/api/events/${eventId}/analysis/alert-timing`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+export const getStorageCapture = (
+  eventId: string,
+  body: { station?: string; storage_m3?: number; capacity_mm_per_hour?: number; catchment_area_km2?: number; runoff_coefficient?: number },
+) =>
+  request<StorageCaptureResult>(`/api/events/${eventId}/analysis/storage-capture`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+

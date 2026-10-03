@@ -382,3 +382,81 @@ export interface ClosureTimingResult {
   assumptions: string[];
   limitations: string[];
 }
+
+export type UrbanReconstructionResponse = {
+  event_id: string;
+  title: string;
+  model_type: string;
+  event_year: number;
+  status: string;
+  replay: Array<ReconstructionEvent & { source_url?: string }>;
+  primary_gauge: string;
+  gauges: string[];
+  rainfall_series: Array<{ time: string; rainfall_10min_mm: number; rainfall_60min_mm: number | null }>;
+  rainfall_peaks: Record<string, { station_code: string; district: string; total_0808_mm: number; max_60min_mm: number; max_60min_end: string }>;
+  design_rainfall_mm_per_hour: number;
+  exposure: {
+    aoi_area_km2: number;
+    traces: {
+      count: number;
+      union_area_in_aoi_km2: number;
+      depth_m: { median: number; p90: number; max: number };
+      depth_ge_0_5m: number;
+      by_damage_type: Record<string, number>;
+      by_district: Record<string, number>;
+    };
+    buildings: {
+      snapshot: string;
+      stock_at_event: number;
+      stock_residential: number;
+      excluded_approved_after_event: number;
+      stock_missing_approval_date: number;
+      trace_intersecting: number;
+      trace_intersecting_residential: number;
+      trace_intersecting_with_underground_floors: number;
+      trace_intersecting_depth_ge_0_5m: number;
+      trace_intersecting_by_use: Record<string, number>;
+    };
+    roads: { osm_road_km_in_aoi: number; osm_road_km_in_traces: number; osm_snapshot: string };
+  };
+  interventions: Array<{ id: string; name: string; question: string; endpoint: string }>;
+  provenance: Array<{ source: string; data_vintage: string; role: string; status: string }>;
+  limitations: string[];
+};
+
+export type AlertTimingScenario = {
+  label: string;
+  kind: "rainfall_threshold" | "manual_time";
+  threshold_mm_per_hour: number | null;
+  alert_time: string | null;
+  reached: boolean;
+  minutes_before_first_rescue_call: number | null;
+  minutes_earlier_than_actual_alert: number | null;
+};
+
+export type AlertTimingResult = {
+  event_id: string;
+  station: string;
+  first_rescue_call: string;
+  actual_first_alert: string;
+  actual_alert_after_rescue_call_min: number;
+  scenarios: AlertTimingScenario[];
+  assumptions: string[];
+};
+
+export type StorageCaptureResult = {
+  event_id: string;
+  station: string;
+  storage_m3: number;
+  capacity_mm_per_hour: number;
+  catchment_area_km2: number;
+  runoff_coefficient: number;
+  excess_volume_m3: number;
+  captured_volume_m3: number;
+  captured_share_pct: number | null;
+  first_excess_time: string | null;
+  storage_full_time: string | null;
+  storage_full_minutes_before_first_rescue_call: number | null;
+  excess_timeline: Array<{ time: string; excess_mm: number; cumulative_excess_m3: number }>;
+  assumptions: string[];
+};

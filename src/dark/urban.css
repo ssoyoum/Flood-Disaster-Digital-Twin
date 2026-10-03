@@ -1,0 +1,71 @@
+/* 강우형 도시 침수 화면(UrbanConsole) 전용. 공통 다크 테마 변수는 dark.css 의 .dk-root 를 쓴다. */
+
+.ub-root .ub-body { grid-template-columns: 260px minmax(0, 1fr) 380px; }
+.ub-root .dk-status { margin-left: auto; }
+.ub-root .ub-stage-note { margin: 4px 8px 12px; padding: 10px 12px; border: 1px solid var(--dk-line); border-radius: 8px; background: var(--dk-panel-2); font-size: 11.5px; line-height: 1.5; }
+.ub-root .ub-stage-note p { margin: 0 0 6px; }
+.ub-root .ub-stage-note small { color: var(--dk-muted); font-size: 10.5px; }
+.ub-root .ub-stage-note a { color: var(--dk-accent); }
+
+.ub-root .ub-replay { bottom: 40px; }
+.ub-root .ub-legend { top: 14px; right: 14px; bottom: auto; max-width: 250px; }
+.ub-root .ub-legend small { color: var(--dk-muted); font-size: 10px; line-height: 1.45; }
+.ub-root .ub-layer-toggles { display: grid; gap: 3px; margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--dk-line); }
+.ub-root .ub-layer-toggles label { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+.ub-root .ub-layer-toggles small { color: var(--dk-muted); }
+
+.ub-root .ub-panel { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--dk-line); border-radius: 10px; background: var(--dk-panel-2); }
+.ub-root .ub-panel header p { margin: 0 0 3px; color: var(--dk-muted); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+.ub-root .ub-panel header b { font-size: 13px; }
+.ub-root .ub-hyeto { width: 100%; height: auto; }
+.ub-root .ub-hyeto text { fill: var(--dk-muted); font-size: 8px; }
+.ub-root .ub-hyeto .ub-hyeto-design { fill: #f87171; }
+.ub-root .ub-hyeto-legend { display: flex; flex-wrap: wrap; gap: 10px; color: var(--dk-muted); font-size: 10.5px; }
+.ub-root .ub-hyeto-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.ub-root .ub-hyeto-legend i { width: 10px; height: 3px; border-radius: 2px; }
+.ub-root .ub-gauge-table { display: grid; gap: 4px; margin: 0; font-size: 11px; }
+.ub-root .ub-gauge-table div { display: grid; grid-template-columns: 96px 1fr; gap: 8px; padding-top: 4px; border-top: 1px solid rgba(34, 48, 74, .7); }
+.ub-root .ub-gauge-table dt { color: var(--dk-muted); }
+.ub-root .ub-gauge-table dt small { font-size: 9.5px; }
+.ub-root .ub-gauge-table dd { margin: 0; font-variant-numeric: tabular-nums; }
+.ub-root .ub-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.ub-root .ub-kpis div { display: grid; gap: 2px; padding: 8px 10px; border: 1px solid var(--dk-line); border-radius: 8px; background: var(--dk-panel); }
+.ub-root .ub-kpis b { font-size: 18px; font-variant-numeric: tabular-nums; }
+.ub-root .ub-kpis span { color: var(--dk-muted); font-size: 10.5px; }
+.ub-root .ub-note { color: var(--dk-muted); font-size: 10.5px; line-height: 1.5; }
+.ub-root .ub-list { display: grid; gap: 4px; margin: 0; padding-left: 16px; font-size: 11px; line-height: 1.45; }
+.ub-root .ub-muted { color: var(--dk-muted); }
+
+.ub-root .ub-whatif { display: grid; gap: 12px; padding-bottom: 16px; }
+.ub-root .dk-compare-panel-head h3 { margin: 0 0 4px; font-size: 16px; }
+.ub-root .dk-compare-panel-head span { color: var(--dk-muted); font-size: 12px; }
+.ub-root .ub-controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px; font-size: 12px; }
+.ub-root .ub-controls > label { display: grid; gap: 4px; color: var(--dk-muted); }
+.ub-root .ub-controls select, .ub-root .ub-controls input[type="time"] { padding: 5px 8px; border: 1px solid var(--dk-line); border-radius: 6px; background: var(--dk-panel); color: var(--dk-text); font: inherit; color-scheme: dark; }
+.ub-root .ub-controls input[type="range"] { width: 180px; accent-color: #2dd4bf; }
+.ub-root .ub-controls fieldset { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; border: 0; }
+.ub-root .ub-controls legend { width: 100%; margin-bottom: 4px; color: var(--dk-muted); }
+.ub-root .ub-chip-toggle { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border: 1px solid var(--dk-line); border-radius: 999px; background: var(--dk-panel); cursor: pointer; }
+.ub-root .ub-chip-toggle:has(input:checked) { border-color: #2dd4bf; color: #2dd4bf; }
+.ub-root .ub-chip-toggle input { accent-color: #2dd4bf; }
+
+.ub-root .ub-timeline { position: relative; height: 74px; margin: 6px 12px 0; border-bottom: 1px solid var(--dk-line); }
+.ub-root .ub-timeline-axis span { position: absolute; bottom: -18px; transform: translateX(-50%); color: var(--dk-muted); font-size: 10px; }
+.ub-root .ub-mark { position: absolute; bottom: 0; width: 2px; height: 30px; transform: translateX(-1px); }
+.ub-root .ub-mark em { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); padding: 1px 5px; border-radius: 4px; font-size: 10px; font-style: normal; font-weight: 800; white-space: nowrap; }
+.ub-root .ub-mark.rescue { height: 52px; background: #ef4444; }
+.ub-root .ub-mark.rescue em { background: #ef4444; color: #fff; }
+.ub-root .ub-mark.actual { height: 38px; background: #fb923c; }
+.ub-root .ub-mark.actual em { transform: translateX(-10%); background: #fb923c; color: #111; }
+.ub-root .ub-mark.whatif { background: #2dd4bf; }
+.ub-root .ub-mark.whatif em { background: #2dd4bf; color: #062925; }
+.ub-root .ub-table { width: 100%; margin-top: 14px; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+.ub-root .ub-table th, .ub-root .ub-table td { padding: 7px 8px; border-bottom: 1px solid var(--dk-line); text-align: left; }
+.ub-root .ub-table th { color: var(--dk-muted); font-size: 10.5px; font-weight: 700; }
+.ub-root .ub-storage-chart { width: 100%; max-width: 760px; height: auto; }
+.ub-root .ub-storage-chart text { fill: var(--dk-muted); font-size: 9px; }
+
+@media (max-width: 1100px) {
+  .ub-root .ub-body { grid-template-columns: 1fr; grid-template-rows: auto 60vh auto; overflow-y: auto; }
+  .ub-root .dk-status { display: none; }
+}
