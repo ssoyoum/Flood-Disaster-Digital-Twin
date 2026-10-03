@@ -22,6 +22,21 @@ FIRST_RESCUE_CALL = "2022-08-08T20:59:00+09:00"
 FIRST_PUBLIC_ALERT = "2022-08-08T21:19:00+09:00"
 DESIGN_RAINFALL_MM_PER_HOUR = 95.0
 DORIMCHEON_TUNNEL_STORAGE_M3 = 400_000
+# Kim et al. 2012, J. Wetlands Research 14(2), citing Lee et al. 2005: 40.96 km2, 14.20 km channel.
+DORIMCHEON_CATCHMENT_KM2 = 40.96
+DORIMCHEON_CATCHMENT_SOURCE = "김재근 외(2012) 한국습지학회지 14(2) 257쪽, 이승종 외(2005) 인용"
+SINWOL_REFERENCE = {
+    "name": "신월 빗물저류배수시설 (양천구)",
+    "storage_m3": 320_000,
+    "design": "시간당 95~100 mm",
+    "storage_source": "서울시 내 손안에 서울, 2022-08-10",
+    "storage_url": "https://mediahub.seoul.go.kr/archives/2005316",
+    "inflow_2022_08_08_m3": 224_929,
+    "inflow_source": "시사뉴스 보도(원문 미확인), 저류량의 약 70%",
+    "inflow_url": "https://www.sisa-news.com/news/article.html?no=253461",
+    "outcome": "양천구 침수 0건(양천구청 발표, 서울신문 2022-08-12)",
+    "note": "다른 유역(양천)의 실적이며 도림천 계산을 검증하지 않는다. 같은 비가 온 날 실제 터널이 저류량의 일부만 썼다는 참고값이다.",
+}
 
 # Times reported in press coverage are marked as such; gauge-derived times come from the processed CSV.
 SEOUL_RECONSTRUCTION_EVENTS = [
@@ -104,7 +119,7 @@ LIMITATIONS = [
     "Official flood traces record where flooding happened after the event; they carry no timestamps, so the map cannot animate flood growth.",
     "Rainfall thresholds use one gauge (신림P) as the trigger; other gauges in the corridor peaked at different minutes.",
     "Lead times are arithmetic between an alert time and recorded incident times. They do not estimate evacuation, casualties, or damage avoided.",
-    "Storage capture is rain volume arithmetic over an assumed catchment area and runoff coefficient. It is not a sewer or tunnel hydraulic model.",
+    "Storage capture is rain volume arithmetic over the Dorimcheon catchment area (40.96 km2, literature value) and an assumed runoff coefficient. It is not a sewer or tunnel hydraulic model.",
     "Building stock comes from a 2026-08-09 register snapshot filtered to use-approval dates on or before 2022-08-08; buildings demolished before 2026 are missing.",
     "Incident times other than gauge thresholds come from press coverage and need official source pages.",
 ]
@@ -416,7 +431,13 @@ def analyze_storage_capture(
     runoff_coefficient: float = 1.0,
 ) -> dict[str, Any]:
     series = _gauge_series(station)
-    area_km2 = catchment_area_km2 if catchment_area_km2 is not None else float(_summary().get("aoi_area_km2") or 0)
+    area_km2 = catchment_area_km2 if catchment_area_km2 is not None else DORIMCHEON_CATCHMENT_KM2
+    if catchment_area_km2 is None:
+        area_basis = f"도림천 유역면적 {DORIMCHEON_CATCHMENT_KM2} km2 ({DORIMCHEON_CATCHMENT_SOURCE})"
+    elif abs(catchment_area_km2 - float(_summary().get("aoi_area_km2") or 0)) < 0.01:
+        area_basis = "분석 범위 bbox 면적(도림천 유역이 아님)"
+    else:
+        area_basis = "사용자 입력 면적"
     if area_km2 <= 0:
         raise ValueError("catchment_area_km2 must be positive")
     capacity_per_step = capacity_mm_per_hour / 6
@@ -443,6 +464,9 @@ def analyze_storage_capture(
         "storage_m3": storage_m3,
         "capacity_mm_per_hour": capacity_mm_per_hour,
         "catchment_area_km2": round(area_km2, 3),
+        "area_basis": area_basis,
+        "aoi_area_km2": _summary().get("aoi_area_km2"),
+        "reference_case": SINWOL_REFERENCE,
         "runoff_coefficient": runoff_coefficient,
         "excess_volume_m3": round(cumulative_m3),
         "captured_volume_m3": round(captured),
@@ -453,7 +477,7 @@ def analyze_storage_capture(
         "excess_timeline": timeline,
         "assumptions": [
             "초과량은 10분 강우가 처리 능력(시간당 값의 1/6)을 넘은 몫만 더한 값이다.",
-            "면적 기본값은 분석 범위 bbox 면적이며 도림천 실제 유역면적이 아니다.",
+            f"면적 기본값은 도림천 유역면적 {DORIMCHEON_CATCHMENT_KM2} km2(문헌값)이다. 신림P 한 곳의 강우를 유역 전체에 같게 적용했다.",
             "유출계수 1.0은 내린 비가 모두 유출된다는 상한 가정이다.",
             "터널 저류량 40만 m3는 2025-11-20 서울시 도시계획위원회 통과안 보도값(한국일보)이다. 신월 저류시설은 32만 m3다.",
             "저류 몫은 부피 산술이며 침수 면적·침수심 감소를 계산하지 않는다.",

@@ -432,8 +432,8 @@ const LIMITATION_KO: Record<string, string> = {
     "강우 임계는 신림P 한 곳 기준입니다. 유역 안 다른 강우계는 정점 시각이 다릅니다.",
   "Lead times are arithmetic between an alert time and recorded incident times. They do not estimate evacuation, casualties, or damage avoided.":
     "선행 시간은 경보 시각과 기록된 사건 시각의 차이입니다. 대피·인명·피해 감소를 추정하지 않습니다.",
-  "Storage capture is rain volume arithmetic over an assumed catchment area and runoff coefficient. It is not a sewer or tunnel hydraulic model.":
-    "저류 계산은 가정한 면적·유출계수에 대한 강우 부피 산술이며 하수관·터널 수리모형이 아닙니다.",
+  "Storage capture is rain volume arithmetic over the Dorimcheon catchment area (40.96 km2, literature value) and an assumed runoff coefficient. It is not a sewer or tunnel hydraulic model.":
+    "저류 계산은 도림천 유역면적(40.96 km², 문헌값)과 가정한 유출계수에 대한 강우 부피 산술이며 하수관·터널 수리모형이 아닙니다.",
   "Building stock comes from a 2026-08-09 register snapshot filtered to use-approval dates on or before 2022-08-08; buildings demolished before 2026 are missing.":
     "건축물은 2026-08-09 스냅샷을 사용승인일로 거른 값이라, 2026년 전에 철거된 건물은 빠져 있습니다.",
   "Incident times other than gauge thresholds come from press coverage and need official source pages.":
@@ -551,6 +551,7 @@ function StoragePanel({ eventId, reconstruction }: { eventId: string; reconstruc
   const [storage, setStorage] = useState(400_000);
   const [capacity, setCapacity] = useState(95);
   const [runoff, setRunoff] = useState(1);
+  const [useAoiArea, setUseAoiArea] = useState(false);
   const [result, setResult] = useState<StorageCaptureResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -558,12 +559,18 @@ function StoragePanel({ eventId, reconstruction }: { eventId: string; reconstruc
     let cancelled = false;
     setError(null);
     const timer = window.setTimeout(() => {
-      api.getStorageCapture(eventId, { station: reconstruction.primary_gauge, storage_m3: storage, capacity_mm_per_hour: capacity, runoff_coefficient: runoff })
+      api.getStorageCapture(eventId, {
+        station: reconstruction.primary_gauge,
+        storage_m3: storage,
+        capacity_mm_per_hour: capacity,
+        runoff_coefficient: runoff,
+        ...(useAoiArea ? { catchment_area_km2: reconstruction.exposure.aoi_area_km2 } : {}),
+      })
         .then((next) => { if (!cancelled) setResult(next); })
         .catch((reason: Error) => { if (!cancelled) setError(reason.message); });
     }, 200);
     return () => { cancelled = true; window.clearTimeout(timer); };
-  }, [eventId, reconstruction.primary_gauge, storage, capacity, runoff]);
+  }, [eventId, reconstruction.primary_gauge, reconstruction.exposure.aoi_area_km2, storage, capacity, runoff, useAoiArea]);
 
   const chart = useMemo(() => {
     if (!result || !result.excess_timeline.length) return null;
@@ -602,6 +609,17 @@ function StoragePanel({ eventId, reconstruction }: { eventId: string; reconstruc
               {value}
             </label>
           ))}
+        </fieldset>
+        <fieldset>
+          <legend>면적</legend>
+          <label className="ub-chip-toggle">
+            <input type="radio" name="area" checked={!useAoiArea} onChange={() => setUseAoiArea(false)} />
+            도림천 유역 40.96 km²
+          </label>
+          <label className="ub-chip-toggle">
+            <input type="radio" name="area" checked={useAoiArea} onChange={() => setUseAoiArea(true)} />
+            분석 범위 {reconstruction.exposure.aoi_area_km2} km²
+          </label>
         </fieldset>
         <label>유출계수 {runoff.toFixed(2)}
           <input type="range" min={0.3} max={1} step={0.05} value={runoff} onChange={(event) => setRunoff(Number(event.target.value))} />
@@ -647,6 +665,15 @@ function StoragePanel({ eventId, reconstruction }: { eventId: string; reconstruc
               <text x={chart.pad.left - 6} y={chart.y(0) + 3} textAnchor="end">0</text>
             </svg>
           )}
+          <section className="ub-panel ub-reference" aria-label="참고 사례">
+            <header><p>참고 사례 · 실제로 지어진 터널</p><b>{result.reference_case.name}</b></header>
+            <dl className="ub-gauge-table">
+              <div><dt>저류량</dt><dd>{num(result.reference_case.storage_m3)} m³ · {result.reference_case.design} <small><a href={result.reference_case.storage_url} target="_blank" rel="noreferrer">{result.reference_case.storage_source}</a></small></dd></div>
+              <div><dt>8.8 유입</dt><dd>{num(result.reference_case.inflow_2022_08_08_m3)} m³ <small><a href={result.reference_case.inflow_url} target="_blank" rel="noreferrer">{result.reference_case.inflow_source}</a></small></dd></div>
+              <div><dt>결과</dt><dd>{result.reference_case.outcome}</dd></div>
+            </dl>
+            <small className="ub-note">{result.reference_case.note}</small>
+          </section>
           <ul className="ub-list ub-muted">{result.assumptions.map((item) => <li key={item}>{item}</li>)}</ul>
         </>
       )}

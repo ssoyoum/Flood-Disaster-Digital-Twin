@@ -40,11 +40,16 @@ def test_alert_timing_measures_lead_time_before_first_rescue_call():
 
 def test_storage_capture_reports_share_and_fill_time():
     result = client.post("/api/events/seoul-2022/analysis/storage-capture", json={}).json()
-    assert result["excess_volume_m3"] == 870263
-    assert result["captured_share_pct"] == 46.0
-    assert result["storage_full_time"].startswith("2022-08-08T20:49")
+    assert result["catchment_area_km2"] == 40.96  # Dorimcheon catchment, literature value
+    assert result["excess_volume_m3"] == 1242453
+    assert result["captured_share_pct"] == 32.2
+    assert result["storage_full_time"].startswith("2022-08-08T20:39")
+    assert result["reference_case"]["inflow_2022_08_08_m3"] == 224929
     halved = client.post("/api/events/seoul-2022/analysis/storage-capture", json={"runoff_coefficient": 0.5}).json()
-    assert halved["captured_share_pct"] == 91.9
+    assert halved["captured_share_pct"] == 64.4
+    bbox = client.post("/api/events/seoul-2022/analysis/storage-capture", json={"catchment_area_km2": 28.69}).json()
+    assert (bbox["excess_volume_m3"], bbox["captured_share_pct"]) == (870263, 46.0)
+    assert bbox["area_basis"].startswith("분석 범위")
 
 
 def test_seoul_analysis_rejects_bad_input_and_other_events():
