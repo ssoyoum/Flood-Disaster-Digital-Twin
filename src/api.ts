@@ -1,4 +1,4 @@
-import type { AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
+import type { ResponseTimingResult, TimelineReconstructionResponse, AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
 
 const configuredApiBase = import.meta.env.VITE_API_BASE;
 const API_BASE = configuredApiBase === "same-origin" ? "" : configuredApiBase ?? (import.meta.env.PROD ? "" : "http://localhost:8033");
@@ -119,5 +119,14 @@ export const getStorageCapture = (
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
+  });
+
+export const getTimelineReconstruction = (eventId: string) => request<TimelineReconstructionResponse>(`/api/events/${eventId}/reconstruction`);
+
+export const getResponseTiming = (eventId: string, interventionId: string, actionTimes: string[]) =>
+  request<ResponseTimingResult>(`/api/events/${eventId}/analysis/response-timing`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ intervention_id: interventionId, action_times: actionTimes }),
   });
 

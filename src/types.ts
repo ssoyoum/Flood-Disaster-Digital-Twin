@@ -460,3 +460,41 @@ export type StorageCaptureResult = {
   excess_timeline: Array<{ time: string; excess_mm: number; cumulative_excess_m3: number }>;
   assumptions: string[];
 };
+
+export type TimelineReconstructionResponse = {
+  event_id: string;
+  title: string;
+  event_year: number;
+  case_kind: "timeline";
+  map_center: [number, number];
+  replay: Array<ReconstructionEvent & { source_url?: string }>;
+  interventions: Array<{
+    id: string;
+    name: string;
+    question: string;
+    actual_label: string;
+    actual_time: string;
+    milestones: string[];
+    presets: string[];
+    endpoint: string;
+  }>;
+  reported_facts: Array<{ label: string; value: string; source: string; url: string }>;
+  provenance: Array<{ source: string; data_vintage: string; role: string; status: string }>;
+  limitations: string[];
+};
+
+export type ResponseTimingResult = {
+  event_id: string;
+  intervention_id: string;
+  intervention_name: string;
+  actual_time: string;
+  actual_label: string;
+  milestones: Array<{ state: string; label: string; time: string }>;
+  scenarios: Array<{
+    action_time: string;
+    is_actual: boolean;
+    minutes_earlier_than_actual: number;
+    minutes_before_milestones: Record<string, number>;
+  }>;
+  assumptions: string[];
+};

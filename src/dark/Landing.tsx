@@ -9,12 +9,12 @@ type CaseText = { name: string; place: string; flow: string };
 const CASE_TEXT: Record<string, CaseText> = {
   "osong-2023": { name: "2023 오송 궁평2지하차도 침수", place: "충북 청주시 흥덕구 오송읍", flow: "미호천 제방 붕괴 → 월류 → 지하차도 침수 → 차량·통행자" },
   "seoul-2022": { name: "2022 서울 도림천 유역 침수", place: "서울 관악·동작·영등포 (도림천 유역)", flow: "집중호우 → 설계강우 초과 → 저지대 침수 → 구조 신고 → 경보 · 빗물터널" },
-  "pohang-2022": { name: "2022 포항 태풍 힌남노 침수", place: "경북 포항 냉천 일대", flow: "태풍 → 냉천 범람 → 아파트 지하주차장·산업시설" },
-  "iksan-2024": { name: "2024 익산 극한호우 침수", place: "전북 익산 함라면", flow: "극한호우 → 배수·소하천 용량 초과 → 농가·농경지·도로" },
-  "andong-uiseong-2026": { name: "2026 안동·의성 복합재난", place: "경북 안동·의성 산불 피해지", flow: "산불 피해지 → 강우 → 임시주거·도로·상수도" },
+  "pohang-2022": { name: "2022 포항 태풍 힌남노 침수", place: "경북 포항 냉천 하류·인덕동", flow: "태풍 → 냉천 범람 → 지하주차장 유입 → 완전 침수 · 진입 금지 시각 비교" },
+  "iksan-2024": { name: "2024 익산 극한호우 침수", place: "전북 익산 산북천 유역(낭산·망성)", flow: "극한호우 → 배수·소하천 용량 초과 → 농가·농경지·도로" },
+  "andong-uiseong-2026": { name: "2026 안동·의성 복합재난", place: "안동 일직면 귀미리 · 의성 단촌면 구계리", flow: "산불 이재민 임시주택 → 집중호우 → 미천 홍수경보 → 대피명령 시각 비교" },
 };
 
-const READY_EVENTS = new Set(["osong-2023", "seoul-2022"]);
+const READY_EVENTS = new Set(["osong-2023", "seoul-2022", "pohang-2022", "andong-uiseong-2026"]);
 
 export function caseText(event: FloodEvent): CaseText {
   return CASE_TEXT[event.id] ?? { name: event.name, place: event.location, flow: event.analysis_flow };

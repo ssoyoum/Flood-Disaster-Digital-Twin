@@ -16,6 +16,21 @@ export const STAGE_KO: Record<string, string> = {
   public_alert: "첫 저지대 침수 문자",
   national_escalation: "중대본 2단계",
   responders_arrive: "소방 현장 도착",
+  typhoon_landfall: "태풍 거제 상륙",
+  first_notice: "관리사무소 재방송(주장)",
+  river_overflow: "냉천 범람 시작",
+  move_car_broadcast: "차량 이동 안내방송",
+  parking_inflow: "지하주차장 침수 시작",
+  parking_full: "지하주차장 완전 침수",
+  plant_outage: "포스코 전기·용수 중단",
+  missing_report: "실종 신고",
+  first_isolation: "신석리 첫 고립",
+  flood_warning: "미천 홍수경보",
+  camper_isolation: "광음리 캠핑카 고립",
+  evacuation_order: "대피명령",
+  predicted_warning_level: "경보 수위 도달 예측",
+  warning_lifted: "홍수경보 해제",
+  national_landslide_alert: "산사태 위기경보 '경계'",
 };
 
 export const ROLE_KO: Record<string, string> = {
@@ -23,6 +38,8 @@ export const ROLE_KO: Record<string, string> = {
   "Hydromet Threshold": "수문 기준",
   "Baseline Event": "기준 사건",
   "Validation Target": "검증 대상",
+  "Claimed Record": "당사자 주장",
+  Forecast: "예측",
 };
 
 export const CONFIDENCE_KO: Record<string, string> = {
@@ -30,6 +47,7 @@ export const CONFIDENCE_KO: Record<string, string> = {
   OBSERVED: "관측",
   DERIVED: "파생",
   PRESS_REPORT: "언론 보도",
+  FORECAST_REPORTED: "예측 보도",
 };
 
 export const STATUS_KO: Record<string, string> = {
@@ -41,6 +59,8 @@ export const STATUS_KO: Record<string, string> = {
 
 const EVENT_KO: Record<string, Pick<FloodEvent, "name" | "location" | "focus_feature">> = {
   "osong-2023": { name: "2023 오송 궁평2지하차도 침수", location: "충북 청주시 흥덕구 오송읍", focus_feature: "궁평2지하차도" },
+  "pohang-2022": { name: "2022 포항 태풍 힌남노 침수", location: "경북 포항 냉천 하류·인덕동", focus_feature: "냉천·인덕동 지하주차장" },
+  "andong-uiseong-2026": { name: "2026 안동·의성 복합재난", location: "안동 일직면·의성 단촌면", focus_feature: "산불 이재민 임시주택" },
   "seoul-2022": { name: "2022 서울 도림천 유역 침수", location: "서울 관악·동작·영등포 (도림천 유역)", focus_feature: "도림천 유역 저지대" },
 };
 

@@ -3,6 +3,7 @@ import { Activity, AlertTriangle } from "lucide-react";
 import * as api from "./api";
 import DarkConsole from "./dark/DarkConsole";
 import UrbanConsole from "./dark/UrbanConsole";
+import TimelineConsole from "./dark/TimelineConsole";
 import { CaseSelectPage, IntroPage } from "./dark/Landing";
 import { localizeEvent, localizeReconstruction } from "./dark/ko";
 import type { DataStatusResponse, ExposureMetrics, FloodEvent, LayersResponse, ReconstructionResponse } from "./types";
@@ -61,6 +62,8 @@ export default function App() {
   }
   // Rainfall-driven urban cases have no levee or underpass, so they use their own console.
   if (route.id === "seoul-2022") return <UrbanConsole key={route.id} eventId={route.id} />;
+  // Cases connected only through reported incident times share a lighter timeline console.
+  if (route.id === "pohang-2022" || route.id === "andong-uiseong-2026") return <TimelineConsole key={route.id} eventId={route.id} />;
   return <EventConsole key={route.id} eventId={route.id} />;
 }
 
