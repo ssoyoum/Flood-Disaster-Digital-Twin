@@ -58,8 +58,12 @@ SEOUL_RECONSTRUCTION_EVENTS = [
         "time": FIRST_RESCUE_CALL,
         "label": "First rescue call in Sillim",
         "state": "rescue_call",
-        "description": "First of eight 112 calls about a flooded semi-basement home in Sillim-dong; the Sillim gauge 60-minute peak (121.5 mm) ends at the same minute.",
-        "source": "Hankook Ilbo, 2022-08-09 (district-level only)",
+        "description": (
+            "First of eight 112 calls about a flooded semi-basement home in Sillim-dong; the Sillim gauge 60-minute peak (121.5 mm) ends at the same minute. "
+            "The official CDSCH situation report (8.9 06:00) records the Gwanak semi-basement case at about 21:07 without saying whether that is the call or the death time."
+        ),
+        "source": "Hankook Ilbo, 2022-08-09 (district-level only); official report lists 21:07경",
+        "official_url": "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000336&nttId=93917",
         "source_url": "https://hankookilbo.com/News/Read/A2022080914150005222",
         "role": "Incident Record",
         "confidence": "PRESS_REPORT",
@@ -78,11 +82,11 @@ SEOUL_RECONSTRUCTION_EVENTS = [
         "time": "2022-08-08T21:30:00+09:00",
         "label": "National response raised",
         "state": "national_escalation",
-        "description": "Central Disaster and Safety Countermeasures Headquarters raised to level 2, crisis alert from caution to alert.",
-        "source": "Kyunghyang Shinmun, 2022-08-08",
-        "source_url": "https://www.khan.co.kr/article/202208082102025",
+        "description": "Central Disaster and Safety Countermeasures Headquarters raised to level 2, crisis alert from caution to alert. The official release says '9시 30분' without a.m./p.m.; level 1 began at 07:30 the same morning.",
+        "source": "Ministry of the Interior and Safety press release, 2022-08-08 (a.m./p.m. not stated); Kyunghyang Shinmun",
+        "source_url": "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=93918",
         "role": "Incident Record",
-        "confidence": "PRESS_REPORT",
+        "confidence": "OFFICIAL_AMBIGUOUS",
     },
     {
         "time": "2022-08-08T21:45:00+09:00",

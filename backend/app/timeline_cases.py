@@ -147,6 +147,8 @@ ANDONG = {
     "reported_facts": [
         {"label": "침수 임시주택", "value": "3개 단지 20동 (귀미1리 11동, 구계리 9~12동 보도)", "source": "세계일보·서울신문·경향신문", "url": "https://www.segye.com/newsView/20260719513934"},
         {"label": "대피", "value": "6개 시군 377가구 564명, 구계리 155명", "source": "세계일보·서울신문", "url": "https://m.seoul.co.kr/news/2026/07/19/20260719500010"},
+        {"label": "대피(공식)", "value": "05시 기준 안동 74명·의성 72명, 16시 기준 안동 73명·의성 156명", "source": "중대본 7.17~19일 호우 대처상황 보고(7.19 06·18시)", "url": "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000336&nttId=127939"},
+        {"label": "미천 홍수경보(공식)", "value": "중대본 보고에 '홍수 경보 1+1곳(안동 미천)'. 발령·해제 시각은 미기재", "source": "중대본 7.19 06시 보고", "url": "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000336&nttId=127939"},
         {"label": "누적 강우", "value": "안동 남선 230.5 mm, 의성 비안 232.5 mm (7/17~)", "source": "세계일보(중대본 7/19 17시 기준)", "url": "https://www.segye.com/newsView/20260719513934"},
         {"label": "사후 점검", "value": "임시주택 2,084동 점검, 앵커볼트 811개 설치", "source": "경향신문", "url": "https://www.khan.co.kr/article/202607211147001/"},
         {"label": "산사태 취약지역 인근", "value": "65곳 인근 임시주택 141동", "source": "경향신문", "url": "https://www.khan.co.kr/article/202607211147001/"},

@@ -48,6 +48,7 @@ export const CONFIDENCE_KO: Record<string, string> = {
   DERIVED: "파생",
   PRESS_REPORT: "언론 보도",
   FORECAST_REPORTED: "예측 보도",
+  OFFICIAL_AMBIGUOUS: "공식(오전·오후 미표기)",
 };
 
 export const STATUS_KO: Record<string, string> = {
