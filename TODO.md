@@ -151,6 +151,12 @@ Last Updated: 2026-10-03 KST
   - 오송 실제 통제 없음 → 06:40 통제면 유입 107분 전. 서울 실제 21:19(-20분) → 20:49(10분). 포항 06:30(7분) → 06:00(37분). 안동 00:00(30분) → 23:40(50분).
   - 덤벨 차트(실제 #d97014 원, 반사실 #109c8e 마름모, 다크 배경 팔레트 검증 통과) + 같은 값의 표 + 툴팁. 사례 간 순위 비교는 하지 않는다고 명시.
 
+- [ ] 공개 사이트 방문 통계·검색 등록·광고 측정 (2026-10-03 코드 준비, 배포 전)
+  - 준비됨: `robots.txt`, `sitemap.xml`, `meta description`·canonical·Open Graph(1200×630 `og-image.png`), GA4·메타 픽셀 동의 배너, 개인정보 안내 `#privacy`, 서치 콘솔 HTML 태그 빌드 주입.
+  - 필요: GA4 측정 ID, 메타 픽셀 ID, 서치 콘솔 인증 값, 문의처. 받은 뒤 `--build-arg`로 이미지 재빌드·배포(배포는 별도 승인).
+  - 배포 뒤: 서치 콘솔에 `https://floodops.duckdns.org/sitemap.xml` 제출, GA4 실시간 보고서로 수집 확인, 메타 이벤트 관리자에서 PageView 확인.
+  - Lighthouse 12(로컬 Edge, 소개 화면) 기준선: 모바일 성능 94·SEO 90, 데스크톱 성능 100·SEO 90. SEO 감점은 `meta description` 부재(이번에 추가).
+
 ## BLOCKED
 
 - Status: External dependency / missing validation material

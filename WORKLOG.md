@@ -2342,3 +2342,45 @@ UI 보완:
   - 32만 m3·95~100 mm/h는 서울시 공식 채널로 확인했다.
   - 8.8 유입 224,929 m3(약 70%)는 언론에서만 확인돼 "원문 미확인"으로 표시했다.
   - 다른 유역이라 도림천 계산의 검증이 아니라는 점도 카드에 적었다.
+
+## 공개 사이트 PageSpeed 측정, GA4·메타 픽셀·서치 콘솔 준비
+
+- 작업일: 2026-10-03
+
+주요 작업:
+- `https://floodops.duckdns.org/`의 속도와 SEO를 측정했다.
+- 검색 등록용 파일과 태그를 추가했다.
+  - `public/robots.txt`, `public/sitemap.xml`
+  - `index.html`의 `meta description`, canonical, Open Graph, Twitter 카드
+  - 소개 화면 캡처로 만든 `public/og-image.png`(1200×630)
+- `src/analytics.ts`를 추가했다.
+  - GA4와 메타 픽셀은 빌드 환경변수(`VITE_GA4_ID`, `VITE_META_PIXEL_ID`)가 있고, 방문자가 동의했을 때만 불러온다.
+  - 해시 라우트가 바뀔 때마다 페이지뷰를 보낸다.
+- `src/dark/Consent.tsx`를 추가했다. 동의 배너와 개인정보 안내(`#privacy`, 수집 항목·제공처·Gemini 전송·철회 방법)가 들어 있다.
+- `vite.config.ts`가 `VITE_GSC_VERIFICATION` 값이 있을 때만 서치 콘솔 인증 태그를 `index.html`에 넣게 했다. `Dockerfile.aws`에는 같은 이름의 `--build-arg`를 받게 했다.
+
+검증 결과:
+- Lighthouse 12(로컬 Edge, 소개 화면)
+  - 모바일: 성능 94, 접근성 100, 권장사항 100, SEO 90, FCP·LCP 2.5 s, TBT 10 ms, CLS 0, 301 KiB
+  - 데스크톱: 성능 100, SEO 90, FCP·LCP 0.5 s
+  - 실서버에서 `robots.txt`와 `sitemap.xml`은 404였다.
+- 가짜 ID(`G-TEST12345`, `1234567890`, 인증 값)로 빌드해 확인했다.
+  - 인증 태그가 `index.html`에 들어갔다.
+  - 미리보기 서버에서 동의 배너가 떴고, 개인정보 안내가 열렸다.
+  - "거부" 뒤에는 새로고침해도 배너가 다시 뜨지 않았다.
+  - `googletagmanager`·`facebook` 요청은 0건이었다.
+- ID 없이 빌드하면 추적 코드와 인증 태그가 0건이다.
+- `vitest` 5개 통과(측정 ID 검증 3개 추가), `npm run build` 통과.
+
+문제/해결:
+- 문제: PageSpeed Insights API가 키 없는 공용 할당량 소진(HTTP 429 Quota exceeded)으로 거절됐다. Lighthouse CLI는 Edge를 직접 띄우지 못했다(chrome-launcher 연결 실패).
+  해결: Edge를 `--remote-debugging-port`로 먼저 띄우고 Lighthouse를 `--port`로 붙여 같은 엔진으로 측정했다. 측정 범위는 소개 화면뿐이다. 관제 화면은 레이어 응답이 커서 별도 측정이 필요하다.
+- 문제: 서치 콘솔은 서버가 내보낸 HTML에서 인증 태그를 찾는다. JS로 나중에 넣으면 인식되지 않는다.
+  해결: 인증 태그는 Vite `transformIndexHtml`로 빌드 때 넣었다. GA4·픽셀만 런타임에 불러온다.
+- 문제: 측정 ID를 그대로 스크립트에 넣으면, 빌드 환경변수의 오타나 이상한 값이 스크립트 문자열로 들어갈 수 있다.
+  해결: GA4는 `G-` 형식, 픽셀은 숫자, 인증 값은 영숫자만 받는다. 형식이 틀리면 꺼진다. 테스트로 고정했다.
+- 문제: GA4·픽셀은 방문자 행동을 쿠키로 수집하므로 안내와 선택권이 필요하다.
+  해결: 동의 전에는 아무것도 불러오지 않는 배너와 개인정보 안내 화면을 만들었다. 메타 광고 랜딩에는 `https://floodops.duckdns.org/#privacy`를 개인정보 처리방침 URL로 쓸 수 있다.
+- 문제: 같은 폴더에서 다른 도구가 E2E 작업 중이었다.
+  해결: `origin/main` 기준 워크트리(`../Flood-Disaster-Digital-Twin-claude`, 브랜치 `claude/seoul-catchment`)로 옮겨 작업했다. `node_modules`는 원래 폴더를 junction으로 연결했다. 이 때문에 Vite 의존성 캐시(`node_modules/.vite`)를 두 폴더가 공유한다.
+

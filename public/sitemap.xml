@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Screens are hash routes (#cases, #event/...), so the single page URL is the only crawlable entry. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://floodops.duckdns.org/</loc>
+    <lastmod>2026-10-03</lastmod>
+  </url>
+</urlset>

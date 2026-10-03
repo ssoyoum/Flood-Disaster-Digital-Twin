@@ -125,6 +125,19 @@ npm run build
 
 2026-10-01에 백엔드 테스트 79개가 통과했습니다. 이후 코드 변경은 별도로 재검증해야 합니다.
 
+## 방문 통계·검색 등록·광고 측정
+
+빌드 환경변수가 있을 때만 켜집니다. 값이 없으면 추적 코드와 인증 태그가 하나도 들어가지 않습니다.
+
+| 변수 | 용도 |
+| --- | --- |
+| `VITE_GA4_ID` | GA4 측정 ID(`G-…`). 동의 배너에서 "동의"한 방문자만 수집 |
+| `VITE_META_PIXEL_ID` | 메타 픽셀 ID(숫자). 같은 동의 배너를 따름 |
+| `VITE_GSC_VERIFICATION` | 서치 콘솔 HTML 태그 인증 값. 빌드 때 `index.html`에 들어감 |
+| `VITE_PRIVACY_CONTACT` | 개인정보 안내(`#privacy`)에 표시할 문의처 |
+
+AWS 이미지는 `--build-arg`로 같은 이름을 넘깁니다. `robots.txt`, `sitemap.xml`, `meta description`, Open Graph 태그(`public/og-image.png`)는 항상 포함됩니다.
+
 ## 관련 문서
 
 - [프로젝트 계획](docs/PROJECT_PLAN.md) · [개발 가이드](docs/DEVELOPMENT_GUIDE.md) · [아키텍처](docs/ARCHITECTURE.md)
