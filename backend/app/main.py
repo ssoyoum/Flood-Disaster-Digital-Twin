@@ -603,14 +603,14 @@ def exposure_inventory(
     response_model=list[AgentExampleQuestion],
     tags=["agent"],
 )
-def agent_examples():
+def agent_examples(event_id: str = "osong-2023"):
     """Starter questions the registered tools can actually answer.
 
     The UI seeds its chips from here so an empty input box never invites a
     request the system has to refuse.
     """
 
-    return list_example_questions()
+    return list_example_questions(event_id)
 
 
 @app.get("/api/agent/planner-status", tags=["agent"])

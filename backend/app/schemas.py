@@ -256,6 +256,15 @@ class AgentToolCallRequest(BaseModel):
     radii_m: list[Annotated[int, Field(ge=50, le=20000)]] | None = None
     reduction_m: Annotated[float, Field(ge=0, le=2.5)] | None = None
     comparison_type: Literal["closure_timing", "inflow_delay"] = "closure_timing"
+    # Seoul 2022 tools
+    thresholds_mm_per_hour: list[Annotated[float, Field(gt=0, le=200)]] | None = None
+    alert_times: list[str] | None = None
+    storage_m3: Annotated[float, Field(gt=0, le=5_000_000)] | None = None
+    capacity_mm_per_hour: Annotated[float, Field(gt=0, le=200)] | None = None
+    runoff_coefficient: Annotated[float, Field(gt=0, le=1.0)] | None = None
+    # Pohang 2022 / Andong-Uiseong 2026 tool
+    intervention_id: str | None = None
+    action_times: list[str] | None = None
 
 
 class AgentToolCallResult(BaseModel):

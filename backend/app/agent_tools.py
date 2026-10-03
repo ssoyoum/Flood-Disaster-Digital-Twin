@@ -8,6 +8,7 @@ from collections.abc import Callable
 import re
 from typing import Any
 
+from . import agent_cases
 from .data import get_event
 from .hand_sensitivity import analyze_hand_threshold
 from .osong_repository import get_osong_reconstruction, get_osong_summary
@@ -129,9 +130,11 @@ _TOOL_CATALOG: tuple[dict[str, Any], ...] = (
 )
 
 
-def list_agent_tools() -> list[dict[str, Any]]:
-    """Return a copy of the tools that are actually executable."""
+def list_agent_tools(event_id: str = "osong-2023") -> list[dict[str, Any]]:
+    """Return a copy of the tools that are actually executable for this event."""
 
+    if agent_cases.handles(event_id):
+        return agent_cases.tools_for(event_id)
     return [dict(tool) for tool in _TOOL_CATALOG]
 
 
@@ -140,6 +143,8 @@ def _get_event(event_id: str, _: AgentToolCallRequest) -> dict[str, Any]:
 
 
 def _get_reconstruction(event_id: str, _: AgentToolCallRequest) -> dict[str, Any]:
+    if agent_cases.handles(event_id):
+        return agent_cases.reconstruction(event_id)
     if event_id != "osong-2023":
         raise ReconstructionUnavailable(
             f"Incident reconstruction timeline is not connected for {event_id}"
@@ -156,6 +161,8 @@ _SUMMARY_KEYS = (
 
 
 def _get_observation_summary(event_id: str, _: AgentToolCallRequest) -> dict[str, Any]:
+    if agent_cases.handles(event_id):
+        return agent_cases.observation_summary(event_id)
     if event_id != "osong-2023":
         raise ReconstructionUnavailable(f"Observations are not connected for {event_id}")
     summary = get_osong_summary()
@@ -272,6 +279,10 @@ def execute_agent_tool(
 ) -> dict[str, Any]:
     """Execute one registered tool and return only domain-derived values."""
 
+    if tool_name in agent_cases.CASE_TOOL_PARAMETERS:
+        if not agent_cases.handles(event_id):
+            raise KeyError(f"{tool_name} is not registered for {event_id}")
+        return agent_cases.run_tool(tool_name, event_id, request)
     handler = _HANDLERS.get(tool_name)
     if handler is None:
         raise KeyError(f"Unknown agent tool: {tool_name}")
@@ -409,13 +420,15 @@ _EXAMPLE_QUESTIONS: tuple[dict[str, str], ...] = (
 )
 
 
-def list_example_questions() -> list[dict[str, str]]:
+def list_example_questions(event_id: str = "osong-2023") -> list[dict[str, str]]:
     """Return the answerable starter questions the UI offers as chips."""
 
+    if agent_cases.handles(event_id):
+        return agent_cases.examples_for(event_id)
     return [dict(example) for example in _EXAMPLE_QUESTIONS]
 
 
-def suggestions_for(workflows: tuple[str, ...] | None = None) -> list[str]:
+def suggestions_for(workflows: tuple[str, ...] | None = None, event_id: str = "osong-2023") -> list[str]:
     """Questions this system can actually answer.
 
     A refusal that only says "no" is a dead end for the person asking. Every
@@ -425,7 +438,7 @@ def suggestions_for(workflows: tuple[str, ...] | None = None) -> list[str]:
 
     return [
         example["question"]
-        for example in _EXAMPLE_QUESTIONS
+        for example in list_example_questions(event_id)
         if workflows is None or example["workflow"] in workflows
     ]
 
