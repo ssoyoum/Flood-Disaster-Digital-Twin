@@ -13,7 +13,7 @@ Last Updated: 2026-10-03 KST
 - Status: Active / presentation-ready MVP
 - Last updated: 2026-10-02
 - Branch: 모든 작업은 `main` 하나에서 진행한다. 2026-09-06에 브랜치 4개를 `main`으로 정리했다.
-- Next action: DEM(EGM2008)과 국내 표고 기준(`gdt`) 차이를 정리한다. 06:40/06:50 불일치는 DQ-009로 정리했다.
+- Next action: DQ-008 AOI 클립 면적·중첩 비율을 09-30 HAND 기준으로 재산출하고 `osong_reconstruction_envelope_comparison.json`을 재생성한다. 수위 기준면 정리는 DQ-007·DQ-009로 끝났다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
@@ -34,7 +34,8 @@ Last Updated: 2026-10-03 KST
   - HAND reconstruction은 HRFCO 수위 변화와 사건 stage를 relative stage pressure로 연결했다.
   - 관측소 기준면은 이미 확보돼 있다: `data/raw/water_level/osong/hrfco_waterlevel_info.xml`의 미호강교(3011665) `gdt` 19.643 m, `pfh` 9.38 m → 계획홍수위 EL 29.023 m(국무조정실 발표 29.02 m와 일치). API 조회 시점 메타데이터라 2023년 당시 값과 같은지는 미확인.
   - 유량은 수위 CSV의 `fw_raw`에 있다(미호강교 08:00 6792.86). 관계곡선 환산값으로 보이며 단위 확인 필요.
-  - 남은 검증: DEM(EGM2008)과 국내 표고 기준 차이, 제방 붕괴 위치/폭, 배수시설, CCTV/공식 조사 timestamp 근거 연결.
+  - [x] DEM(EGM2008)과 국내 표고 기준 차이 정리(2026-10-03, DQ-007 재검토): 오프셋 43.4 cm(부호 미확정, σ 18.5 cm)보다 Copernicus DSM 절대 오차(< 4 m LE90)와 하천 수면 편집값(18.0/18.5/19.0 m)이 훨씬 커서, 수위를 DEM 절대 수면으로 비교하지 않고 relative stage pressure를 유지한다. 절대 비교는 LiDAR DTM 확보 후.
+  - 남은 검증: 제방 붕괴 위치/폭, 배수시설, CCTV/공식 조사 timestamp 근거 연결.
   - [x] 06:40/06:50 불일치 정리(2026-10-03, DQ-009): 06:40은 국무조정실 감찰 결과 발표 시각이다. 보관된 HRFCO 10분 자료로는 06:40 9.30 m(EL 28.943), 06:50 9.38 m(EL 29.023)이다. timeline은 발표 시각을 유지하고 관측 시각을 사건 설명에 함께 적었다. 차이의 원인(실시간/보정 자료, 1분/10분 자료)은 감찰 원문을 봐야 알 수 있다.
   - 수위값 자체를 DEM 절대 수면고나 공식 침수심으로 해석하지 않는다.
 - [x] What-if 2개 구현 + 1개 보류

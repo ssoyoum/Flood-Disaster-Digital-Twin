@@ -120,6 +120,12 @@ Open data-quality issues count: 3
 - 대상 데이터셋: `data/processed/osong/osong_hand_reconstruction_grid.geojson`, `data/processed/osong/osong_hand_flood_envelope_timeline.geojson`
 - 증상: HAND-like envelope는 하천 대비 상대고도와 연결성을 사용하지만, HRFCO 관측 수위의 기준면을 DEM vertical datum으로 변환하지 않았다.
 - 원인: 현재 확보한 수위 processed CSV에는 관측소 수위값과 위치는 있으나, 해당 수위를 DEM 해발고도 수면으로 환산할 gauge datum / rating / river cross-section 정보가 없다.
+- 재검토 (2026-10-03): gauge datum은 있었다. 관측소 정보 XML의 미호강교 `gdt` 19.643 m로 수위를 국내 표고(인천만 평균해수면 기준)로 환산할 수 있다(계획홍수위 EL 29.023 m). 그래도 DEM과 절대 비교하지 않는 결론은 유지한다. 근거는 다음과 같다.
+  - 기준면 차이: Copernicus DEM은 EGM2008(EPSG:3855) 기준이다. 국내 수직기준은 전지구 지오이드에서 43.4 cm 벗어나 있다(Jekeli·Yang·Kwon 2009, Newton's Bulletin 4, GPS/수준점 500점, 표준편차 18.5 cm). 원문에 뺄셈 방향이 없어 보정 부호는 확정하지 못했다.
+  - DEM 정확도가 기준면 차이보다 훨씬 크다: 제품 사양 절대 수직정확도 < 4 m(LE90). 건물·구조물·식생을 포함한 DSM이고, 취득 시기는 2010-12~2015-01로 2023년 임시제방·교량 공사 상태를 담지 않는다.
+  - 하천 수면은 편집값이다: 미호강교 주변 81×81셀에서 가장 많은 값이 18.5 / 18.0 / 19.0 m로 계단식 평탄화된 값이다. 관측소 영점표고 19.643 m보다 낮아 실제 수면으로 쓸 수 없다.
+  - 지하차도 주변 7×7셀은 20.64~29.81 m(중앙값 26.36 m)로, 30 m 셀에 도로·옹벽·주변 구조물이 섞여 있다.
+  - 정리: 0.43 m 보정을 해도 DEM 오차(수 m)와 하천 편집값 때문에 "EL 29.02 m 수면 아래 셀 = 침수"라는 비교는 근거가 되지 않는다. 절대 수면 비교는 LiDAR DTM(국토지리정보원 수치표고 등)과 국내 표고 기준 자료를 확보한 뒤에 한다.
 - 분석 결과에 미치는 영향: 수위값을 직접 DEM 고도와 비교한 실제 침수 수면으로 해석할 수 없다. 지도 결과는 시간별 위험공간 재구성용이며 실제 침수심·유속·면적 검증값이 아니다.
 - 해결 방법: API/UI/manifest에서 `TEMPORARY`, `DERIVED_APPROXIMATION`, HAND-like reconstruction임을 명시한다. Phase 2에서는 gauge datum, breach geometry, discharge, roughness, drainage structure를 확보해 calibrated physical model과 비교한다.
 - 검증 방법: HAND grid feature count, stage별 selected feature count, CRS, geometry type, stage별 observed water level, relative water-level rise, input file path를 validation report에 기록한다.
