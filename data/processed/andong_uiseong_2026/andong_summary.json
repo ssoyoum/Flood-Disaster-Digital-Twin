@@ -1,0 +1,18 @@
+{
+  "case_id": "andong-uiseong-2026",
+  "bbox": [
+    128.63,
+    36.44,
+    128.8,
+    36.535
+  ],
+  "osm_snapshot": "2026-07-17T00:00:00Z",
+  "counts": {
+    "aoi": 1,
+    "buildings": 23,
+    "roads": 1156,
+    "waterways": 18,
+    "facilities": 11,
+    "sites": 5
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "case_id": "pohang-2022",
+  "bbox": [
+    129.37,
+    35.965,
+    129.43,
+    36.01
+  ],
+  "osm_snapshot": "2022-09-06T00:00:00Z",
+  "counts": {
+    "aoi": 1,
+    "buildings": 66,
+    "roads": 926,
+    "waterways": 9,
+    "facilities": 113,
+    "sites": 3
+  }
+}
