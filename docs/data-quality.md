@@ -1,6 +1,6 @@
 ﻿# Data Quality Register
 
-Last updated: 2026-09-02 23:55 KST
+Last updated: 2026-10-03 KST
 
 주요 데이터셋 또는 snapshot:
 - 2023 Osong event data package
@@ -150,6 +150,20 @@ Open data-quality issues count: 3
 - 채택 판정: AOI 클립은 채택한다. 30m 해상도 재계산은 선택 규칙을 고친 뒤 재평가한다. 선택 규칙 재설계는 공식 Flood Extent 또는 Safemap raster 대조 검증 절차가 마련된 뒤에만 착수한다. 검증 기준 없이 파라미터를 조이는 것은 근거 없는 튜닝이다.
 - 근거 코드/산출물 경로: `data/processed/osong/osong_reconstruction_envelope_comparison.json`, `data/processed/osong/osong_sgis_admin_boundary_2023.geojson`, `data/scripts/create_osong_hand_reconstruction.py`
 - Residual risk / 남은 한계: 공식 vector Flood Extent가 없어 축소된 envelope도 정답과 대조 검증할 수 없다. 노출 KPI는 계속 `PENDING_FLOOD_EXTENT`로 유지한다.
+
+### DQ-009: Official design-flood-level time (06:40) is 10 minutes earlier than the archived HRFCO record (06:50)
+
+- Status: Accepted discrepancy / official time kept
+- Impact: Medium
+- 발견일: 2026-10-02
+- 대상 데이터셋: `data/processed/osong/osong_hrfco_water_level_10m_2023-07-14_17.csv`, `data/raw/water_level/osong/hrfco_waterlevel_info.xml`, `backend/app/osong_repository.py`
+- 증상: 국무조정실 감찰 결과 발표(2023-07-28, 보도 기준)는 "07-15 06:40 미호천교 수위가 계획홍수위 해발 29.02 m에 도달"이라고 한다. 저장소의 HRFCO 10분 자료에서 미호강교(3011665)는 06:40에 9.30 m(EL 28.943 m), 06:50에 9.38 m(EL 29.023 m)로, 계획홍수위에 처음 닿는 시각은 06:50이다.
+- 기준면 확인: 관측소 정보 XML의 `gdt` 19.643 m + `pfh` 9.38 m = EL 29.023 m로 발표값 29.02 m와 일치한다. 따라서 차이는 기준면이 아니라 시각 쪽에 있다.
+- 원인: 확인하지 못했다. 발표가 당시 실시간(검증 전) 자료를 썼고 보관 자료는 이후 보정됐을 가능성, 1분 단위 자료 기준일 가능성, 10분 자료의 timestamp 규약 차이가 후보지만 근거가 없어 판정하지 않는다.
+- 분석 결과에 미치는 영향: timeline의 `hydraulic_warning` 단계와 HAND stage 1(관측 수위 9.30 m 사용)은 발표 시각을 따른다. 통제 요건 충족 시각을 관측 자료로 다시 계산하면 10분 늦어진다. closure-timing·inflow-delay 분석은 08:09 이후 시각만 쓰므로 영향이 없다.
+- 해결 방법: timeline 시각은 사건 기록인 06:40으로 유지하고, 사건 설명에 관측 자료 기준 06:50과 두 시각의 수위값을 함께 적는다. 관측 자료로 시각을 덮어쓰지 않는다.
+- 검증 방법: CSV에서 `station_id=3011665` 06:30~07:00 행을 읽어 9.20 / 9.30 / 9.38 / 9.47 m를 확인한다.
+- Residual risk / 남은 한계: 감찰 결과 원문 PDF의 쪽수, 그리고 발표에 쓰인 수위 자료의 종류(실시간/보정, 1분/10분)를 확인해야 확정할 수 있다. `gdt`는 API 조회 시점 메타데이터라 2023년 당시 값과 같은지 확인하지 못했다.
 
 ## Open issues / watchlist
 

@@ -26,8 +26,12 @@ OSONG_RECONSTRUCTION_EVENTS = [
         "time": "2023-07-15T06:40:00+09:00",
         "label": "Miho River design flood level reached",
         "state": "hydraulic_warning",
-        "description": "Miho River bridge water level reached the reported design flood level of 29.02 m.",
-        "source": "Official incident timeline + HRFCO observation context; source-page evidence pending",
+        "description": (
+            "Miho River bridge water level reached the reported design flood level of EL 29.02 m. "
+            "The archived HRFCO 10-minute record reads 9.30 m (EL 28.943 m) at 06:40 and first reaches "
+            "9.38 m (EL 29.023 m) at 06:50; the official 06:40 time is kept as the incident record."
+        ),
+        "source": "Office for Government Policy Coordination audit announcement (2023-07-28, press coverage) + HRFCO 10-minute observation; source-page evidence pending",
         "role": "Hydromet Threshold",
         "confidence": "NEEDS_SOURCE_PAGE",
     },
