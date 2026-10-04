@@ -156,6 +156,7 @@ Last Updated: 2026-10-03 KST
   - 필요: GA4 측정 ID, 메타 픽셀 ID, 서치 콘솔 인증 값, 문의처. 받은 뒤 `--build-arg`로 이미지 재빌드·배포(배포는 별도 승인).
   - 배포 뒤: 서치 콘솔에 `https://floodops.duckdns.org/sitemap.xml` 제출, GA4 실시간 보고서로 수집 확인, 메타 이벤트 관리자에서 PageView 확인.
   - Lighthouse 12(로컬 Edge, 소개 화면) 기준선: 모바일 성능 94·SEO 90, 데스크톱 성능 100·SEO 90. SEO 감점은 `meta description` 부재(이번에 추가).
+  - 관제 화면(공개 서버, 2026-10-04): 오송 레이어 응답 gzip 4.0 MB를 받는 데 9.4초(TTFB 0.11초). 첫 측정은 167초(재시작 직후로 추정). 레이어 응답을 화면이 쓰는 속성·좌표 5자리로 줄여 1.06 MB로 만들었다(배포 전).
 
 ## BLOCKED
 
