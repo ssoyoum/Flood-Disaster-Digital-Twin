@@ -34,6 +34,7 @@ from .seoul_repository import (
     get_seoul_summary,
 )
 from .case_comparison import get_case_lead_times
+from .layer_payload import slim_layers
 from .timeline_cases import (
     analyze_response_timing,
     get_timeline_reconstruction,
@@ -186,7 +187,8 @@ def timeline(event_id: str):
 @lru_cache(maxsize=8)
 def _layers_json(event_id: str, layer_year: int) -> bytes:
     # get_layers deep-copies ~30 MB of GeoJSON; serialising it once keeps repeat requests from blocking others.
-    return json.dumps(get_layers(event_id, layer_year), ensure_ascii=False).encode("utf-8")
+    # Only the properties the consoles read are sent; see layer_payload for what is dropped and why.
+    return json.dumps(slim_layers(get_layers(event_id, layer_year)), ensure_ascii=False, separators=(",", ":")).encode("utf-8")
 
 
 @lru_cache(maxsize=8)

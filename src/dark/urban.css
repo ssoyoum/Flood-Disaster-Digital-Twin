@@ -77,3 +77,4 @@
 .ub-root .tl-actual-row td { color: #fdba74; }
 .ub-root .ub-panel .dk-compare-back { justify-self: start; }
 .ub-root .ub-gauge-table dd small a { color: var(--dk-muted); }
+.ub-root .ub-reference { max-width: 760px; }

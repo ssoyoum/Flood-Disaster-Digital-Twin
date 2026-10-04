@@ -450,6 +450,20 @@ export type StorageCaptureResult = {
   storage_m3: number;
   capacity_mm_per_hour: number;
   catchment_area_km2: number;
+  area_basis: string;
+  aoi_area_km2: number;
+  reference_case: {
+    name: string;
+    storage_m3: number;
+    design: string;
+    storage_source: string;
+    storage_url: string;
+    inflow_2022_08_08_m3: number;
+    inflow_source: string;
+    inflow_url: string;
+    outcome: string;
+    note: string;
+  };
   runoff_coefficient: number;
   excess_volume_m3: number;
   captured_volume_m3: number;

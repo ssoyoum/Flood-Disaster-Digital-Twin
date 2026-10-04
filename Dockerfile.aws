@@ -6,6 +6,13 @@ COPY index.html tsconfig.json tsconfig.app.json vite.config.ts ./
 COPY src ./src
 COPY public ./public
 ENV VITE_API_BASE=same-origin
+# Analytics and Search Console are off unless these build args are passed, e.g.
+# docker build --build-arg VITE_GA4_ID=G-XXXX --build-arg VITE_META_PIXEL_ID=123 --build-arg VITE_GSC_VERIFICATION=token ...
+ARG VITE_GA4_ID=""
+ARG VITE_META_PIXEL_ID=""
+ARG VITE_GSC_VERIFICATION=""
+ARG VITE_PRIVACY_CONTACT=""
+ENV VITE_GA4_ID=$VITE_GA4_ID VITE_META_PIXEL_ID=$VITE_META_PIXEL_ID VITE_GSC_VERIFICATION=$VITE_GSC_VERIFICATION VITE_PRIVACY_CONTACT=$VITE_PRIVACY_CONTACT
 RUN npm run build
 
 FROM python:3.12-slim

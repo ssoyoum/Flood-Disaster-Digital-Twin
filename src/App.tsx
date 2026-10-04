@@ -5,17 +5,20 @@ import DarkConsole from "./dark/DarkConsole";
 import UrbanConsole from "./dark/UrbanConsole";
 import TimelineConsole from "./dark/TimelineConsole";
 import CaseComparePage from "./dark/CaseCompare";
+import { ConsentBanner, PrivacyPage } from "./dark/Consent";
+import { loadAnalytics, trackPageView } from "./analytics";
 import { CaseSelectPage, IntroPage } from "./dark/Landing";
 import { localizeEvent, localizeReconstruction } from "./dark/ko";
 import type { DataStatusResponse, ExposureMetrics, FloodEvent, LayersResponse, ReconstructionResponse } from "./types";
 
 // Hash routes keep the browser back button working: "" intro, "#cases", "#event/<id>".
-type Route = { page: "intro" } | { page: "cases" } | { page: "compare" } | { page: "event"; id: string };
+type Route = { page: "intro" } | { page: "cases" } | { page: "compare" } | { page: "privacy" } | { page: "event"; id: string };
 
 function readRoute(): Route {
   const hash = window.location.hash.replace(/^#\/?/, "");
   if (hash === "cases") return { page: "cases" };
   if (hash === "compare") return { page: "compare" };
+  if (hash === "privacy") return { page: "privacy" };
   if (hash.startsWith("event/")) return { page: "event", id: decodeURIComponent(hash.slice(6)) };
   return { page: "intro" };
 }
@@ -37,6 +40,15 @@ function go(hash: string) {
 }
 
 export default function App() {
+  return (
+    <>
+      <Screens />
+      <ConsentBanner onPrivacy={() => go("privacy")} onDecided={() => trackPageView(window.location.hash)} />
+    </>
+  );
+}
+
+function Screens() {
   const [route, setRoute] = useState<Route>(readRoute);
   const [events, setEvents] = useState<FloodEvent[] | null>(null);
   const [eventsError, setEventsError] = useState(false);
@@ -49,7 +61,13 @@ export default function App() {
 
   useEffect(() => {
     api.getEvents().then(setEvents).catch(() => setEventsError(true));
+    // A returning visitor who already agreed gets the trackers without seeing the banner again.
+    loadAnalytics();
   }, []);
+
+  useEffect(() => {
+    trackPageView(window.location.hash);
+  }, [route]);
 
   useEffect(() => {
     if (route.page === "intro") document.title = "FloodOps | 홍수 대응 디지털 트윈";
@@ -62,6 +80,7 @@ export default function App() {
     if (!events) return <LoadingState label="사례 목록을 불러오는 중" />;
     return <CaseSelectPage events={events} onSelect={(id) => go(`event/${encodeURIComponent(id)}`)} onBack={() => go("")} onCompare={() => go("compare")} />;
   }
+  if (route.page === "privacy") return <PrivacyPage onBack={() => window.history.length > 1 ? window.history.back() : go("")} />;
   if (route.page === "compare") return <CaseComparePage onBack={() => go("cases")} onOpen={(id) => go(`event/${encodeURIComponent(id)}`)} />;
   // Rainfall-driven urban cases have no levee or underpass, so they use their own console.
   if (route.id === "seoul-2022") return <UrbanConsole key={route.id} eventId={route.id} />;
