@@ -18,7 +18,7 @@ import type {
 } from "../types";
 import "./dark.css";
 
-import { stageKo, statusKo, textKo } from "./ko";
+import { ROLE_KO, stageKo, statusKo, textKo } from "./ko";
 import { FloodOpsLogo } from "./Landing";
 
 /*
@@ -33,7 +33,7 @@ import { FloodOpsLogo } from "./Landing";
 
 type ScenarioMode = "baseline" | "intervention";
 type LayerKey = keyof LayersResponse;
-type ConsoleView = "console" | "compare" | "insights";
+type ConsoleView = "console" | "compare" | "insights" | "provenance";
 
 // Count envelope cells at the current stage and how close they reach the underpass.
 function spatialStatus(layers: LayersResponse, stage: number) {
@@ -429,6 +429,7 @@ export default function DarkConsole({
           <button type="button" className={view === "console" ? "active" : ""} onClick={() => setView("console")}>관제 화면</button>
           <button type="button" className={view === "compare" ? "active" : ""} onClick={() => { if (view !== "compare" && time === 0 && stages.length > 4) setTime(4); setView("compare"); }}>시나리오 비교</button>
           <button type="button" className={view === "insights" ? "active" : ""} onClick={() => setView("insights")}>인사이트</button>
+          <button type="button" className={view === "provenance" ? "active" : ""} onClick={() => setView("provenance")}>출처·한계</button>
         </nav>
         <div className="dk-header-agent">
           <div className="dk-header-agent-title"><span><strong>대응 에이전트</strong><small>근거 기반 조치 질의</small></span></div>
@@ -529,7 +530,9 @@ export default function DarkConsole({
         </aside>
       </div> : view === "compare"
         ? <ScenarioComparePage eventData={eventData} layers={layers} summary={summary} dataStatus={dataStatus} reconstruction={reconstruction} time={time} playing={playing} setTime={setTime} setPlaying={setPlaying} onTogglePlayback={togglePlayback} onBack={() => setView("console")} />
-        : <InsightsPage eventData={eventData} layers={layers} summary={summary} dataStatus={dataStatus} reconstruction={reconstruction} time={time} onBack={() => setView("console")} />}
+        : view === "provenance"
+          ? <ProvenancePage eventData={eventData} reconstruction={reconstruction} onBack={() => setView("console")} />
+          : <InsightsPage eventData={eventData} layers={layers} summary={summary} dataStatus={dataStatus} reconstruction={reconstruction} time={time} onBack={() => setView("console")} />}
     </div>
   );
 }
@@ -723,6 +726,34 @@ function EvidenceHandSection({
   );
 }
 
+function ProvenancePage({ eventData, reconstruction, onBack }: {
+  eventData: FloodEvent;
+  reconstruction: ReconstructionResponse | null;
+  onBack: () => void;
+}) {
+  const sources = reconstruction?.provenance ?? [];
+  const limitations = reconstruction?.limitations ?? [];
+
+  return <main className="dk-provenance">
+    <header className="dk-provenance-head">
+      <div><p>출처 · 자료 시점 · 쓰임</p><h2>어떤 근거로 {eventData.data_year}년 사건을 재구성했나요?</h2>
+        <span>사건 연도와 자료 제작·관측 시점은 다를 수 있습니다. 아래 각 자료의 역할과 한계를 함께 확인하세요.</span></div>
+      <button type="button" className="dk-compare-back" onClick={onBack}>관제 화면으로</button>
+    </header>
+    <section className="dk-provenance-panel" aria-label="자료별 출처와 쓰임">
+      <h3>자료별 출처와 쓰임</h3>
+      {sources.length ? <div className="dk-provenance-list">{sources.map((item, index) => <article key={`${item.role}-${index}`}>
+        <div className="dk-provenance-role"><strong>{ROLE_KO[item.role] ?? item.role}</strong><span>{statusKo(item.status)}</span></div>
+        <dl><div><dt>출처</dt><dd>{item.source || "출처 미기록"}</dd></div><div><dt>자료 시점</dt><dd>{item.data_vintage || "시점 미기록"}</dd></div></dl>
+      </article>)}</div> : <p>연결된 출처 정보가 없습니다.</p>}
+    </section>
+    <section className="dk-provenance-panel" aria-label="재구성의 한계">
+      <h3>이 자료로 판단할 수 없는 것</h3>
+      {limitations.length ? <ul className="dk-provenance-limits">{limitations.map((item) => <li key={item}>{textKo(item)}</li>)}</ul> : <p>등록된 한계 설명이 없습니다.</p>}
+    </section>
+  </main>;
+}
+
 function InsightsPage({
   eventData,
   layers,
@@ -785,11 +816,10 @@ function InsightsPage({
         </article>
 
         <article className="dk-insight-card engineering">
-          <div className="dk-insight-label"><i />03 · 데이터 엔지니어링</div>
-          <h3>오늘 조정한 데이터 흐름</h3>
-          <p>화면에 값을 직접 넣지 않고 API 응답을 공통 계약으로 묶어 지도·단면·시나리오가 같은 데이터를 바라보게 했습니다.</p>
-          <div className="dk-insight-tags"><span>API 응답 형식 고정</span><span>레이어 출처 기록</span><span>재생 타임라인</span><span>단일 컨테이너 배포</span></div>
-          <small>레이어 메타데이터: {layers.hand_reconstruction.status} · {layers.hand_reconstruction.source_type ?? "출처 미기록"}</small>
+          <div className="dk-insight-label"><i />03 · 자료 출처</div>
+          <h3>사건 연도와 자료 시점을 구분한다</h3>
+          <p>{eventData.data_year}년 사건을 재구성하지만, 관측·지도·시설 자료의 시점은 서로 다릅니다. 출처·역할·한계는 출처·한계 화면에서 확인할 수 있습니다.</p>
+          <dl className="dk-insight-dl"><div><dt>관측 입력</dt><dd>{reconstruction?.provenance.find((item) => item.role === "Observed Input")?.source ?? "출처 미기록"}</dd></div><div><dt>HAND 지도</dt><dd>{layers.hand_reconstruction.source ?? "출처 미기록"}</dd></div></dl>
         </article>
 
         <article className="dk-insight-card scenario">

@@ -349,6 +349,28 @@
 .dk-insights-footer strong { color: #6ee7b7; font-size: 12px; }
 .dk-insights-footer span { color: var(--dk-muted); font-size: 11px; line-height: 1.55; }
 
+/* 사건 연도와 자료 시점, 출처의 쓰임과 해석 한계를 함께 보여준다. */
+.dk-provenance { display: grid; align-content: start; gap: 16px; min-height: 0; overflow: auto; padding: 28px clamp(18px, 4vw, 64px) 42px; background: var(--dk-bg); }
+.dk-provenance-head, .dk-provenance-panel { max-width: 1180px; width: 100%; margin: 0 auto; }
+.dk-provenance-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+.dk-provenance-head p { margin: 0 0 5px; color: var(--dk-accent); font-size: 10px; letter-spacing: .15em; }
+.dk-provenance-head h2 { margin: 0; font-size: clamp(20px, 3vw, 30px); letter-spacing: -.03em; }
+.dk-provenance-head span { display: block; margin-top: 7px; color: var(--dk-muted); font-size: 12px; line-height: 1.5; }
+.dk-provenance-panel { padding: 18px; border: 1px solid var(--dk-line); border-radius: 12px; background: rgba(17, 26, 43, .86); }
+.dk-provenance-panel h3 { margin: 0 0 14px; font-size: 16px; }
+.dk-provenance-panel > p { color: var(--dk-muted); font-size: 12px; }
+.dk-provenance-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.dk-provenance-list article { min-width: 0; padding: 13px; border: 1px solid var(--dk-line); border-radius: 9px; }
+.dk-provenance-role { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.dk-provenance-role strong { color: var(--dk-text); font-size: 13px; }
+.dk-provenance-role span { color: var(--dk-muted); font-size: 10px; }
+.dk-provenance-list dl { display: grid; gap: 7px; margin: 10px 0 0; }
+.dk-provenance-list dl div { display: grid; grid-template-columns: 60px minmax(0, 1fr); gap: 8px; }
+.dk-provenance-list dt { color: var(--dk-muted); font-size: 10px; }
+.dk-provenance-list dd { margin: 0; overflow-wrap: anywhere; color: var(--dk-text); font-size: 11px; line-height: 1.5; }
+.dk-provenance-limits { display: grid; gap: 8px; margin: 0; padding-left: 20px; }
+.dk-provenance-limits li { color: var(--dk-text); font-size: 12px; line-height: 1.6; }
+
 /* HAND 셀 단면: 기준면 대비 관측 상승분을 단계 이동에 맞춰 차오르게 한다. */
 .dk-xs { display: grid; gap: 8px; padding-top: 12px; border-top: 1px solid var(--dk-line); }
 .dk-xs-head p { margin: 0 0 3px; color: var(--dk-muted); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
@@ -411,6 +433,11 @@
   .dk-brand p { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
 
+@media (max-width: 1400px) {
+  .dk-view-tabs button { padding: 0 8px; }
+  .dk-clock { display: none; }
+}
+
 @media (max-width: 1200px) {
   .dk-body { --dk-left-width: 220px; --dk-right-width: 320px; }
   .dk-header-agent { min-width: 220px; max-width: none; }
@@ -455,6 +482,9 @@
   .dk-insights { padding: 20px 14px 30px; }
   .dk-insights-head { display: grid; }
   .dk-insight-kpis, .dk-insight-grid { grid-template-columns: 1fr; }
+  .dk-provenance { padding: 20px 14px 30px; }
+  .dk-provenance-head { display: grid; }
+  .dk-provenance-list { grid-template-columns: 1fr; }
   .dk-compare-replay { grid-template-columns: 1fr 32px auto 32px auto; }
   .dk-compare-replay-label { grid-column: 1 / -1; }
   .dk-compare-replay input[type="range"] { grid-column: 1 / -2; }

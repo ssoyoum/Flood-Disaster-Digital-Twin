@@ -39,6 +39,12 @@ export const ROLE_KO: Record<string, string> = {
   "Baseline Event": "기준 사건",
   "Validation Target": "검증 대상",
   "Claimed Record": "당사자 주장",
+  "Observed Input": "관측 입력",
+  "Incident State Validation": "사건 상태 검증",
+  "Approximate visualization envelope": "범람 근사 시각화",
+  "HAND-based reconstruction envelope": "HAND 재구성 범위",
+  "Transport Facility Geometry": "지하차도 위치·형상",
+  "Visual verification only": "시각 대조 전용",
   Forecast: "예측",
 };
 
@@ -86,6 +92,16 @@ const TEXT_KO: Record<string, string> = {
     "가정한 통제가 완전히 지켜지면 신규 진입이 멈춥니다. 차량·인명 피해 효과는 계산하지 않습니다.",
   "TEMPORARY HAND-like reconstruction, not official Flood Extent or a calibrated hydraulic model.":
     "임시 HAND 방식 재구성이며 공식 침수범위나 보정된 수리모형 결과가 아닙니다.",
+  "This MVP reconstructs the observed event timeline and intervention window; it is not a calibrated 2D hydraulic model.":
+    "관측 사건 시각과 대응 가능 시간을 재구성한 결과이며 보정된 2차원 수리모형이 아닙니다.",
+  "Underpass water depth and a validated intervention trigger threshold are not connected.":
+    "지하차도 수심과 검증된 통제 발동 기준은 연결되지 않았습니다.",
+  "Approximate flood envelope is a temporary DEM-constrained visualization layer, not official Flood Extent or a hydraulic simulation.":
+    "근사 범람 범위는 DEM을 이용한 임시 시각화 자료이며 공식 침수범위나 수리해석 결과가 아닙니다.",
+  "Flood Extent and exposure counts remain PENDING_FLOOD_EXTENT until verified vector flood geometry or calibrated simulation output is available.":
+    "검증된 침수 도형이나 보정된 모형 결과가 확보되기 전에는 공식 침수범위와 침수 노출 수를 산출하지 않습니다.",
+  "CCTV-derived inundation timestamps still need explicit source-page evidence in the manifest.":
+    "CCTV 기반 침수 시각은 원문 쪽수와 시각 근거를 자료 목록에 연결해야 합니다.",
 };
 export const textKo = <T,>(value: T): T => (typeof value === "string" && TEXT_KO[value] ? (TEXT_KO[value] as T) : value);
 const localizeStrings = <T extends object>(obj: T): T =>
