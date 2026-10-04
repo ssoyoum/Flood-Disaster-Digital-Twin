@@ -121,9 +121,11 @@ npm run dev
 python -m pytest backend/tests -q
 npm test
 npm run build
+npx playwright install --only-shell chromium
+npm run test:e2e
 ```
 
-2026-10-01에 백엔드 테스트 79개가 통과했습니다. 이후 코드 변경은 별도로 재검증해야 합니다.
+Playwright E2E는 FastAPI(`8035`)와 Vite(`5175`)를 자동으로 띄워 오송 진입·사건 재생·레이어 설정·출처·한계 화면·통제 시각 비교를 확인합니다. 2026-10-03 기준 백엔드 테스트 116개, Vitest 2개, Playwright E2E 3개가 통과했습니다.
 
 ## 관련 문서
 

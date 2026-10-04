@@ -11,9 +11,9 @@ Last Updated: 2026-10-03 KST
 ## NOW
 
 - Status: Active / presentation-ready MVP
-- Last updated: 2026-10-02
+- Last updated: 2026-10-03
 - Branch: 모든 작업은 `main` 하나에서 진행한다. 2026-09-06에 브랜치 4개를 `main`으로 정리했다.
-- Next action: NEXT의 Playwright E2E로 넘어간다. API 오류 상태 테스트와 수위 기준면(DQ-007·DQ-009), DQ-008 재산출은 끝났다.
+- Next action: 공식 검증 자료 확보와 궁평2지하차도 시설 정보 점검을 이어간다. API 오류 상태, Playwright E2E, provenance 화면은 끝났다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
@@ -175,7 +175,7 @@ Last Updated: 2026-10-03 KST
 ## NEXT
 
 - Status: Ready after NOW
-- Last updated: 2026-09-04
+- Last updated: 2026-10-03
 - Next action: Improve validation, error handling, provenance, and E2E coverage after the presentation-ready MVP.
 
 - [x] README/TODO implementation status synchronization
@@ -199,10 +199,14 @@ Last Updated: 2026-10-03 KST
   - 누락된 오송 레이어는 `UNAVAILABLE`/`MISSING_PROCESSED_FILE`, 손상된 GeoJSON은 `UNAVAILABLE`/`MALFORMED_PROCESSED_FILE`로 반환하고 빈 FeatureCollection을 제공한다.
   - 연결되지 않은 익산 데이터셋은 `UNAVAILABLE`, 등록되지 않은 사건은 404로 응답하는 것을 확인했다.
   - `python -m pytest backend/tests -q`: 116개 통과.
-- [ ] Playwright E2E
-  - `osong-2023` 진입, replay 실행, scenario 변경, layer toggle, provenance 표시를 검증한다.
-- [ ] provenance 화면 고도화
-  - 개발용 status보다 사용자 의미의 source, vintage, role, limitation을 우선 표시한다.
+- [x] Playwright E2E (2026-10-03)
+  - `osong-2023` 진입, 7단계 replay 실행, HAND 레이어 토글, 사건 시각 근거와 지도 출처 표시를 Chromium에서 검증했다.
+  - 통제 시각을 08:09로 변경해 유입 18분 전이라는 비교 결과와 침수 진행 한계 표시를 검증했다.
+  - `npm run test:e2e`: 3개 통과. `npm test`: 2개 통과. `npm run build`: 통과.
+- [x] provenance 화면 고도화 (2026-10-03)
+  - 오송 `출처·한계` 탭에서 API의 7개 자료에 대해 역할·출처·자료 시점과 재구성 한계 5개를 함께 표시한다.
+  - 인사이트의 `TEMPORARY`/source_type 개발용 문자열 대신 사건 연도, 관측 입력 출처, HAND 지도 출처를 표시한다.
+  - Chromium E2E에서 출처·자료 시점·역할·한계 표시를 확인했다.
 
 ## LATER
 
