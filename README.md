@@ -1,10 +1,34 @@
 # FloodOps
 
-**과거 홍수 사건을 재구성하고 대응 조건을 비교하는 의사결정 지원 PoC**입니다. 미래 침수나 인명피해를 예측하는 시스템은 아닙니다. 관측·공간 자료로 사건을 다시 살펴보고, 등록된 분석으로 답할 수 있는 질문과 아직 답할 수 없는 질문을 구분합니다.
+<p align="center">
+  <a href="https://floodops.duckdns.org/">
+    <img src="docs/screenshots/hero.gif" alt="FloodOps — 그때 먼저 통제했다면 무엇이 달라졌을까. 사건 단계가 진행되며 제방 붕괴 지점에서 침수 추정 셀이 번지는 모식도" width="100%" />
+  </a>
+</p>
 
-**공개 시연:** [floodops.duckdns.org](https://floodops.duckdns.org/) · **현재 분석 사례:** 2023 오송 궁평2지하차도
+<p align="center">
+  <a href="https://floodops.duckdns.org/"><img src="https://img.shields.io/badge/서비스_바로가기-floodops.duckdns.org-0ea5e9?style=for-the-badge&logo=googlechrome&logoColor=white" alt="서비스 바로가기"></a>
+  <a href="https://floodops.duckdns.org/docs"><img src="https://img.shields.io/badge/API-Swagger-38bdf8?style=for-the-badge&logo=fastapi&logoColor=white" alt="API 문서"></a>
+</p>
 
-> 2026-10-01 확인: 공개 서버의 `/health`는 200이고 Gemini 키가 설정되어 자유 질의 Agent가 동작합니다. Agent 호출은 IP당 분당 6회·하루 60회, 서비스 전체 하루 500회로 제한됩니다. 공개 배포본은 수동으로 다시 빌드해야 로컬 수정이 반영됩니다([배포 기록](docs/DEPLOY_AWS.md)).
+**같은 재난에서 더 일찍 대응하려면 무엇을 알아야 할까요?** FloodOps는 관측·공간 자료로 과거 홍수를 재구성하고, 통제·대피 시점을 바꿔 대응 여유 시간을 비교하는 의사결정 지원 PoC입니다.
+
+> 2026-10-08 확인: 공개 서버의 `/health`는 200이고, `/api/agent/planner-status`는 `gemini-3.5-flash-lite` 모델로 Agent가 연결되어 있음을 보고합니다. Agent 호출은 IP당 분당 6회·하루 60회, 서비스 전체 하루 500회로 제한됩니다. 공개 배포본은 수동으로 다시 빌드해야 로컬 수정이 반영됩니다([배포 기록](docs/DEPLOY_AWS.md)).
+
+## 기술 스택
+
+| 영역 | 기술 |
+| --- | --- |
+| 프런트엔드 | React 18 · TypeScript · Vite · MapLibre GL JS |
+| 백엔드 | FastAPI · Pydantic · Shapely |
+| Agent | Gemini API(REST, `httpx` 직접 호출) |
+| 테스트 | pytest · Vitest · Playwright |
+| 배포 | Docker · AWS EC2 |
+
+- **MapLibre GL JS** — 사건 레이어(건물·도로·하천·HAND 셀)를 GeoJSON 그대로 지도에 올립니다. 별도 벡터 타일 서버가 없습니다.
+- **FastAPI + Pydantic** — 요청·응답을 타입으로 선언해 `/docs`(Swagger)를 자동 생성하고, 통제 시각·HAND 임계 같은 분석 API 입력값을 서버가 검증합니다.
+- **Shapely** — HAND 근사 재구성과 반경별 시설 재고 집계 등 지오메트리 연산에 씁니다.
+- **Gemini REST 직접 호출** — SDK 없이 `httpx`로 호출하고, 서버가 등록된 7개 도구만 실행하도록 직접 검증합니다. 모델은 분석값을 만들지 않고 도구를 선택할 뿐입니다.
 
 ## 한눈에 보기
 
@@ -39,6 +63,35 @@ flowchart LR
 - **주변 시설 재고:** 지하차도 주변의 연결된 건물·도로·시설을 반경별로 집계합니다. 재고 수를 침수 피해량으로 해석하지 않습니다.
 - **Agent 질의:** Gemini가 등록된 읽기 전용 도구를 선택하고 결과를 확인한 뒤 근거 번호와 도구 호출 내역을 보여줍니다. 최대 4회 도구 호출을 허용하며, 도구명과 사용자 입력값을 서버에서 검증합니다.
 
+## 화면
+
+<table>
+  <tr>
+    <td width="50%" align="center" valign="top">
+      <b>사례 선택</b><br>
+      <img src="docs/screenshots/screen-cases.jpg" alt="사례 선택 화면" width="440"><br>
+      <sub>현재 등록된 5개 사례 중 관제 가능한 사례를 고릅니다</sub>
+    </td>
+    <td width="50%" align="center" valign="top">
+      <b>관제 화면</b><br>
+      <img src="docs/screenshots/screen-console.jpg" alt="오송 관제 화면" width="440"><br>
+      <sub>사건 단계를 재생하며 지도 레이어와 관측 근거를 함께 봅니다</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center" valign="top">
+      <b>시나리오 비교</b><br>
+      <img src="docs/screenshots/screen-compare.jpg" alt="시나리오 비교 화면" width="440"><br>
+      <sub>HAND 판정 임계를 낮춰 같은 시각의 선택 셀 변화를 나란히 봅니다</sub>
+    </td>
+    <td width="50%" align="center" valign="top">
+      <b>출처·한계</b><br>
+      <img src="docs/screenshots/screen-provenance.jpg" alt="출처·한계 화면" width="440"><br>
+      <sub>자료별 출처·시점·역할과 이 자료로 판단할 수 없는 것을 함께 보여줍니다</sub>
+    </td>
+  </tr>
+</table>
+
 ## Agent가 답하는 범위
 
 로컬 서버에 유효한 `GEMINI_API_KEY`가 있을 때 관제 화면은 `POST /api/agent/ask`를 사용합니다. 질문, 최근 대화, 도구 결과가 Gemini에 전달됩니다. Agent는 사건 조회·재구성, 통제 시각, 명시한 유입 지연, 주변 시설 재고, 기준 시나리오 비교, HAND 임계 민감도 등 **등록된 7개 도구** 중에서 선택합니다. 답변에는 호출 결과와 `[1]` 같은 근거 번호를 남기며, 후속 질문을 제안할 수 있습니다.
@@ -67,39 +120,6 @@ HAND 선택 임계를 1.5m 낮추면 단계별 붉은 셀이 어떻게 바뀌나
 
 데이터 출처·이용 조건과 가용 상태는 [`data/manifests/`](data/manifests/) 및 [데이터 품질 기록](docs/data-quality.md)에 정리되어 있습니다. 시나리오 저장은 현재 메모리 기반이고 PostGIS 연계는 보류 상태입니다.
 
-## 로컬 실행
-
-Python과 Node.js가 필요합니다. 저장소 루트에서 두 터미널을 사용합니다.
-
-**1. API 서버**
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r backend/requirements.txt
-uvicorn app.main:app --app-dir backend --reload --port 8033
-```
-
-API 확인: [상태](http://localhost:8033/health) · [Swagger UI](http://localhost:8033/docs) · [Agent 설정 상태](http://localhost:8033/api/agent/planner-status)
-
-자유 질의를 사용하려면 저장소 루트의 `.env`에 실제 `GEMINI_API_KEY`를 설정합니다. `GEMINI_MODEL`은 선택 사항입니다. 예시 파일의 `REPLACE_ME`를 그대로 키로 사용하지 마세요. 키는 프런트엔드 환경 변수에 넣지 않습니다. 키가 없어도 사건 재생과 직접 시나리오 비교는 사용할 수 있습니다.
-
-**2. 웹 화면**
-
-```powershell
-npm ci
-npm run dev
-```
-
-[http://localhost:5173](http://localhost:5173)에서 엽니다. Vite는 5173 포트가 사용 중이면 다른 포트로 자동 이동하지 않습니다. API를 다른 포트에서 실행한다면 웹 서버를 시작하기 전에 다음 값을 설정합니다.
-
-```powershell
-$env:VITE_API_BASE = "http://127.0.0.1:8035"
-npm run dev
-```
-
-`docker-compose.yml`은 프런트엔드·API·PostGIS 개발 구성입니다. 현재 백엔드 이미지는 사건 가공 데이터를 포함하지 않으므로 **오송 전체 시연용 배포 이미지와는 구성이 다릅니다.** 프런트엔드와 오송 가공 자료를 함께 포함하는 단일 컨테이너 정의는 [`Dockerfile.aws`](Dockerfile.aws)입니다.
-
 ## 주요 API
 
 | 경로 | 용도 |
@@ -126,19 +146,6 @@ npm run test:e2e
 ```
 
 Playwright E2E는 FastAPI(`8035`)와 Vite(`5175`)를 자동으로 띄워 오송 진입·사건 재생·레이어 설정·출처·한계 화면·통제 시각 비교를 확인합니다. 2026-10-04 기준 백엔드 테스트 118개, Vitest 5개, Playwright E2E 3개가 통과했습니다.
-
-## 방문 통계·검색 등록·광고 측정
-
-빌드 환경변수가 있을 때만 켜집니다. 값이 없으면 추적 코드와 인증 태그가 하나도 들어가지 않습니다.
-
-| 변수 | 용도 |
-| --- | --- |
-| `VITE_GA4_ID` | GA4 측정 ID(`G-…`). 동의 배너에서 "동의"한 방문자만 수집 |
-| `VITE_META_PIXEL_ID` | 메타 픽셀 ID(숫자). 같은 동의 배너를 따름 |
-| `VITE_GSC_VERIFICATION` | 서치 콘솔 HTML 태그 인증 값. 빌드 때 `index.html`에 들어감 |
-| `VITE_PRIVACY_CONTACT` | 개인정보 안내(`#privacy`)에 표시할 문의처 |
-
-AWS 이미지는 `--build-arg`로 같은 이름을 넘깁니다. `robots.txt`, `sitemap.xml`, `meta description`, Open Graph 태그(`public/og-image.png`)는 항상 포함됩니다.
 
 ## 관련 문서
 
