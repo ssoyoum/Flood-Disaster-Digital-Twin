@@ -19,8 +19,16 @@ data/processed/seoul_rainfall_2022_event.csv
 data/processed/osong/*_buildings_*.geojson
 data/processed/osong/*_roads_*.geojson
 data/processed/osong/osong_building_qa_official_osm_2023.geojson
-# HRFCO 10-minute histories are large (about 4 MB per station); raw JSON and the manifest let them be rebuilt.
-data/processed/hrfco/*_10M.csv
+# HRFCO histories are large (about 2 MB per station-year set for 1H, 4 MB for 10M); raw JSON and the manifest let them
+# be rebuilt. Only the Miho River reference set stays tracked so the Osong twin works from a GitHub checkout.
+data/processed/hrfco/*.csv
+!data/processed/hrfco/waterlevel_3011665_1H.csv
+!data/processed/hrfco/waterlevel_3011635_1H.csv
+!data/processed/hrfco/waterlevel_3011685_1H.csv
+!data/processed/hrfco/rainfall_30114070_1H.csv
+!data/processed/hrfco/rainfall_30114020_1H.csv
+!data/processed/hrfco/rainfall_30104010_1H.csv
+!data/processed/hrfco/rainfall_30104040_1H.csv
 # Layers the app serves are tracked so a GitHub-based build has the same data.
 !data/processed/osong/osong_official_buildings_2023.geojson
 !data/processed/osong/osong_osm_roads_2023.geojson

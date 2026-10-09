@@ -228,6 +228,61 @@ def qc_jumps(kind: str, station: str, interval: str, jump_m: float) -> dict[str,
     return result
 
 
+EVENTS_FILE = REPO_ROOT / "data" / "manifests" / "hrfco-events.json"
+
+
+def summarize_events(interval: str = "1H", gap_hours: int = 24) -> dict[str, Any]:
+    """Count flood events per downloaded water-level station against its official levels.
+
+    An event is a run of samples at or above the attention level (attwl) separated by more than
+    gap_hours. The peak level is compared with the advisory (wrnwl), warning (almwl) and planned
+    flood (pfh) levels from the station catalog, so the training-set size per station is visible.
+    """
+
+    catalog = json.loads(CATALOG_FILE.read_text(encoding="utf-8"))
+    levels = {s["code"]: s for s in catalog["kinds"]["waterlevel"]["stations"]}
+    summary: dict[str, Any] = {"interval": interval, "gap_hours": gap_hours, "built_at": datetime.now().isoformat(timespec="seconds"), "stations": {}}
+    for path in sorted(PROCESSED_DIR.glob(f"waterlevel_*_{interval}.csv")):
+        code = path.stem.split("_")[1]
+        info = levels.get(code, {})
+        att, wrn, alm, pfh = (info.get(k) for k in ("attwl", "wrnwl", "almwl", "pfh"))
+        rows = [r for r in csv.DictReader(path.open(encoding="utf-8")) if r.get("wl")]
+        values = [(datetime.strptime(r["timestamp_kst"], "%Y-%m-%d %H:%M"), float(r["wl"])) for r in rows]
+        events: list[dict[str, Any]] = []
+        current: dict[str, Any] | None = None
+        if att is not None:
+            for t, w in values:
+                if w >= att:
+                    if current is None or (t - current["end_dt"]).total_seconds() > gap_hours * 3600:
+                        if current:
+                            events.append(current)
+                        current = {"start": t.strftime("%Y-%m-%d %H:%M"), "end": t.strftime("%Y-%m-%d %H:%M"), "end_dt": t, "peak": w, "peak_time": t.strftime("%Y-%m-%d %H:%M")}
+                    else:
+                        current["end"] = t.strftime("%Y-%m-%d %H:%M")
+                        current["end_dt"] = t
+                        if w > current["peak"]:
+                            current["peak"], current["peak_time"] = w, t.strftime("%Y-%m-%d %H:%M")
+            if current:
+                events.append(current)
+        for e in events:
+            e.pop("end_dt", None)
+        summary["stations"][code] = {
+            "name": info.get("name"), "agency": info.get("agency"), "flood_forecast_station": info.get("flood_forecast_station"),
+            "levels_m": {"attention": att, "advisory": wrn, "warning": alm, "planned_flood": pfh},
+            "rows": len(rows), "first": rows[0]["timestamp_kst"] if rows else None, "last": rows[-1]["timestamp_kst"] if rows else None,
+            "max_wl_m": max((w for _, w in values), default=None),
+            "events_attention": len(events),
+            "events_advisory": sum(1 for e in events if wrn is not None and e["peak"] >= wrn),
+            "events_warning": sum(1 for e in events if alm is not None and e["peak"] >= alm),
+            "events_planned_flood": sum(1 for e in events if pfh is not None and e["peak"] >= pfh),
+            "events": events[:40],
+        }
+    totals = {k: sum(v[k] for v in summary["stations"].values()) for k in ("events_attention", "events_advisory", "events_warning", "events_planned_flood")}
+    summary["totals"] = {"stations": len(summary["stations"]), **totals}
+    EVENTS_FILE.write_text(json.dumps(summary, ensure_ascii=False, indent=1), encoding="utf-8")
+    return summary
+
+
 def parse_years(text: str) -> list[int]:
     if "-" in text:
         a, b = text.split("-")
@@ -255,7 +310,14 @@ def main() -> None:
     qc.add_argument("--stations", nargs="+", required=True)
     qc.add_argument("--interval", default="1H", choices=["1H", "10M"])
     qc.add_argument("--jump", type=float, default=3.0, help="flag steps of at least this many metres between samples")
+    ev = sub.add_parser("events", help="count flood events per downloaded water-level station against official levels")
+    ev.add_argument("--interval", default="1H", choices=["1H", "10M"])
+    ev.add_argument("--gap-hours", type=int, default=24)
     args = parser.parse_args()
+    if args.command == "events":
+        out = summarize_events(args.interval, args.gap_hours)
+        print(json.dumps(out["totals"], ensure_ascii=False))
+        return
     if args.command == "qc":
         for station in args.stations:
             out = qc_jumps(args.kind, station, args.interval, args.jump)

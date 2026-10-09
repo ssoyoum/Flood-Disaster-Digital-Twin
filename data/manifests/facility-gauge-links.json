@@ -1,0 +1,12 @@
+{
+ "linked_at": "2026-10-10T08:46:47",
+ "facilities": 283,
+ "sources": [
+  "twin_registry",
+  "underpass_coordinates.csv"
+ ],
+ "max_km": 5.0,
+ "facilities_with_gauge_within_max_km": 229,
+ "facilities_with_flood_forecast_gauge_within_max_km": 48,
+ "csv": "data/processed/facilities/facility_gauge_links.csv"
+}

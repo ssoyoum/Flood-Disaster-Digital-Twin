@@ -1,0 +1,84 @@
+{
+ "built_at": "2026-10-10T08:46:44",
+ "molit_rows": 938,
+ "osm_distinct_names": 396,
+ "counts": {
+  "matched": 282,
+  "ambiguous": 4,
+  "unmatched": 652,
+  "rejected_other_province": 18
+ },
+ "by_sido": {
+  "강원특별자치도": {
+   "total": 5,
+   "matched": 3
+  },
+  "경기도": {
+   "total": 369,
+   "matched": 124
+  },
+  "경상남도": {
+   "total": 34,
+   "matched": 16
+  },
+  "경상북도": {
+   "total": 17,
+   "matched": 2
+  },
+  "광주광역시": {
+   "total": 25,
+   "matched": 2
+  },
+  "대구광역시": {
+   "total": 36,
+   "matched": 15
+  },
+  "대전광역시": {
+   "total": 31,
+   "matched": 21
+  },
+  "부산광역시": {
+   "total": 49,
+   "matched": 7
+  },
+  "서울특별시": {
+   "total": 197,
+   "matched": 41
+  },
+  "세종특별자치시": {
+   "total": 21,
+   "matched": 12
+  },
+  "울산광역시": {
+   "total": 24,
+   "matched": 12
+  },
+  "인천광역시": {
+   "total": 38,
+   "matched": 3
+  },
+  "전라남도": {
+   "total": 15,
+   "matched": 5
+  },
+  "전라북도": {
+   "total": 20,
+   "matched": 5
+  },
+  "충청남도": {
+   "total": 25,
+   "matched": 8
+  },
+  "충청북도": {
+   "total": 32,
+   "matched": 6
+  }
+ },
+ "csv": "data/processed/facilities/underpass_coordinates.csv",
+ "method": "normalised name match MOLIT ↔ OSM highway ways named *지하차도*, same-name ways within 2 km averaged, other-province candidates rejected by coarse bbox",
+ "limits": [
+  "OSM coverage is partial and names may differ from the register (e.g. 교차로 vs 지하차도).",
+  "ambiguous rows (same name in several places) need manual review.",
+  "coordinates are way centres, not portals."
+ ]
+}
