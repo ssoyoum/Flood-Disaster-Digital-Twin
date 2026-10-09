@@ -1124,61 +1124,121 @@ function HandScenarioView({
 /* ------------------------------------------------------------------ */
 
 export function AgentDock({ eventId, compact = false }: { eventId: string; compact?: boolean }) {
+  const [facilityMode, setFacilityMode] = useState(false);
+  const [facilities, setFacilities] = useState<api.AgentFacility[]>([]);
+  const [selectedFacility, setSelectedFacility] = useState("");
+  const [observationAt, setObservationAt] = useState("");
+  const facilityId = facilityMode && facilities.some((item) => item.id === selectedFacility && item.event_id === eventId) ? selectedFacility : null;
   const [message, setMessage] = useState("");
   const [turns, setTurns] = useState<Array<{ question: string; response: AgentAskResult }>>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isOsong = eventId === "osong-2023";
   const [examples, setExamples] = useState<AgentExampleQuestion[]>(isOsong ? FALLBACK_EXAMPLES : []);
-
-  useEffect(() => { setTurns([]); setMessage(""); setError(null); }, [eventId]);
+  const pendingRequest = useRef<AbortController | null>(null);
+  const scopePicker = useRef<HTMLDetailsElement | null>(null);
 
   useEffect(() => {
     let live = true;
-    api.getAgentExamples(eventId)
-      .then((items) => { if (live && items.length) setExamples(items); })
-      .catch(() => { /* keep the offline fallback chips */ });
+    setFacilityMode(false); setFacilities([]); setSelectedFacility(""); setObservationAt("");
+    api.getAgentFacilities().then((items) => {
+      if (!live) return;
+      const choices = items.filter((item) => item.event_id === eventId);
+      setFacilities(choices); setSelectedFacility(choices[0]?.id ?? "");
+    }).catch(() => {});
     return () => { live = false; };
   }, [eventId]);
 
+  useEffect(() => {
+    setTurns([]); setMessage(""); setError(null); setBusy(false);
+    return () => {
+      pendingRequest.current?.abort();
+      pendingRequest.current = null;
+    };
+  }, [eventId, facilityId, observationAt]);
+
+  useEffect(() => {
+    let live = true;
+    setExamples(facilityId ? [] : eventId === "osong-2023" ? FALLBACK_EXAMPLES : []);
+    api.getAgentExamples(eventId, facilityId)
+      .then((items) => { if (live && items.length) setExamples(items); })
+      .catch(() => { /* keep the offline fallback chips */ });
+    return () => { live = false; };
+  }, [eventId, facilityId]);
+
   const ask = async (question: string) => {
     const text = question.trim();
-    if (!text || busy) return;
+    if (!text || busy || pendingRequest.current) return;
+    if (Array.from(text).length > 1000) {
+      setError("질문은 1,000자 이내로 입력해 주세요.");
+      return;
+    }
+    const controller = new AbortController();
+    if (scopePicker.current) scopePicker.current.open = false;
+    pendingRequest.current = controller;
     setBusy(true); setError(null);
     try {
       const history = turns.flatMap((turn): Array<{ role: "user" | "assistant"; content: string }> => [
         { role: "user", content: turn.question },
         { role: "assistant", content: turn.response.answer },
       ]).slice(-6);
-      const response = await api.askAgent(eventId, text, history);
+      const response = await api.askAgent(eventId, text, history, controller.signal,
+        facilityId ? { facility_id: facilityId, observation_at: observationAt || null } : undefined);
+      if (pendingRequest.current !== controller || controller.signal.aborted) return;
+      if (response.event_id !== eventId || (response.facility_id ?? null) !== facilityId) throw new Error("Agent event mismatch");
       setTurns((previous) => [...previous, { question: text, response }]);
       setMessage(response.status === "UNAVAILABLE" ? text : "");
     } catch (cause) {
+      if (pendingRequest.current !== controller || controller.signal.aborted) return;
       setMessage(text);
       const detail = cause instanceof Error ? cause.message : "";
       setError(detail.includes("API 429")
         ? detail.replace(/^API 429:\s*/, "")
         : detail.includes("API 404")
           ? "Agent API 경로를 찾을 수 없습니다. API 서버를 최신 코드로 다시 실행해 주세요."
-          : "Agent API에 연결하지 못했습니다. 서버 실행 상태를 확인해 주세요.");
+          : detail.includes("API 422")
+            ? "질문 형식이 API 조건과 맞지 않습니다. 질문을 줄여 다시 시도해 주세요."
+            : detail === "Agent event mismatch"
+              ? "다른 사건의 응답이 도착했습니다. 현재 사건에서 다시 질문해 주세요."
+              : "Agent API에 연결하지 못했습니다. 서버 실행 상태를 확인해 주세요.");
     }
-    finally { setBusy(false); }
+    finally {
+      if (pendingRequest.current === controller) {
+        pendingRequest.current = null;
+        setBusy(false);
+      }
+    }
   };
 
-  const idleHint = isOsong ? "예: HAND 임계를 1.5m 낮추면 붉은 셀이 어떻게 바뀌나요?" : examples[0] ? `예: ${examples[0].question}` : "사건과 대응 조건을 물어보세요.";
+  const idleHint = facilityId ? "시설 상태·통제 기준·과거 백테스트를 물어보세요." : isOsong ? "예: HAND 임계를 1.5m 낮추면 붉은 셀이 어떻게 바뀌나요?" : examples[0] ? `예: ${examples[0].question}` : "사건과 대응 조건을 물어보세요.";
   const status = busy ? "자료를 확인하고 다음 도구를 판단하는 중…" : turns.length ? "다른 조건이나 후속 질문을 이어서 물어보세요." : idleHint;
 
   return (
     <div className={`dk-agent${compact ? " dk-agent-compact" : ""}`}>
-      <div className="dk-agent-head"><p>FloodOps 에이전트</p><span className="dk-agent-badge llm">Gemini + 분석 도구</span></div>
+      <div className="dk-agent-head"><p>FloodOps 에이전트</p><span className="dk-agent-badge llm">{facilityId ? "시설 판단 근거" : "Gemini + 분석 도구"}</span></div>
+      {facilities.length > 0 && <details className="dk-agent-scope-picker" ref={scopePicker}>
+        <summary>분석 범위 · {facilityId ? "시설 판단" : "과거 사건"}</summary>
+        <div className="dk-agent-scope" aria-label="Agent 분석 범위">
+        <button type="button" aria-pressed={!facilityMode} onClick={() => setFacilityMode(false)}>과거 사건 분석</button>
+        <button type="button" aria-pressed={facilityMode} onClick={() => setFacilityMode(true)}>시설 통제 판단</button>
+        {facilityId && <>
+          <label>대상 시설<select aria-label="Agent 대상 시설" value={selectedFacility} onChange={(event) => setSelectedFacility(event.target.value)}>{facilities.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+          <label>과거 재생 시각<input aria-label="Agent 과거 재생 시각" type="datetime-local" value={observationAt} onChange={(event) => setObservationAt(event.target.value)} /></label>
+          <small>시각을 지정하면 과거 관측을 재생합니다. 비워두면 연결된 관측 모드를 사용합니다. 실제 통제는 담당자 판단이 우선합니다.</small>
+          {compact && <div className="dk-agent-suggestions" aria-label="추천 질문">
+            {examples.map((item) => <button key={item.label} type="button" title={item.question} disabled={busy} onClick={() => void ask(item.question)}>{item.label}</button>)}
+          </div>}
+        </>}
+        </div>
+      </details>}
       {!compact && <div className="dk-agent-intro">질문에 따라 등록된 분석 도구를 차례로 호출하고 결과를 읽어 답합니다. 질문·대화 기록·도구 결과는 Gemini에 전송됩니다. 도구로 확인할 수 없는 피해 효과는 추정하지 않습니다.</div>}
       {!compact && <div className="dk-agent-suggestions" aria-label="추천 질문">
-        {isOsong && <button type="button" disabled={busy} onClick={() => void ask("HAND 선택 임계를 1.5m 낮추면 붉은 셀이 단계별로 어떻게 바뀌나요?")}>HAND 붉은 셀 변화</button>}
-        {isOsong && <button type="button" disabled={busy} onClick={() => void ask("08:25 통제와 유입 10분 지연을 함께 비교하면 무엇이 다르고, 무엇은 알 수 없나요?")}>통제 + 유입 지연 함께</button>}
+        {isOsong && !facilityId && <button type="button" disabled={busy} onClick={() => void ask("HAND 선택 임계를 1.5m 낮추면 붉은 셀이 단계별로 어떻게 바뀌나요?")}>HAND 붉은 셀 변화</button>}
+        {isOsong && !facilityId && <button type="button" disabled={busy} onClick={() => void ask("08:25 통제와 유입 10분 지연을 함께 비교하면 무엇이 다르고, 무엇은 알 수 없나요?")}>통제 + 유입 지연 함께</button>}
         {examples.map((item) => <button key={item.label} type="button" title={item.question} disabled={busy} onClick={() => void ask(item.question)}>{item.label}</button>)}
       </div>}
       <form className="dk-agent-bar" onSubmit={(event) => { event.preventDefault(); void ask(message); }}>
-        <input aria-label="Agent request" value={message} onChange={(event) => setMessage(event.target.value)} placeholder="사건과 개입 조건을 자유롭게 물어보세요" />
+        <input aria-label="Agent request" value={message} maxLength={1000} disabled={busy} onChange={(event) => setMessage(event.target.value)} placeholder="사건과 개입 조건을 자유롭게 물어보세요" />
         <button type="submit" disabled={busy || !message.trim()}>질문</button>
       </form>
       <small className="dk-agent-status" aria-live="polite">{status}</small>
@@ -1187,6 +1247,7 @@ export function AgentDock({ eventId, compact = false }: { eventId: string; compa
           <strong>질문 · {turn.question}</strong>
           {turn.response.status !== "ANSWERED" && <small className="dk-agent-response-state">{turn.response.status === "UNAVAILABLE" ? "Agent 응답 실패 · 입력란에서 다시 시도할 수 있습니다." : "분석 근거 부족"}</small>}
           <p className="dk-agent-answer">{turn.response.answer}</p>
+          {turn.response.context_note && turn.response.context_note !== turn.response.answer && <small className="dk-note">{turn.response.context_note}</small>}
           {index === (compact ? 0 : turns.length - 1) && (turn.response.follow_ups?.length ?? 0) > 0 && (
             <div className="dk-agent-followups" aria-label="이어서 물어볼 질문">
               {turn.response.follow_ups!.map((item) => <button key={item} type="button" disabled={busy} onClick={() => void ask(item)}>{item}</button>)}
@@ -1212,9 +1273,12 @@ export function AgentDock({ eventId, compact = false }: { eventId: string; compa
   );
 }
 
-type FindingsKind = AgentWorkflowName | "hand_threshold" | "alert_timing" | "storage_capture" | "response_timing";
+type FindingsKind = AgentWorkflowName | "hand_threshold" | "alert_timing" | "storage_capture" | "response_timing" | "facility_status" | "control_rule" | "facility_backtest";
 
 const FINDINGS_BY_TOOL: Record<string, FindingsKind> = {
+  get_facility_status: "facility_status",
+  get_control_rule: "control_rule",
+  get_facility_backtest: "facility_backtest",
   analyze_hand_threshold: "hand_threshold",
   analyze_closure_timing: "closure_timing",
   analyze_inflow_delay: "inflow_delay",
@@ -1227,6 +1291,38 @@ const FINDINGS_BY_TOOL: Record<string, FindingsKind> = {
 const rows = (result: Record<string, unknown>, key: string) => (Array.isArray(result[key]) ? (result[key] as Array<Record<string, unknown>>) : []);
 
 function Findings({ workflow, result }: { workflow: FindingsKind; result: Record<string, unknown> }) {
+  if (workflow === "facility_status") {
+    const observation = result.observation as Record<string, unknown> | undefined;
+    return <div className="dk-findings-stack">
+      <strong>{result.mode === "replay" ? "과거 재생" : "실시간 관측"}</strong>
+      {observation ? <table className="dk-table"><tbody>
+        <tr><td>관측 시각</td><td>{String(observation.time)} (KST)</td></tr>
+        <tr><td>수위 · 단계</td><td>{String(observation.water_level_m)}m · {String(result.stage_label)}</td></tr>
+        <tr><td>계획홍수위 여유</td><td>{String(result.margin_to_planned_flood_m)}m</td></tr>
+        <tr><td>자료 시차 · 주기</td><td>{String(observation.age_min)}분 · {String(observation.interval)}</td></tr>
+        <tr><td>검토 상태</td><td>{result.observation_quality === "stale" ? "관측 갱신 필요 · 현재 판단 불가" : result.recommendation === "CLOSURE_REVIEW" ? "통제 검토 필요" : result.recommendation === "MONITOR" ? "관측 감시" : "등록 규칙의 정상 단계"}</td></tr>
+      </tbody></table> : <small>연결된 관측이 없어 판단할 수 없습니다.</small>}
+      <small>과거 재생은 현재 상태가 아닙니다. 실제 통제는 현장 계측·담당자 판단이 우선합니다.</small>
+    </div>;
+  }
+  if (workflow === "control_rule") {
+    const rule = result.rule as Record<string, unknown>;
+    const levels = result.levels_m as Record<string, unknown>;
+    return <div className="dk-findings-stack"><table className="dk-table"><tbody>
+      <tr><td>계획홍수위 · 경보 수위</td><td>{String(levels.planned_flood)}m · {String(levels.warning)}m</td></tr>
+      <tr><td>상승 속도 검토 구간</td><td>{String(rule.rate_window_min)}분</td></tr>
+      <tr><td>도달 외삽 검토 조건</td><td>{String(rule.lead_threshold_min)}분 이내</td></tr>
+    </tbody></table><small>{String(rule.basis)}</small><small>등록된 검토 규칙이며 법정 통제 명령이나 예보가 아닙니다.</small></div>;
+  }
+  if (workflow === "facility_backtest") {
+    const first = result.first_closure_review as Record<string, unknown> | null;
+    const lead = result.lead_minutes as Record<string, unknown> | null;
+    return <div className="dk-findings-stack"><strong>과거 수위 백테스트</strong><table className="dk-table"><tbody>
+      <tr><td>첫 통제 검토</td><td>{first ? String(first.time) : "조건 도달 기록 없음"}</td></tr>
+      <tr><td>재구성 유입까지</td><td>{lead ? `${String(lead.underpass_inflow)}분` : "계산 불가"}</td></tr>
+      <tr><td>재구성 붕괴까지</td><td>{lead ? `${String(lead.levee_failure)}분` : "계산 불가"}</td></tr>
+    </tbody></table><small>{String(result.note)}</small></div>;
+  }
   if (workflow === "alert_timing") {
     return (
       <table className="dk-table">

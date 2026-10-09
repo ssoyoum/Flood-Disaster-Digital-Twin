@@ -319,6 +319,7 @@ export type AgentWorkflowResult = {
 };
 
 export type AgentAskResult = {
+  facility_id?: string | null;
   event_id: string;
   status: "ANSWERED" | "NEEDS_DATA" | "UNAVAILABLE";
   answer: string;
@@ -326,6 +327,16 @@ export type AgentAskResult = {
   evidence_calls: number[];
   limitations: string[];
   follow_ups?: string[];
+  context_note?: string;
+  diagnostics?: {
+    request_id: string;
+    duration_ms: number;
+    model_steps: number;
+    model_requests: number;
+    completion_source: "model" | "registered_tools" | "capability" | "clarification" | "unavailable";
+    context_mode?: "current" | "reused" | "updated" | "ambiguous";
+    failures: Array<{ stage: "model" | "validation" | "tool" | "answer"; code: string; step: number; tool_name: string | null }>;
+  } | null;
   tool_calls: Array<{
     order: number;
     tool_name: string;

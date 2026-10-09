@@ -1,4 +1,5 @@
 import type { CaseLeadTimes, ResponseTimingResult, TimelineReconstructionResponse, AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
+import { boundedAgentHistory, type ConversationMessage } from "./agentConversation";
 
 const configuredApiBase = import.meta.env.VITE_API_BASE;
 const API_BASE = configuredApiBase === "same-origin" ? "" : configuredApiBase ?? (import.meta.env.PROD ? "" : "http://localhost:8033");
@@ -65,13 +66,18 @@ export const testSafetyDataApi = (serviceKey: string) =>
 export const getExposureInventory = (eventId: string, radii: number[] = [300, 500, 1000, 2000]) =>
   request<ExposureInventory>(`/api/events/${eventId}/exposure-inventory?${radii.map((radius) => `radii_m=${radius}`).join("&")}`);
 
-export const getAgentExamples = (eventId = "osong-2023") => request<AgentExampleQuestion[]>(`/api/agent/examples?event_id=${encodeURIComponent(eventId)}`);
+export const getAgentExamples = (eventId = "osong-2023", facilityId?: string | null) => request<AgentExampleQuestion[]>(`/api/agent/examples?event_id=${encodeURIComponent(eventId)}${facilityId ? `&facility_id=${encodeURIComponent(facilityId)}` : ""}`);
 
-export const askAgent = (eventId: string, message: string, history: Array<{ role: "user" | "assistant"; content: string }> = []) =>
+export type AgentFacility = { id: string; name: string; event_id: string; mode: "live" | "replay" };
+export type AgentFacilityScope = { facility_id: string; observation_at?: string | null };
+export const getAgentFacilities = () => request<AgentFacility[]>("/api/twin/facilities");
+
+export const askAgent = (eventId: string, message: string, history: ConversationMessage[] = [], signal?: AbortSignal, scope?: AgentFacilityScope) =>
   request<AgentAskResult>("/api/agent/ask", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ event_id: eventId, message, history }),
+    body: JSON.stringify({ event_id: eventId, message, history: boundedAgentHistory(history), ...scope }),
+    signal,
   });
 
 export const planAgentIntent = (eventId: string, message: string) =>

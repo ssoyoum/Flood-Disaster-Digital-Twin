@@ -18,6 +18,8 @@ export default defineConfig({
       reuseExistingServer: false,
       timeout: 120_000,
       name: "FastAPI",
+      // Browser regression tests exercise registered tools without paid model calls.
+      env: { GEMINI_API_KEY: "" },
     },
     {
       command: "npm run dev -- --host 127.0.0.1 --port 5175",
