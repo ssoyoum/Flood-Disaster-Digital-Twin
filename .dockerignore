@@ -9,7 +9,9 @@ docs
 data/raw
 data/interim
 data/manifests
-data/processed/seoul*
+# Large Seoul source exports stay out; data/processed/seoul_2022 is what the app serves.
+data/processed/seoul_flood_footprints_2022.geojson
+data/processed/seoul_rainfall_2022_event.csv
 backend/tests
 .claude
 .claude-flow

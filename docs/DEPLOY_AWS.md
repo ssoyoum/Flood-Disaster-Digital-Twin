@@ -7,7 +7,18 @@
 - 서버 메모리(1GB)를 아끼려고 프런트엔드는 로컬에서 `VITE_API_BASE=same-origin`으로 빌드하고, 서버에서는 Python 런타임만 이미지로 빌드한다. Gemini 키는 이미지에 넣지 않고 서버의 root 전용 `/etc/floodops.env`를 `--env-file`로 넘긴다.
 - 계정은 무료 요금제 크레딧으로 운영하므로 서버를 추가하거나 사양을 바꾸지 않는다. 사양 변경 시 재시작으로 공인 IP가 바뀐다.
 - 현재 API의 시나리오 상태는 메모리에 있으며 `/health`는 `database: demo-in-memory`, `postgis: pending`을 반환한다. 단일 인스턴스 시연에 맞춘 구성이다.
-- 사건 목록은 5개지만 분석 자료가 연결된 사건은 오송이다. 서울 2022 침수흔적 원본 19,881개 피처는 확보됐으나 사건 API에는 아직 연결되지 않았다.
+- 사건 목록은 5개이며 `main`에서는 오송·서울 2022·포항 2022·안동·의성 2026 네 사례의 관제 화면과 반사실 분석이 동작한다. 익산 2024는 시각 근거가 없어 잠겨 있다.
+- 2026-10-09 확인: 공개 서버는 10-01 빌드라 `/api/events`에는 5개 사건이 보이지만 `seoul-2022`·`pohang-2022`·`andong-uiseong-2026`의 `/reconstruction`은 404다. 다른 사례를 공개 화면에서 열려면 현재 `main`으로 이미지를 다시 빌드해 컨테이너를 교체해야 한다.
+
+## 다른 사례까지 여는 재배포 준비 (2026-10-09)
+
+이미지에 들어가야 하는 것과 확인한 값이다. 로컬 Docker가 없어 서버 Docker로 빌드한다.
+
+- `Dockerfile.aws`는 `data/processed/{osong,seoul_2022,pohang_2022,andong_uiseong_2026}`을 모두 복사한다. 예전 `.dockerignore`의 `data/processed/seoul*` 줄이 `seoul_2022` 디렉터리까지 제외해 COPY가 실패했으므로, 지금은 원본 export 두 파일(`seoul_flood_footprints_2022.geojson`, `seoul_rainfall_2022_event.csv`)만 제외한다.
+- 서버에 올리는 패키지는 지난 배포와 같이 `backend/app`, `backend/requirements.txt`, 위 네 데이터 폴더, 로컬에서 `VITE_API_BASE=same-origin npm run build`로 만든 `dist`(`index.html`이 가리키는 자산만)로 구성한다. 오송 건물 QA(31MB)·OSM 건물 두 파일·CODIL 텍스트는 뺀다. 서버 Dockerfile은 `Dockerfile.aws`의 Python 단계에서 `COPY --from=frontend-build /web/dist ./dist`를 `COPY dist ./dist`로 바꾼 것이다.
+- 레이어 응답 크기(`/api/events/{id}/layers`, 5자리 좌표·화면 속성만): 오송 gzip 1.07 MB, 서울 1.18 MB, 포항 0.03 MB, 안동 0.12 MB.
+- 메모리: 네 사례 레이어를 모두 읽은 뒤 Python 프로세스 RSS 364 MB(로컬 측정, 오송만 읽었을 때 259 MB). 컨테이너 상한 600 MB 안에 들어가지만 여유는 10-01 배포(291 MB)보다 줄어든다. 배포 뒤 `docker stats`로 확인한다.
+- 배포 뒤 확인: `/health` 200, `/api/events` 5건, 네 사례 각각 `/api/events/{id}/reconstruction` 200, `/api/cases/lead-times` 200, 브라우저에서 사례 선택 → 서울·포항·안동 관제 화면과 반사실 비교가 열리는지 확인한다. 로컬에서는 `npm run test:e2e`의 `other-cases.spec.ts`가 같은 흐름을 검사한다.
 
 ## 빌드와 로컬 확인
 

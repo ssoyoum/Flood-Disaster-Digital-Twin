@@ -2504,3 +2504,28 @@ UI 보완:
 - 문제: 처음 쓰려던 화면 캡처는 `docs/submission/` 아래에 있어 `.gitignore` 대상이었습니다.
   해결: README 이미지는 모두 추적되는 `docs/screenshots/`에 새로 캡처해 두었습니다.
 - 참고: 병행 작업으로 생긴 `public/readme-hero.svg`는 README에서 더 이상 참조하지 않으며, 이번 커밋에 넣지 않고 작업 트리에 남겨 두었습니다.
+
+## 공개 서버에서 다른 사례도 열리도록 재배포 준비
+
+- 작업일: 2026-10-09
+
+주요 작업:
+- 공개 서버(`floodops.duckdns.org`)가 10-01 빌드라 서울·포항·안동 관제 화면이 열리지 않는 원인을 확인했습니다. `/api/events`에는 5개 사건이 보이지만 세 사례의 `/reconstruction`이 404입니다. 로컬 `main`에서는 네 사례가 모두 동작합니다.
+- `.dockerignore`의 `data/processed/seoul*` 줄이 `seoul_2022` 디렉터리까지 제외해 `Dockerfile.aws`의 COPY가 실패하는 결함을 고쳤습니다. 원본 export 두 파일만 제외합니다.
+- `docs/DEPLOY_AWS.md`에 네 사례 재배포 체크리스트(패키지 구성, 레이어 응답 크기, 메모리 측정값, 배포 뒤 확인 항목)를 적었습니다.
+- Playwright `e2e/other-cases.spec.ts`를 추가해 사례 선택 화면에서 서울·포항·안동으로 들어가 단계 수와 반사실 비교 결과를 검사하고, 익산이 잠겨 있는지 확인합니다.
+- 배포 자체는 하지 않았습니다.
+
+검증 결과:
+- `Dockerfile.aws`의 COPY 원본 14개가 모두 존재하고 `.dockerignore`에 걸리지 않는 것을 확인했습니다.
+- `VITE_API_BASE=same-origin npm run build` 통과(`index-Ct5YW_h1.js` 1,102 kB).
+- 네 사례 레이어 응답 gzip: 오송 1.07 MB, 서울 1.18 MB, 포항 0.03 MB, 안동 0.12 MB. 네 사례를 모두 읽은 뒤 Python 프로세스 RSS 364 MB(오송만 259 MB).
+- `npx playwright test`: 9개 통과(기존 5개 + 신규 4개). `python -m pytest backend/tests -q`: 117 passed, 1 failed(`test_gemini_action_retries_one_malformed_decision`, 단독 실행 시 통과하는 순서 의존 실패).
+
+문제/해결:
+- 문제: 사용자가 공개 화면에서 오송 외 사례가 열리지 않는다고 했습니다. 코드는 10-03에 이미 연결돼 있었고, 10-03 지시대로 서버에 올리지 않아 공개본이 오래된 상태였습니다.
+  해결: 서버 재빌드가 필요하다는 점을 확인하고, 재빌드 전에 막힐 것(`.dockerignore` 결함)과 확인할 것(메모리·응답 크기·화면 흐름)을 먼저 정리했습니다.
+- 문제: AWS CLI 세션이 만료돼 `aws login` 브라우저 승인이 필요했고, 자동 모드 권한 분류기가 배포 패키지 조립을 배포 행위로 막았습니다.
+  해결: 사용자가 "배포 말고 준비만" 하라고 해 저장소 쪽 준비로 범위를 바꿨습니다. 배포 절차와 확인 값은 `docs/DEPLOY_AWS.md`에 남겼습니다.
+- 문제: 안동 사례는 반사실 패널이 2개(대피명령·산사태 위기경보)라 `23:40` 체크박스가 두 개 잡혀 Playwright strict mode에 걸렸습니다.
+  해결: 첫 패널로 범위를 좁히고 두 번째 패널의 제목도 함께 검사합니다.
