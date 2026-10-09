@@ -160,6 +160,7 @@ CASES: dict[str, dict[str, Any]] = {POHANG["event"]["id"]: POHANG, ANDONG["event
 LIMITATIONS = [
     "Incident times are press-reported and need official source pages.",
     "No official flood extent, gauge series, or building register is connected; the map shows an event-date OSM snapshot only.",
+    "The red HAND cells are terrain near the main stream whose threshold rises in the reported order of events; the peak threshold is calibrated to reported inundated sites, not measured. They are not a flood extent, depth, or exposure.",
     "Lead times are arithmetic between a response time and reported milestones. They do not estimate evacuation, casualties, or damage avoided.",
     "Focus sites are village or bridge centre points, not the exact location of affected homes.",
 ]
@@ -174,7 +175,7 @@ def _read(case: dict[str, Any], suffix: str) -> dict[str, Any] | None:
     return json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
 
 
-def _layer(case: dict[str, Any], key: str, label: str, suffix: str | None, status: str, source: str) -> dict[str, Any]:
+def _layer(case: dict[str, Any], key: str, label: str, suffix: str | None, status: str, source: str, source_type: str | None = None) -> dict[str, Any]:
     data = _read(case, suffix) if suffix else None
     if data is None:
         return {"key": key, "label": label, "status": "UNAVAILABLE", "source_type": "NOT_CONNECTED", "source": source, "snapshot": None, "path": None, "feature_count": 0, "geometry_types": [], "data": EMPTY_FEATURE_COLLECTION}
@@ -182,7 +183,7 @@ def _layer(case: dict[str, Any], key: str, label: str, suffix: str | None, statu
         "key": key,
         "label": label,
         "status": status,
-        "source_type": "OSM_ATTIC" if status == "VERIFIED" else "DERIVED",
+        "source_type": source_type or ("OSM_ATTIC" if status == "VERIFIED" else "DERIVED"),
         "source": source,
         "snapshot": case["event"]["started_at"][:10],
         "path": f"data/processed/{case['dir']}/{case['prefix']}_{suffix}",
@@ -201,9 +202,12 @@ def get_timeline_layers(event_id: str) -> dict[str, Any]:
         "roads": _layer(case, "roads", "도로", "osm_roads.geojson", "VERIFIED", osm),
         "buildings": _layer(case, "buildings", "건축물(OSM, 부분)", "osm_buildings.geojson", "VERIFIED", osm),
         "waterways": _layer(case, "waterways", "하천", "osm_waterways.geojson", "VERIFIED", osm),
-        "terrain": _layer(case, "terrain", "지형", None, "UNAVAILABLE", "Not connected"),
+        "terrain": _layer(case, "terrain", "지형 격자(HAND)", "hand_reconstruction_grid.geojson", "DERIVED", "Copernicus DEM GLO-30", source_type="DEM_GRID"),
         "approx_flood_envelope": _layer(case, "approx_flood_envelope", "근사 범람", None, "UNAVAILABLE", "Not connected"),
-        "hand_reconstruction": _layer(case, "hand_reconstruction", "HAND 재구성", None, "UNAVAILABLE", "Not connected"),
+        "hand_reconstruction": _layer(
+            case, "hand_reconstruction", "HAND 재구성(보도 순서 기준)", "hand_flood_envelope_timeline.geojson", "TEMPORARY",
+            f"Copernicus DEM GLO-30 + OSM {osm} waterways + reported stage order", source_type="DERIVED_APPROXIMATION",
+        ),
         "facilities": _layer(case, "facilities", "초점 지점", "focus_sites.geojson", "DERIVED", "Reported place names, OSM place nodes"),
         "underpass": _layer(case, "underpass", "지하차도", None, "UNAVAILABLE", "Not applicable"),
         "flood_extent": _layer(case, "flood_extent", "공식 침수범위", None, "UNAVAILABLE", "Official flood extent not connected"),
@@ -220,7 +224,7 @@ def get_timeline_status(event_id: str) -> dict[str, Any]:
         "flood_extent": {k: v for k, v in layers["flood_extent"].items()},
         "population": {"status": "UNAVAILABLE"},
         "rainfall": {"status": "UNAVAILABLE", "notes": "KMA AWS series not downloaded yet; reported totals are listed as press facts."},
-        "dem": {"status": "UNAVAILABLE"},
+        "dem": {"status": "DERIVED", "source": "Copernicus DEM GLO-30", "notes": "HAND grid for stage replay only; not a flood extent."} if layers["terrain"]["feature_count"] else {"status": "UNAVAILABLE"},
         "layers": {key: {k: v for k, v in value.items() if k != "data"} for key, value in layers.items()},
     }
 
@@ -235,12 +239,13 @@ def get_timeline_summary(event_id: str) -> dict[str, Any]:
         "building_count": layers["buildings"]["feature_count"],
         "road_count": layers["roads"]["feature_count"],
         "waterway_count": layers["waterways"]["feature_count"],
-        "terrain_low_elevation_cells": 0,
+        "terrain_low_elevation_cells": layers["terrain"]["feature_count"],
         "terrain_low_elevation_threshold_m": None,
         "rainfall_peak_mm_per_hour": None,
         "rainfall_records": None,
         "facility_count": layers["facilities"]["feature_count"],
         "underpass_available": False,
+        "hand_reconstruction_features": layers["hand_reconstruction"]["feature_count"],
         "flooded_area_km2": "UNAVAILABLE",
         "exposed_population": "UNAVAILABLE",
         "exposed_buildings": "UNAVAILABLE",
@@ -249,6 +254,19 @@ def get_timeline_summary(event_id: str) -> dict[str, Any]:
         "affected_shelters": "UNAVAILABLE",
         "data_status": "No exposure counts: official flood extent and building register are not connected for this case.",
     }
+
+
+def _hand_metadata(case: dict[str, Any]) -> dict[str, Any] | None:
+    data = _read(case, "hand_flood_envelope_timeline.geojson")
+    if not data:
+        return None
+    meta = dict(data.get("metadata") or {})
+    counts: dict[str, int] = {}
+    for feature in data.get("features", []):
+        state = feature.get("properties", {}).get("state")
+        counts[state] = counts.get(state, 0) + 1
+    meta["stage_counts"] = counts
+    return meta
 
 
 def get_timeline_reconstruction(event_id: str) -> dict[str, Any]:
@@ -271,7 +289,9 @@ def get_timeline_reconstruction(event_id: str) -> dict[str, Any]:
         "provenance": [
             {"source": "언론 보도 사건 시각", "data_vintage": case["event"]["started_at"][:10], "role": "Incident times", "status": "TEMPORARY"},
             {"source": "OpenStreetMap attic", "data_vintage": case["event"]["started_at"][:10], "role": "Roads, waterways, partial buildings", "status": "VERIFIED"},
+            {"source": "Copernicus DEM GLO-30 + HAND 근사", "data_vintage": "DEM 2021 release; stage order from reports", "role": "Stage replay cells (approximation)", "status": "TEMPORARY"},
         ],
+        "hand_reconstruction": _hand_metadata(case),
         "limitations": LIMITATIONS,
     }
 

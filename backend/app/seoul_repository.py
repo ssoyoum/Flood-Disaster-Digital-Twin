@@ -116,7 +116,7 @@ SEOUL_RECONSTRUCTION_EVENTS = [
 ]
 
 LIMITATIONS = [
-    "Official flood traces record where flooding happened after the event; they carry no timestamps, so the map cannot animate flood growth.",
+    "Official flood traces record where flooding happened after the event; they carry no timestamps. The replay reveals them deepest-first as the 60-minute rainfall climbs past the 95 mm/h design target, which is an ordering assumption, not an observed sequence.",
     "Rainfall thresholds use one gauge (신림P) as the trigger; other gauges in the corridor peaked at different minutes.",
     "Lead times are arithmetic between an alert time and recorded incident times. They do not estimate evacuation, casualties, or damage avoided.",
     "Storage capture is rain volume arithmetic over the Dorimcheon catchment area (40.96 km2, literature value) and an assumed runoff coefficient. It is not a sewer or tunnel hydraulic model.",
@@ -211,6 +211,44 @@ def _layer(key: str, label: str, filename: str | None, *, status: str, source_ty
 
 
 @lru_cache(maxsize=1)
+def trace_reveal_rule() -> list[dict[str, Any]]:
+    """Per replay stage: the 신림P 60-minute rainfall so far and the trace depth revealed from that stage on.
+
+    Nothing is shown while the running 60-minute maximum stays under the 95 mm/h design target, because the
+    drainage system was designed to carry that much. Beyond it, deeper traces (lower ground) appear first and
+    the shallowest appear once the rainfall reaches its event maximum. This orders the official record; it does
+    not time it.
+    """
+    series = _gauge_series(PRIMARY_GAUGE) if _rainfall_rows() else []
+    max_depth = float((_summary().get("traces", {}).get("depth_m") or {}).get("max") or 1.0)
+    peak = max([row["rainfall_60min_mm"] or 0.0 for row in series] or [0.0])
+    rule = []
+    running = 0.0
+    for index, event in enumerate(SEOUL_RECONSTRUCTION_EVENTS):
+        stage_time = _event_time(event["time"])
+        for row in series:
+            if row["observed_at"] <= stage_time and row["rainfall_60min_mm"]:
+                running = max(running, row["rainfall_60min_mm"])
+        if peak <= DESIGN_RAINFALL_MM_PER_HOUR or running < DESIGN_RAINFALL_MM_PER_HOUR:
+            depth = None
+        else:
+            depth = round(max_depth * max(0.0, 1.0 - (running - DESIGN_RAINFALL_MM_PER_HOUR) / (peak - DESIGN_RAINFALL_MM_PER_HOUR)), 2)
+        rule.append({"stage_index": index, "state": event["state"], "time": event["time"], "rainfall_60min_running_max_mm": round(running, 1), "reveal_depth_m": depth})
+    return rule
+
+
+def _annotate_reveal(layer: dict[str, Any]) -> dict[str, Any]:
+    rule = trace_reveal_rule()
+    for feature in layer.get("data", {}).get("features", []):
+        props = feature.setdefault("properties", {})
+        depth = props.get("flood_depth_m")
+        depth = float(depth) if depth not in (None, "") else 0.0
+        stage = next((row["stage_index"] for row in rule if row["reveal_depth_m"] is not None and depth >= row["reveal_depth_m"]), None)
+        props["reveal_stage"] = stage if stage is not None else len(rule)
+    return layer
+
+
+@lru_cache(maxsize=1)
 def get_seoul_layers() -> dict[str, Any]:
     unavailable = lambda key, label: _layer(key, label, None, status="UNAVAILABLE", source_type="NOT_APPLICABLE", source="Not used for the Seoul urban case", snapshot=None)  # noqa: E731
     return {
@@ -226,10 +264,10 @@ def get_seoul_layers() -> dict[str, Any]:
         "hand_reconstruction": unavailable("hand_reconstruction", "HAND 재구성"),
         "facilities": _layer("facilities", "시설", "seoul_osm_facilities_2022.geojson", status="VERIFIED", source_type="OSM_ATTIC", source="OpenStreetMap Overpass attic", snapshot="2022-08-08"),
         "underpass": unavailable("underpass", "지하차도"),
-        "flood_extent": _layer(
+        "flood_extent": _annotate_reveal(_layer(
             "flood_extent", "서울시 침수흔적도 2022", "seoul_flood_traces_2022_dorimcheon.geojson", status="VERIFIED", source_type="OFFICIAL_FLOOD_TRACE",
             source="서울시 침수흔적도 (공공데이터포털 15133406)", snapshot="2022-08-08~17 호우",
-        ),
+        )),
     }
 
 
@@ -340,6 +378,7 @@ def get_seoul_reconstruction() -> dict[str, Any]:
         ],
         "rainfall_peaks": summary.get("rainfall_peaks", {}),
         "design_rainfall_mm_per_hour": DESIGN_RAINFALL_MM_PER_HOUR,
+        "trace_reveal": trace_reveal_rule(),
         "exposure": {
             "aoi_area_km2": summary.get("aoi_area_km2"),
             "traces": summary.get("traces", {}),

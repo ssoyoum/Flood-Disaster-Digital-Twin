@@ -22,6 +22,8 @@ UI_PROPERTIES = frozenset({
     # Seoul official flood traces and trace-overlay buildings
     "trace_id", "flood_depth_m", "damage_type", "district", "start_date", "end_date",
     "dong", "main_use", "above_ground_floors", "underground_floors", "max_trace_depth_m", "use_approval_date",
+    # Seoul staged reveal of the official traces (depth order under the rainfall curve)
+    "reveal_stage",
 })
 
 

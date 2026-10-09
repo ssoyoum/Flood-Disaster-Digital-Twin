@@ -1,0 +1,150 @@
+{
+  "created_at": "2026-10-09T15:34:00.038516+00:00",
+  "event_id": "andong-uiseong-2026",
+  "status": "TEMPORARY",
+  "source_type": "DERIVED_APPROXIMATION",
+  "method": "Height above the nearest 미천 cell on a 126 m Copernicus DEM grid, thresholded per stage, 4-neighbour flood fill from river-side seeds.",
+  "stage_driver": "REPORTED_GAUGE_AND_ORDER",
+  "stage_driver_basis": "보도된 미천 운산리 수위(23:40 3.5 m, 경보 수위 4.7 m 도달 예측 00:30, 05:40 해제)로 상승·하강 순서만 정한다. 하천은 OSM river 등급 선(미천과 이름 없는 상류 구간) 전체이고, 상한은 침수가 보도된 귀미1리(일직면) 주변 가장 낮은 셀에 닿는 최소 임계로 맞춘다. 구계리(단촌면)는 river 선에서 5 km 떨어진 소하천 변이라 이 envelope으로 재현하지 않는다.",
+  "peak_threshold_m": 0.25,
+  "dem": {
+    "raw_file": "data/raw/copernicus_dem_glo30/Copernicus_DSM_COG_10_N36_00_E128_00_DEM.tif",
+    "raw_sha256": "8AF5B10B27529358DB96D8B019C8C5FEE09426DCC48A831FE5F16514FEBD47F8",
+    "raw_crs": "EPSG:4326",
+    "raw_pixel_size_degrees": [
+      0.0002777777777777778,
+      0.0002777777777777778
+    ],
+    "window_shape": [
+      343,
+      614
+    ],
+    "window_bounds": [
+      128.62972222222223,
+      36.43972222222222,
+      128.80027777777778,
+      36.535
+    ],
+    "source": "Copernicus DEM GLO-30 (public AWS Open Data bucket copernicus-dem-30m)"
+  },
+  "aoi_bbox": [
+    128.63,
+    36.44,
+    128.8,
+    36.535
+  ],
+  "cell_size_m": 126.1,
+  "grid_feature_count": 8296,
+  "timeline_feature_count": 5691,
+  "seed_distance_m": 250,
+  "connectivity_distance_m": {
+    "base": 0,
+    "peak": 2000,
+    "power": 2,
+    "measured_from": "미천"
+  },
+  "stage_counts": {
+    "first_isolation": 605,
+    "flood_warning": 952,
+    "camper_isolation": 973,
+    "evacuation_order": 1035,
+    "predicted_warning_level": 1073,
+    "warning_lifted": 788,
+    "national_landslide_alert": 265
+  },
+  "stage_contexts": [
+    {
+      "stage_index": 0,
+      "time": "2026-07-18T22:59:00+09:00",
+      "state": "first_isolation",
+      "stage_fraction": 0.3,
+      "hand_threshold_m": 0.07,
+      "connectivity_distance_m": 180,
+      "selected_feature_count": 605
+    },
+    {
+      "stage_index": 1,
+      "time": "2026-07-18T23:40:00+09:00",
+      "state": "flood_warning",
+      "stage_fraction": 0.55,
+      "hand_threshold_m": 0.14,
+      "connectivity_distance_m": 605,
+      "selected_feature_count": 952
+    },
+    {
+      "stage_index": 2,
+      "time": "2026-07-18T23:44:00+09:00",
+      "state": "camper_isolation",
+      "stage_fraction": 0.6,
+      "hand_threshold_m": 0.15,
+      "connectivity_distance_m": 720,
+      "selected_feature_count": 973
+    },
+    {
+      "stage_index": 3,
+      "time": "2026-07-19T00:00:00+09:00",
+      "state": "evacuation_order",
+      "stage_fraction": 0.8,
+      "hand_threshold_m": 0.2,
+      "connectivity_distance_m": 1280,
+      "selected_feature_count": 1035
+    },
+    {
+      "stage_index": 4,
+      "time": "2026-07-19T00:30:00+09:00",
+      "state": "predicted_warning_level",
+      "stage_fraction": 1.0,
+      "hand_threshold_m": 0.25,
+      "connectivity_distance_m": 2000,
+      "selected_feature_count": 1073
+    },
+    {
+      "stage_index": 5,
+      "time": "2026-07-19T05:40:00+09:00",
+      "state": "warning_lifted",
+      "stage_fraction": 0.35,
+      "hand_threshold_m": 0.09,
+      "connectivity_distance_m": 245,
+      "selected_feature_count": 788
+    },
+    {
+      "stage_index": 6,
+      "time": "2026-07-19T08:00:00+09:00",
+      "state": "national_landslide_alert",
+      "stage_fraction": 0.2,
+      "hand_threshold_m": 0.05,
+      "connectivity_distance_m": 80,
+      "selected_feature_count": 265
+    }
+  ],
+  "limitations": [
+    "관측 수위가 아니라 보도된 사건 순서로 임계를 올린 지형 근사다. 침수심·유속·유량을 계산하지 않는다.",
+    "임계 상한 0.25 m는 관측값이 아니라 보도된 침수 지점에 닿도록 맞춘 값이다.",
+    "126 m 격자라 제방·도로 성토·배수로처럼 격자보다 좁은 구조물은 반영되지 않는다.",
+    "공식 침수범위가 아니며 노출 집계에 쓰지 않는다."
+  ],
+  "output_files": [
+    "data/processed/andong_uiseong_2026/andong_hand_reconstruction_grid.geojson",
+    "data/processed/andong_uiseong_2026/andong_hand_flood_envelope_timeline.geojson",
+    "data/processed/andong_uiseong_2026/andong_hand_reconstruction_validation.json"
+  ],
+  "validity_assessment": {
+    "appropriate_use": "Stage-by-stage replay of where low, river-connected terrain lies as the reported event unfolds.",
+    "inappropriate_use": "Official flood extent, hydraulic simulation, depth or velocity estimate, exposure KPI."
+  },
+  "calibration": {
+    "peak_threshold_m": 0.25,
+    "all_anchors_reached": true,
+    "anchors": [
+      {
+        "name": "귀미1리 (안동 일직면)",
+        "grid_id": "dem-050-038",
+        "cell_index": 6138,
+        "hand_m": 0.0,
+        "distance_to_primary_river_m": 50.6,
+        "snapped_within_m": 400,
+        "distance_from_reported_point_m": 419.4
+      }
+    ]
+  }
+}

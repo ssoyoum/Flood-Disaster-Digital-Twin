@@ -234,6 +234,27 @@ Open data-quality issues count: 3
   - 남은 시각은 언론 출처를 유지한다. 확인 경로: 홍수통제소 Open API 홍수예보 발령 목록, 산사태정보시스템 위기경보 이력, 재난안전데이터공유플랫폼 긴급재난문자 이력.
 - Residual risk / 남은 한계: 익산 2024는 시각 근거가 없어 연결하지 않았다. 카탈로그 위치만 산북천 유역으로 바로잡았다.
 
+### DQ-012: Stage replay layers for Seoul, Pohang and Andong-Uiseong are ordering assumptions, not timed observations
+
+- Status: Accepted limitation
+- Impact: Medium
+- 발견일: 2026-10-10
+- 대상 데이터셋: `backend/app/seoul_repository.py`(`trace_reveal_rule`), `data/processed/pohang_2022/pohang_hand_*`, `data/processed/andong_uiseong_2026/andong_hand_*`, `data/scripts/create_case_hand_reconstruction.py`
+- 증상: 오송 외 사례는 재생을 눌러도 지도에서 바뀌는 공간 상태가 없었다. 오송의 HAND envelope은 관측 수위로 단계 임계를 올리지만, 세 사례에는 수위 계열이 없다.
+- 원인과 선택:
+  - 서울: Copernicus DSM으로 HAND envelope을 만들어 공식 침수흔적도와 대조했다. 임계 0.25~3 m, 연결 거리 600~1,500 m 전 조합에서 envelope 면적 중 흔적 위 비율이 14~16%로, 하천 회랑 전체의 흔적 비율과 같았다. 고밀 시가지에서 30 m DSM은 건물 높이를 포함해 지면 고저를 구분하지 못한다. 이 envelope은 싣지 않았다.
+    대신 공식 흔적도를 단계별로 드러낸다. 신림P 60분 강우의 누적 최댓값이 방재성능목표 95 mm/h를 넘기 전에는 아무것도 보이지 않고, 넘은 뒤에는 깊은 흔적부터, 강우 최댓값(121.5 mm)에서 전체가 보인다. 20:49 단계 1,557건(침수심 0.38 m 이상), 20:59 이후 10,468건 전체.
+  - 포항: 관측이 없어 보도된 사건 순서로만 범위를 넓힌다. 냉천교(보도된 범람 지점)에서 HAND 0.25 m 이하 지형을 따라 퍼지며, 도달 거리 상한 900 m는 보도된 침수 지점(인덕동 일대)에 닿는 최소 거리다. 90 m 격자, 단계별 셀 수 0·0·78·120·144·175·175·175.
+  - 안동·의성: 보도된 미천 수위(23:40 3.5 m, 00:30 경보 수위 4.7 m 도달 예측, 05:40 해제)로 상승·하강 순서만 정한다. 하천은 OSM river 등급 선(미천과 이름 없는 상류 구간)이고, 임계 상한 0.25 m는 침수가 보도된 귀미1리 주변 가장 낮은 셀에 닿는 최소값이다. 골짜기 바닥은 HAND 0 m가 대부분이라 임계보다 하천에서의 거리(비율²×2 km)가 범위를 정한다. 150 m 격자, 단계별 셀 수 605·952·973·1,035·1,073·788·265. 구계리(단촌면)는 river 선에서 5 km 떨어진 소하천 변이라 이 envelope으로 재현하지 않는다.
+- 분석 결과에 미치는 영향:
+  - 세 사례의 단계별 지도는 "어느 순서로 넓어졌을 것"이라는 가정이다. 시각·면적·침수심을 뒷받침하지 않으며 노출 집계와 반사실 계산에 쓰지 않는다.
+  - 서울의 반사실(경보 시각·저류)과 포항·안동의 반사실(대응 시각)은 이 레이어와 무관하게 관측·보도 시각만으로 계산된다.
+- 해결 방법:
+  - API: 서울 `flood_extent` 피처에 `reveal_stage`, `reconstruction.trace_reveal`에 단계별 강우·드러내는 침수심을 넣었다. 포항·안동 `hand_reconstruction` 레이어는 `TEMPORARY`/`DERIVED_APPROXIMATION`이고 `reconstruction.hand_reconstruction`에 stage_driver·임계 상한·보정 기준점을 넣었다.
+  - 화면: 서울 범례에 "단계별 표시(깊은 곳 먼저)" 토글과 현재 건수, 포항·안동 범례에 "HAND 근사, 보도 순서"와 현재 셀 수를 표시한다. 한계 목록에 같은 문장을 넣었다.
+- 검증 방법: `backend/tests/test_stage_replay_layers.py`, `e2e/other-cases.spec.ts`(단계 이동 시 건수·셀 수 변화).
+- Residual risk / 남은 한계: 포항·안동 임계 상한은 관측값이 아니다. 기상청 AWS·홍수통제소 수위 자료를 연결하면 오송처럼 관측 기반 임계로 바꾼다. 서울은 도림천 수위 이력(정보공개)으로 순서 가정을 대조할 수 있다.
+
 ## Open issues / watchlist
 
 - DSSP-IF-00117 또는 대체 공식 vector Flood Extent 확보 시 DQ-001, DQ-002를 재검증한다.
@@ -244,4 +265,5 @@ Open data-quality issues count: 3
 - 공식 건물통합정보와 OSM historical building QA에서 `MATCHED`, `OFFICIAL_ONLY`, `OSM_ONLY` 비율을 산출하면 별도 DQ issue 또는 validation metric으로 기록한다.
 - SGIS 또는 공식 행정경계 snapshot이 변경되면 `event_year`와 `boundary_snapshot` 혼동 여부를 재검증한다.
 - 강우·수위 신규 관측소를 추가하면 timezone, period, unit, aggregation interval을 다시 확인한다.
+- 포항·안동에 관측 강우·수위가 연결되면 DQ-012의 보도 순서 임계를 관측 기반으로 바꾸고 단계별 셀 수를 재기록한다.
 

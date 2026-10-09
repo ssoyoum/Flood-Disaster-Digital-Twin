@@ -17,7 +17,10 @@ import "./urban.css";
  */
 
 type View = "console" | "compare";
-type LayerKey = "roads" | "waterways" | "buildings" | "aoi";
+type LayerKey = "hand_reconstruction" | "roads" | "waterways" | "buildings" | "aoi";
+
+// HAND 근사 셀: 현재 단계(stage_index)의 폴리곤만 보인다.
+const stageFilter = (time: number) => ["all", ["==", ["geometry-type"], "Polygon"], ["==", ["get", "stage_index"], time]] as never;
 
 const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas";
 const ATTRIBUTION = ["도로·하천·건축물 © OpenStreetMap contributors", "사건 시각: 언론 보도"];
@@ -55,6 +58,8 @@ const LIMITATION_KO: Record<string, string> = {
     "선행 시간은 대응 시각과 보도된 사건 시각의 차이입니다. 대피·인명·피해 감소를 추정하지 않습니다.",
   "Focus sites are village or bridge centre points, not the exact location of affected homes.":
     "초점 지점은 마을·교량 중심점이며 피해 주택의 정확한 위치가 아닙니다.",
+  "The red HAND cells are terrain near the main stream whose threshold rises in the reported order of events; the peak threshold is calibrated to reported inundated sites, not measured. They are not a flood extent, depth, or exposure.":
+    "붉은 HAND 셀은 하천 주변 낮은 지형을 보도된 사건 순서대로 넓힌 근사입니다. 상한은 관측이 아니라 침수가 보도된 지점에 닿도록 맞춘 값이며, 침수범위·침수심·노출이 아닙니다.",
 };
 
 const clock = (iso?: string | null) => (iso ? iso.slice(11, 16) : "—");
@@ -155,7 +160,7 @@ function TimelineConsoleView({ eventData, layers, reconstruction }: { eventData:
         </div>
         <nav className="dk-view-tabs" aria-label="FloodOps 화면">
           <button type="button" className={view === "console" ? "active" : ""} onClick={() => setView("console")}>관제 화면</button>
-          <button type="button" className={view === "compare" ? "active" : ""} onClick={() => { setPlaying(false); setView("compare"); }}>반사실 비교</button>
+          <button type="button" className={view === "compare" ? "active" : ""} onClick={() => { setPlaying(false); setView("compare"); }}>시나리오 비교</button>
         </nav>
         <div className="dk-header-agent">
           <div className="dk-header-agent-title"><span><strong>대응 에이전트</strong><small>근거 기반 조치 질의</small></span></div>
@@ -195,7 +200,7 @@ function TimelineConsoleView({ eventData, layers, reconstruction }: { eventData:
             )}
           </aside>
 
-          <TimelineMap layers={layers} center={reconstruction.map_center} tone={tone}>
+          <TimelineMap layers={layers} center={reconstruction.map_center} tone={tone} time={time}>
             <div className="dk-replay ub-replay">
               <button type="button" onClick={() => step(-1)} aria-label="이전 단계">‹</button>
               <button type="button" onClick={togglePlayback}>{playing ? "❚❚ 일시정지" : "▶ 재생"}</button>
@@ -216,10 +221,10 @@ function TimelineConsoleView({ eventData, layers, reconstruction }: { eventData:
                   ))}
                 </dl>
               </section>
-              <section className="ub-panel" aria-label="반사실 질문">
+              <section className="ub-panel" aria-label="시나리오 질문">
                 <header><p>반사실 질문</p><b>{reconstruction.interventions.length}개</b></header>
                 <ul className="ub-list">{reconstruction.interventions.map((item) => <li key={item.id}><b>{item.name}</b> · {item.question}</li>)}</ul>
-                <button type="button" className="dk-compare-back" onClick={() => setView("compare")}>반사실 비교 열기</button>
+                <button type="button" className="dk-compare-back" onClick={() => setView("compare")}>시나리오 비교 열기</button>
               </section>
               <section className="ub-panel" aria-label="출처와 한계">
                 <header><p>출처 · 한계</p><b>무엇을 계산하지 않는가</b></header>
@@ -232,7 +237,7 @@ function TimelineConsoleView({ eventData, layers, reconstruction }: { eventData:
         <main className="dk-compare ub-compare">
           <div className="dk-compare-head">
             <div>
-              <p>반사실 비교</p>
+              <p>시나리오 비교</p>
               <h2>이 대응을 더 일찍 했다면?</h2>
               <span>보도된 사건 시각은 그대로 두고, 대응 시각 하나만 옮겨 이후 사건까지 남는 시간을 계산합니다. 대피 성공이나 인명·피해 감소는 계산하지 않습니다.</span>
             </div>
@@ -247,11 +252,13 @@ function TimelineConsoleView({ eventData, layers, reconstruction }: { eventData:
   );
 }
 
-function TimelineMap({ layers, center, tone, children }: { layers: LayersResponse; center: [number, number]; tone: string; children?: ReactNode }) {
+function TimelineMap({ layers, center, tone, time, children }: { layers: LayersResponse; center: [number, number]; tone: string; time: number; children?: ReactNode }) {
   const elementRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [ready, setReady] = useState(false);
-  const [visible, setVisible] = useState<Record<LayerKey, boolean>>({ roads: true, waterways: true, buildings: true, aoi: true });
+  const [visible, setVisible] = useState<Record<LayerKey, boolean>>({ hand_reconstruction: true, roads: true, waterways: true, buildings: true, aoi: true });
+  const hasHand = layers.hand_reconstruction.feature_count > 0;
+  const handCells = hasHand ? layers.hand_reconstruction.data.features.filter((feature) => feature.properties?.stage_index === time).length : 0;
 
   useEffect(() => {
     if (!elementRef.current || mapRef.current) return undefined;
@@ -278,9 +285,15 @@ function TimelineMap({ layers, center, tone, children }: { layers: LayersRespons
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-left");
     map.on("load", () => {
       const add = (key: keyof LayersResponse) => map.addSource(key, { type: "geojson", data: layers[key].data as never });
-      add("aoi"); add("roads"); add("waterways"); add("buildings"); add("facilities");
+      add("aoi"); add("roads"); add("waterways"); add("buildings"); add("facilities"); add("hand_reconstruction");
       map.addLayer({ id: "aoi-line", type: "line", source: "aoi", paint: { "line-color": "#22d3ee", "line-width": 1.2, "line-dasharray": [3, 3], "line-opacity": 0.55 } });
       map.addLayer({ id: "roads-line", type: "line", source: "roads", paint: { "line-color": "#64748b", "line-width": 0.9, "line-opacity": 0.5 } });
+      // 오송과 같은 붉은 HAND 셀. 단계가 바뀌면 필터만 바꾼다.
+      map.addLayer({
+        id: "hand-fill", type: "fill", source: "hand_reconstruction", filter: stageFilter(0),
+        paint: { "fill-color": "#f87171", "fill-opacity": ["interpolate", ["linear"], ["get", "hand_threshold_m"], 0, 0.22, 3, 0.42] },
+      });
+      map.addLayer({ id: "hand-outline", type: "line", source: "hand_reconstruction", filter: stageFilter(0), paint: { "line-color": "#f87171", "line-width": 0.8, "line-opacity": 0.8 } });
       map.addLayer({ id: "waterways-line", type: "line", source: "waterways", paint: { "line-color": "#7dd3fc", "line-width": 2.6, "line-opacity": 0.9 } });
       map.addLayer({ id: "buildings-fill", type: "fill", source: "buildings", paint: { "fill-color": "#3b4a63", "fill-opacity": 0.6 } });
       map.addLayer({ id: "sites-halo", type: "circle", source: "facilities", paint: { "circle-radius": 14, "circle-color": "#fbbf24", "circle-opacity": 0.18 } });
@@ -318,24 +331,35 @@ function TimelineMap({ layers, center, tone, children }: { layers: LayersRespons
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) return;
-    const groups: Record<LayerKey, string[]> = { roads: ["roads-line"], waterways: ["waterways-line"], buildings: ["buildings-fill"], aoi: ["aoi-line"] };
+    const groups: Record<LayerKey, string[]> = { hand_reconstruction: ["hand-fill", "hand-outline"], roads: ["roads-line"], waterways: ["waterways-line"], buildings: ["buildings-fill"], aoi: ["aoi-line"] };
     (Object.keys(groups) as LayerKey[]).forEach((key) => {
       groups[key].forEach((id) => { if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", visible[key] ? "visible" : "none"); });
     });
   }, [ready, visible]);
 
-  const names: Record<LayerKey, string> = { waterways: "하천", roads: "도로", buildings: "건축물(OSM, 부분)", aoi: "분석 범위" };
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready) return;
+    for (const id of ["hand-fill", "hand-outline"]) if (map.getLayer(id)) map.setFilter(id, stageFilter(time));
+  }, [ready, time]);
+
+  const names: Record<LayerKey, string> = { hand_reconstruction: "침수 추정 범위 (HAND 근사)", waterways: "하천", roads: "도로", buildings: "건축물(OSM, 부분)", aoi: "분석 범위" };
   return (
     <section className="dk-map-wrap ub-map-wrap" aria-label="지도" style={{ ["--tone" as string]: tone }}>
       <div ref={elementRef} className="dk-map" />
       {children}
       <div className="dk-legend ub-legend">
         <p>지도</p>
+        {hasHand && <span><i style={{ background: "#f87171" }} />침수 추정 범위 (HAND 근사, 보도 순서) · 현재 {num(handCells)}셀</span>}
         <span><i style={{ background: "#fbbf24" }} />보도된 지점 (마을·교량 중심점)</span>
         <span><i style={{ background: "#7dd3fc" }} />하천</span>
-        <small>공식 침수범위가 연결되지 않아 침수 영역을 그리지 않습니다. 건축물은 사건일 OSM에 있는 것만 보입니다.</small>
+        <small>
+          {hasHand
+            ? "붉은 셀은 하천 주변 낮은 지형을 보도된 사건 순서로 넓힌 근사입니다. 공식 침수범위·침수심이 아닙니다. 건축물은 사건일 OSM에 있는 것만 보입니다."
+            : "공식 침수범위가 연결되지 않아 침수 영역을 그리지 않습니다. 건축물은 사건일 OSM에 있는 것만 보입니다."}
+        </small>
         <div className="ub-layer-toggles">
-          {(Object.keys(names) as LayerKey[]).map((key) => (
+          {(Object.keys(names) as LayerKey[]).filter((key) => key !== "hand_reconstruction" || hasHand).map((key) => (
             <label key={key}>
               <input type="checkbox" checked={visible[key]} onChange={(event) => setVisible((state) => ({ ...state, [key]: event.target.checked }))} />
               {names[key]} <small>{num(layers[key].feature_count)}</small>

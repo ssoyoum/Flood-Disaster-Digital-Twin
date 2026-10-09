@@ -151,7 +151,7 @@ function UrbanConsoleView({ eventData, layers, reconstruction }: { eventData: Fl
         </div>
         <nav className="dk-view-tabs" aria-label="FloodOps 화면">
           <button type="button" className={view === "console" ? "active" : ""} onClick={() => setView("console")}>관제 화면</button>
-          <button type="button" className={view === "compare" ? "active" : ""} onClick={() => { setPlaying(false); setView("compare"); }}>반사실 비교</button>
+          <button type="button" className={view === "compare" ? "active" : ""} onClick={() => { setPlaying(false); setView("compare"); }}>시나리오 비교</button>
         </nav>
         <div className="dk-header-agent">
           <div className="dk-header-agent-title"><span><strong>대응 에이전트</strong><small>근거 기반 조치 질의</small></span></div>
@@ -196,7 +196,7 @@ function UrbanConsoleView({ eventData, layers, reconstruction }: { eventData: Fl
             )}
           </aside>
 
-          <UrbanMap layers={layers} tone={tone}>
+          <UrbanMap layers={layers} tone={tone} time={time}>
             <div className="dk-replay ub-replay">
               <button type="button" onClick={() => step(-1)} aria-label="이전 단계">‹</button>
               <button type="button" onClick={togglePlayback}>{playing ? "❚❚ 일시정지" : "▶ 재생"}</button>
@@ -222,11 +222,19 @@ function UrbanConsoleView({ eventData, layers, reconstruction }: { eventData: Fl
   );
 }
 
-function UrbanMap({ layers, tone, children }: { layers: LayersResponse; tone: string; children?: ReactNode }) {
+// 흔적을 단계별로 드러내는 필터: reveal_stage(백엔드가 침수심·강우 순서로 매긴 단계)가 현재 단계 이하인 흔적만.
+const revealFilter = (time: number) => ["<=", ["coalesce", ["get", "reveal_stage"], 99], time] as never;
+
+function UrbanMap({ layers, tone, time, children }: { layers: LayersResponse; tone: string; time: number; children?: ReactNode }) {
   const elementRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [ready, setReady] = useState(false);
   const [visible, setVisible] = useState<Record<LayerKey, boolean>>({ flood_extent: true, buildings: true, roads: true, waterways: true, aoi: true });
+  const [staged, setStaged] = useState(true);
+  const revealed = useMemo(
+    () => layers.flood_extent.data.features.filter((feature) => Number(feature.properties?.reveal_stage ?? 99) <= time).length,
+    [layers, time],
+  );
 
   useEffect(() => {
     if (!elementRef.current || mapRef.current) return undefined;
@@ -258,7 +266,7 @@ function UrbanMap({ layers, tone, children }: { layers: LayersResponse; tone: st
       map.addLayer({ id: "aoi-line", type: "line", source: "aoi", paint: { "line-color": "#22d3ee", "line-width": 1.2, "line-dasharray": [3, 3], "line-opacity": 0.55 } });
       map.addLayer({ id: "roads-line", type: "line", source: "roads", paint: { "line-color": "#64748b", "line-width": 0.8, "line-opacity": 0.4 } });
       map.addLayer({ id: "waterways-line", type: "line", source: "waterways", paint: { "line-color": "#7dd3fc", "line-width": 2.2, "line-opacity": 0.9 } });
-      map.addLayer({ id: "traces-fill", type: "fill", source: "flood_extent", paint: { "fill-color": DEPTH_COLOR as never, "fill-opacity": 0.55 } });
+      map.addLayer({ id: "traces-fill", type: "fill", source: "flood_extent", filter: revealFilter(0), paint: { "fill-color": DEPTH_COLOR as never, "fill-opacity": 0.55 } });
       map.addLayer({ id: "buildings-line", type: "line", source: "buildings", minzoom: 14, paint: { "line-color": BUILDING_DEPTH_COLOR as never, "line-width": 1, "line-opacity": 0.85 } });
 
       map.on("click", "traces-fill", (event: MapLayerMouseEvent) => {
@@ -304,6 +312,12 @@ function UrbanMap({ layers, tone, children }: { layers: LayersResponse; tone: st
     });
   }, [ready, visible]);
 
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready || !map.getLayer("traces-fill")) return;
+    map.setFilter("traces-fill", staged ? revealFilter(time) : null);
+  }, [ready, staged, time]);
+
   const names: Record<LayerKey, string> = {
     flood_extent: "공식 침수흔적", buildings: "흔적과 겹친 건축물", roads: "도로", waterways: "하천(도림천 등)", aoi: "분석 범위",
   };
@@ -318,8 +332,16 @@ function UrbanMap({ layers, tone, children }: { layers: LayersResponse; tone: st
         <span><i style={{ background: "#38bdf8" }} />0.3–0.5 m</span>
         <span><i style={{ background: "#2563eb" }} />0.5–0.8 m</span>
         <span><i style={{ background: "#7c3aed" }} />0.8 m 이상</span>
-        <small>사건 뒤 조사한 기록이라 시각 정보가 없습니다. 단계를 바꿔도 범위는 그대로입니다.</small>
+        <small>
+          {staged
+            ? `사건 뒤 조사한 기록이라 시각 정보가 없습니다. 60분 강우가 설계강우(95 mm/h)를 넘은 뒤 깊은 흔적부터 드러냅니다(순서 가정). 현재 ${num(revealed)} / ${num(layers.flood_extent.feature_count)}건.`
+            : "사건 뒤 조사한 기록이라 시각 정보가 없습니다. 전체 흔적을 한 번에 보여줍니다."}
+        </small>
         <div className="ub-layer-toggles">
+          <label>
+            <input type="checkbox" checked={staged} onChange={(event) => setStaged(event.target.checked)} />
+            단계별 표시 <small>깊은 곳 먼저</small>
+          </label>
           {(Object.keys(names) as LayerKey[]).map((key) => (
             <label key={key}>
               <input type="checkbox" checked={visible[key]} onChange={(event) => setVisible((state) => ({ ...state, [key]: event.target.checked }))} />
@@ -445,7 +467,7 @@ function ComparePage({ eventData, reconstruction, onBack }: { eventData: FloodEv
     <main className="dk-compare ub-compare">
       <div className="dk-compare-head">
         <div>
-          <p>반사실 비교</p>
+          <p>시나리오 비교</p>
           <h2>이 조치가 있었다면?</h2>
           <span>관측 기록은 그대로 두고, 경보 시각과 저류 시설만 바꿔 시각과 부피를 계산합니다. 인명·피해 감소는 계산하지 않습니다.</span>
         </div>

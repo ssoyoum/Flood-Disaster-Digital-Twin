@@ -15,8 +15,16 @@ test("Seoul 2022 opens from the case library and compares alert timing", async (
   await expect(page.locator(".dk-stages button")).toHaveCount(7);
   await expect(page.getByRole("region", { name: "강우 관측" })).toContainText("설계강우 95 mm/h");
   await expect(page.getByRole("region", { name: "공식 침수흔적 노출" })).toContainText("10,468");
+  // Traces stay hidden until the 60-minute rainfall passes the design target, then appear deepest-first.
+  const legend = page.locator(".dk-legend");
+  await expect(legend).toContainText("현재 0 / 10,468건");
+  await page.getByRole("button", { name: "다음 단계" }).click();
+  await page.getByRole("button", { name: "다음 단계" }).click();
+  await expect(legend).toContainText("현재 1,557 / 10,468건");
+  await page.getByRole("button", { name: "다음 단계" }).click();
+  await expect(legend).toContainText("현재 10,468 / 10,468건");
 
-  await page.getByRole("navigation", { name: "FloodOps 화면" }).getByRole("button", { name: "반사실 비교" }).click();
+  await page.getByRole("navigation", { name: "FloodOps 화면" }).getByRole("button", { name: "시나리오 비교" }).click();
   const table = page.locator(".ub-whatif .ub-table").first();
   await expect(table).toContainText("20:49");
   await expect(table).toContainText("30분 빠름");
@@ -28,8 +36,17 @@ test("Pohang 2022 replays reported times and compares the entry-ban time", async
   await expect(page.locator("h1")).toContainText("포항");
   await expect(page.locator(".dk-stages button")).toHaveCount(8);
   await expect(page.locator(".dk-status")).toContainText("언론 보도 시각");
+  // The HAND cells appear at the reported overflow (stage 3) and keep growing in reported order.
+  const legend = page.locator(".dk-legend");
+  await expect(legend).toContainText("HAND 근사");
+  await expect(legend).toContainText("현재 0셀");
+  await page.getByRole("button", { name: "다음 단계" }).click();
+  await page.getByRole("button", { name: "다음 단계" }).click();
+  await expect(legend).toContainText("현재 78셀");
+  await page.getByRole("button", { name: "다음 단계" }).click();
+  await expect(legend).toContainText("현재 120셀");
 
-  await page.getByRole("button", { name: "반사실 비교 열기" }).click();
+  await page.getByRole("button", { name: "시나리오 비교 열기" }).click();
   await page.getByRole("checkbox", { name: /06:00/ }).check();
   const table = page.locator(".ub-table");
   await expect(table).toContainText("(실제)");
@@ -52,8 +69,16 @@ test("Andong-Uiseong 2026 replays overnight times and compares the evacuation or
   await openCase(page, 4, "andong-uiseong-2026");
   await expect(page.locator("h1")).toContainText("안동");
   await expect(page.locator(".dk-stages button")).toHaveCount(7);
+  // The HAND band is already present at the first reported isolation and widens up to the predicted peak.
+  const legend = page.locator(".dk-legend");
+  await expect(legend).toContainText("HAND 근사");
+  const cellsAt = async () => Number((await legend.textContent())?.match(/현재 ([\d,]+)셀/)?.[1].replace(/,/g, "") ?? "0");
+  const first = await cellsAt();
+  expect(first).toBeGreaterThan(0);
+  for (let index = 0; index < 4; index += 1) await page.getByRole("button", { name: "다음 단계" }).click();
+  await expect.poll(cellsAt).toBeGreaterThan(first);
 
-  await page.getByRole("navigation", { name: "FloodOps 화면" }).getByRole("button", { name: "반사실 비교" }).click();
+  await page.getByRole("navigation", { name: "FloodOps 화면" }).getByRole("button", { name: "시나리오 비교" }).click();
   // Two interventions render their own panels; the evacuation order comes first.
   const panels = page.locator(".dk-compare-panel");
   await expect(panels).toHaveCount(2);

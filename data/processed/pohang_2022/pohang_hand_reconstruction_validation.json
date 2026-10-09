@@ -1,0 +1,159 @@
+{
+  "created_at": "2026-10-09T15:22:39.868071+00:00",
+  "event_id": "pohang-2022",
+  "status": "TEMPORARY",
+  "source_type": "DERIVED_APPROXIMATION",
+  "method": "Height above the nearest 냉천 cell on a 77 m Copernicus DEM grid, thresholded per stage, 4-neighbour flood fill from river-side seeds.",
+  "stage_driver": "REPORTED_ORDER_ONLY",
+  "stage_driver_basis": "관측 수위·강우 계열이 없어 보도된 사건 순서(범람 06:00 → 유입 06:37 → 완전 침수 06:45)로만 범위를 넓힌다. 보도된 범람 지점(냉천교)에서 낮은 지형을 따라 퍼지며, 도달 거리 상한은 보도된 침수 지점(인덕동 일대)에 닿는 최소 거리로 맞춘다.",
+  "peak_threshold_m": 0.25,
+  "dem": {
+    "raw_file": "data/raw/copernicus_dem_glo30/Copernicus_DSM_COG_10_N35_00_E129_00_DEM.tif",
+    "raw_sha256": "2749F616C0A47B8E510DF77026C4578B2CB869B0D1940D0544345FDB18FAAD37",
+    "raw_crs": "EPSG:4326",
+    "raw_pixel_size_degrees": [
+      0.0002777777777777778,
+      0.0002777777777777778
+    ],
+    "window_shape": [
+      126,
+      217
+    ],
+    "window_bounds": [
+      129.37,
+      35.965,
+      129.43027777777777,
+      36.0
+    ],
+    "source": "Copernicus DEM GLO-30 (public AWS Open Data bucket copernicus-dem-30m)"
+  },
+  "aoi_bbox": [
+    129.37,
+    35.965,
+    129.43,
+    36.01
+  ],
+  "cell_size_m": 76.9,
+  "grid_feature_count": 3024,
+  "timeline_feature_count": 867,
+  "seed_distance_m": 150,
+  "connectivity_distance_m": {
+    "base": 300,
+    "peak": 900,
+    "measured_from": "냉천교"
+  },
+  "stage_counts": {
+    "typhoon_landfall": 0,
+    "first_notice": 0,
+    "river_overflow": 78,
+    "move_car_broadcast": 120,
+    "parking_inflow": 144,
+    "parking_full": 175,
+    "plant_outage": 175,
+    "missing_report": 175
+  },
+  "stage_contexts": [
+    {
+      "stage_index": 0,
+      "time": "2022-09-06T04:50:00+09:00",
+      "state": "typhoon_landfall",
+      "stage_fraction": 0.0,
+      "hand_threshold_m": 0.0,
+      "connectivity_distance_m": 300,
+      "selected_feature_count": 0
+    },
+    {
+      "stage_index": 1,
+      "time": "2022-09-06T05:20:00+09:00",
+      "state": "first_notice",
+      "stage_fraction": 0.0,
+      "hand_threshold_m": 0.0,
+      "connectivity_distance_m": 300,
+      "selected_feature_count": 0
+    },
+    {
+      "stage_index": 2,
+      "time": "2022-09-06T06:00:00+09:00",
+      "state": "river_overflow",
+      "stage_fraction": 0.35,
+      "hand_threshold_m": 0.09,
+      "connectivity_distance_m": 510,
+      "selected_feature_count": 78
+    },
+    {
+      "stage_index": 3,
+      "time": "2022-09-06T06:30:00+09:00",
+      "state": "move_car_broadcast",
+      "stage_fraction": 0.6,
+      "hand_threshold_m": 0.15,
+      "connectivity_distance_m": 660,
+      "selected_feature_count": 120
+    },
+    {
+      "stage_index": 4,
+      "time": "2022-09-06T06:37:00+09:00",
+      "state": "parking_inflow",
+      "stage_fraction": 0.8,
+      "hand_threshold_m": 0.2,
+      "connectivity_distance_m": 780,
+      "selected_feature_count": 144
+    },
+    {
+      "stage_index": 5,
+      "time": "2022-09-06T06:45:00+09:00",
+      "state": "parking_full",
+      "stage_fraction": 1.0,
+      "hand_threshold_m": 0.25,
+      "connectivity_distance_m": 900,
+      "selected_feature_count": 175
+    },
+    {
+      "stage_index": 6,
+      "time": "2022-09-06T07:00:00+09:00",
+      "state": "plant_outage",
+      "stage_fraction": 1.0,
+      "hand_threshold_m": 0.25,
+      "connectivity_distance_m": 900,
+      "selected_feature_count": 175
+    },
+    {
+      "stage_index": 7,
+      "time": "2022-09-06T07:40:00+09:00",
+      "state": "missing_report",
+      "stage_fraction": 1.0,
+      "hand_threshold_m": 0.25,
+      "connectivity_distance_m": 900,
+      "selected_feature_count": 175
+    }
+  ],
+  "limitations": [
+    "관측 수위가 아니라 보도된 사건 순서로 임계를 올린 지형 근사다. 침수심·유속·유량을 계산하지 않는다.",
+    "임계 상한 0.25 m는 관측값이 아니라 보도된 침수 지점에 닿도록 맞춘 값이다.",
+    "77 m 격자라 제방·도로 성토·배수로처럼 격자보다 좁은 구조물은 반영되지 않는다.",
+    "공식 침수범위가 아니며 노출 집계에 쓰지 않는다."
+  ],
+  "output_files": [
+    "data/processed/pohang_2022/pohang_hand_reconstruction_grid.geojson",
+    "data/processed/pohang_2022/pohang_hand_flood_envelope_timeline.geojson",
+    "data/processed/pohang_2022/pohang_hand_reconstruction_validation.json"
+  ],
+  "validity_assessment": {
+    "appropriate_use": "Stage-by-stage replay of where low, river-connected terrain lies as the reported event unfolds.",
+    "inappropriate_use": "Official flood extent, hydraulic simulation, depth or velocity estimate, exposure KPI."
+  },
+  "calibration": {
+    "peak_threshold_m": 0.25,
+    "all_anchors_reached": true,
+    "origin": "냉천교",
+    "peak_reach_from_origin_m": 900,
+    "anchors": [
+      {
+        "name": "인덕동 일대",
+        "grid_id": "dem-015-035",
+        "cell_index": 1115,
+        "hand_m": 0.0,
+        "distance_to_primary_river_m": 245.4
+      }
+    ]
+  }
+}
