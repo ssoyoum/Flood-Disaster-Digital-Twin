@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Annotated, Literal
 
 from pydantic import BaseModel, Field, field_validator
@@ -247,7 +248,21 @@ class AgentToolDescriptor(BaseModel):
     output: str
 
 
-class AgentToolCallRequest(BaseModel):
+class FacilityAgentScope(BaseModel):
+    facility_id: str | None = Field(default=None, min_length=1, max_length=100)
+    observation_at: str | None = None
+
+    @field_validator("observation_at")
+    @classmethod
+    def _valid_observation_time(cls, value: str | None) -> str | None:
+        if value is not None:
+            if "T" not in value:
+                raise ValueError("observation_at must be an ISO date-time; select a replay time in the facility view.")
+            datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return value
+
+
+class AgentToolCallRequest(FacilityAgentScope):
     """Common request envelope for registered Agent tools."""
 
     event_id: str = "osong-2023"
@@ -378,7 +393,7 @@ class AgentConversationTurn(BaseModel):
     content: str = Field(min_length=1, max_length=1500)
 
 
-class AgentAskRequest(BaseModel):
+class AgentAskRequest(FacilityAgentScope):
     message: str = Field(min_length=1, max_length=1000)
     event_id: str = "osong-2023"
     history: list[AgentConversationTurn] = Field(default_factory=list, max_length=6)
@@ -392,7 +407,25 @@ class AgentAskToolTrace(BaseModel):
     result: dict[str, Any]
 
 
+class AgentAskFailure(BaseModel):
+    stage: Literal["model", "validation", "tool", "answer"]
+    code: str
+    step: int = Field(ge=0)
+    tool_name: str | None = None
+
+
+class AgentAskDiagnostics(BaseModel):
+    request_id: str
+    duration_ms: int = Field(ge=0)
+    model_steps: int = Field(ge=0)
+    model_requests: int = Field(ge=0)
+    completion_source: Literal["model", "registered_tools", "capability", "clarification", "unavailable"]
+    context_mode: Literal["current", "reused", "updated", "ambiguous"] = "current"
+    failures: list[AgentAskFailure] = Field(default_factory=list)
+
+
 class AgentAskResult(BaseModel):
+    facility_id: str | None = None
     event_id: str
     status: Literal["ANSWERED", "NEEDS_DATA", "UNAVAILABLE"]
     answer: str
@@ -401,6 +434,8 @@ class AgentAskResult(BaseModel):
     limitations: list[str] = Field(default_factory=list)
     follow_ups: list[str] = Field(default_factory=list)
     model: str | None = None
+    diagnostics: AgentAskDiagnostics | None = None
+    context_note: str = ""
 
 
 class ScenarioComparisonResult(BaseModel):

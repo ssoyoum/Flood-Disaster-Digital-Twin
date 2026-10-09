@@ -2,10 +2,10 @@
 
 Last Updated: 2026-10-10 KST
 
-- Current identity: **Counterfactual Disaster Digital Twin PoC**
-- Current MVP: **Historical Disaster Reconstruction + What-if Intervention**
+- Current identity: **지하차도 통제 판단 트윈 PoC** (아래 DIRECTION 기준)
+- Current MVP: **시설 관측·판정·백테스트 API + 시설 Agent + 과거 사건 재구성·What-if 화면**. 지금 상태 보드 재배치는 아직 남아 있다.
 - Reference case: `osong-2023`
-- Core principle: FloodOps reconstructs what happened during the 2023 Osong disaster, then compares how response conditions could have changed under counterfactual interventions.
+- Core principle: 시설의 관측·통제 검토 규칙을 연결하고 과거 사건으로 백테스트한다. 과거 사건 재구성과 통제 시각 비교는 검증 기능으로 유지한다.
 - Work sync rule: 작업 완료·상태 변경 시 TODO.md와 WORKLOG.md의 완료 여부 및 현재 상태가 서로 모순되지 않도록 함께 동기화한다.
 
 ## DIRECTION (2026-10-10 방향 재설정)
@@ -35,16 +35,42 @@ Phase 3 운영 트윈 (PROJECT_PLAN Phase 3, 앞당겨 진행):
 - [~] 시설 레지스트리(2026-10-10): `twin.py`의 `FACILITIES`에 궁평2지하차도 등록(미호강교 3011665, 관심 5.0·주의보 7.0·경보 8.0·계획홍수위 9.38 m). 충북 2~3곳 추가와 내수 침수형 유형은 남음.
 - [x] 단계 판정 규칙 `river_stage_v1`과 백테스트(2026-10-10): 계획홍수위 도달 또는 경보 수위+60분 이내 도달이면 `CLOSURE_REVIEW`. 2023년 계열에서 06:50 이전 첫 권고, 유입까지 97분 이상·제방 붕괴까지 79분 이상(`test_twin.py`). `GET /api/twin/facilities/{id}/backtest`.
 - [ ] 지금 상태 보드 화면: 현재 수위·여유·상승 속도·HAND 공간 상태·남은 추정 분·권고 상태. 기존 관제·시나리오 비교는 "통제 기준 검토"와 "백테스트" 탭으로 재배치한다.
-- [ ] Agent 범위 축소: 지금 상태 설명·통제 기준 근거·과거 사건 비교 세 가지 도구로 재등록한다.
+- [x] 시설 Agent 세 도구 연결(2026-10-10): `get_facility_status`·`get_control_rule`·`get_facility_backtest`. 오송 상단 Agent의 "분석 범위 → 시설 통제 판단"에서 시설·과거 재생 시각을 선택한다. 시설 범위에서 기존 사건 분석 도구는 호출할 수 없으며 화면에서 고른 시설·시각을 서버가 고정한다. 기존 사건 분석은 별도 범위로 유지한다.
+  - 실시간/과거 재생·관측 시각·신선도·규칙 가정·DQ-009 차이를 구분한다. 관측 누락·지연 시 `NEEDS_DATA`, 실시간 오류를 과거 자료로 대체하지 않는다.
+  - offline 시설 질문 3/3, 실제 Gemini 시설 질문 3/3 모델 설명 완료(HTTP 6회, 관측은 2023년 재생). 사용법·한계는 [docs/FACILITY_AGENT.md](docs/FACILITY_AGENT.md).
 - [ ] 공개 서버 재배포(완성도 항목). 배포 전 `docs/DEPLOY_AWS.md` 체크리스트.
 - [ ] PROJECT_PLAN.md의 Definition·Phase 절을 이 방향으로 갱신한다.
 
 ## NOW
 
-- Status: Active / presentation-ready MVP
-- Last updated: 2026-10-03
+- Status: Active / 시설 중심 운영 트윈으로 전환 중
+- Last updated: 2026-10-10
 - Branch: 모든 작업은 `main` 하나에서 진행한다. 2026-09-06에 브랜치 4개를 `main`으로 정리했다.
-- Next action: 공식 검증 자료 확보와 궁평2지하차도 시설 정보 점검을 이어간다. API 오류 상태, Playwright E2E, provenance 화면은 끝났다.
+- Next action: 지금 상태 보드와 통제 기준 검토·백테스트 탭을 구성하고, 관측 신선도·담당자 판단 경계를 화면 전체에 맞춘다. 시설 확장 대상 확인과 실무 인터뷰·파일럿, 공식 통제 원문 확보를 이어간다.
+
+- [x] Agent 연결 안정화 1차 (2026-10-09)
+  - `/api/agent/ask`의 모델 단계·JSON 재시도가 전체 `AGENT_ASK_TIMEOUT_SECONDS`(기본 25초)를 공유한다. 남은 시간에 HTTP 요청을 취소하고 도구 결과 폴백을 유지한다. 로컬 분석·직렬화 시간은 추가될 수 있다.
+  - 응답 `diagnostics`에 요청 ID·소요 시간·모델 단계/HTTP 시도 수·완료 경로·실패 단계/코드를 추가했다. 모델·입력 검증·도구 실행·답변 근거 오류를 구분한다.
+  - 질문 1,000자·대화 6개·각 대화 1,500자 제한을 UI/API에 맞췄다. 긴 답변 후 후속 질문의 422를 예방하고 사건 전환 시 이전 요청·답변을 버린다.
+  - 1차 당시 백엔드 128개·프런트엔드 7개·Playwright E2E 5개와 빌드 통과. 아래 후속 대화 보완에서 검증 범위를 확대했다.
+- [x] Agent 후속 대화·실행 입력 대조 (2026-10-09)
+  - 명시적 후속 질문만 직전 사용자 조건을 이어받으며, 같은 분석의 새 수치는 기존 값을 교체한다. Assistant 숫자·중간에 바뀐 주제·모호한 상대 시간·복합 조건은 임의로 합치지 않는다.
+  - 모델 입력 검증은 전체 과거 숫자 대신 서버가 선택한 `parameter_context`를 사용한다. 호출 기록도 정규화 후 실제 입력을 표시한다.
+  - `context_note`와 `diagnostics.context_mode`로 이번 질문·재사용·조건 변경·확인 필요를 구분한다.
+  - 백엔드 150개·프런트엔드 7개·E2E 10개 통과, 프로덕션 빌드 통과. 브라우저→실제 로컬 Agent API의 08:20→재사용→08:10 흐름도 확인했다.
+  - `backend/evaluation/evaluate_agent.py`와 13개 질문으로 Agent/직접 분석 API를 재대조할 수 있다. offline 13/13 통과(도구 11·조건 확인 2, 모델 요청 0).
+- [ ] 실제 Agent 종단 간 대조
+  - [x] 오송 소수 질문 4건 점검: 모델 설명 3건·조건 확인 1건, 실제 모델 HTTP 6회. 08:20의 7분, 재사용 7분, 08:10의 17분이 직접 분석과 일치했다.
+  - [docs/AGENT_EVALUATION_RESULTS.md](docs/AGENT_EVALUATION_RESULTS.md)에 질문·완료 경로·소요 시간·한계를 기록했다. 공개 서버 배포 검증이나 전체 성공률 측정은 아니다.
+  - [ ] 서울·포항·안동의 실제 모델 대조, 물리 효과 질문, 장시간·동시 사용 확인.
+  - [docs/AGENT_VALIDATION.md](docs/AGENT_VALIDATION.md)의 사건별 질문·후속 대화·실패 경로를 실제 Gemini와 직접 분석 API로 대조한다.
+  - 모델 설명 완료와 도구 폴백을 구분해 측정한다. planner-status 가용성이나 HTTP 200만으로 실제 연결 완료로 판단하지 않는다.
+- [x] 시장성·유용성 검증 실행 양식 준비 (2026-10-09)
+  - [docs/MARKET_VALIDATION.md](docs/MARKET_VALIDATION.md)에 사용자/도입 검토자 가설, 교류회에서 얻을 도움, 20분 인터뷰, 5~8명 대조 파일럿 과제·평가·진행 조건을 구체화했다.
+  - `docs/market-validation/`에 인터뷰·파일럿 기록 CSV 헤더를 준비했다. 실제 참여·답변·구매 의향·매출 기록은 아직 없다.
+- [ ] 교류회 후 시장 인터뷰·파일럿 수행
+  - 반복 업무·현재 대안·구매 검토 주체·도입 조건을 기록하고, 기존 방식과 FloodOps의 완료·오류·시간을 대조한다.
+  - V1·V2 PPT는 보존하며 실제 결과 확보 후 유용성·시장 근거 장표를 갱신한다.
 
 - [x] Historical Replay 완성
   - 실제 흐름: `강우 -> 미호강 수위 -> 월류 -> 임시제방 붕괴 -> 지하차도 유입 -> 주행 곤란 -> 완전 침수`
@@ -97,7 +123,7 @@ Phase 3 운영 트윈 (PROJECT_PLAN Phase 3, 앞당겨 진행):
   - 모델이 반환한 파라미터는 분석 endpoint와 동일한 범위(`radii_m` 50~20000, `delay_minutes` 0~180, `HH:MM`)로 재검증한다.
   - SDK/자격증명 부재나 검증 실패 시 결정론 planner로 폴백한다. `planner=llm` 명시 시에만 503으로 실패를 노출한다.
   - `GET /api/agent/planner-status`로 API 호출 없이 가용성을 조회한다.
-  - 모델: `claude-opus-5`. `ANTHROPIC_API_KEY` 미설정 시에도 서비스는 정상 동작한다.
+  - 현재 기본 모델: 코드의 `gemini-3.5-flash-lite`(`GEMINI_MODEL`로 변경), 자격증명 `GEMINI_API_KEY`. 키 미설정 시 결정론 planner·등록 도구 폴백을 사용한다. `/ask` 모델 전체 예산은 위 Agent 안정화 항목을 따른다.
 - [x] Agent 거절 응답에 인접 질문 제시
   - `AgentIntentPlanResult.suggestions`로 답할 수 있는 질문을 함께 반환한다.
   - `UNSUPPORTED`는 전체, `NEEDS_CLARIFICATION`은 감지된 후보 워크플로만, `READY`는 빈 배열이다.
@@ -154,7 +180,7 @@ Phase 3 운영 트윈 (PROJECT_PLAN Phase 3, 앞당겨 진행):
   - 사건 단계 7개: 12:50 호우경보, 13:09 50 mm/h, 20:49 설계강우 초과, 20:59 첫 구조 신고, 21:19 첫 저지대 문자, 21:30 중대본 2단계, 21:45 소방 도착. 강우 임계 외에는 언론 보도 시각이다.
   - 반사실 A `POST /api/events/seoul-2022/analysis/alert-timing`: 95 mm/h 도달 경보는 첫 신고 10분 전, 실제 문자보다 30분 빠름.
   - 반사실 B `POST /api/events/seoul-2022/analysis/storage-capture`: 40만 m3 터널, 95 mm/h, 유출계수 1.0이면 초과량 870,263 m3 중 46.0%, 20:49 만수.
-  - Agent는 서울을 지원하지 않는다. 반경 재고(`exposure-inventory`)는 서울에서 404를 유지한다.
+  - 서울 Agent는 아래 2026-10-03 다중 사례 확장에서 경보 시점·저류 비교를 지원한다. 반경 재고(`exposure-inventory`)는 서울에서 404를 유지한다.
 - [ ] 서울 사례 보강
   - 언론 보도 시각을 공식 원문으로 교체한다. 2026-10-03: 중대본 2단계는 행안부 보도자료로 바꿨다(오전·오후 미표기). 첫 신고 20:59는 중대본 보고의 '21:07경'과 어긋나 병기했다. 12:50 경보, 21:19 문자, 21:45 소방 도착은 원문 미확보.
   - 도림천 수위(신대방1교 등) 2022-08-08 이력을 정보공개로 확보한다. 공개 API는 최신값만 준다.

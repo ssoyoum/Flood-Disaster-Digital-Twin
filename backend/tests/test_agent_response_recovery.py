@@ -16,11 +16,11 @@ def test_gemini_action_retries_one_malformed_decision(monkeypatch):
     ])
     calls = []
 
-    def fake_post(*args, **kwargs):
+    async def fake_post(*args, **kwargs):
         calls.append((args, kwargs))
         return next(responses)
 
-    monkeypatch.setattr(agent_runner.httpx, "post", fake_post)
+    monkeypatch.setattr(agent_runner, "_post_gemini", fake_post)
     action = agent_runner._gemini_action({"question": "diagnostic"})
 
     assert action.action == "final"
