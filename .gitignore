@@ -38,3 +38,8 @@ docs/submission/
 # Local Claude/Ruflo tool settings
 .claude/
 .mcp.json
+
+# Presentation build intermediates (re-created by build.py)
+docs/presentations/**/out/
+docs/presentations/**/__pycache__/
+docs/presentations/**/.fontcache/

@@ -323,6 +323,7 @@ function TimelineMap({ layers, center, tone, time, children }: { layers: LayersR
       setReady(true);
     });
     mapRef.current = map;
+    if (import.meta.env.DEV) (window as unknown as { __floodopsMap?: maplibregl.Map }).__floodopsMap = map;
     return () => { map.remove(); mapRef.current = null; };
     // 최초 1회만 만든다.
     // eslint-disable-next-line react-hooks/exhaustive-deps
