@@ -1,0 +1,1 @@
+participant_id,organization_id,date,sequence,condition_set,method,task_id,duration_seconds,completed,calculation_check,source_check,assumption_check,critical_misinterpretation,help_count,agent_completion_source,agent_failure_code,satisfaction_1_to_5,repeat_use_case,evidence_ref
