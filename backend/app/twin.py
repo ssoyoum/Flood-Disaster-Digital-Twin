@@ -31,7 +31,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 OSONG_DIR = REPO_ROOT / "data" / "processed" / "osong"
 WATER_LEVEL_FILE = OSONG_DIR / "osong_hrfco_water_level_10m_2023-07-14_17.csv"
 RAINFALL_FILE = OSONG_DIR / "osong_kma_aws_rainfall_2023-07-14_17.csv"
-HRFCO_ENDPOINT = "https://api.hrfco.go.kr/{key}/waterlevel/list/10M/{station}/{start}/{end}.xml"
+HRFCO_ENDPOINT = "https://api.hrfco.go.kr/{key}/waterlevel/list/{interval}/{station}/{start}/{end}.xml"
 DEFAULT_REPLAY_NOW = "2023-07-15T08:00:00"
 
 # Gauge levels come from the HRFCO station metadata (hrfco_waterlevel_info.xml, queried 2026).
@@ -124,8 +124,23 @@ class HrfcoLiveSource:
         self.timeout = timeout
 
     def window(self, station_id: str, end: datetime, minutes: int) -> list[dict[str, Any]]:
+        """10-minute rows; falls back to the hourly series when the 10-minute feed is blank.
+
+        Some Geum River gauges (e.g. 미호강교) publish blank 10-minute values outside flood operations
+        while the hourly series stays populated (checked 2026-10-10).
+        """
+        rows = self._fetch(station_id, end, minutes, "10M")
+        if rows:
+            return rows
+        hourly = self._fetch(station_id, end, max(minutes, 180), "1H")
+        for row in hourly:
+            row["interval"] = "1H"
+        return hourly
+
+    def _fetch(self, station_id: str, end: datetime, minutes: int, interval: str) -> list[dict[str, Any]]:
         start = end - timedelta(minutes=minutes)
-        url = HRFCO_ENDPOINT.format(key=self.key, station=station_id, start=start.strftime("%Y%m%d%H%M"), end=end.strftime("%Y%m%d%H%M"))
+        fmt = "%Y%m%d%H%M" if interval == "10M" else "%Y%m%d%H"
+        url = HRFCO_ENDPOINT.format(key=self.key, interval=interval, station=station_id, start=start.strftime(fmt), end=end.strftime(fmt))
         response = httpx.get(url, timeout=self.timeout)
         response.raise_for_status()
         rows = []
@@ -134,7 +149,8 @@ class HrfcoLiveSource:
             # Missing values arrive as blank elements; skip them instead of failing the whole window.
             if fields.get("wl") and fields.get("ymdhm"):
                 try:
-                    rows.append({"time": datetime.strptime(fields["ymdhm"], "%Y%m%d%H%M"), "station_id": station_id, "water_level_m": float(fields["wl"])})
+                    stamp = fields["ymdhm"] if len(fields["ymdhm"]) == 12 else fields["ymdhm"] + "00"
+                    rows.append({"time": datetime.strptime(stamp, "%Y%m%d%H%M"), "station_id": station_id, "water_level_m": float(fields["wl"]), "interval": interval})
                 except ValueError:
                     continue
         return sorted(rows, key=lambda r: r["time"])
@@ -210,7 +226,7 @@ def assess(facility: dict[str, Any], window: list[dict[str, Any]], now: datetime
         "facility_id": facility["id"],
         "at": now.isoformat(),
         "status": "OK",
-        "observation": {"station_id": gauge["station_id"], "station": gauge["name"], "time": latest["time"].isoformat(), "water_level_m": level, "water_level_el_m": round(gauge["datum_el_m"] + level, 3), "age_min": int((now - latest["time"]).total_seconds() // 60)},
+        "observation": {"station_id": gauge["station_id"], "station": gauge["name"], "time": latest["time"].isoformat(), "water_level_m": level, "water_level_el_m": round(gauge["datum_el_m"] + level, 3), "age_min": int((now - latest["time"]).total_seconds() // 60), "interval": latest.get("interval", "10M")},
         "rate_m_per_10min": round(rate * 10, 3),
         "stage": stage,
         "stage_label": STAGE_KO[stage],
