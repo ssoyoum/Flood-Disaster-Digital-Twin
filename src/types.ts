@@ -537,3 +537,32 @@ export type CaseLeadTimes = {
   }>;
   limitations: string[];
 };
+
+// ---- Underpass control-decision twin (backend/app/twin.py) ----
+export type TwinMode = { mode: "replay" | "live"; hrfco_key_configured: boolean; kma_key_configured: boolean; replay_now_default: string };
+
+export type TwinFacility = {
+  id: string; name: string; kind: string; driver: string; location: [number, number]; road: string; managing_agency: string; event_id: string;
+  gauge: { station_id: string; name: string }; mode: "replay" | "live";
+};
+
+export type TwinStatus = {
+  facility_id: string; at: string; status: "OK" | "NO_OBSERVATION"; mode: "replay" | "live";
+  facility: { id: string; name: string; kind: string; driver: string; location: [number, number]; road: string; managing_agency: string; event_id: string };
+  observation: { station_id: string; station: string; time: string; water_level_m: number; water_level_el_m: number; age_min: number; interval: string } | null;
+  rate_m_per_10min: number | null; stage: string | null; stage_label: string | null; levels_m: Record<string, number> | null;
+  margin_to_planned_flood_m: number | null; minutes_to_planned_flood: number | null;
+  recommendation: "NORMAL" | "MONITOR" | "CLOSURE_REVIEW" | null; reason: string | null;
+  rule: { id: string; review_when: string; rate_window_min: number; lead_threshold_min: number; basis: string; official_closure_trigger: string } | null;
+  rainfall: { station: string | null; last_hour_mm: number; sum_6h_mm: number } | null;
+  reference_minutes_to_inflow: number | null; limitations: string[];
+};
+
+export type TwinBacktest = {
+  facility_id: string; event_id: string; rule: TwinStatus["rule"];
+  series: { station_id: string; from: string | null; to: string | null; records: number };
+  stage_transitions: Array<{ time: string; stage: string; water_level_m: number }>;
+  first_closure_review: { time: string; water_level_m: number; reason: string; stage: string } | null;
+  lead_minutes: Record<string, number> | null;
+  reference_event: Record<string, string>; note: string;
+};

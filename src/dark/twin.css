@@ -1,0 +1,54 @@
+/* 지하차도 통제 판단 보드 (TwinBoard). dark.css·urban.css의 dk-/ub- 규칙을 재사용한다. */
+.tw-root { min-height: 100dvh; display: flex; flex-direction: column; }
+.tw-root .dk-topbar h1 { margin: 0; font-size: 15px; }
+.tw-tab-link { display: inline-flex; align-items: center; height: 100%; padding: 0 12px; border-bottom: 2px solid transparent; color: var(--dk-muted); font-size: 12px; font-weight: 800; text-decoration: none; }
+.tw-tab-link:hover { color: var(--dk-text); border-bottom-color: var(--dk-accent); }
+.tw-root .dk-status { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.tw-mode[data-mode="live"] { color: #34d399; border-color: #34d399; }
+.tw-mode[data-mode="replay"] { color: #fbbf24; border-color: #fbbf24; }
+.tw-back { padding: 6px 10px; font-size: 12px; }
+
+.tw-main { flex: 1; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; padding: 16px 18px 24px; max-width: 1480px; width: 100%; margin: 0 auto; box-sizing: border-box; }
+.tw-col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.tw-card { padding: 16px 18px; border: 1px solid var(--dk-line); border-radius: 12px; background: rgba(17, 26, 43, .86); }
+.tw-eyebrow { margin: 0 0 8px; color: var(--dk-muted); font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.tw-facility h2 { margin: 0 0 10px; font-size: 22px; }
+.tw-facility a { color: var(--dk-accent); }
+.tw-facility dl { margin: 0; display: grid; gap: 6px; }
+.tw-facility dl div { display: grid; grid-template-columns: 96px 1fr; gap: 10px; align-items: baseline; }
+.tw-facility dt { margin: 0; color: var(--dk-muted); font-size: 12px; }
+.tw-facility dd { margin: 0; font-size: 14px; }
+
+.tw-reco { border-color: var(--tone); }
+.tw-reco-badge { display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 10px; background: color-mix(in srgb, var(--tone) 18%, transparent); color: var(--tone); font-size: 26px; font-weight: 900; }
+.tw-reco-badge.is-empty { color: var(--dk-muted); background: var(--dk-panel-2); font-size: 18px; }
+.tw-reco-reason { margin: 12px 0 4px; font-size: 15px; line-height: 1.5; }
+.tw-reco small { color: var(--dk-muted); font-size: 12px; }
+
+.tw-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 6px 0 12px; }
+.tw-kpis div { padding: 10px 12px; border-radius: 10px; background: var(--dk-panel-2); }
+.tw-kpis strong { display: block; font-size: 20px; font-variant-numeric: tabular-nums; }
+.tw-kpis span { display: block; margin-top: 2px; color: var(--dk-muted); font-size: 11px; }
+
+.tw-levelbar { margin: 8px 0 10px; }
+.tw-levelbar-track { position: relative; height: 14px; border-radius: 7px; background: #1b2a40; overflow: visible; }
+.tw-levelbar-fill { height: 100%; border-radius: 7px; background: linear-gradient(90deg, #38bdf8, var(--tone)); }
+.tw-levelbar-mark { position: absolute; top: -4px; width: 2px; height: 22px; background: var(--dk-muted); }
+.tw-levelbar-mark.warning { background: #fbbf24; }
+.tw-levelbar-mark.planned_flood { background: #f87171; }
+.tw-levelbar-now { position: absolute; top: -24px; transform: translateX(-50%); padding: 1px 6px; border-radius: 6px; background: var(--tone); color: #0b1220; font-size: 11px; font-weight: 900; white-space: nowrap; }
+.tw-levelbar-labels { position: relative; height: 16px; margin-top: 6px; }
+.tw-levelbar-labels span { position: absolute; transform: translateX(-50%); color: var(--dk-muted); font-size: 10px; white-space: nowrap; }
+
+.tw-presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.tw-presets button { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border: 1px solid var(--dk-line); border-radius: 999px; background: var(--dk-panel-2); color: var(--dk-text); font-size: 12px; font-weight: 800; }
+.tw-presets button small { color: var(--dk-muted); font-weight: 600; }
+.tw-presets button.active { border-color: var(--dk-accent); color: var(--dk-accent); }
+.tw-time { display: flex; align-items: center; gap: 10px; color: var(--dk-muted); font-size: 12px; }
+.tw-time input { padding: 5px 8px; border: 1px solid var(--dk-line); border-radius: 6px; background: var(--dk-panel-2); color: var(--dk-text); }
+.tw-table { width: 100%; margin-top: 8px; }
+
+@media (max-width: 960px) {
+  .tw-main { grid-template-columns: 1fr; }
+  .tw-root .dk-status { margin-left: 0; }
+}

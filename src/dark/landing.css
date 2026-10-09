@@ -174,3 +174,5 @@
 @media (prefers-reduced-motion: reduce) {
   .fo-case-slide { transition: none; }
 }
+
+.fo-intro-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }

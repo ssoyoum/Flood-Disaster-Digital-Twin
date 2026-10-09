@@ -106,7 +106,7 @@ function ServiceSchematic() {
   );
 }
 
-export function IntroPage({ onStart }: { onStart: () => void }) {
+export function IntroPage({ onStart, onTwin }: { onStart: () => void; onTwin?: () => void }) {
   const features = [
     { icon: History, title: "사건 재구성", text: "수위·강우 관측과 지형으로 과거 홍수를 시간대별로 다시 재생합니다." },
     { icon: GitCompare, title: "개입 비교", text: "지하차도 통제 시각을 바꿔 원상태와 개입 결과를 나란히 비교합니다." },
@@ -130,9 +130,16 @@ export function IntroPage({ onStart }: { onStart: () => void }) {
             <br />
             담당자가 직접 비교해 보는 관제 서비스입니다.
           </p>
-          <button className="fo-primary" type="button" onClick={onStart}>
-            사례 선택 <ArrowRight size={18} />
-          </button>
+          <div className="fo-intro-actions">
+            <button className="fo-primary" type="button" onClick={onStart}>
+              사례 선택 <ArrowRight size={18} />
+            </button>
+            {onTwin && (
+              <button className="fo-ghost" type="button" onClick={onTwin}>
+                지하차도 통제 판단 보드 <ArrowRight size={16} />
+              </button>
+            )}
+          </div>
         </div>
         <ServiceSchematic />
       </section>

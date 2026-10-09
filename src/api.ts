@@ -1,4 +1,4 @@
-import type { CaseLeadTimes, ResponseTimingResult, TimelineReconstructionResponse, AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
+import type { TwinBacktest, TwinFacility, TwinMode, TwinStatus, CaseLeadTimes, ResponseTimingResult, TimelineReconstructionResponse, AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
 import { boundedAgentHistory, type ConversationMessage } from "./agentConversation";
 
 const configuredApiBase = import.meta.env.VITE_API_BASE;
@@ -137,3 +137,9 @@ export const getResponseTiming = (eventId: string, interventionId: string, actio
   });
 
 export const getCaseLeadTimes = () => request<CaseLeadTimes>("/api/cases/lead-times");
+
+// Underpass control-decision twin
+export const getTwinMode = () => request<TwinMode>("/api/twin/mode");
+export const getTwinFacilities = () => request<TwinFacility[]>("/api/twin/facilities");
+export const getTwinStatus = (facilityId: string, at?: string) => request<TwinStatus>(`/api/twin/facilities/${encodeURIComponent(facilityId)}/status${at ? `?at=${encodeURIComponent(at)}` : ""}`);
+export const getTwinBacktest = (facilityId: string) => request<TwinBacktest>(`/api/twin/facilities/${encodeURIComponent(facilityId)}/backtest`);

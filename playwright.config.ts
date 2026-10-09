@@ -18,8 +18,9 @@ export default defineConfig({
       reuseExistingServer: false,
       timeout: 120_000,
       name: "FastAPI",
-      // Browser regression tests exercise registered tools without paid model calls.
-      env: { GEMINI_API_KEY: "" },
+      // Browser regression tests exercise registered tools without paid model calls, and the twin board
+      // replays the stored 2023 series so E2E never depends on the live gauge API.
+      env: { GEMINI_API_KEY: "", FLOODOPS_TWIN_MODE: "replay" },
     },
     {
       command: "npm run dev -- --host 127.0.0.1 --port 5175",

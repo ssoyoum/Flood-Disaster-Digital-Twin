@@ -56,7 +56,7 @@ FACILITIES: dict[str, dict[str, Any]] = {
         "rain_station": {"station_id": "327", "name": "청주금천", "source": "KMA AWS hourly (2023 CSV)"},
         "control_rule": {
             "id": "river_stage_v1",
-            "review_when": "stage >= planned_flood, or stage >= warning and the planned flood level is less than 60 minutes away at the current rate of rise",
+            "review_when": "계획홍수위에 도달했거나, 경보 수위 이상이면서 현재 상승 속도로 계획홍수위까지 60분 이내이면 통제 검토를 권고한다.",
             "rate_window_min": 30,
             "lead_threshold_min": 60,
             "basis": "국무조정실 감찰 결과는 계획홍수위 도달(06:40)을 통제 요건 충족 시각으로 봤다. 상승 속도 조건은 그보다 앞서 검토를 시작하게 하는 트윈의 가정이다.",
