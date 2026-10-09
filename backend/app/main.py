@@ -34,6 +34,7 @@ from .seoul_repository import (
     get_seoul_summary,
 )
 from .case_comparison import get_case_lead_times
+from .twin import FACILITIES as TWIN_FACILITIES, backtest as twin_backtest, facility_status as twin_facility_status, list_facilities as twin_list_facilities, twin_mode
 from .layer_payload import slim_layers
 from .timeline_cases import (
     analyze_response_timing,
@@ -484,6 +485,41 @@ def case_lead_times():
     """Actual versus one registered counterfactual response time for every connected case."""
 
     return get_case_lead_times()
+
+
+@app.get("/api/twin/facilities", tags=["twin"])
+def twin_facilities():
+    """Registered underpasses with their gauges and the current observation mode (replay or live)."""
+
+    return twin_list_facilities()
+
+
+@app.get("/api/twin/mode", tags=["twin"])
+def twin_mode_status():
+    return twin_mode()
+
+
+@app.get("/api/twin/facilities/{facility_id}/status", tags=["twin"])
+def twin_status(facility_id: str, at: str | None = Query(default=None, description="ISO time for replay mode; defaults to the configured replay 'now' or the real clock in live mode")):
+    """Current stage, minutes to the planned flood level and the closure-review recommendation for one facility."""
+
+    if facility_id not in TWIN_FACILITIES:
+        raise HTTPException(status_code=404, detail=f"Unknown facility: {facility_id}")
+    try:
+        return twin_facility_status(facility_id, at)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except Exception as exc:  # live source failure must not hide the facility
+        raise HTTPException(status_code=503, detail=f"Observation source unavailable: {exc}") from exc
+
+
+@app.get("/api/twin/facilities/{facility_id}/backtest", tags=["twin"])
+def twin_backtest_route(facility_id: str):
+    """Apply the facility's control rule to the stored 2023 series and report when it would have fired."""
+
+    if facility_id not in TWIN_FACILITIES:
+        raise HTTPException(status_code=404, detail=f"Unknown facility: {facility_id}")
+    return twin_backtest(facility_id)
 
 
 @app.get("/api/agent/tools", response_model=list[AgentToolDescriptor], tags=["agent"])
