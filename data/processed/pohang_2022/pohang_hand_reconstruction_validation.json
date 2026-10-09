@@ -1,11 +1,11 @@
 {
-  "created_at": "2026-10-09T15:22:39.868071+00:00",
+  "created_at": "2026-10-09T17:24:13.133361+00:00",
   "event_id": "pohang-2022",
   "status": "TEMPORARY",
   "source_type": "DERIVED_APPROXIMATION",
   "method": "Height above the nearest 냉천 cell on a 77 m Copernicus DEM grid, thresholded per stage, 4-neighbour flood fill from river-side seeds.",
   "stage_driver": "REPORTED_ORDER_ONLY",
-  "stage_driver_basis": "관측 수위·강우 계열이 없어 보도된 사건 순서(범람 06:00 → 유입 06:37 → 완전 침수 06:45)로만 범위를 넓힌다. 보도된 범람 지점(냉천교)에서 낮은 지형을 따라 퍼지며, 도달 거리 상한은 보도된 침수 지점(인덕동 일대)에 닿는 최소 거리로 맞춘다.",
+  "stage_driver_basis": "관측 수위·강우 계열이 없어 보도된 사건 순서(범람 06:00 → 유입 06:37 → 완전 침수 06:45)로만 냉천 양안의 띠를 넓힌다(거리 = 비율²×2 km). 임계 상한은 보도된 침수 지점(인덕동 일대)에 닿는 최소 임계다.",
   "peak_threshold_m": 0.25,
   "dem": {
     "raw_file": "data/raw/copernicus_dem_glo30/Copernicus_DSM_COG_10_N35_00_E129_00_DEM.tif",
@@ -35,22 +35,23 @@
   ],
   "cell_size_m": 76.9,
   "grid_feature_count": 3024,
-  "timeline_feature_count": 867,
+  "timeline_feature_count": 2254,
   "seed_distance_m": 150,
   "connectivity_distance_m": {
-    "base": 300,
-    "peak": 900,
-    "measured_from": "냉천교"
+    "base": 0,
+    "peak": 2000,
+    "power": 2,
+    "measured_from": "냉천"
   },
   "stage_counts": {
     "typhoon_landfall": 0,
     "first_notice": 0,
-    "river_overflow": 78,
-    "move_car_broadcast": 120,
-    "parking_inflow": 144,
-    "parking_full": 175,
-    "plant_outage": 175,
-    "missing_report": 175
+    "river_overflow": 236,
+    "move_car_broadcast": 370,
+    "parking_inflow": 403,
+    "parking_full": 415,
+    "plant_outage": 415,
+    "missing_report": 415
   },
   "stage_contexts": [
     {
@@ -59,7 +60,7 @@
       "state": "typhoon_landfall",
       "stage_fraction": 0.0,
       "hand_threshold_m": 0.0,
-      "connectivity_distance_m": 300,
+      "connectivity_distance_m": 0,
       "selected_feature_count": 0
     },
     {
@@ -68,7 +69,7 @@
       "state": "first_notice",
       "stage_fraction": 0.0,
       "hand_threshold_m": 0.0,
-      "connectivity_distance_m": 300,
+      "connectivity_distance_m": 0,
       "selected_feature_count": 0
     },
     {
@@ -77,8 +78,8 @@
       "state": "river_overflow",
       "stage_fraction": 0.35,
       "hand_threshold_m": 0.09,
-      "connectivity_distance_m": 510,
-      "selected_feature_count": 78
+      "connectivity_distance_m": 245,
+      "selected_feature_count": 236
     },
     {
       "stage_index": 3,
@@ -86,8 +87,8 @@
       "state": "move_car_broadcast",
       "stage_fraction": 0.6,
       "hand_threshold_m": 0.15,
-      "connectivity_distance_m": 660,
-      "selected_feature_count": 120
+      "connectivity_distance_m": 720,
+      "selected_feature_count": 370
     },
     {
       "stage_index": 4,
@@ -95,8 +96,8 @@
       "state": "parking_inflow",
       "stage_fraction": 0.8,
       "hand_threshold_m": 0.2,
-      "connectivity_distance_m": 780,
-      "selected_feature_count": 144
+      "connectivity_distance_m": 1280,
+      "selected_feature_count": 403
     },
     {
       "stage_index": 5,
@@ -104,8 +105,8 @@
       "state": "parking_full",
       "stage_fraction": 1.0,
       "hand_threshold_m": 0.25,
-      "connectivity_distance_m": 900,
-      "selected_feature_count": 175
+      "connectivity_distance_m": 2000,
+      "selected_feature_count": 415
     },
     {
       "stage_index": 6,
@@ -113,8 +114,8 @@
       "state": "plant_outage",
       "stage_fraction": 1.0,
       "hand_threshold_m": 0.25,
-      "connectivity_distance_m": 900,
-      "selected_feature_count": 175
+      "connectivity_distance_m": 2000,
+      "selected_feature_count": 415
     },
     {
       "stage_index": 7,
@@ -122,12 +123,12 @@
       "state": "missing_report",
       "stage_fraction": 1.0,
       "hand_threshold_m": 0.25,
-      "connectivity_distance_m": 900,
-      "selected_feature_count": 175
+      "connectivity_distance_m": 2000,
+      "selected_feature_count": 415
     }
   ],
   "limitations": [
-    "관측 수위가 아니라 보도된 사건 순서로 임계를 올린 지형 근사다. 침수심·유속·유량을 계산하지 않는다.",
+    "관측 수위가 아니라 보도된 사건 순서로 띠를 넓힌 지형 근사다. 침수심·유속·유량을 계산하지 않는다.",
     "임계 상한 0.25 m는 관측값이 아니라 보도된 침수 지점에 닿도록 맞춘 값이다.",
     "77 m 격자라 제방·도로 성토·배수로처럼 격자보다 좁은 구조물은 반영되지 않는다.",
     "공식 침수범위가 아니며 노출 집계에 쓰지 않는다."
@@ -144,15 +145,15 @@
   "calibration": {
     "peak_threshold_m": 0.25,
     "all_anchors_reached": true,
-    "origin": "냉천교",
-    "peak_reach_from_origin_m": 900,
     "anchors": [
       {
         "name": "인덕동 일대",
         "grid_id": "dem-015-035",
         "cell_index": 1115,
         "hand_m": 0.0,
-        "distance_to_primary_river_m": 245.4
+        "distance_to_primary_river_m": 245.4,
+        "snapped_within_m": 0,
+        "distance_from_reported_point_m": 15.5
       }
     ]
   }

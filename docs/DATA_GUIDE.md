@@ -15,8 +15,8 @@
 | 사건 | 지도 테마 | 핵심 분석 대상 | 현재 상태 |
 | --- | --- | --- | --- |
 | 2023 오송 | 2023 Osong Underpass Flood — Miho River | 지하차도·교통시설 | 대표 사건, 침수흔적도·수위 API 대기 |
-| 2022 서울 | 2022 Seoul Urban Flood — Gangnam & Sillim | 반지하·지하공간 | 공식 침수흔적도·10분 강우 연결, 흔적을 강우 순서로 단계 표시(DQ-012) |
-| 2022 포항 | 2022 Pohang Typhoon Flood — Naengcheon | 산업시설 | 보도 시각 재생·대응 시각 반사실, HAND 근사 셀은 보도 순서 기준(DQ-012) |
+| 2022 서울 | 2022 Seoul Urban Flood — Gangnam & Sillim | 반지하·지하공간 | 공식 침수흔적도·10분 강우 연결, 흔적을 강우 순서로 단계 표시 + 강우 비율 HAND 띠(DQ-012) |
+| 2022 포항 | 2022 Pohang Typhoon Flood — Naengcheon | 산업시설 | 보도 시각 재생·대응 시각 반사실, 냉천 양안 HAND 띠는 보도 순서 기준(DQ-012) |
 | 2024 익산 | 2024 Iksan Extreme Rainfall Flood — Sanbukcheon | 농경지 | 카탈로그 등록, 시각 근거 없어 잠금 |
 | 2026 안동·의성 | 2026 Andong–Uiseong Compound Flood — Gwimi & Gugye | 임시주거·산불피해지역 | 보도 시각 재생·대피명령 반사실, HAND 근사 셀은 보도 수위 순서 기준(DQ-012) |
 

@@ -23,6 +23,8 @@ test("Seoul 2022 opens from the case library and compares alert timing", async (
   await expect(legend).toContainText("현재 1,557 / 10,468건");
   await page.getByRole("button", { name: "다음 단계" }).click();
   await expect(legend).toContainText("현재 10,468 / 10,468건");
+  await expect(legend).toContainText("HAND 근사");
+  await expect(legend).toContainText("1,218셀");
 
   await page.getByRole("navigation", { name: "FloodOps 화면" }).getByRole("button", { name: "시나리오 비교" }).click();
   const table = page.locator(".ub-whatif .ub-table").first();
@@ -42,9 +44,9 @@ test("Pohang 2022 replays reported times and compares the entry-ban time", async
   await expect(legend).toContainText("현재 0셀");
   await page.getByRole("button", { name: "다음 단계" }).click();
   await page.getByRole("button", { name: "다음 단계" }).click();
-  await expect(legend).toContainText("현재 78셀");
+  await expect(legend).toContainText("현재 236셀");
   await page.getByRole("button", { name: "다음 단계" }).click();
-  await expect(legend).toContainText("현재 120셀");
+  await expect(legend).toContainText("현재 370셀");
 
   await page.getByRole("button", { name: "시나리오 비교 열기" }).click();
   await page.getByRole("checkbox", { name: /06:00/ }).check();

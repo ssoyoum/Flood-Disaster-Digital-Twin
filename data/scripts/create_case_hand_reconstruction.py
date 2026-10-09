@@ -1,4 +1,4 @@
-"""Create HAND-like stage envelopes for the Pohang and Andong-Uiseong cases.
+"""Create HAND-like stage envelopes for the Seoul, Pohang and Andong-Uiseong cases.
 
 This mirrors the Osong reconstruction: a Copernicus DEM grid, height above the nearest
 primary-river cell, a per-stage threshold, and a 4-neighbour flood fill from river-side
@@ -12,11 +12,13 @@ series:
   4.7 m expected at 00:30) orders the rise and fall; the peak is calibrated to the reported
   inundated temporary-housing villages (귀미1리, 구계리).
 
-Seoul 2022 is deliberately not built here. A DSM-based HAND envelope over the Dorimcheon
-corridor was tested on 2026-10-10 against the official flood traces: at every threshold from
-0.25 m to 3 m and every connectivity distance, 14-16% of the envelope lay on traces, the same
-share as the corridor as a whole, so the DSM adds no information in that dense urban block.
-The Seoul console stages the official traces by depth and rainfall instead (seoul_repository).
+- seoul-2022: the band follows the 신림P 60-minute rainfall (running maximum over the event peak)
+  on the same rule, drawn on top of the official flood traces. A DSM-based envelope was tested
+  against the traces on 2026-10-10: 14-16% of it lay on traces at every threshold, the same share
+  as the corridor as a whole, so it is a replay visual, not evidence (DQ-012).
+
+All three use the same rule as Andong: the valley floor is HAND 0 almost everywhere, so the
+stage fraction mainly widens the band around the river lines (distance = fraction^2 x 2 km).
 
 None of this is an official flood extent, a hydraulic model, or a depth estimate.
 """
@@ -41,6 +43,7 @@ from shapely.strtree import STRtree
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "backend"))
 
+from app.seoul_repository import SEOUL_RECONSTRUCTION_EVENTS, trace_reveal_rule  # noqa: E402
 from app.timeline_cases import CASES as TIMELINE_CASES  # noqa: E402
 
 PROCESSED = REPO_ROOT / "data" / "processed"
@@ -61,7 +64,32 @@ ANDONG_FRACTIONS = {
     "predicted_warning_level": 1.0, "warning_lifted": 0.35, "national_landslide_alert": 0.2,
 }
 
+def seoul_fractions() -> dict[str, float]:
+    rule = trace_reveal_rule()
+    peak = max(row["rainfall_60min_running_max_mm"] for row in rule) or 1.0
+    return {row["state"]: round(row["rainfall_60min_running_max_mm"] / peak, 4) for row in rule}
+
+
 CASES: dict[str, dict[str, Any]] = {
+    "seoul-2022": {
+        "dir": "seoul_2022",
+        "prefix": "seoul",
+        "tile": "Copernicus_DSM_COG_10_N37_00_E126_00_DEM.tif",
+        "aoi": "seoul_dorimcheon_aoi.geojson",
+        "waterways": "seoul_osm_waterways_2022.geojson",
+        "primary_river": "도림천",
+        "primary_filter": {"waterway": "stream"},
+        "cell_pixels": 3,
+        "seed_distance_m": 150,
+        "connectivity_m": (0, 2000),
+        "connectivity_power": 2,
+        "stages": [{"stage_index": i, **e} for i, e in enumerate(SEOUL_RECONSTRUCTION_EVENTS)],
+        "driver": "RAINFALL_60MIN_RUNNING_MAX",
+        "driver_basis": "신림P(2302) 60분 누적 강우의 단계 시각까지 최댓값을 사건 최댓값(121.5 mm)으로 나눈 비율로 띠를 넓힌다. 하천은 OSM stream 등급 선 전체(도림천·대방천·봉천천 등)이고 임계 0.25 m는 다른 사례와 같다. 공식 침수흔적도와 대조하면 띠의 14~16%만 흔적 위에 있어 재생용 도식이지 침수 근거가 아니다.",
+        "fractions": seoul_fractions(),
+        "anchors": None,
+        "anchor_names": [],
+    },
     "pohang-2022": {
         "dir": "pohang_2022",
         "prefix": "pohang",
@@ -71,14 +99,14 @@ CASES: dict[str, dict[str, Any]] = {
         "primary_river": "냉천",
         "cell_pixels": 3,
         "seed_distance_m": 150,
-        "connectivity_m": (300, 1200),
+        "connectivity_m": (0, 2000),
+        "connectivity_power": 2,
         "stages": [{"stage_index": i, **e} for i, e in enumerate(TIMELINE_CASES["pohang-2022"]["replay"])],
         "driver": "REPORTED_ORDER_ONLY",
-        "driver_basis": "관측 수위·강우 계열이 없어 보도된 사건 순서(범람 06:00 → 유입 06:37 → 완전 침수 06:45)로만 범위를 넓힌다. 보도된 범람 지점(냉천교)에서 낮은 지형을 따라 퍼지며, 도달 거리 상한은 보도된 침수 지점(인덕동 일대)에 닿는 최소 거리로 맞춘다.",
+        "driver_basis": "관측 수위·강우 계열이 없어 보도된 사건 순서(범람 06:00 → 유입 06:37 → 완전 침수 06:45)로만 냉천 양안의 띠를 넓힌다(거리 = 비율²×2 km). 임계 상한은 보도된 침수 지점(인덕동 일대)에 닿는 최소 임계다.",
         "fractions": POHANG_FRACTIONS,
         "anchors": "pohang_focus_sites.geojson",
         "anchor_names": ["인덕동 일대"],
-        "origin_name": "냉천교",
     },
     "andong-uiseong-2026": {
         "dir": "andong_uiseong_2026",
@@ -268,7 +296,7 @@ def run_case(event_id: str) -> dict[str, Any]:
     base_conn, span_conn = case["connectivity_m"]
     anchors: list[dict[str, Any]] = []
     fractions = case["fractions"]
-    sites = read_geojson(case_dir / case["anchors"])
+    sites = read_geojson(case_dir / case["anchors"]) if case.get("anchors") else {"features": []}
     tree = STRtree([c["geometry_m"] for c in cells])
     origin: Point | None = None
     for site in sites["features"]:
@@ -320,7 +348,7 @@ def run_case(event_id: str) -> dict[str, Any]:
         "features": [{"type": "Feature", "properties": {"grid_id": c["grid_id"], "mean_elevation_m": round(c["elevation_m"], 2), "hand_m": round(c["hand_m"], 2), "distance_to_primary_river_m": round(c["distance_to_primary_river_m"], 1), "distance_to_river_m": round(c["distance_to_river_m"], 1), "status": "TEMPORARY"}, "geometry": mapping(c["geometry"])} for c in cells],
     }
     limitations = [
-        "관측 수위가 아니라 보도된 사건 순서로 임계를 올린 지형 근사다. 침수심·유속·유량을 계산하지 않는다.",
+        ("관측 수위가 아니라 강우 비율" if case["driver"].startswith("RAINFALL") else "관측 수위가 아니라 보도된 사건 순서") + "로 띠를 넓힌 지형 근사다. 침수심·유속·유량을 계산하지 않는다.",
         f"{cell_size_m:.0f} m 격자라 제방·도로 성토·배수로처럼 격자보다 좁은 구조물은 반영되지 않는다.",
         "공식 침수범위가 아니며 노출 집계에 쓰지 않는다.",
     ]

@@ -122,6 +122,7 @@ LIMITATIONS = [
     "Storage capture is rain volume arithmetic over the Dorimcheon catchment area (40.96 km2, literature value) and an assumed runoff coefficient. It is not a sewer or tunnel hydraulic model.",
     "Building stock comes from a 2026-08-09 register snapshot filtered to use-approval dates on or before 2022-08-08; buildings demolished before 2026 are missing.",
     "Incident times other than gauge thresholds come from press coverage and need official source pages.",
+    "The red HAND band widens with the 신림P 60-minute rainfall along the stream lines; checked against the official traces it is no better than the corridor average (14-16% on traces), so it is a replay visual, not evidence.",
 ]
 
 
@@ -259,9 +260,12 @@ def get_seoul_layers() -> dict[str, Any]:
             source="국토교통부 GIS건물통합정보 x 서울시 침수흔적도", snapshot="2026-08-09 (사용승인 2022-08-08 이전)",
         ),
         "waterways": _layer("waterways", "하천", "seoul_osm_waterways_2022.geojson", status="VERIFIED", source_type="OSM_ATTIC", source="OpenStreetMap Overpass attic", snapshot="2022-08-08"),
-        "terrain": unavailable("terrain", "지형"),
+        "terrain": _layer("terrain", "지형 격자(HAND)", "seoul_hand_reconstruction_grid.geojson", status="DERIVED", source_type="DEM_GRID", source="Copernicus DEM GLO-30", snapshot="2021 release"),
         "approx_flood_envelope": unavailable("approx_flood_envelope", "근사 범람"),
-        "hand_reconstruction": unavailable("hand_reconstruction", "HAND 재구성"),
+        "hand_reconstruction": _layer(
+            "hand_reconstruction", "HAND 재구성(강우 비율 기준)", "seoul_hand_flood_envelope_timeline.geojson", status="TEMPORARY", source_type="DERIVED_APPROXIMATION",
+            source="Copernicus DEM GLO-30 + OSM stream lines + 신림P 60분 강우 비율", snapshot="2022-08-08",
+        ),
         "facilities": _layer("facilities", "시설", "seoul_osm_facilities_2022.geojson", status="VERIFIED", source_type="OSM_ATTIC", source="OpenStreetMap Overpass attic", snapshot="2022-08-08"),
         "underpass": unavailable("underpass", "지하차도"),
         "flood_extent": _annotate_reveal(_layer(
@@ -305,7 +309,7 @@ def get_seoul_status() -> dict[str, Any]:
             "records": len(_rainfall_rows()),
             "notes": "동작구청 gauge stops after 2022-08-08 23:12; its 08-09 rows are missing.",
         },
-        "dem": {"status": "UNAVAILABLE", "notes": "Terrain is not used; the official flood traces replace a terrain-based envelope."},
+        "dem": {"status": "DERIVED", "source": "Copernicus DEM GLO-30", "notes": "HAND band for stage replay only; the official flood traces remain the observed extent."} if layers["terrain"]["feature_count"] else {"status": "UNAVAILABLE"},
         "layers": {key: {k: v for k, v in value.items() if k != "data"} for key, value in layers.items()},
         "summary_created_at": summary.get("created_at"),
     }
@@ -359,6 +363,19 @@ def get_seoul_observations() -> list[dict[str, Any]]:
     ] if _rainfall_rows() else []
 
 
+def _hand_metadata() -> dict[str, Any] | None:
+    layer = get_seoul_layers()["hand_reconstruction"]
+    if not layer["feature_count"]:
+        return None
+    meta = dict(layer["data"].get("metadata") or {})
+    counts: dict[str, int] = {}
+    for feature in layer["data"]["features"]:
+        state = feature.get("properties", {}).get("state")
+        counts[state] = counts.get(state, 0) + 1
+    meta["stage_counts"] = counts
+    return meta
+
+
 def get_seoul_reconstruction() -> dict[str, Any]:
     summary = _summary()
     series = _gauge_series(PRIMARY_GAUGE) if _rainfall_rows() else []
@@ -405,7 +422,9 @@ def get_seoul_reconstruction() -> dict[str, Any]:
             {"source": "국토교통부 GIS건물통합정보", "data_vintage": "2026-08-09 (사용승인 2022-08-08 이전 필터)", "role": "Building stock", "status": "DERIVED"},
             {"source": "OpenStreetMap attic", "data_vintage": "2022-08-08", "role": "Roads, waterways, facilities", "status": "VERIFIED"},
             {"source": "언론 보도(한국일보·경향신문·이데일리·뉴시스)", "data_vintage": "2022-08", "role": "Incident times", "status": "TEMPORARY"},
+            {"source": "Copernicus DEM GLO-30 + HAND 근사", "data_vintage": "DEM 2021 release; 강우 비율은 2022-08-08", "role": "Stage replay band (approximation)", "status": "TEMPORARY"},
         ],
+        "hand_reconstruction": _hand_metadata(),
         "limitations": LIMITATIONS,
     }
 

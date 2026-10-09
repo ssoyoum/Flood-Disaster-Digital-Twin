@@ -1,0 +1,140 @@
+{
+  "created_at": "2026-10-09T17:24:16.903409+00:00",
+  "event_id": "seoul-2022",
+  "status": "TEMPORARY",
+  "source_type": "DERIVED_APPROXIMATION",
+  "method": "Height above the nearest 도림천 cell on a 74 m Copernicus DEM grid, thresholded per stage, 4-neighbour flood fill from river-side seeds.",
+  "stage_driver": "RAINFALL_60MIN_RUNNING_MAX",
+  "stage_driver_basis": "신림P(2302) 60분 누적 강우의 단계 시각까지 최댓값을 사건 최댓값(121.5 mm)으로 나눈 비율로 띠를 넓힌다. 하천은 OSM stream 등급 선 전체(도림천·대방천·봉천천 등)이고 임계 0.25 m는 다른 사례와 같다. 공식 침수흔적도와 대조하면 띠의 14~16%만 흔적 위에 있어 재생용 도식이지 침수 근거가 아니다.",
+  "peak_threshold_m": 0.25,
+  "dem": {
+    "raw_file": "data/raw/copernicus_dem_glo30/Copernicus_DSM_COG_10_N37_00_E126_00_DEM.tif",
+    "raw_sha256": "F530DD28308ECD6C5CEB0405DC1FFB7113BCAFDEC30D023DE50F16DC433A274F",
+    "raw_crs": "EPSG:4326",
+    "raw_pixel_size_degrees": [
+      0.0002777777777777778,
+      0.0002777777777777778
+    ],
+    "window_shape": [
+      162,
+      234
+    ],
+    "window_bounds": [
+      126.89,
+      37.465,
+      126.955,
+      37.51
+    ],
+    "source": "Copernicus DEM GLO-30 (public AWS Open Data bucket copernicus-dem-30m)"
+  },
+  "aoi_bbox": [
+    126.89,
+    37.465,
+    126.955,
+    37.51
+  ],
+  "cell_size_m": 74.2,
+  "grid_feature_count": 4212,
+  "timeline_feature_count": 7524,
+  "seed_distance_m": 150,
+  "connectivity_distance_m": {
+    "base": 0,
+    "peak": 2000,
+    "power": 2,
+    "measured_from": "도림천"
+  },
+  "stage_counts": {
+    "rain_warning": 405,
+    "heavy_rain": 1031,
+    "design_exceeded": 1216,
+    "rescue_call": 1218,
+    "public_alert": 1218,
+    "national_escalation": 1218,
+    "responders_arrive": 1218
+  },
+  "stage_contexts": [
+    {
+      "stage_index": 0,
+      "time": "2022-08-08T12:50:00+09:00",
+      "state": "rain_warning",
+      "stage_fraction": 0.2016,
+      "hand_threshold_m": 0.05,
+      "connectivity_distance_m": 81,
+      "selected_feature_count": 405
+    },
+    {
+      "stage_index": 1,
+      "time": "2022-08-08T13:09:00+09:00",
+      "state": "heavy_rain",
+      "stage_fraction": 0.4239,
+      "hand_threshold_m": 0.11,
+      "connectivity_distance_m": 359,
+      "selected_feature_count": 1031
+    },
+    {
+      "stage_index": 2,
+      "time": "2022-08-08T20:49:00+09:00",
+      "state": "design_exceeded",
+      "stage_fraction": 0.9177,
+      "hand_threshold_m": 0.23,
+      "connectivity_distance_m": 1684,
+      "selected_feature_count": 1216
+    },
+    {
+      "stage_index": 3,
+      "time": "2022-08-08T20:59:00+09:00",
+      "state": "rescue_call",
+      "stage_fraction": 1.0,
+      "hand_threshold_m": 0.25,
+      "connectivity_distance_m": 2000,
+      "selected_feature_count": 1218
+    },
+    {
+      "stage_index": 4,
+      "time": "2022-08-08T21:19:00+09:00",
+      "state": "public_alert",
+      "stage_fraction": 1.0,
+      "hand_threshold_m": 0.25,
+      "connectivity_distance_m": 2000,
+      "selected_feature_count": 1218
+    },
+    {
+      "stage_index": 5,
+      "time": "2022-08-08T21:30:00+09:00",
+      "state": "national_escalation",
+      "stage_fraction": 1.0,
+      "hand_threshold_m": 0.25,
+      "connectivity_distance_m": 2000,
+      "selected_feature_count": 1218
+    },
+    {
+      "stage_index": 6,
+      "time": "2022-08-08T21:45:00+09:00",
+      "state": "responders_arrive",
+      "stage_fraction": 1.0,
+      "hand_threshold_m": 0.25,
+      "connectivity_distance_m": 2000,
+      "selected_feature_count": 1218
+    }
+  ],
+  "limitations": [
+    "관측 수위가 아니라 강우 비율로 띠를 넓힌 지형 근사다. 침수심·유속·유량을 계산하지 않는다.",
+    "임계 상한 0.25 m는 관측값이 아니라 보도된 침수 지점에 닿도록 맞춘 값이다.",
+    "74 m 격자라 제방·도로 성토·배수로처럼 격자보다 좁은 구조물은 반영되지 않는다.",
+    "공식 침수범위가 아니며 노출 집계에 쓰지 않는다."
+  ],
+  "output_files": [
+    "data/processed/seoul_2022/seoul_hand_reconstruction_grid.geojson",
+    "data/processed/seoul_2022/seoul_hand_flood_envelope_timeline.geojson",
+    "data/processed/seoul_2022/seoul_hand_reconstruction_validation.json"
+  ],
+  "validity_assessment": {
+    "appropriate_use": "Stage-by-stage replay of where low, river-connected terrain lies as the reported event unfolds.",
+    "inappropriate_use": "Official flood extent, hydraulic simulation, depth or velocity estimate, exposure KPI."
+  },
+  "calibration": {
+    "peak_threshold_m": 0.25,
+    "all_anchors_reached": true,
+    "anchors": []
+  }
+}

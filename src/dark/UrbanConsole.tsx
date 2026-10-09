@@ -17,7 +17,10 @@ import "./urban.css";
  */
 
 type View = "console" | "compare";
-type LayerKey = "flood_extent" | "buildings" | "roads" | "waterways" | "aoi";
+type LayerKey = "hand_reconstruction" | "flood_extent" | "buildings" | "roads" | "waterways" | "aoi";
+
+// HAND 근사 띠: 현재 단계(stage_index)의 폴리곤만 보인다(안동·포항 화면과 같은 규칙).
+const stageFilter = (time: number) => ["all", ["==", ["geometry-type"], "Polygon"], ["==", ["get", "stage_index"], time]] as never;
 
 const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas";
 const DATA_ATTRIBUTION = [
@@ -229,8 +232,13 @@ function UrbanMap({ layers, tone, time, children }: { layers: LayersResponse; to
   const elementRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [ready, setReady] = useState(false);
-  const [visible, setVisible] = useState<Record<LayerKey, boolean>>({ flood_extent: true, buildings: true, roads: true, waterways: true, aoi: true });
+  const [visible, setVisible] = useState<Record<LayerKey, boolean>>({ hand_reconstruction: true, flood_extent: true, buildings: true, roads: true, waterways: true, aoi: true });
   const [staged, setStaged] = useState(true);
+  const hasHand = layers.hand_reconstruction.feature_count > 0;
+  const handCells = useMemo(
+    () => (hasHand ? layers.hand_reconstruction.data.features.filter((feature) => feature.properties?.stage_index === time).length : 0),
+    [hasHand, layers, time],
+  );
   const revealed = useMemo(
     () => layers.flood_extent.data.features.filter((feature) => Number(feature.properties?.reveal_stage ?? 99) <= time).length,
     [layers, time],
@@ -262,9 +270,14 @@ function UrbanMap({ layers, tone, time, children }: { layers: LayersResponse; to
 
     map.on("load", () => {
       const add = (key: LayerKey) => map.addSource(key, { type: "geojson", data: layers[key].data as never });
-      add("aoi"); add("roads"); add("waterways"); add("flood_extent"); add("buildings");
+      add("aoi"); add("roads"); add("waterways"); add("flood_extent"); add("buildings"); add("hand_reconstruction");
       map.addLayer({ id: "aoi-line", type: "line", source: "aoi", paint: { "line-color": "#22d3ee", "line-width": 1.2, "line-dasharray": [3, 3], "line-opacity": 0.55 } });
       map.addLayer({ id: "roads-line", type: "line", source: "roads", paint: { "line-color": "#64748b", "line-width": 0.8, "line-opacity": 0.4 } });
+      map.addLayer({
+        id: "hand-fill", type: "fill", source: "hand_reconstruction", filter: stageFilter(0),
+        paint: { "fill-color": "#f87171", "fill-opacity": ["interpolate", ["linear"], ["get", "hand_threshold_m"], 0, 0.2, 3, 0.4] },
+      });
+      map.addLayer({ id: "hand-outline", type: "line", source: "hand_reconstruction", filter: stageFilter(0), paint: { "line-color": "#f87171", "line-width": 0.8, "line-opacity": 0.75 } });
       map.addLayer({ id: "waterways-line", type: "line", source: "waterways", paint: { "line-color": "#7dd3fc", "line-width": 2.2, "line-opacity": 0.9 } });
       map.addLayer({ id: "traces-fill", type: "fill", source: "flood_extent", filter: revealFilter(0), paint: { "fill-color": DEPTH_COLOR as never, "fill-opacity": 0.55 } });
       map.addLayer({ id: "buildings-line", type: "line", source: "buildings", minzoom: 14, paint: { "line-color": BUILDING_DEPTH_COLOR as never, "line-width": 1, "line-opacity": 0.85 } });
@@ -305,7 +318,7 @@ function UrbanMap({ layers, tone, time, children }: { layers: LayersResponse; to
     const map = mapRef.current;
     if (!map || !ready) return;
     const groups: Record<LayerKey, string[]> = {
-      flood_extent: ["traces-fill"], buildings: ["buildings-line"], roads: ["roads-line"], waterways: ["waterways-line"], aoi: ["aoi-line"],
+      hand_reconstruction: ["hand-fill", "hand-outline"], flood_extent: ["traces-fill"], buildings: ["buildings-line"], roads: ["roads-line"], waterways: ["waterways-line"], aoi: ["aoi-line"],
     };
     (Object.keys(groups) as LayerKey[]).forEach((key) => {
       groups[key].forEach((id) => { if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", visible[key] ? "visible" : "none"); });
@@ -316,10 +329,11 @@ function UrbanMap({ layers, tone, time, children }: { layers: LayersResponse; to
     const map = mapRef.current;
     if (!map || !ready || !map.getLayer("traces-fill")) return;
     map.setFilter("traces-fill", staged ? revealFilter(time) : null);
+    for (const id of ["hand-fill", "hand-outline"]) if (map.getLayer(id)) map.setFilter(id, stageFilter(time));
   }, [ready, staged, time]);
 
   const names: Record<LayerKey, string> = {
-    flood_extent: "공식 침수흔적", buildings: "흔적과 겹친 건축물", roads: "도로", waterways: "하천(도림천 등)", aoi: "분석 범위",
+    hand_reconstruction: "침수 추정 범위 (HAND 근사)", flood_extent: "공식 침수흔적", buildings: "흔적과 겹친 건축물", roads: "도로", waterways: "하천(도림천 등)", aoi: "분석 범위",
   };
 
   return (
@@ -328,6 +342,7 @@ function UrbanMap({ layers, tone, time, children }: { layers: LayersResponse; to
       {children}
       <div className="dk-legend ub-legend">
         <p>공식 침수흔적 · 침수심</p>
+        {hasHand && <span><i style={{ background: "#f87171" }} />침수 추정 범위 (HAND 근사, 강우 비율) · 현재 {num(handCells)}셀</span>}
         <span><i style={{ background: "#7dd3fc" }} />0.3 m 미만</span>
         <span><i style={{ background: "#38bdf8" }} />0.3–0.5 m</span>
         <span><i style={{ background: "#2563eb" }} />0.5–0.8 m</span>
@@ -342,7 +357,7 @@ function UrbanMap({ layers, tone, time, children }: { layers: LayersResponse; to
             <input type="checkbox" checked={staged} onChange={(event) => setStaged(event.target.checked)} />
             단계별 표시 <small>깊은 곳 먼저</small>
           </label>
-          {(Object.keys(names) as LayerKey[]).map((key) => (
+          {(Object.keys(names) as LayerKey[]).filter((key) => key !== "hand_reconstruction" || hasHand).map((key) => (
             <label key={key}>
               <input type="checkbox" checked={visible[key]} onChange={(event) => setVisible((state) => ({ ...state, [key]: event.target.checked }))} />
               {names[key]} <small>{num(layers[key].feature_count)}</small>

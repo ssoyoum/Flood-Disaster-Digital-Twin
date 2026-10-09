@@ -88,3 +88,17 @@ def test_andong_hand_envelope_rises_to_the_predicted_peak_then_recedes():
     meta = get_timeline_reconstruction("andong-uiseong-2026")["hand_reconstruction"]
     assert meta["stage_driver"] == "REPORTED_GAUGE_AND_ORDER"
     assert "구계리" in meta["stage_driver_basis"]
+
+
+def test_seoul_hand_band_follows_the_rainfall_fraction():
+    layers = get_seoul_layers()
+    hand = layers["hand_reconstruction"]
+    assert hand["status"] == "TEMPORARY" and hand["feature_count"] > 0 and layers["terrain"]["feature_count"] > 0
+    counts = Counter(feature["properties"]["state"] for feature in hand["data"]["features"])
+    series = [counts.get(event["state"], 0) for event in SEOUL_RECONSTRUCTION_EVENTS]
+    assert series == sorted(series) and series[0] > 0 and series[-1] > series[0]
+    reconstruction = client.get("/api/events/seoul-2022/reconstruction").json()
+    assert reconstruction["hand_reconstruction"]["stage_driver"] == "RAINFALL_60MIN_RUNNING_MAX"
+    assert any("14-16%" in item for item in reconstruction["limitations"])
+    status = client.get("/api/events/seoul-2022/status").json()
+    assert status["dem"]["status"] == "DERIVED"
