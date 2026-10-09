@@ -1,0 +1,784 @@
+{
+ "source": "HRFCO OpenAPI",
+ "entries": [
+  {
+   "kind": "waterlevel",
+   "station": "3011665",
+   "interval": "1H",
+   "years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "months": [
+    1,
+    12
+   ],
+   "rows": 70082,
+   "valid": 68099,
+   "by_year": {
+    "2019": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2020": {
+     "rows": 8761,
+     "valid": 8761
+    },
+    "2021": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2022": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2023": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2024": {
+     "rows": 8761,
+     "valid": 8761
+    },
+    "2025": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2026": {
+     "rows": 8760,
+     "valid": 6777
+    }
+   },
+   "requests": 8,
+   "processed_file": "data/processed/hrfco/waterlevel_3011665_1H.csv",
+   "sha256": "463FDC2BE21DE0393252CEE16ED5F6ED755A085B89910B6A4856DDA623BE884C",
+   "fetched_at": "2026-10-10T08:23:20",
+   "qc_jumps": {
+    "kind": "waterlevel",
+    "station": "3011665",
+    "interval": "1H",
+    "jump_threshold_m": 3.0,
+    "flag_count": 3,
+    "flags": [
+     {
+      "time": "2023-05-16 01:00",
+      "from": 1.51,
+      "to": 11.26
+     },
+     {
+      "time": "2023-05-16 12:00",
+      "from": 13.28,
+      "to": 4.17
+     },
+     {
+      "time": "2023-05-16 13:00",
+      "from": 4.17,
+      "to": 1.16
+     }
+    ]
+   }
+  },
+  {
+   "kind": "waterlevel",
+   "station": "3011635",
+   "interval": "1H",
+   "years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "months": [
+    1,
+    12
+   ],
+   "rows": 70082,
+   "valid": 68098,
+   "by_year": {
+    "2019": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2020": {
+     "rows": 8761,
+     "valid": 8761
+    },
+    "2021": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2022": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2023": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2024": {
+     "rows": 8761,
+     "valid": 8761
+    },
+    "2025": {
+     "rows": 8760,
+     "valid": 8759
+    },
+    "2026": {
+     "rows": 8760,
+     "valid": 6777
+    }
+   },
+   "requests": 8,
+   "processed_file": "data/processed/hrfco/waterlevel_3011635_1H.csv",
+   "sha256": "A544D984CA0C32EED4DFD0E6334431FBF430932B6AA750F16BE16AEEC1E728B0",
+   "fetched_at": "2026-10-10T08:23:35",
+   "qc_jumps": {
+    "kind": "waterlevel",
+    "station": "3011635",
+    "interval": "1H",
+    "jump_threshold_m": 3.0,
+    "flag_count": 0,
+    "flags": []
+   }
+  },
+  {
+   "kind": "waterlevel",
+   "station": "3011685",
+   "interval": "1H",
+   "years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "months": [
+    1,
+    12
+   ],
+   "rows": 70082,
+   "valid": 68098,
+   "by_year": {
+    "2019": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2020": {
+     "rows": 8761,
+     "valid": 8761
+    },
+    "2021": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2022": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2023": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2024": {
+     "rows": 8761,
+     "valid": 8761
+    },
+    "2025": {
+     "rows": 8760,
+     "valid": 8759
+    },
+    "2026": {
+     "rows": 8760,
+     "valid": 6777
+    }
+   },
+   "requests": 8,
+   "processed_file": "data/processed/hrfco/waterlevel_3011685_1H.csv",
+   "sha256": "251554E9DC85F96B400F69D75827657EAEE387E6C9F5A8D0DE32D06495756843",
+   "fetched_at": "2026-10-10T08:23:50",
+   "qc_jumps": {
+    "kind": "waterlevel",
+    "station": "3011685",
+    "interval": "1H",
+    "jump_threshold_m": 3.0,
+    "flag_count": 0,
+    "flags": []
+   }
+  },
+  {
+   "kind": "rainfall",
+   "station": "30114070",
+   "interval": "1H",
+   "years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "months": [
+    1,
+    12
+   ],
+   "rows": 70082,
+   "valid": 68100,
+   "by_year": {
+    "2019": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2020": {
+     "rows": 8761,
+     "valid": 8761
+    },
+    "2021": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2022": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2023": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2024": {
+     "rows": 8761,
+     "valid": 8761
+    },
+    "2025": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2026": {
+     "rows": 8760,
+     "valid": 6778
+    }
+   },
+   "requests": 8,
+   "processed_file": "data/processed/hrfco/rainfall_30114070_1H.csv",
+   "sha256": "8F4EFFA51440D9B76F47A64DCCB080D2DFF40D97BFFDAA4AA330F2C1AE2B9B47",
+   "fetched_at": "2026-10-10T08:24:04"
+  },
+  {
+   "kind": "rainfall",
+   "station": "30114020",
+   "interval": "1H",
+   "years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "months": [
+    1,
+    12
+   ],
+   "rows": 70082,
+   "valid": 68100,
+   "by_year": {
+    "2019": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2020": {
+     "rows": 8761,
+     "valid": 8761
+    },
+    "2021": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2022": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2023": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2024": {
+     "rows": 8761,
+     "valid": 8761
+    },
+    "2025": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2026": {
+     "rows": 8760,
+     "valid": 6778
+    }
+   },
+   "requests": 8,
+   "processed_file": "data/processed/hrfco/rainfall_30114020_1H.csv",
+   "sha256": "483D03514FD2725ED50BC2D183AFC75562CFB68FB8F75889A0F5A04C892EFB15",
+   "fetched_at": "2026-10-10T08:24:28"
+  },
+  {
+   "kind": "rainfall",
+   "station": "30104010",
+   "interval": "1H",
+   "years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "months": [
+    1,
+    12
+   ],
+   "rows": 70082,
+   "valid": 55598,
+   "by_year": {
+    "2019": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2020": {
+     "rows": 8761,
+     "valid": 8761
+    },
+    "2021": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2022": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2023": {
+     "rows": 8760,
+     "valid": 8760
+    },
+    "2024": {
+     "rows": 8761,
+     "valid": 8761
+    },
+    "2025": {
+     "rows": 8760,
+     "valid": 3036
+    },
+    "2026": {
+     "rows": 8760,
+     "valid": 0
+    }
+   },
+   "requests": 8,
+   "processed_file": "data/processed/hrfco/rainfall_30104010_1H.csv",
+   "sha256": "D9C612B42134C64717E20A3E02444FA9D67B23AFB715C0368C298B2FEAE35B5A",
+   "fetched_at": "2026-10-10T08:24:55"
+  },
+  {
+   "kind": "rainfall",
+   "station": "30104040",
+   "interval": "1H",
+   "years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "months": [
+    1,
+    12
+   ],
+   "rows": 70082,
+   "valid": 12311,
+   "by_year": {
+    "2019": {
+     "rows": 8760,
+     "valid": 0
+    },
+    "2020": {
+     "rows": 8761,
+     "valid": 0
+    },
+    "2021": {
+     "rows": 8760,
+     "valid": 0
+    },
+    "2022": {
+     "rows": 8760,
+     "valid": 0
+    },
+    "2023": {
+     "rows": 8760,
+     "valid": 0
+    },
+    "2024": {
+     "rows": 8761,
+     "valid": 0
+    },
+    "2025": {
+     "rows": 8760,
+     "valid": 5533
+    },
+    "2026": {
+     "rows": 8760,
+     "valid": 6778
+    }
+   },
+   "requests": 8,
+   "processed_file": "data/processed/hrfco/rainfall_30104040_1H.csv",
+   "sha256": "2254E66327CB7A9760F0111ED9BFB2508476517A30CF4C508E8006F9A39637E2",
+   "fetched_at": "2026-10-10T08:25:08"
+  },
+  {
+   "kind": "waterlevel",
+   "station": "3011665",
+   "interval": "10M",
+   "years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "months": [
+    6,
+    9
+   ],
+   "rows": 140544,
+   "valid": 140544,
+   "by_year": {
+    "2019": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2020": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2021": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2022": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2023": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2024": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2025": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2026": {
+     "rows": 17568,
+     "valid": 17568
+    }
+   },
+   "requests": 72,
+   "processed_file": "data/processed/hrfco/waterlevel_3011665_10M.csv",
+   "sha256": "7FB6808F6190DC2086C58DA9BC2DF5A7848EFD3F382EC8C3F3CDAF40CE04E4F3",
+   "fetched_at": "2026-10-10T08:26:59",
+   "qc_jumps": {
+    "kind": "waterlevel",
+    "station": "3011665",
+    "interval": "10M",
+    "jump_threshold_m": 3.0,
+    "flag_count": 0,
+    "flags": []
+   }
+  },
+  {
+   "kind": "waterlevel",
+   "station": "3011635",
+   "interval": "10M",
+   "years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "months": [
+    6,
+    9
+   ],
+   "rows": 140544,
+   "valid": 140544,
+   "by_year": {
+    "2019": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2020": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2021": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2022": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2023": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2024": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2025": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2026": {
+     "rows": 17568,
+     "valid": 17568
+    }
+   },
+   "requests": 72,
+   "processed_file": "data/processed/hrfco/waterlevel_3011635_10M.csv",
+   "sha256": "48D4744C6968DBCA51E6255CFB9F135DDF586AEE9B59877E2996B5DAD9DCE9C9",
+   "fetched_at": "2026-10-10T08:28:13",
+   "qc_jumps": {
+    "kind": "waterlevel",
+    "station": "3011635",
+    "interval": "10M",
+    "jump_threshold_m": 3.0,
+    "flag_count": 0,
+    "flags": []
+   }
+  },
+  {
+   "kind": "waterlevel",
+   "station": "3011685",
+   "interval": "10M",
+   "years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "months": [
+    6,
+    9
+   ],
+   "rows": 140544,
+   "valid": 140544,
+   "by_year": {
+    "2019": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2020": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2021": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2022": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2023": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2024": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2025": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2026": {
+     "rows": 17568,
+     "valid": 17568
+    }
+   },
+   "requests": 72,
+   "processed_file": "data/processed/hrfco/waterlevel_3011685_10M.csv",
+   "sha256": "10AC70FC9BA4B8C0748AA81A6D50CDA4B8E4F68A5F472D6686B0C2841DC5CED7",
+   "fetched_at": "2026-10-10T08:29:20",
+   "qc_jumps": {
+    "kind": "waterlevel",
+    "station": "3011685",
+    "interval": "10M",
+    "jump_threshold_m": 3.0,
+    "flag_count": 0,
+    "flags": []
+   }
+  },
+  {
+   "kind": "rainfall",
+   "station": "30114070",
+   "interval": "10M",
+   "years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "months": [
+    6,
+    9
+   ],
+   "rows": 140544,
+   "valid": 140544,
+   "by_year": {
+    "2019": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2020": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2021": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2022": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2023": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2024": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2025": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2026": {
+     "rows": 17568,
+     "valid": 17568
+    }
+   },
+   "requests": 72,
+   "processed_file": "data/processed/hrfco/rainfall_30114070_10M.csv",
+   "sha256": "9EAC7962587CC23517DF12B2EF81D2F09FCBFB887E5ED87C53458E905823705F",
+   "fetched_at": "2026-10-10T08:30:37"
+  },
+  {
+   "kind": "rainfall",
+   "station": "30114020",
+   "interval": "10M",
+   "years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "months": [
+    6,
+    9
+   ],
+   "rows": 140544,
+   "valid": 140544,
+   "by_year": {
+    "2019": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2020": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2021": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2022": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2023": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2024": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2025": {
+     "rows": 17568,
+     "valid": 17568
+    },
+    "2026": {
+     "rows": 17568,
+     "valid": 17568
+    }
+   },
+   "requests": 72,
+   "processed_file": "data/processed/hrfco/rainfall_30114020_10M.csv",
+   "sha256": "91BC820A206637D65E7C93BB9FE47EC8192CBA803E9CC0166BC4E89571E1A1E9",
+   "fetched_at": "2026-10-10T08:32:38"
+  }
+ ],
+ "excluded_stations": {
+  "30114110": "옥산 강우: 목록에는 있으나 2019~2026 전 기간 값이 없어 제외(2026-10-10)"
+ },
+ "notes": [
+  "1H CSV는 git에 추적, 10M CSV는 크기 때문에 git 제외(원본 JSON은 data/raw/hrfco에 로컬 보관)",
+  "qc_jumps는 3 m 이상 급변 표시이며 자동 제거는 하지 않는다"
+ ]
+}
