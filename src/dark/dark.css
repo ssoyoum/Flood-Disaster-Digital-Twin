@@ -536,3 +536,13 @@
 .dk-scenario-input-label { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; color: var(--dk-text); font-size: 11px; font-weight: 700; }
 .dk-scenario-input-label strong { color: #2dd4bf; font-size: 12px; font-variant-numeric: tabular-nums; }
 @media (max-width: 700px) { .dk-scenario-tabs { grid-template-columns: 1fr; } }
+
+.dk-agent-scope { display: flex; flex-wrap: wrap; gap: 7px; padding: 8px 0; }
+.dk-agent-scope button, .dk-agent-scope input, .dk-agent-scope select { border: 1px solid var(--dk-line); border-radius: 5px; padding: 6px 8px; background: var(--dk-bg); color: var(--dk-text); font-size: 11px; }
+.dk-agent-scope button[aria-pressed="true"] { border-color: var(--dk-accent); color: var(--dk-accent); }
+.dk-agent-scope label { display: grid; gap: 4px; width: 100%; color: var(--dk-muted); font-size: 11px; }
+.dk-agent-scope small { width: 100%; color: var(--dk-muted); line-height: 1.5; }
+.dk-agent-scope-picker > summary { cursor: pointer; color: var(--dk-accent); font-size: 11px; white-space: nowrap; }
+.dk-agent-compact .dk-agent-scope-picker { flex: none; }
+.dk-agent-compact .dk-agent-head { display: none; }
+.dk-agent-compact .dk-agent-scope-picker[open] .dk-agent-scope { position: absolute; left: 0; top: calc(100% + 9px); z-index: 40; width: min(340px, calc(100vw - 24px)); max-height: calc(100vh - 90px); overflow: auto; padding: 12px; border: 1px solid var(--dk-accent); border-radius: 9px; background: var(--dk-panel); box-shadow: 0 10px 30px #0008; }

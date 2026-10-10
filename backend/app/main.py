@@ -35,6 +35,7 @@ from .seoul_repository import (
 )
 from .case_comparison import get_case_lead_times
 from .twin import FACILITIES as TWIN_FACILITIES, backtest as twin_backtest, facility_status as twin_facility_status, list_facilities as twin_list_facilities, twin_mode
+from . import agent_facility
 from .layer_payload import slim_layers
 from .timeline_cases import (
     analyze_response_timing,
@@ -83,6 +84,19 @@ from .services import (
     run_scenario,
     validate_scenario_buildings,
 )
+
+
+def _require_agent_scope(event_id: str, facility_id: str | None, observation_at: str | None = None) -> None:
+    if facility_id is None:
+        if observation_at is not None:
+            raise HTTPException(status_code=422, detail="Select a facility before setting observation_at.")
+        return
+    try:
+        agent_facility.require_facility(facility_id, event_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Unknown Agent facility")
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 app = FastAPI(title="FloodOps API", version="0.1.0")
@@ -523,10 +537,12 @@ def twin_backtest_route(facility_id: str):
 
 
 @app.get("/api/agent/tools", response_model=list[AgentToolDescriptor], tags=["agent"])
-def agent_tools():
+def agent_tools(event_id: str = "osong-2023", facility_id: str | None = None):
     """List the deterministic tools currently available to the Agent layer."""
 
-    return list_agent_tools()
+    _require_event(event_id)
+    _require_agent_scope(event_id, facility_id)
+    return list_agent_tools(event_id, facility_id)
 
 
 @app.post(
@@ -538,6 +554,7 @@ def run_agent_tool(tool_name: str, request: AgentToolCallRequest):
     """Execute one registered analysis/data tool without LLM-side invention."""
 
     _require_event(request.event_id)
+    _require_agent_scope(request.event_id, request.facility_id, request.observation_at)
     try:
         result = execute_agent_tool(tool_name, request.event_id, request)
     except KeyError as exc:
@@ -558,6 +575,7 @@ def ask_agent_question(request: AgentAskRequest, http_request: Request):
     """Let Gemini choose registered tools iteratively and explain their evidence."""
 
     _require_event(request.event_id)
+    _require_agent_scope(request.event_id, request.facility_id, request.observation_at)
     agent_limiter.check(client_key(http_request))
     return ask_agent(request)
 
@@ -649,14 +667,16 @@ def exposure_inventory(
     response_model=list[AgentExampleQuestion],
     tags=["agent"],
 )
-def agent_examples(event_id: str = "osong-2023"):
+def agent_examples(event_id: str = "osong-2023", facility_id: str | None = None):
     """Starter questions the registered tools can actually answer.
 
     The UI seeds its chips from here so an empty input box never invites a
     request the system has to refuse.
     """
 
-    return list_example_questions(event_id)
+    _require_event(event_id)
+    _require_agent_scope(event_id, facility_id)
+    return agent_facility.EXAMPLES if facility_id else list_example_questions(event_id)
 
 
 @app.get("/api/agent/planner-status", tags=["agent"])

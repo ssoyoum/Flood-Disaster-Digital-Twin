@@ -8,7 +8,7 @@ from collections.abc import Callable
 import re
 from typing import Any
 
-from . import agent_cases
+from . import agent_cases, agent_facility
 from .data import get_event
 from .hand_sensitivity import analyze_hand_threshold
 from .osong_repository import get_osong_reconstruction, get_osong_summary
@@ -130,9 +130,11 @@ _TOOL_CATALOG: tuple[dict[str, Any], ...] = (
 )
 
 
-def list_agent_tools(event_id: str = "osong-2023") -> list[dict[str, Any]]:
+def list_agent_tools(event_id: str = "osong-2023", facility_id: str | None = None) -> list[dict[str, Any]]:
     """Return a copy of the tools that are actually executable for this event."""
 
+    if facility_id:
+        return agent_facility.tools(facility_id, event_id)
     if agent_cases.handles(event_id):
         return agent_cases.tools_for(event_id)
     return [dict(tool) for tool in _TOOL_CATALOG]
@@ -279,6 +281,10 @@ def execute_agent_tool(
 ) -> dict[str, Any]:
     """Execute one registered tool and return only domain-derived values."""
 
+    if request.facility_id:
+        return agent_facility.run_tool(tool_name, event_id, request)
+    if tool_name in agent_facility.TOOL_NAMES:
+        raise ValueError("A facility-scoped tool needs an explicitly selected facility.")
     if tool_name in agent_cases.CASE_TOOL_PARAMETERS:
         if not agent_cases.handles(event_id):
             raise KeyError(f"{tool_name} is not registered for {event_id}")
