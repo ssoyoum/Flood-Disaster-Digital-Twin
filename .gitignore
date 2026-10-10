@@ -29,6 +29,8 @@ data/processed/hrfco/*.csv
 !data/processed/hrfco/rainfall_30114020_1H.csv
 !data/processed/hrfco/rainfall_30104010_1H.csv
 !data/processed/hrfco/rainfall_30104040_1H.csv
+# Reproducible per-hour QC masks stay local; policy and summary provenance are tracked.
+data/processed/hrfco-quality/
 # Layers the app serves are tracked so a GitHub-based build has the same data.
 !data/processed/osong/osong_official_buildings_2023.geojson
 !data/processed/osong/osong_osm_roads_2023.geojson

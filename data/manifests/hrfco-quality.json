@@ -1,0 +1,139 @@
+{
+  "policy_id": "hourly_water_research_v1",
+  "policy_sha256": "f0fefc427c9426eb79a2ea36ed3d444add8bf049b14e24c85c3c2757070931fb",
+  "audited_at": "2026-10-10T10:07:45.294352+09:00",
+  "training_integration_complete": false,
+  "station_notes": {
+    "30114110": "옥산 강우는 수집 manifest에서 무자료로 제외돼 있다. 운영 목록에 존재한다는 사실을 관측 확보로 계산하지 않는다.",
+    "30104010": "부강면사무소 강우와 명학리(30104040)는 교체 후보이며 공식 확인 전 서로 다른 관측소로 보관한다.",
+    "30104040": "명학리 강우와 부강면사무소(30104010)를 자동으로 이어 붙이지 않는다. 교체·기준·위치 확인 필요."
+  },
+  "source": "stored real HRFCO hourly water observations",
+  "stations": {
+    "3011665": {
+      "station_id": "3011665",
+      "status": "AUDITED",
+      "counts": {
+        "MISSING_HOUR": 46,
+        "RESEARCH_QUARANTINE": 12,
+        "INVALID_VALUE": 1983,
+        "hourly_slots": 70128,
+        "unique_recorded_hours": 70082,
+        "usable_readings": 68087,
+        "usable_training_windows": 67967,
+        "quarantine_affected_windows": 42,
+        "jump_review_count": 3
+      },
+      "first": "2019-01-01T00:00:00",
+      "last": "2026-12-31T23:00:00",
+      "first_usable_observation": "2019-01-01T00:00:00",
+      "last_usable_observation": "2026-10-10T08:00:00",
+      "gap_intervals": [
+        {
+          "start": "2020-01-01T00:00:00",
+          "end": "2020-01-01T22:00:00",
+          "hours": 23
+        },
+        {
+          "start": "2024-01-01T00:00:00",
+          "end": "2024-01-01T22:00:00",
+          "hours": 23
+        }
+      ],
+      "jump_review": [
+        {
+          "time": "2023-05-16T01:00:00",
+          "previous_time": "2023-05-16T00:00:00",
+          "change_m": 9.75,
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "time": "2023-05-16T12:00:00",
+          "previous_time": "2023-05-16T11:00:00",
+          "change_m": -9.11,
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "time": "2023-05-16T13:00:00",
+          "previous_time": "2023-05-16T12:00:00",
+          "change_m": -3.01,
+          "status": "REVIEW_REQUIRED"
+        }
+      ],
+      "source_file": "waterlevel_3011665_1H.csv",
+      "source_sha256": "463fdc2be21de0393252cee16ed5f6ed755a085b89910b6a4856dda623be884c",
+      "quality_file": "waterlevel_3011665_1H_quality.csv",
+      "quality_sha256": "e67dfb16637a16023aeb517f0b640e2d97f26d53939003e3b033c30b92bd9e92"
+    },
+    "3011635": {
+      "station_id": "3011635",
+      "status": "AUDITED",
+      "counts": {
+        "MISSING_HOUR": 46,
+        "INVALID_VALUE": 1984,
+        "hourly_slots": 70128,
+        "unique_recorded_hours": 70082,
+        "usable_readings": 68098,
+        "usable_training_windows": 67997,
+        "quarantine_affected_windows": 0,
+        "jump_review_count": 0
+      },
+      "first": "2019-01-01T00:00:00",
+      "last": "2026-12-31T23:00:00",
+      "first_usable_observation": "2019-01-01T00:00:00",
+      "last_usable_observation": "2026-10-10T08:00:00",
+      "gap_intervals": [
+        {
+          "start": "2020-01-01T00:00:00",
+          "end": "2020-01-01T22:00:00",
+          "hours": 23
+        },
+        {
+          "start": "2024-01-01T00:00:00",
+          "end": "2024-01-01T22:00:00",
+          "hours": 23
+        }
+      ],
+      "jump_review": [],
+      "source_file": "waterlevel_3011635_1H.csv",
+      "source_sha256": "a544d984ca0c32eed4dfd0e6334431fbf430932b6aa750f16be16aeec1e728b0",
+      "quality_file": "waterlevel_3011635_1H_quality.csv",
+      "quality_sha256": "982584fa3b05834686b8a50f20d82db727d077d4e792c29aa932ba8930465ed9"
+    },
+    "3011685": {
+      "station_id": "3011685",
+      "status": "AUDITED",
+      "counts": {
+        "MISSING_HOUR": 46,
+        "INVALID_VALUE": 1984,
+        "hourly_slots": 70128,
+        "unique_recorded_hours": 70082,
+        "usable_readings": 68098,
+        "usable_training_windows": 67997,
+        "quarantine_affected_windows": 0,
+        "jump_review_count": 0
+      },
+      "first": "2019-01-01T00:00:00",
+      "last": "2026-12-31T23:00:00",
+      "first_usable_observation": "2019-01-01T00:00:00",
+      "last_usable_observation": "2026-10-10T08:00:00",
+      "gap_intervals": [
+        {
+          "start": "2020-01-01T00:00:00",
+          "end": "2020-01-01T22:00:00",
+          "hours": 23
+        },
+        {
+          "start": "2024-01-01T00:00:00",
+          "end": "2024-01-01T22:00:00",
+          "hours": 23
+        }
+      ],
+      "jump_review": [],
+      "source_file": "waterlevel_3011685_1H.csv",
+      "source_sha256": "251554e9dc85f96b400f69d75827657eaee387e6c9f5a8d0de32d06495756843",
+      "quality_file": "waterlevel_3011685_1H_quality.csv",
+      "quality_sha256": "a7fe538e82543d794edecef5b328ccecc16c534db02d432c7ced8b2df1bc2440"
+    }
+  }
+}

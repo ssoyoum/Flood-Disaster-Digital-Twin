@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "hourly_water_research_v1",
+  "jump_review_threshold_m": 3.0,
+  "jump_alone_rejects_reading": false,
+  "input_lags_hours": [0, 1, 3, 6, 12, 24],
+  "target_leads_hours": [1, 2, 3, 4, 5, 6],
+  "quarantines": [
+    {
+      "id": "mihoganggyo_20230516_research_quarantine",
+      "station_id": "3011665",
+      "start": "2023-05-16T01:00:00",
+      "end": "2023-05-16T12:00:00",
+      "reason": "실명 1H 자료에서 00:00 1.51m → 01:00 11.26m, 09:00 13.28m → 12:00 4.17m → 13:00 1.16m 계단 변화가 확인돼 연구 학습에서 격리한다. 센서 오류의 공식 확정이 아니라 원출처 확인 전 보수적 제외다.",
+      "evidence": "data/processed/hrfco/waterlevel_3011665_1H.csv",
+      "review_status": "SOURCE_CONFIRMATION_PENDING"
+    }
+  ],
+  "station_notes": {
+    "30114110": "옥산 강우는 수집 manifest에서 무자료로 제외돼 있다. 운영 목록에 존재한다는 사실을 관측 확보로 계산하지 않는다.",
+    "30104010": "부강면사무소 강우와 명학리(30104040)는 교체 후보이며 공식 확인 전 서로 다른 관측소로 보관한다.",
+    "30104040": "명학리 강우와 부강면사무소(30104010)를 자동으로 이어 붙이지 않는다. 교체·기준·위치 확인 필요."
+  }
+}
