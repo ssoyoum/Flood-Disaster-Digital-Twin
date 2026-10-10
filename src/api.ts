@@ -1,5 +1,6 @@
 import type { TwinBacktest, TwinFacility, TwinMode, TwinStatus, CaseLeadTimes, ResponseTimingResult, TimelineReconstructionResponse, AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
 import { boundedAgentHistory, type ConversationMessage } from "./agentConversation";
+import type { WaterLevelReadiness } from "./types";
 
 const configuredApiBase = import.meta.env.VITE_API_BASE;
 const API_BASE = configuredApiBase === "same-origin" ? "" : configuredApiBase ?? (import.meta.env.PROD ? "" : "http://localhost:8033");
@@ -143,3 +144,5 @@ export const getTwinMode = () => request<TwinMode>("/api/twin/mode");
 export const getTwinFacilities = () => request<TwinFacility[]>("/api/twin/facilities");
 export const getTwinStatus = (facilityId: string, at?: string) => request<TwinStatus>(`/api/twin/facilities/${encodeURIComponent(facilityId)}/status${at ? `?at=${encodeURIComponent(at)}` : ""}`);
 export const getTwinBacktest = (facilityId: string) => request<TwinBacktest>(`/api/twin/facilities/${encodeURIComponent(facilityId)}/backtest`);
+export const getWaterLevelReadiness = (facilityId: string, at?: string, signal?: AbortSignal) =>
+  request<WaterLevelReadiness>(`/api/twin/facilities/${encodeURIComponent(facilityId)}/forecast-readiness${at ? `?at=${encodeURIComponent(at)}` : ""}`, { signal });

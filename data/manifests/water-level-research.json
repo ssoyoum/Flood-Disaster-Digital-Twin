@@ -1,0 +1,149 @@
+{
+  "schema_version": "1.0",
+  "project": "water-level-rise",
+  "imported_at": "2026-10-10T04:56:34.872693+09:00",
+  "status": "RESEARCH_ONLY",
+  "target": "max(WL(t+1h),...,WL(t+6h))-WL(t)",
+  "horizon_hours": 6,
+  "target_unit": "m",
+  "negative_target_valid": true,
+  "station_identity": "anonymous",
+  "timestamp_identity": "synthetic",
+  "real_station_mapping_available": false,
+  "facility_validation_complete": false,
+  "required_features": [
+    "wl_t",
+    "wl_t_minus_1h",
+    "wl_t_minus_3h",
+    "wl_t_minus_6h",
+    "wl_t_minus_12h",
+    "wl_t_minus_24h",
+    "imerg_rain_1h",
+    "imerg_rain_6h",
+    "imerg_rain_24h",
+    "sfc_rain_1h",
+    "sfc_rain_6h",
+    "sfc_rain_24h",
+    "radar_reflectivity_mean",
+    "radar_reflectivity_p95",
+    "radar_reflectivity_ge20_fraction",
+    "cat_area",
+    "wsarea",
+    "mean_elevation",
+    "mean_slope",
+    "urban_ratio",
+    "forest_ratio",
+    "stream_order"
+  ],
+  "trained_features": [
+    "wl_t",
+    "wl_t_minus_1h",
+    "wl_t_minus_3h",
+    "wl_t_minus_6h",
+    "wl_t_minus_12h",
+    "wl_t_minus_24h",
+    "imerg_rain_1h",
+    "imerg_rain_6h",
+    "imerg_rain_24h",
+    "sfc_rain_1h",
+    "sfc_rain_6h",
+    "sfc_rain_24h",
+    "radar_reflectivity_mean",
+    "radar_reflectivity_p95",
+    "radar_reflectivity_ge20_fraction",
+    "cat_area",
+    "wsarea",
+    "mean_elevation",
+    "mean_slope",
+    "urban_ratio",
+    "forest_ratio",
+    "stream_order",
+    "wl_change_1h",
+    "wl_change_3h",
+    "wl_change_6h",
+    "wl_change_12h",
+    "wl_change_24h",
+    "wl_acceleration_3h",
+    "wl_acceleration_6h",
+    "wl_observed_range_24h",
+    "imerg_rain_previous_1_to_6h",
+    "imerg_rain_previous_6_to_24h",
+    "imerg_rain_recent_share",
+    "sfc_rain_previous_1_to_6h",
+    "sfc_rain_previous_6_to_24h",
+    "sfc_rain_recent_share",
+    "sfc_rain_6h_x_log_area",
+    "tide_proxy_rise",
+    "tide_proxy_rise_24h",
+    "station_tide_corr",
+    "wl_above_station_median",
+    "station_rise_std",
+    "station_rise_q99"
+  ],
+  "models": [
+    "lgbm",
+    "xgb",
+    "cat"
+  ],
+  "seeds": 3,
+  "evaluation": {
+    "type": "source_project_train_oof",
+    "rows": 749657,
+    "test_prediction_rows": 186263,
+    "global_rmse_m": 0.22156424090829827,
+    "target_gt_1m_rows": 18889,
+    "target_gt_1m_rmse_m": 1.0998626388593806,
+    "folds": [
+      {
+        "fold": 1,
+        "events": 29,
+        "rows": 187485,
+        "rmse_m": 0.2656956339135328
+      },
+      {
+        "fold": 2,
+        "events": 31,
+        "rows": 187373,
+        "rmse_m": 0.15731032903876085
+      },
+      {
+        "fold": 3,
+        "events": 31,
+        "rows": 187413,
+        "rmse_m": 0.21722966395688045
+      },
+      {
+        "fold": 4,
+        "events": 31,
+        "rows": 187386,
+        "rmse_m": 0.23199275726131477
+      }
+    ],
+    "recomputed_from_oof": true,
+    "floodops_facility_score": null
+  },
+  "provenance": [
+    {
+      "file": "baseline.py",
+      "sha256": "d28d4a18b0e30bc8365939ff56cda01837de0fae1728b801a04d0e765ca3b02a"
+    },
+    {
+      "file": "train_lgbm.py",
+      "sha256": "5f0bdfc512a80e97a87abeaf67bfdfa6dba30e31576e5bd5f5447c1bce9d1352"
+    },
+    {
+      "file": "artifacts/blend_metrics.json",
+      "sha256": "d2a8eb0bd74caa735e447b38232374a82c1110b8efba98c842b9f76179f230a3"
+    },
+    {
+      "file": "artifacts/blend_oof.csv",
+      "sha256": "db2182009445c150d72770bc7d7f223b82d6eb1d14a1b21d2522279e5e910e64"
+    }
+  ],
+  "limits": [
+    "익명 관측소·합성 시각을 실제 시설/시각과 연결하지 않는다.",
+    "대회 내부 OOF 오차는 FloodOps 실제 시설 예측 성능이 아니다.",
+    "6시간 최대 상승량은 임계 도달 시각·침수심·통제 명령이 아니다.",
+    "실제 관측의 단위·처리·유역 대표성을 확인하고 실측 사건으로 별도 학습·검증해야 한다."
+  ]
+}

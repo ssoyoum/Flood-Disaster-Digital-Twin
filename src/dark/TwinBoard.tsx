@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Activity, AlertTriangle, ArrowLeft, Gauge, Radio, RotateCcw } from "lucide-react";
 import * as api from "../api";
-import type { TwinBacktest, TwinFacility, TwinStatus } from "../types";
+import type { TwinBacktest, TwinFacility, TwinStatus, WaterLevelReadiness } from "../types";
 import { FloodOpsLogo } from "./Landing";
 import "./dark.css";
 import "./twin.css";
@@ -48,7 +48,8 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
   const [backtest, setBacktest] = useState<TwinBacktest | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
+  const [waterInputs, setWaterInputs] = useState<WaterLevelReadiness | null>(null);
+  const [waterInputError, setWaterInputError] = useState<string | null>(null);
   useEffect(() => {
     api.getTwinFacilities().then((list) => { setFacilities(list); setFacilityId((current) => current ?? list[0]?.id ?? null); }).catch((reason: Error) => setError(reason.message));
     // 뒤로가기나 주소 직접 수정으로 ?at= 가 바뀌면 같은 컴포넌트에서 다시 읽는다.
@@ -61,12 +62,32 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
     if (!facilityId) return undefined;
     let cancelled = false;
     setLoading(true);
+    setStatus(null);
+    setBacktest(null);
     setError(null);
     Promise.all([api.getTwinStatus(facilityId, at ?? undefined), api.getTwinBacktest(facilityId)])
       .then(([nextStatus, nextBacktest]) => { if (!cancelled) { setStatus(nextStatus); setBacktest(nextBacktest); } })
       .catch((reason: Error) => { if (!cancelled) setError(reason.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
+  }, [facilityId, at]);
+
+  useEffect(() => {
+    if (!facilityId) return undefined;
+    let active = true;
+    let pending: AbortController | null = null;
+    setWaterInputs(null); setWaterInputError(null);
+    const refresh = () => {
+      pending?.abort();
+      const controller = new AbortController();
+      pending = controller;
+      api.getWaterLevelReadiness(facilityId, at ?? undefined, controller.signal)
+        .then((data) => { if (active && !controller.signal.aborted) { setWaterInputs(data); setWaterInputError(null); } })
+        .catch(() => { if (active && !controller.signal.aborted) setWaterInputError("수위 이력을 불러오지 못했습니다. 현재 관측과 연결 상태를 확인해 주세요."); });
+    };
+    refresh();
+    const timer = at ? null : window.setInterval(refresh, 5 * 60_000);
+    return () => { active = false; pending?.abort(); if (timer !== null) window.clearInterval(timer); };
   }, [facilityId, at]);
 
   // 실시간 모드에서는 5분마다 다시 읽는다(관측은 10분 간격).
@@ -133,8 +154,8 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
               </>
             ) : (
               <>
-                <div className="tw-reco-badge is-empty">관측 없음</div>
-                <p className="tw-reco-reason">이 시각에는 관측값이 없습니다. 실시간 모드에서는 10분 자료가 늦게 채워질 수 있어 1시간 자료로 대체합니다.</p>
+                <div className="tw-reco-badge is-empty">{loading ? "관측 확인 중" : "관측 없음"}</div>
+                <p className="tw-reco-reason">{loading ? "선택한 시설과 시각의 관측을 불러오고 있습니다." : "이 시각에는 관측값이 없습니다. 실시간 모드에서는 10분 자료가 늦게 채워질 수 있어 1시간 자료로 대체합니다."}</p>
               </>
             )}
           </article>
@@ -152,6 +173,28 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
               관측 {clock(status?.observation?.time)} · {status?.observation?.interval === "1H" ? "1시간 자료" : "10분 자료"} · {status?.observation?.age_min ?? "—"}분 전
               {status?.reference_minutes_to_inflow !== null && status?.reference_minutes_to_inflow !== undefined && ` · 2023년 실제 유입(08:27)까지 ${status.reference_minutes_to_inflow}분`}
             </small>
+          </article>
+
+          <article className="tw-card tw-water-history" aria-label="수위 이력과 예측 연결">
+            <p className="tw-eyebrow">24시간 수위 이력 · 예측 모델 입력 연결</p>
+            {waterInputs ? <>
+              <p className="tw-water-context">{waterInputs.mode === "replay" ? "과거 재생" : "실시간 관측"} · {dayClock(waterInputs.as_of)} 기준</p>
+              {waterInputs.observation_quality !== "fresh" && <p className="dk-error">{waterInputs.observation_quality === "missing" ? "연결된 수위 관측이 없습니다." : "관측이 오래돼 현재 판단에 사용할 수 없습니다."}</p>}
+              <table className="ub-table tw-table">
+                <thead><tr><th>입력 시점</th><th>관측 시각</th><th>수위</th></tr></thead>
+                <tbody>{waterInputs.history.map((point) => <tr key={point.hours_ago}>
+                  <td>{point.hours_ago === 0 ? "기준 시점" : `${point.hours_ago}시간 전`}</td>
+                  <td>{dayClock(point.time)}</td><td>{point.water_level_m === null ? "관측 없음" : `${num(point.water_level_m)} m`}</td>
+                </tr>)}</tbody>
+              </table>
+              <details className="tw-water-research">
+                <summary>6시간 상승량 예측 · 실측 검증 대기</summary>
+                <p>수위 예측 프로젝트의 입력 {waterInputs.required_input_count}종 중 수위 {waterInputs.available_input_count}종을 연결했습니다. 강우·레이더·유역 조건과 실제 관측소 검증이 더 필요합니다.</p>
+                <p>연구 모델의 내부 검증 오차는 {num(waterInputs.research.evaluation.global_rmse_m, 3)} m입니다. 1m 초과 상승 구간에서는 {num(waterInputs.research.evaluation.target_gt_1m_rmse_m, 3)} m이며, 이 시설의 예측 성능을 뜻하지 않습니다.</p>
+                <small className="ub-note">원본의 관측소와 시각은 익명화돼 실제 시설과 직접 연결할 수 없습니다. 지금 표시한 값은 관측 이력이며, 모델 예측이나 통제 권고가 아닙니다.</small>
+              </details>
+            </> : !waterInputError && <small className="ub-note">수위 이력을 확인하는 중…</small>}
+            {waterInputError && <p className="dk-error">{waterInputError}</p>}
           </article>
         </section>
 

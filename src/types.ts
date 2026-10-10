@@ -566,3 +566,14 @@ export type TwinBacktest = {
   lead_minutes: Record<string, number> | null;
   reference_event: Record<string, string>; note: string;
 };
+
+export type WaterLevelReadiness = {
+  facility_id: string; station_id: string; at: string; mode: "replay" | "live"; status: "RESEARCH_ONLY";
+  as_of: string | null; observation_quality: "fresh" | "stale" | "missing"; observation_age_min: number | null;
+  prediction_available: false; prediction_maxrise_6h_m: null; control_decision_usable: false;
+  available_input_count: number; required_input_count: number; missing_features: string[]; blockers: string[];
+  history: Array<{ hours_ago: number; time: string | null; water_level_m: number | null; status: string }>;
+  research: { project: string; horizon_hours: number; evaluation: { global_rmse_m: number; target_gt_1m_rmse_m: number; rows: number } };
+  limitations: string[];
+};
+

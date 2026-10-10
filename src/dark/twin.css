@@ -1,5 +1,6 @@
 /* 지하차도 통제 판단 보드 (TwinBoard). dark.css·urban.css의 dk-/ub- 규칙을 재사용한다. */
 .tw-root { min-height: 100dvh; display: flex; flex-direction: column; }
+.tw-root .dk-topbar { flex-shrink: 0; min-height: 58px; }
 .tw-root .dk-topbar h1 { margin: 0; font-size: 15px; }
 .tw-tab-link { display: inline-flex; align-items: center; height: 100%; padding: 0 12px; border-bottom: 2px solid transparent; color: var(--dk-muted); font-size: 12px; font-weight: 800; text-decoration: none; }
 .tw-tab-link:hover { color: var(--dk-text); border-bottom-color: var(--dk-accent); }
@@ -8,7 +9,7 @@
 .tw-mode[data-mode="replay"] { color: #fbbf24; border-color: #fbbf24; }
 .tw-back { padding: 6px 10px; font-size: 12px; }
 
-.tw-main { flex: 1; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; padding: 16px 18px 24px; max-width: 1480px; width: 100%; margin: 0 auto; box-sizing: border-box; }
+.tw-main { flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; padding: 16px 18px 24px; max-width: 1480px; width: 100%; margin: 0 auto; box-sizing: border-box; }
 .tw-col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .tw-card { padding: 16px 18px; border: 1px solid var(--dk-line); border-radius: 12px; background: rgba(17, 26, 43, .86); }
 .tw-eyebrow { margin: 0 0 8px; color: var(--dk-muted); font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
@@ -47,6 +48,10 @@
 .tw-time { display: flex; align-items: center; gap: 10px; color: var(--dk-muted); font-size: 12px; }
 .tw-time input { padding: 5px 8px; border: 1px solid var(--dk-line); border-radius: 6px; background: var(--dk-panel-2); color: var(--dk-text); }
 .tw-table { width: 100%; margin-top: 8px; }
+.tw-water-context { color: var(--dk-muted); font-size: 12px; }
+.tw-water-research { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--dk-line); }
+.tw-water-research summary { cursor: pointer; color: var(--dk-accent); font-size: 13px; }
+.tw-water-research p { color: var(--dk-text); font-size: 12px; line-height: 1.6; }
 
 @media (max-width: 960px) {
   .tw-main { grid-template-columns: 1fr; }
