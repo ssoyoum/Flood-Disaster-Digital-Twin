@@ -37,6 +37,7 @@ from .case_comparison import get_case_lead_times
 from .twin import FACILITIES as TWIN_FACILITIES, backtest as twin_backtest, facility_status as twin_facility_status, list_facilities as twin_list_facilities, twin_mode
 from . import agent_facility
 from .water_level_bridge import readiness as water_level_readiness
+from .rise_model import forecast as rise_forecast
 from .layer_payload import slim_layers
 from .timeline_cases import (
     analyze_response_timing,
@@ -548,6 +549,20 @@ def twin_forecast_readiness(facility_id: str, at: str | None = None):
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=503, detail="Water-level research inputs unavailable") from exc
+
+
+@app.get("/api/twin/facilities/{facility_id}/rise-forecast", tags=["twin"])
+def twin_rise_forecast(facility_id: str, at: str | None = Query(default=None, description="ISO time; same convention as /status")):
+    """6-hour maximum rise predicted by the model retrained on real HRFCO stations. Research card; never feeds the recommendation."""
+
+    if facility_id not in TWIN_FACILITIES:
+        raise HTTPException(status_code=404, detail=f"Unknown facility: {facility_id}")
+    try:
+        return rise_forecast(facility_id, at)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Rise forecast unavailable: {exc}") from exc
 
 
 @app.get("/api/agent/tools", response_model=list[AgentToolDescriptor], tags=["agent"])

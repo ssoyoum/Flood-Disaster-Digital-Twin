@@ -57,3 +57,11 @@
   .tw-main { grid-template-columns: 1fr; }
   .tw-root .dk-status { margin-left: 0; }
 }
+
+/* 6시간 최대 상승 예측(연구 카드): 권고 카드와 구분되도록 점선 테두리를 쓴다. */
+.tw-rise { border-style: dashed; }
+.tw-rise-head { display: flex; align-items: center; gap: 14px; margin: 4px 0 10px; }
+.tw-rise-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 10px; background: color-mix(in srgb, var(--rise-tone) 18%, transparent); color: var(--rise-tone); font-size: 24px; font-weight: 900; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tw-rise-reach { display: block; font-size: 15px; color: var(--rise-tone); }
+.tw-rise-sub { display: block; margin-top: 2px; color: var(--dk-muted); font-size: 12px; }
+.tw-rise-kpis { margin: 0 0 8px; }

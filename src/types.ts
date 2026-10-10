@@ -577,3 +577,18 @@ export type WaterLevelReadiness = {
   limitations: string[];
 };
 
+export type RiseForecast = {
+  facility_id: string; station_id: string; at: string; mode: "replay" | "live"; kind: "RESEARCH"; control_decision_usable: false; horizon_hours: number;
+  as_of: string | null; observation_quality: "fresh" | "stale" | "missing"; observation_age_min: number | null; interval: string | null;
+  inputs: { water: Record<string, number | null>; rain: { sfc_rain_1h: number | null; sfc_rain_6h: number | null; sfc_rain_24h: number | null; station: string | null } };
+  model: {
+    trained_at: string | null; stations: number | null; train_rows: number | null; rows_with_rain: number | null;
+    cv_oof_rmse_m: number | null; cv_oof_rmse_target_gt_1m: number | null; cv_linear_rmse_m: number | null; cv_no_change_rmse_m: number | null;
+    holdout_month: string | null; holdout_pfh_skill: { hours_reaching_within_6h: number; model: { hit: number; miss: number; false_alarm: number; pod: number | null; far: number | null }; linear: { hit: number; miss: number; false_alarm: number; pod: number | null; far: number | null } } | null;
+    osong_planned_flood_lead_min: number | null; osong_planned_flood_lead_min_linear: number | null; osong_window_rmse_m: Record<string, number> | null; contract: string | null; lightgbm: string | null;
+  } | null;
+  prediction_available: boolean; reason?: string; missing_inputs?: string[];
+  maxrise_6h_m?: number; forecast_level_m?: number; forecast_level_el_m?: number; forecast_stage?: string; forecast_stage_label?: string;
+  reaches_within_6h?: { advisory: boolean; warning: boolean; planned_flood: boolean }; margin_after_rise_m?: number; linear_6h_m?: number; station_in_training?: boolean;
+  limitations: string[];
+};

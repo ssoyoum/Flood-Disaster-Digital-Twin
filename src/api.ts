@@ -1,4 +1,4 @@
-import type { TwinBacktest, TwinFacility, TwinMode, TwinStatus, CaseLeadTimes, ResponseTimingResult, TimelineReconstructionResponse, AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
+import type { RiseForecast, TwinBacktest, TwinFacility, TwinMode, TwinStatus, CaseLeadTimes, ResponseTimingResult, TimelineReconstructionResponse, AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
 import { boundedAgentHistory, type ConversationMessage } from "./agentConversation";
 import type { WaterLevelReadiness } from "./types";
 
@@ -146,3 +146,5 @@ export const getTwinStatus = (facilityId: string, at?: string) => request<TwinSt
 export const getTwinBacktest = (facilityId: string) => request<TwinBacktest>(`/api/twin/facilities/${encodeURIComponent(facilityId)}/backtest`);
 export const getWaterLevelReadiness = (facilityId: string, at?: string, signal?: AbortSignal) =>
   request<WaterLevelReadiness>(`/api/twin/facilities/${encodeURIComponent(facilityId)}/forecast-readiness${at ? `?at=${encodeURIComponent(at)}` : ""}`, { signal });
+export const getRiseForecast = (facilityId: string, at?: string, signal?: AbortSignal) =>
+  request<RiseForecast>(`/api/twin/facilities/${encodeURIComponent(facilityId)}/rise-forecast${at ? `?at=${encodeURIComponent(at)}` : ""}`, { signal });

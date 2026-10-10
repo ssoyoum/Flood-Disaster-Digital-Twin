@@ -18,12 +18,15 @@ RUN npm run build
 FROM python:3.12-slim
 WORKDIR /app
 COPY backend/requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# LightGBM (6-hour rise model) needs OpenMP at runtime.
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir -r requirements.txt
 COPY backend/app ./backend/app
 COPY data/processed/osong ./data/processed/osong
 COPY data/processed/seoul_2022 ./data/processed/seoul_2022
 COPY data/processed/pohang_2022 ./data/processed/pohang_2022
 COPY data/processed/andong_uiseong_2026 ./data/processed/andong_uiseong_2026
+COPY data/models ./data/models
 COPY --from=frontend-build /web/dist ./dist
 ENV PYTHONPATH=/app/backend \
     FLOODOPS_STATIC_DIR=/app/dist

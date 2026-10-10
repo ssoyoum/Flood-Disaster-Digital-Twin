@@ -5,3 +5,4 @@ shapely==2.0.6
 pytest==8.3.4
 httpx==0.28.1
 python-dotenv==1.0.1
+lightgbm==4.7.0

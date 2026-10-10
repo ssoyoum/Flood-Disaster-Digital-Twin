@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Activity, AlertTriangle, ArrowLeft, Gauge, Radio, RotateCcw } from "lucide-react";
+import { Activity, AlertTriangle, ArrowLeft, Gauge, Radio, RotateCcw, TrendingUp } from "lucide-react";
 import * as api from "../api";
-import type { TwinBacktest, TwinFacility, TwinStatus, WaterLevelReadiness } from "../types";
+import type { RiseForecast, TwinBacktest, TwinFacility, TwinStatus, WaterLevelReadiness } from "../types";
 import { FloodOpsLogo } from "./Landing";
 import "./dark.css";
 import "./twin.css";
@@ -50,6 +50,28 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
   const [loading, setLoading] = useState(false);
   const [waterInputs, setWaterInputs] = useState<WaterLevelReadiness | null>(null);
   const [waterInputError, setWaterInputError] = useState<string | null>(null);
+  const [rise, setRise] = useState<RiseForecast | null>(null);
+  const [riseError, setRiseError] = useState<string | null>(null);
+
+  // 6시간 최대 상승 예측(연구 카드). 권고와 같은 시각을 보되 권고 계산에는 들어가지 않는다.
+  useEffect(() => {
+    if (!facilityId) return undefined;
+    let active = true;
+    let pending: AbortController | null = null;
+    setRise(null); setRiseError(null);
+    const refresh = () => {
+      pending?.abort();
+      const controller = new AbortController();
+      pending = controller;
+      api.getRiseForecast(facilityId, at ?? undefined, controller.signal)
+        .then((data) => { if (active && !controller.signal.aborted) { setRise(data); setRiseError(null); } })
+        .catch(() => { if (active && !controller.signal.aborted) setRiseError("상승 예측을 불러오지 못했습니다."); });
+    };
+    refresh();
+    const timer = at ? null : window.setInterval(refresh, 5 * 60_000);
+    return () => { active = false; pending?.abort(); if (timer !== null) window.clearInterval(timer); };
+  }, [facilityId, at]);
+
   useEffect(() => {
     api.getTwinFacilities().then((list) => { setFacilities(list); setFacilityId((current) => current ?? list[0]?.id ?? null); }).catch((reason: Error) => setError(reason.message));
     // 뒤로가기나 주소 직접 수정으로 ?at= 가 바뀌면 같은 컴포넌트에서 다시 읽는다.
@@ -175,6 +197,8 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
             </small>
           </article>
 
+          <RiseCard rise={rise} error={riseError} levels={status?.levels_m ?? null} />
+
           <article className="tw-card tw-water-history" aria-label="수위 이력과 예측 연결">
             <p className="tw-eyebrow">24시간 수위 이력 · 예측 모델 입력 연결</p>
             {waterInputs ? <>
@@ -188,7 +212,7 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
                 </tr>)}</tbody>
               </table>
               <details className="tw-water-research">
-                <summary>6시간 상승량 예측 · 실측 검증 대기</summary>
+                <summary>연구 모델 입력 연결 · 원본(익명 관측소) 검증 수치</summary>
                 <p>수위 예측 프로젝트의 입력 {waterInputs.required_input_count}종 중 수위 {waterInputs.available_input_count}종을 연결했습니다. 강우·레이더·유역 조건과 실제 관측소 검증이 더 필요합니다.</p>
                 <p>연구 모델의 내부 검증 오차는 {num(waterInputs.research.evaluation.global_rmse_m, 3)} m입니다. 1m 초과 상승 구간에서는 {num(waterInputs.research.evaluation.target_gt_1m_rmse_m, 3)} m이며, 이 시설의 예측 성능을 뜻하지 않습니다.</p>
                 <small className="ub-note">원본의 관측소와 시각은 익명화돼 실제 시설과 직접 연결할 수 없습니다. 지금 표시한 값은 관측 이력이며, 모델 예측이나 통제 권고가 아닙니다.</small>
@@ -252,6 +276,68 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
         </section>
       </main>
     </div>
+  );
+}
+
+const RISE_REASON: Record<string, string> = {
+  MODEL_NOT_AVAILABLE: "학습된 모델 파일이 서버에 없습니다.",
+  MISSING_EXACT_LAGS: "24시간 전까지의 정시 관측이 모자라 예측하지 않습니다.",
+  OBSERVATION_NOT_FRESH: "관측이 오래돼 예측하지 않습니다.",
+};
+
+/*
+ * 6시간 최대 상승 예측 카드. 홍수통제소 실명 관측소 자료로 다시 학습한 LightGBM이 "앞으로 6시간 안의 최대 상승량"을 낸다.
+ * 권고 배지는 수위 규칙만으로 계산되므로 이 카드는 참고 자료다. 도달 시각이나 침수심은 예측하지 않는다.
+ */
+function RiseCard({ rise, error, levels }: { rise: RiseForecast | null; error: string | null; levels: Record<string, number> | null }) {
+  const model = rise?.model ?? null;
+  const skill = model?.holdout_pfh_skill ?? null;
+  const reaches = rise?.reaches_within_6h;
+  const reachLabel = reaches?.planned_flood ? "계획홍수위 도달 예상" : reaches?.warning ? "경보 수위 도달 예상" : reaches?.advisory ? "주의보 수위 도달 예상" : "주의보 수위 미만 예상";
+  const reachTone = reaches?.planned_flood ? "#f87171" : reaches?.warning ? "#fb923c" : reaches?.advisory ? "#fbbf24" : "#38bdf8";
+  return (
+    <article className="tw-card tw-rise" aria-label="6시간 최대 상승 예측" style={{ ["--rise-tone" as string]: reachTone }}>
+      <p className="tw-eyebrow">6시간 최대 상승 예측 · 연구 카드 · 권고에 반영하지 않음</p>
+      {rise?.prediction_available ? (
+        <>
+          <div className="tw-rise-head">
+            <div className="tw-rise-badge"><TrendingUp size={20} />{rise.maxrise_6h_m !== undefined && rise.maxrise_6h_m > 0 ? "+" : ""}{num(rise.maxrise_6h_m)} m</div>
+            <div>
+              <strong className="tw-rise-reach">{reachLabel}</strong>
+              <span className="tw-rise-sub">예상 최고 수위 {num(rise.forecast_level_m)} m{levels?.planned_flood !== undefined && ` · 계획홍수위 ${levels.planned_flood} m까지 ${num(rise.margin_after_rise_m)} m`}</span>
+            </div>
+          </div>
+          <div className="ub-kpis tw-kpis tw-rise-kpis">
+            <div><strong>{num(rise.linear_6h_m)} m</strong><span>단순 외삽(최근 1시간 상승 × 6)</span></div>
+            <div><strong>{rise.inputs.rain.sfc_rain_6h === null ? "—" : `${num(rise.inputs.rain.sfc_rain_6h, 1)} mm`}</strong><span>최근 6시간 강우{rise.inputs.rain.station ? ` · ${rise.inputs.rain.station}` : " · 실시간 강우 미연결"}</span></div>
+          </div>
+          <small className="ub-note">기준 관측 {dayClock(rise.as_of)} · {rise.interval === "1H" ? "1시간 자료" : "10분 자료"}{rise.station_in_training === false && " · 이 관측소는 학습에 포함되지 않음"}</small>
+        </>
+      ) : (
+        <>
+          <div className="tw-reco-badge is-empty">{error ? "불러오기 실패" : rise ? "예측 없음" : "예측 확인 중"}</div>
+          <p className="tw-reco-reason">{error ?? (rise ? RISE_REASON[rise.reason ?? ""] ?? rise.reason : "모델 입력을 모으는 중입니다.")}</p>
+        </>
+      )}
+      {model && (
+        <details className="tw-water-research">
+          <summary>모델 근거 · 실명 관측소 {model.stations ?? "—"}곳 재학습 · 2023-07-15 오송 검증</summary>
+          <p>
+            홍수통제소 1시간 수위 {model.train_rows?.toLocaleString() ?? "—"}행(강우 입력 있는 행 {model.rows_with_rain?.toLocaleString() ?? "—"})으로 학습했고 {model.holdout_month} 한 달은 학습에서 뺐습니다.
+            {model.cv_oof_rmse_m !== null && ` 월 단위 교차검증 오차 ${num(model.cv_oof_rmse_m, 3)} m (단순 외삽 ${num(model.cv_linear_rmse_m, 3)} m, 변화 없음 ${num(model.cv_no_change_rmse_m, 3)} m).`}
+          </p>
+          {skill && skill.model && skill.linear && (
+            <p>
+              제외한 달에서 «6시간 안 계획홍수위 도달»을 맞힌 횟수: 모델 {skill.model.hit}/{skill.hours_reaching_within_6h} (오경보 {skill.model.false_alarm}), 단순 외삽 {skill.linear.hit}/{skill.hours_reaching_within_6h} (오경보 {skill.linear.false_alarm}).
+            </p>
+          )}
+          {model.osong_planned_flood_lead_min !== null && (
+            <p>오송 2023-07-15: 모델은 계획홍수위 도달 {model.osong_planned_flood_lead_min}분 전에 «6시간 안 도달»을 냈습니다. 단순 외삽은 {model.osong_planned_flood_lead_min_linear}분 전이지만 전날 저녁부터 경보 수위 도달을 잘못 예고했습니다.</p>
+          )}
+          <small className="ub-note">{rise?.limitations.join(" ")}</small>
+        </details>
+      )}
+    </article>
   );
 }
 
