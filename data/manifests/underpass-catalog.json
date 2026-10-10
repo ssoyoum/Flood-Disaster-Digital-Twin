@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.0",
+  "checked_at": "2026-10-10T04:35:00.206056+09:00",
+  "record_count": 1053,
+  "chungbuk_national_source_records": 32,
+  "status": "CATALOG_ONLY",
+  "operational_facilities_added": 0,
+  "deduplication": "No cross-source or same-name merging; record count is not a unique facility count.",
+  "limits": [
+    "The national inventory covers facilities subject to the Facility Safety Act, not all underpasses.",
+    "Missing coordinates, sensors, closure histories and approved control rules remain unknown.",
+    "Structural safety grades are not flood-risk grades; nearest gauge is not automatically representative."
+  ],
+  "sources": [
+    {
+      "dataset_id": "15124755",
+      "title": "국토교통부_시설물안전법 대상 지하차도 현황",
+      "source_url": "https://data.go.kr/data/15124755/fileData.do",
+      "source_date": "20230930",
+      "source_updated_at": "2025-11-18",
+      "raw_path": "data/raw/facilities/15124755.csv",
+      "raw_sha256": "e2ea144a60acd1d44078c115bf3c9c5ee7e6aa5bb1c4d6063e6416088d4ee79f",
+      "encoding": "cp949",
+      "downloaded_at": "2026-10-10T04:34:58.385026+09:00",
+      "row_count": 938,
+      "columns": [
+        "순번(No)",
+        "시설물명",
+        "시설물구분",
+        "시설물종류",
+        "종별",
+        "관리주체구분",
+        "항목명",
+        "위치"
+      ],
+      "license": "https://data.go.kr/ugs/selectPortalPolicyView.do",
+      "coordinate_fields": []
+    },
+    {
+      "dataset_id": "15045183",
+      "title": "인천광역시_지하차도 현황",
+      "source_url": "https://data.go.kr/data/15045183/fileData.do",
+      "source_date": "20260206",
+      "source_updated_at": "2026-02-06",
+      "raw_path": "data/raw/facilities/15045183.csv",
+      "raw_sha256": "da00ef879de297ab65752a3696d6f51177a8fa39190e60ded0c5c7d36a7eefd6",
+      "encoding": "cp949",
+      "downloaded_at": "2026-10-10T04:34:58.795351+09:00",
+      "row_count": 42,
+      "columns": [
+        "시설구분",
+        "확장구분",
+        "시설물명",
+        "도로구분",
+        "주소",
+        "총길이(미터)",
+        "총폭(미터)",
+        "유효폭(미터)",
+        "높이(미터)",
+        "준공년도",
+        "기관구분",
+        "관리구분"
+      ],
+      "license": "https://data.go.kr/ugs/selectPortalPolicyView.do",
+      "coordinate_fields": []
+    },
+    {
+      "dataset_id": "15119688",
+      "title": "부산광역시_지하차도 현황",
+      "source_url": "https://data.go.kr/data/15119688/fileData.do",
+      "source_date": "20260909",
+      "source_updated_at": "2026-09-09",
+      "raw_path": "data/raw/facilities/15119688.csv",
+      "raw_sha256": "a9780bf62e2480619b78d1956fa2475fec8d8a0d4c2c51e9dc391bde0739db22",
+      "encoding": "cp949",
+      "downloaded_at": "2026-10-10T04:34:59.192750+09:00",
+      "row_count": 59,
+      "columns": [
+        "시설명",
+        "시도",
+        "시군구",
+        "총길이",
+        "총폭",
+        "높이"
+      ],
+      "license": "https://data.go.kr/ugs/selectPortalPolicyView.do",
+      "coordinate_fields": []
+    },
+    {
+      "dataset_id": "3080197",
+      "title": "경기도 부천시_지하차도 현황",
+      "source_url": "https://data.go.kr/data/3080197/fileData.do",
+      "source_date": "20250530",
+      "source_updated_at": "2026-07-08",
+      "raw_path": "data/raw/facilities/3080197.csv",
+      "raw_sha256": "afdae9916ac1fac65e3297244bc39edfd29c8e9378b4b8d01cab5d9b80adb651",
+      "encoding": "cp949",
+      "downloaded_at": "2026-10-10T04:34:59.621846+09:00",
+      "row_count": 14,
+      "columns": [
+        "지하차도명",
+        "위치",
+        "준공일",
+        "총연장(미터)",
+        "폭(미터)",
+        "통과높이",
+        "안전점검(유지보수) 내역",
+        "안전등급"
+      ],
+      "license": "https://data.go.kr/ugs/selectPortalPolicyView.do",
+      "coordinate_fields": []
+    }
+  ]
+}
