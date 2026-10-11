@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Bot, GitCompare, History, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Gauge, GitCompare, History, Lock, Scale } from "lucide-react";
 import type { FloodEvent } from "../types";
 import "./landing.css";
 
@@ -56,8 +56,8 @@ function ServiceSchematic() {
     <figure className="fo-schematic" aria-label="오송 지하차도 침수 모식도">
       <header>
         <div>
-          <span className="fo-schematic-tag">시나리오 모식도</span>
-          <strong>2023 오송 · 지하차도 통제 비교</strong>
+          <span className="fo-schematic-tag">검증 사건 모식도</span>
+          <strong>2023 오송 · 궁평2지하차도</strong>
         </div>
         <span className="fo-schematic-meta">근사 재구성 기준</span>
       </header>
@@ -108,37 +108,37 @@ function ServiceSchematic() {
 
 export function IntroPage({ onStart, onTwin }: { onStart: () => void; onTwin?: () => void }) {
   const features = [
-    { icon: History, title: "사건 재구성", text: "수위·강우 관측과 지형으로 과거 홍수를 시간대별로 다시 재생합니다." },
-    { icon: GitCompare, title: "개입 비교", text: "지하차도 통제 시각을 바꿔 원상태와 개입 결과를 나란히 비교합니다." },
-    { icon: Bot, title: "에이전트 질의", text: "질문을 분석 계획으로 바꾸고, 담당자 승인 후에만 도구를 실행합니다." },
+    { icon: Gauge, title: "지금 상태", text: "지하차도에 연결된 하천 수위로 단계·상승 속도·계획홍수위까지 남은 분을 보고, 통제 검토 권고를 받습니다." },
+    { icon: Scale, title: "통제 기준 검토", text: "기준을 바꾸면 2023년 오송에서 몇 분 먼저 알렸을지와 2019~2026년 다른 홍수기에 몇 번 권고했을지를 함께 봅니다." },
+    { icon: History, title: "사건으로 검증", text: "과거 사건을 관측 단계별로 재생하고 통제 시각을 바꿔 유입까지 남는 시간을 비교합니다. 에이전트 질의도 같은 도구를 씁니다." },
   ];
   return (
     <main className="fo-landing fo-intro">
       <Brand />
       <section className="fo-hero">
         <div className="fo-hero-copy">
-          <p className="fo-eyebrow">홍수 대응 의사결정 디지털 트윈</p>
+          <p className="fo-eyebrow">지하차도 통제 판단 디지털 트윈</p>
           <h1>
-            그때 먼저 통제했다면
+            이 지하차도,
             <br />
-            무엇이 달라졌을까
+            지금 막아야 할까
           </h1>
           <p className="fo-lead">
-            FloodOps는 실제 홍수 사건을 공공 관측자료로 재구성하고,
+            FloodOps는 지하차도마다 연결된 하천 수위로 지금 단계와 통제 검토까지 남은 시간을 보여주고,
             <br />
-            통제·대피 같은 대응 조치를 가정했을 때 피해가 어떻게 달라지는지
+            그 기준이 과거 홍수에서 몇 분 먼저 알렸을지, 평소에는 얼마나 자주 울렸을지
             <br />
-            담당자가 직접 비교해 보는 관제 서비스입니다.
+            담당자가 직접 검증해 보는 판단 보조 도구입니다.
           </p>
           <div className="fo-intro-actions">
-            <button className="fo-primary" type="button" onClick={onStart}>
-              사례 선택 <ArrowRight size={18} />
-            </button>
             {onTwin && (
-              <button className="fo-ghost" type="button" onClick={onTwin}>
-                지하차도 통제 판단 보드 <ArrowRight size={16} />
+              <button className="fo-primary" type="button" onClick={onTwin}>
+                지하차도 통제 판단 보드 <ArrowRight size={18} />
               </button>
             )}
+            <button className={onTwin ? "fo-ghost" : "fo-primary"} type="button" onClick={onStart}>
+              과거 사건 재생 <ArrowRight size={16} />
+            </button>
           </div>
         </div>
         <ServiceSchematic />
@@ -152,7 +152,7 @@ export function IntroPage({ onStart, onTwin }: { onStart: () => void; onTwin?: (
           </article>
         ))}
       </section>
-      <p className="fo-footnote">침수 범위는 관측·지형 기반 근사 재구성이며 공식 침수범위가 아닙니다. 각 화면에 출처와 한계를 함께 표시합니다.</p>
+      <p className="fo-footnote">권고는 하천 수위로 본 선행 지표이며, 통제 결정은 담당자 판단과 현장 기준(침수심)이 우선합니다. 침수 범위는 관측·지형 기반 근사 재구성이며 공식 침수범위가 아닙니다.</p>
     </main>
   );
 }

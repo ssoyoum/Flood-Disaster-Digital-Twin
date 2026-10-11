@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("enter Osong, replay stages, toggle a layer, and show provenance", async ({ page }) => {
   await page.goto("/");
-  await page.locator(".fo-primary").click();
+  await page.getByRole("button", { name: /과거 사건 재생/ }).click();
   await expect(page).toHaveURL(/#cases$/);
 
   await page.locator(".fo-case-slide.is-center .fo-case.is-ready").click();

@@ -2,8 +2,6 @@
 .tw-root { min-height: 100dvh; display: flex; flex-direction: column; }
 .tw-root .dk-topbar { flex-shrink: 0; min-height: 58px; }
 .tw-root .dk-topbar h1 { margin: 0; font-size: 15px; }
-.tw-tab-link { display: inline-flex; align-items: center; height: 100%; padding: 0 12px; border-bottom: 2px solid transparent; color: var(--dk-muted); font-size: 12px; font-weight: 800; text-decoration: none; }
-.tw-tab-link:hover { color: var(--dk-text); border-bottom-color: var(--dk-accent); }
 .tw-root .dk-status { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .tw-mode[data-mode="live"] { color: #34d399; border-color: #34d399; }
 .tw-mode[data-mode="replay"] { color: #fbbf24; border-color: #fbbf24; }
@@ -52,6 +50,39 @@
 .tw-water-research { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--dk-line); }
 .tw-water-research summary { cursor: pointer; color: var(--dk-accent); font-size: 13px; }
 .tw-water-research p { color: var(--dk-text); font-size: 12px; line-height: 1.6; }
+
+/* 공간 상태 카드: 비교 화면의 지도 카드를 보드 폭에 맞춰 낮춘다. */
+.tw-spatial .dk-compare-map { height: 340px; }
+.tw-spatial .dk-compare-map-card { margin-bottom: 8px; }
+
+/* 통제 기준 검토 탭 */
+.tw-section-title { margin: 0 0 6px; font-size: 19px; }
+.tw-section-lead { margin: 0 0 14px; color: var(--dk-muted); font-size: 13px; line-height: 1.6; }
+.tw-choice-group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+.tw-choice-group > span { flex-basis: 100%; color: var(--dk-muted); font-size: 11px; font-weight: 800; }
+.tw-choice-group button { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid var(--dk-line); border-radius: 999px; background: var(--dk-panel-2); color: var(--dk-text); font-size: 12px; font-weight: 800; }
+.tw-choice-group button small { color: var(--dk-muted); font-weight: 600; }
+.tw-choice-group button.active { border-color: var(--dk-accent); color: var(--dk-accent); }
+.tw-range { display: grid; gap: 6px; color: var(--dk-muted); font-size: 12px; }
+.tw-range strong { color: var(--dk-text); }
+.tw-range input { width: 100%; accent-color: var(--dk-accent); }
+.tw-criteria-result .tw-kpi-cost strong { color: #fbbf24; }
+.tw-kpis strong small { font-size: 12px; font-weight: 700; color: var(--dk-muted); }
+.tw-criteria-sentence { margin: 0; font-size: 14px; line-height: 1.7; }
+.tw-criteria-sentence b { color: var(--dk-accent); }
+.tw-row-cost td { color: #fbbf24; }
+.tw-sweep tbody tr { cursor: pointer; }
+.tw-sweep tbody tr:hover, .tw-sweep tbody tr:focus-visible { background: var(--dk-panel-2); outline: none; }
+.tw-sweep tbody tr.is-selected { background: color-mix(in srgb, var(--dk-accent) 16%, transparent); }
+.tw-tag { margin-left: 6px; padding: 1px 6px; border: 1px solid var(--dk-accent); border-radius: 999px; color: var(--dk-accent); font-size: 10px; font-weight: 800; }
+.tw-criteria-note .tw-eyebrow { display: flex; align-items: center; gap: 6px; }
+
+/* 백테스트 탭의 사건 검증 링크 */
+.tw-links { display: grid; gap: 10px; }
+.tw-links a { display: grid; gap: 4px; padding: 12px 14px; border: 1px solid var(--dk-line); border-radius: 10px; background: var(--dk-panel-2); color: var(--dk-text); text-decoration: none; }
+.tw-links a:hover { border-color: var(--dk-accent); }
+.tw-links strong { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; }
+.tw-links span { color: var(--dk-muted); font-size: 12px; line-height: 1.5; }
 
 @media (max-width: 960px) {
   .tw-main { grid-template-columns: 1fr; }

@@ -72,7 +72,7 @@ function Screens() {
   }, [route]);
 
   useEffect(() => {
-    if (route.page === "intro") document.title = "FloodOps | 홍수 대응 디지털 트윈";
+    if (route.page === "intro") document.title = "FloodOps | 지하차도 통제 판단 트윈";
     if (route.page === "cases") document.title = "사례 선택 | FloodOps";
     if (route.page === "twin") document.title = "지하차도 통제 판단 트윈 | FloodOps";
   }, [route]);

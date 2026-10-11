@@ -546,6 +546,25 @@ export type TwinFacility = {
   gauge: { station_id: string; name: string }; mode: "replay" | "live";
 };
 
+export type CriteriaFloor = "advisory" | "warning";
+
+export type TwinCriteriaReview = {
+  facility_id: string;
+  station: { station_id: string; name: string; levels_m: Record<string, number> };
+  params: { stage_floor: CriteriaFloor; stage_floor_label: string; lead_threshold_min: number; rate_window_min: number };
+  current_rule: { id: string; stage_floor: CriteriaFloor; lead_threshold_min: number };
+  is_current_rule: boolean;
+  reference_event: Record<string, string>;
+  first_review: { time: string; water_level_m: number } | null;
+  lead_minutes: Record<"official_requirement_met" | "levee_failure" | "underpass_inflow" | "full_inundation", number> | null;
+  other_episode_count: number; other_review_minutes: number;
+  episodes: Array<{ start: string; end: string; review_minutes: number; peak_water_level_m: number; peak_stage: string; reference_event: boolean }>;
+  by_year: Array<{ year: number; rows: number; max_water_level_m: number; episodes: number; review_minutes: number; reference_event: boolean }>;
+  sweep: Array<{ stage_floor: CriteriaFloor; lead_threshold_min: number; first_review_time: string | null; lead_to_inflow_min: number | null; other_episode_count: number; other_review_minutes: number }>;
+  coverage: { from: string; to: string; rows: number; interval: string; season: string; years: number[] };
+  limitations: string[];
+};
+
 export type TwinStatus = {
   facility_id: string; at: string; status: "OK" | "NO_OBSERVATION"; mode: "replay" | "live";
   facility: { id: string; name: string; kind: string; driver: string; location: [number, number]; road: string; managing_agency: string; event_id: string };
@@ -553,7 +572,7 @@ export type TwinStatus = {
   rate_m_per_10min: number | null; stage: string | null; stage_label: string | null; levels_m: Record<string, number> | null;
   margin_to_planned_flood_m: number | null; minutes_to_planned_flood: number | null;
   recommendation: "NORMAL" | "MONITOR" | "CLOSURE_REVIEW" | null; reason: string | null;
-  rule: { id: string; review_when: string; rate_window_min: number; lead_threshold_min: number; basis: string; official_closure_trigger: string } | null;
+  rule: { id: string; review_when: string; stage_floor?: CriteriaFloor; rate_window_min: number; lead_threshold_min: number; basis: string; official_closure_trigger: string } | null;
   rainfall: { station: string | null; last_hour_mm: number; sum_6h_mm: number } | null;
   reference_minutes_to_inflow: number | null; limitations: string[];
 };

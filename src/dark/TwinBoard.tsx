@@ -1,10 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
-import { Activity, AlertTriangle, ArrowLeft, Gauge, Radio, RotateCcw, TrendingUp } from "lucide-react";
+import { Activity, AlertTriangle, ArrowLeft, ArrowRight, Gauge, Radio, RotateCcw, TrendingUp } from "lucide-react";
 import * as api from "../api";
 import type { RiseForecast, TwinBacktest, TwinFacility, TwinStatus, WaterLevelReadiness } from "../types";
 import { FloodOpsLogo } from "./Landing";
+import TwinCriteria from "./TwinCriteria";
+import TwinSpatial from "./TwinSpatial";
 import "./dark.css";
 import "./twin.css";
+
+type BoardTab = "now" | "criteria" | "backtest";
+const TABS: Array<{ id: BoardTab; label: string }> = [
+  { id: "now", label: "지금 상태" },
+  { id: "criteria", label: "통제 기준 검토" },
+  { id: "backtest", label: "백테스트" },
+];
 
 /*
  * 지하차도 통제 판단 보드.
@@ -52,6 +61,7 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
   const [waterInputError, setWaterInputError] = useState<string | null>(null);
   const [rise, setRise] = useState<RiseForecast | null>(null);
   const [riseError, setRiseError] = useState<string | null>(null);
+  const [tab, setTab] = useState<BoardTab>("now");
 
   // 6시간 최대 상승 예측(연구 카드). 권고와 같은 시각을 보되 권고 계산에는 들어가지 않는다.
   useEffect(() => {
@@ -138,9 +148,9 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
           </div>
         </div>
         <nav className="dk-view-tabs" aria-label="FloodOps 화면">
-          <button type="button" className="active">지금 상태</button>
-          <a href="#event/osong-2023" className="tw-tab-link">통제 기준 검토</a>
-          <a href="#compare" className="tw-tab-link">검증 사례</a>
+          {TABS.map((item) => (
+            <button key={item.id} type="button" className={tab === item.id ? "active" : ""} aria-pressed={tab === item.id} onClick={() => setTab(item.id)}>{item.label}</button>
+          ))}
         </nav>
         <div className="dk-status">
           <span className="dk-chip tw-mode" data-mode={viewingReplay ? "replay" : "live"}>
@@ -152,7 +162,7 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
         </div>
       </header>
 
-      <main className="tw-main">
+      {tab === "now" && <main className="tw-main">
         <section className="tw-col">
           <article className="tw-card tw-facility" aria-label="시설">
             <p className="tw-eyebrow">시설</p>
@@ -240,6 +250,24 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
             {error && <p className="dk-error">{error}</p>}
           </article>
 
+          <TwinSpatial eventId={facility.event_id} at={status?.at ?? at} replay={viewingReplay} />
+
+          <article className="tw-card" aria-label="규칙과 한계">
+            <p className="tw-eyebrow">규칙 · {status?.rule?.id ?? "—"}</p>
+            <ul className="ub-list">
+              {status?.rule && <li>{status.rule.review_when}</li>}
+              {status?.rule && <li>{status.rule.basis}</li>}
+              {status?.rule && <li>{status.rule.official_closure_trigger}</li>}
+              {status?.limitations.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+          </article>
+        </section>
+      </main>}
+
+      {tab === "criteria" && <TwinCriteria facilityId={facility.id} />}
+
+      {tab === "backtest" && <main className="tw-main">
+        <section className="tw-col">
           <article className="tw-card" aria-label="백테스트">
             <p className="tw-eyebrow">백테스트 · 2023년 관측에 같은 규칙 적용</p>
             {backtest ? (
@@ -263,18 +291,30 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
               </>
             ) : <small className="ub-note">불러오는 중…</small>}
           </article>
+        </section>
 
-          <article className="tw-card" aria-label="규칙과 한계">
-            <p className="tw-eyebrow">규칙 · {status?.rule?.id ?? "—"}</p>
+        <section className="tw-col">
+          <article className="tw-card tw-links" aria-label="사건으로 검증">
+            <p className="tw-eyebrow">사건으로 검증</p>
+            <a href={`#event/${facility.event_id}`}>
+              <strong>2023 오송 사건 재생 · 통제 시각 비교 <ArrowRight size={14} /></strong>
+              <span>관측 단계별 공간 재구성을 재생하고, 통제 시각을 바꿨을 때 유입까지 남는 시간을 비교합니다.</span>
+            </a>
+            <a href="#compare">
+              <strong>다른 사례의 대응 시간 <ArrowRight size={14} /></strong>
+              <span>서울·포항·안동 사건의 실제 대응과 한 가지 가정 대응의 시간 차이입니다. 시설 운영 등록은 아닙니다.</span>
+            </a>
+          </article>
+          <article className="tw-card" aria-label="백테스트 범위">
+            <p className="tw-eyebrow">이 백테스트가 말하는 것</p>
             <ul className="ub-list">
-              {status?.rule && <li>{status.rule.review_when}</li>}
-              {status?.rule && <li>{status.rule.basis}</li>}
-              {status?.rule && <li>{status.rule.official_closure_trigger}</li>}
-              {status?.limitations.map((item) => <li key={item}>{item}</li>)}
+              <li>저장된 2023년 10분 수위에 지금 보드와 같은 규칙({status?.rule?.id ?? backtest?.rule?.id ?? "—"})을 적용했을 때 언제 권고가 나왔는지입니다.</li>
+              <li>다른 해 홍수기까지 넓힌 비교와 기준 변경은 «통제 기준 검토» 탭에서 봅니다.</li>
+              <li>권고가 났다고 실제 통제가 가능했다는 뜻은 아닙니다. 현장 확인·진입 차단 설비·인력은 반영하지 않습니다.</li>
             </ul>
           </article>
         </section>
-      </main>
+      </main>}
     </div>
   );
 }

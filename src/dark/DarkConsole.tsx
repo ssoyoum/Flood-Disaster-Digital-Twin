@@ -537,9 +537,9 @@ export default function DarkConsole({
   );
 }
 
-type MapSync = { maps: maplibregl.Map[]; syncing: boolean };
+export type MapSync = { maps: maplibregl.Map[]; syncing: boolean };
 
-function ScenarioMap({
+export function ScenarioMap({
   layers,
   reconstruction,
   time,
