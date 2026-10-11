@@ -4,6 +4,7 @@ import threading
 import os
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 import httpx
 from fastapi import FastAPI, HTTPException, Query, Request
@@ -34,7 +35,7 @@ from .seoul_repository import (
     get_seoul_summary,
 )
 from .case_comparison import get_case_lead_times
-from .twin import FACILITIES as TWIN_FACILITIES, backtest as twin_backtest, facility_status as twin_facility_status, list_facilities as twin_list_facilities, twin_mode
+from .twin import FACILITIES as TWIN_FACILITIES, backtest as twin_backtest, criteria_review as twin_criteria_review, facility_status as twin_facility_status, list_facilities as twin_list_facilities, twin_mode
 from . import agent_facility
 from .water_level_bridge import readiness as water_level_readiness
 from .rise_model import forecast as rise_forecast
@@ -536,6 +537,24 @@ def twin_backtest_route(facility_id: str):
     if facility_id not in TWIN_FACILITIES:
         raise HTTPException(status_code=404, detail=f"Unknown facility: {facility_id}")
     return twin_backtest(facility_id)
+
+
+@app.get("/api/twin/facilities/{facility_id}/criteria-review", tags=["twin"])
+def twin_criteria_review_route(
+    facility_id: str,
+    stage_floor: Literal["advisory", "warning"] | None = Query(default=None, description="Lowest gauge stage at which the rate-of-rise condition may trigger a review; defaults to the facility rule"),
+    lead_threshold_min: int | None = Query(default=None, ge=0, le=360, description="Review when the current rate reaches the planned flood level within this many minutes; 0 means the planned flood level only"),
+):
+    """Replay a closure-review rule over every stored flood season: lead time in the reference event and review episodes elsewhere."""
+
+    if facility_id not in TWIN_FACILITIES:
+        raise HTTPException(status_code=404, detail=f"Unknown facility: {facility_id}")
+    try:
+        return twin_criteria_review(facility_id, stage_floor, lead_threshold_min)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.get("/api/twin/facilities/{facility_id}/forecast-readiness", tags=["twin"])

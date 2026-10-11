@@ -16,6 +16,7 @@ Nothing here measures depth inside the underpass. The official closure trigger i
 from __future__ import annotations
 
 import csv
+import gzip
 import os
 import re
 from datetime import datetime, timedelta
@@ -54,9 +55,11 @@ FACILITIES: dict[str, dict[str, Any]] = {
             "source": "HRFCO waterlevel info (2026 조회); 계획홍수위 EL 29.023 m = gdt 19.643 + pfh 9.38",
         },
         "rain_station": {"station_id": "327", "name": "청주금천", "source": "KMA AWS hourly (2023 CSV)"},
+        "history_series": "miho_3011665_10m_floodseason_2019_2026.csv.gz",
         "control_rule": {
             "id": "river_stage_v1",
             "review_when": "계획홍수위에 도달했거나, 경보 수위 이상이면서 현재 상승 속도로 계획홍수위까지 60분 이내이면 통제 검토를 권고한다.",
+            "stage_floor": "warning",
             "rate_window_min": 30,
             "lead_threshold_min": 60,
             "basis": "국무조정실 감찰 결과는 계획홍수위 도달(06:40)을 통제 요건 충족 시각으로 봤다. 상승 속도 조건은 그보다 앞서 검토를 시작하게 하는 트윈의 가정이다.",
@@ -206,9 +209,10 @@ def assess(facility: dict[str, Any], window: list[dict[str, Any]], now: datetime
         minutes_to_pfh = (pfh - level) / rate
     else:
         minutes_to_pfh = None
-    review = stage == "planned_flood" or (STAGE_ORDER.index(stage) >= STAGE_ORDER.index("warning") and minutes_to_pfh is not None and minutes_to_pfh <= rule["lead_threshold_min"])
+    floor = rule.get("stage_floor", "warning")
+    review = stage == "planned_flood" or (STAGE_ORDER.index(stage) >= STAGE_ORDER.index(floor) and minutes_to_pfh is not None and minutes_to_pfh <= rule["lead_threshold_min"])
     if review:
-        recommendation, reason = "CLOSURE_REVIEW", ("계획홍수위에 도달했습니다." if stage == "planned_flood" else f"경보 수위 이상이고 현재 상승 속도로 계획홍수위까지 {minutes_to_pfh:.0f}분입니다.")
+        recommendation, reason = "CLOSURE_REVIEW", ("계획홍수위에 도달했습니다." if stage == "planned_flood" else f"{STAGE_KO[floor]} 이상이고 현재 상승 속도로 계획홍수위까지 {minutes_to_pfh:.0f}분입니다.")
     elif stage in ("advisory", "warning"):
         recommendation, reason = "MONITOR", f"{STAGE_KO[stage]}입니다. 상승 속도를 감시합니다."
     else:
@@ -292,6 +296,154 @@ def backtest(facility_id: str) -> dict[str, Any]:
         "lead_minutes": lead,
         "reference_event": reference,
         "note": "백테스트는 저장된 2023년 10분 수위에 같은 규칙을 적용한 결과다. 06:40은 국무조정실이 통제 요건 충족 시각으로 본 시각이고, 보관된 10분 자료로는 06:50에 계획홍수위에 닿는다(DQ-009).",
+    }
+
+
+# ---- closure-criteria review -------------------------------------------------------------------
+CRITERIA_FLOORS = ("advisory", "warning")
+CRITERIA_LEADS = (0, 60, 120, 180)
+CRITERIA_MAX_LEAD = 360
+EPISODE_GAP = timedelta(hours=6)
+REFERENCE_WINDOW = timedelta(hours=24)
+REFERENCE_KEYS = ("official_requirement_met", "levee_failure", "underpass_inflow", "full_inundation")
+
+
+@lru_cache(maxsize=4)
+def _history_series(filename: str) -> tuple[tuple[datetime, float], ...]:
+    path = OSONG_DIR / filename
+    if not path.exists():
+        return ()
+    with gzip.open(path, "rt", encoding="utf-8", newline="") as handle:
+        return tuple(sorted((_parse_ts(r["timestamp_kst"]), float(r["wl"])) for r in csv.DictReader(handle) if r.get("wl")))
+
+
+def _review_flags(series: tuple[tuple[datetime, float], ...], levels: dict[str, float], stage_floor: str, lead_threshold_min: int, rate_window_min: int) -> list[bool]:
+    """``assess`` applied at every row of a long series: same 120-minute window, base row and rule."""
+
+    pfh = levels["planned_flood"]
+    floor_level = levels[stage_floor]
+    window = timedelta(minutes=120)
+    rate_delta = timedelta(minutes=rate_window_min)
+    flags: list[bool] = []
+    lo = 0
+    cand = -1  # last row at or before t - rate_window; only moves forward
+    for i, (t, level) in enumerate(series):
+        while series[lo][0] < t - window:
+            lo += 1
+        while cand + 1 <= i and series[cand + 1][0] <= t - rate_delta:
+            cand += 1
+        base = cand if cand >= lo else lo
+        if base == i:
+            rate = 0.0
+        else:
+            span = max(1.0, (t - series[base][0]).total_seconds() / 60)
+            rate = (level - series[base][1]) / span
+        flags.append(level >= pfh or (level >= floor_level and rate > 0 and (pfh - level) / rate <= lead_threshold_min))
+    return flags
+
+
+def _review_episodes(series: tuple[tuple[datetime, float], ...], flags: list[bool], levels: dict[str, float], interval_min: int = 10) -> list[dict[str, Any]]:
+    episodes: list[dict[str, Any]] = []
+    current: dict[str, Any] | None = None
+    for (t, level), flag in zip(series, flags):
+        if not flag:
+            continue
+        if current is not None and t - current["end"] <= EPISODE_GAP:
+            current["end"] = t
+            current["rows"] += 1
+            current["peak"] = max(current["peak"], level)
+        else:
+            current = {"start": t, "end": t, "rows": 1, "peak": level}
+            episodes.append(current)
+    return [{
+        "start": e["start"].isoformat(), "end": e["end"].isoformat(), "review_minutes": e["rows"] * interval_min,
+        "peak_water_level_m": e["peak"], "peak_stage": classify_stage(e["peak"], levels),
+    } for e in episodes]
+
+
+@lru_cache(maxsize=64)
+def _criteria_result(facility_id: str, stage_floor: str, lead_threshold_min: int, rate_window_min: int) -> dict[str, Any]:
+    facility = FACILITIES[facility_id]
+    series = _history_series(facility["history_series"])
+    levels = facility["gauge"]["levels_m"]
+    reference = facility["reference_event"]
+    inflow = datetime.fromisoformat(reference["underpass_inflow"])
+    flags = _review_flags(series, levels, stage_floor, lead_threshold_min, rate_window_min)
+    first = next(((t, wl) for (t, wl), flag in zip(series, flags) if flag and inflow - REFERENCE_WINDOW <= t <= inflow), None)
+    episodes = _review_episodes(series, flags, levels)
+    for episode in episodes:
+        start = datetime.fromisoformat(episode["start"])
+        episode["reference_event"] = inflow - REFERENCE_WINDOW <= start <= inflow
+    others = [e for e in episodes if not e["reference_event"]]
+    by_year: dict[str, dict[str, Any]] = {}
+    for t, wl in series:
+        year = by_year.setdefault(str(t.year), {"year": t.year, "rows": 0, "max_water_level_m": wl, "episodes": 0, "review_minutes": 0, "reference_event": False})
+        year["rows"] += 1
+        year["max_water_level_m"] = max(year["max_water_level_m"], wl)
+    for episode in episodes:
+        year = by_year[episode["start"][:4]]
+        if episode["reference_event"]:
+            year["reference_event"] = True
+        else:
+            year["episodes"] += 1
+            year["review_minutes"] += episode["review_minutes"]
+    return {
+        "first_review": {"time": first[0].isoformat(), "water_level_m": first[1]} if first else None,
+        "lead_minutes": {key: int((datetime.fromisoformat(reference[key]) - first[0]).total_seconds() // 60) for key in REFERENCE_KEYS} if first else None,
+        "other_episode_count": len(others),
+        "other_review_minutes": sum(e["review_minutes"] for e in others),
+        "episodes": episodes,
+        "by_year": [by_year[key] for key in sorted(by_year)],
+    }
+
+
+def criteria_review(facility_id: str, stage_floor: str | None = None, lead_threshold_min: int | None = None) -> dict[str, Any]:
+    """Replay a closure-review rule over every flood season on record and show its cost and lead.
+
+    The 2023 event gives the lead time; the other seasons show how often the same rule would have asked
+    for a closure review without a recorded underpass flood (not verified as false alarms).
+    """
+
+    facility = FACILITIES[facility_id]
+    if not facility.get("history_series") or not _history_series(facility["history_series"]):
+        raise LookupError(f"No stored history for {facility_id}")
+    rule = facility["control_rule"]
+    floor = stage_floor or rule.get("stage_floor", "warning")
+    lead = rule["lead_threshold_min"] if lead_threshold_min is None else lead_threshold_min
+    if floor not in CRITERIA_FLOORS:
+        raise ValueError(f"stage_floor must be one of {CRITERIA_FLOORS}")
+    if not 0 <= lead <= CRITERIA_MAX_LEAD:
+        raise ValueError(f"lead_threshold_min must be between 0 and {CRITERIA_MAX_LEAD}")
+    rate_window = rule["rate_window_min"]
+    series = _history_series(facility["history_series"])
+    result = _criteria_result(facility_id, floor, lead, rate_window)
+    sweep = []
+    for sweep_floor in CRITERIA_FLOORS:
+        for sweep_lead in CRITERIA_LEADS:
+            row = _criteria_result(facility_id, sweep_floor, sweep_lead, rate_window)
+            sweep.append({
+                "stage_floor": sweep_floor, "lead_threshold_min": sweep_lead,
+                "first_review_time": row["first_review"]["time"] if row["first_review"] else None,
+                "lead_to_inflow_min": row["lead_minutes"]["underpass_inflow"] if row["lead_minutes"] else None,
+                "other_episode_count": row["other_episode_count"], "other_review_minutes": row["other_review_minutes"],
+            })
+    return {
+        "facility_id": facility_id,
+        "station": {"station_id": facility["gauge"]["station_id"], "name": facility["gauge"]["name"], "levels_m": facility["gauge"]["levels_m"]},
+        "params": {"stage_floor": floor, "stage_floor_label": STAGE_KO[floor], "lead_threshold_min": lead, "rate_window_min": rate_window},
+        "current_rule": {"id": rule["id"], "stage_floor": rule.get("stage_floor", "warning"), "lead_threshold_min": rule["lead_threshold_min"]},
+        "is_current_rule": floor == rule.get("stage_floor", "warning") and lead == rule["lead_threshold_min"],
+        "reference_event": facility["reference_event"],
+        **result,
+        "sweep": sweep,
+        "coverage": {"from": series[0][0].isoformat(), "to": series[-1][0].isoformat(), "rows": len(series), "interval": "10M", "season": "매년 6~9월", "years": sorted({t.year for t, _ in series})},
+        "limitations": [
+            "홍수기(6~9월) 10분 수위만 대상이다. 10~5월 자료와 1시간 품질 감사 마스크는 적용하지 않았다.",
+            "2023년 사건 밖의 권고 구간은 '실제 침수 기록 없이 통제를 검토했을 구간'의 후보다. 그 시기 지하차도 침수·통제 기록을 확인하지 않았으므로 오경보로 단정하지 않는다.",
+            "권고가 6시간 넘게 끊기면 다른 구간으로 센다. 계획홍수위 도달은 기준과 관계없이 항상 권고한다.",
+            "규칙은 미호강교 수위만 본다. 내수 침수와 강우의 직접 영향은 반영하지 않는다.",
+            "통제 결정은 담당자 판단과 현장 기준(침수심)이 우선한다.",
+        ],
     }
 
 
