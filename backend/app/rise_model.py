@@ -22,6 +22,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 MODEL_DIR = REPO_ROOT / "data" / "models"
 MODEL_FILE = MODEL_DIR / "rise_lgbm_1h.txt"
 STATS_FILE = MODEL_DIR / "rise_station_stats.json"
+Q90_FILE = MODEL_DIR / "rise_lgbm_1h_q90.txt"
 CARD_FILE = MODEL_DIR / "rise_model_card.json"
 HORIZON_H = 6
 LAGS = (1, 3, 6, 12, 24)
@@ -42,6 +43,18 @@ def load_model() -> tuple[Any, dict[str, Any], dict[str, Any]] | None:
     stats = json.loads(STATS_FILE.read_text(encoding="utf-8"))
     card = json.loads(CARD_FILE.read_text(encoding="utf-8")) if CARD_FILE.exists() else {}
     return booster, stats, card
+
+
+@lru_cache(maxsize=1)
+def load_upper_model() -> Any | None:
+    """90% quantile companion (upper bound of the 6 h rise); optional."""
+    if not Q90_FILE.exists():
+        return None
+    try:
+        import lightgbm as lgb
+    except ImportError:
+        return None
+    return lgb.Booster(model_str=Q90_FILE.read_text(encoding="utf-8"))
 
 
 def rain_totals(rain_rows: list[dict[str, Any]], anchor: datetime) -> dict[str, float | None]:
@@ -105,8 +118,11 @@ def model_summary(card: dict[str, Any]) -> dict[str, Any]:
         "cv_linear_rmse_m": cv.get("baseline_linear_rmse_m"),
         "cv_no_change_rmse_m": cv.get("baseline_no_change_rmse_m"),
         "holdout_month": card.get("holdout_month"),
-        "holdout_pfh_skill": {k: pfh_skill.get(k) for k in ("hours_reaching_within_6h", "model", "linear")} if pfh_skill else None,
+        "holdout_pfh_skill": {k: pfh_skill.get(k) for k in ("hours_reaching_within_6h", "model", "q90", "linear")} if pfh_skill else None,
+        "holdout_q90_coverage": hold.get("q90_coverage"),
+        "quality_masks": card.get("quality_masks"),
         "osong_planned_flood_lead_min": (osong.get("planned_flood") or {}).get("lead_min_model"),
+        "osong_planned_flood_lead_min_q90": (osong.get("planned_flood") or {}).get("lead_min_q90"),
         "osong_planned_flood_lead_min_linear": (osong.get("planned_flood") or {}).get("lead_min_linear"),
         "osong_window_rmse_m": osong.get("rmse_m"),
         "contract": card.get("contract"),
@@ -157,8 +173,17 @@ def forecast(facility_id: str, at: str | None = None) -> dict[str, Any]:
     levels = gauge["levels_m"]
     stage = twin.classify_stage(forecast_level, levels)
     linear = max(0.0, x["wl_change_1h"]) * HORIZON_H
+    upper = load_upper_model()
+    upper_fields: dict[str, Any] = {"maxrise_6h_q90_m": None, "forecast_level_q90_m": None, "forecast_stage_q90": None, "reaches_within_6h_q90": None}
+    if upper is not None:
+        rise_q90 = max(rise, predict_rise(upper, x))  # the upper bound never sits below the central estimate
+        level_q90 = level + rise_q90
+        stage_q90 = twin.classify_stage(level_q90, levels)
+        upper_fields = {"maxrise_6h_q90_m": round(rise_q90, 2), "forecast_level_q90_m": round(level_q90, 2), "forecast_stage_q90": stage_q90,
+                        "reaches_within_6h_q90": {name: level_q90 >= levels[name] for name in ("advisory", "warning", "planned_flood")}}
     return {
         **base,
+        **upper_fields,
         "prediction_available": True,
         "maxrise_6h_m": round(rise, 2),
         "forecast_level_m": round(forecast_level, 2),

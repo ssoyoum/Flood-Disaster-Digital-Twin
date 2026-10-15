@@ -67,6 +67,11 @@ def test_replay_forecast_on_2023_07_15_precedes_the_planned_flood_level(monkeypa
     assert data["maxrise_6h_m"] > 0.5 and data["forecast_level_m"] == round(data["inputs"]["water"]["wl_t"] + data["maxrise_6h_m"], 2)
     assert data["reaches_within_6h"]["warning"] is True  # 8.0 m was observed at 05:00; the forecast at 04:10 already says so
     assert data["model"]["stations"] >= 3 and data["inputs"]["rain"]["sfc_rain_6h"] is not None
+    if rise_model.load_upper_model() is not None:
+        # The 90% upper bound never sits below the central estimate and carries its own threshold flags.
+        assert data["maxrise_6h_q90_m"] >= data["maxrise_6h_m"]
+        assert data["forecast_level_q90_m"] == round(data["inputs"]["water"]["wl_t"] + data["maxrise_6h_q90_m"], 2)
+        assert data["reaches_within_6h_q90"]["warning"] is True
     # The recommendation at the same time comes from the stage rule alone.
     status = client.get(f"/api/twin/facilities/{FACILITY}/status", params={"at": "2023-07-15T04:10:00"}).json()
     assert status["recommendation"] in {"MONITOR", "CLOSURE_REVIEW"} and "maxrise_6h_m" not in status

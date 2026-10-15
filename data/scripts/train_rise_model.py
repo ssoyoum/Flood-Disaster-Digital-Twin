@@ -37,6 +37,8 @@ STATIONS = REPO_ROOT / "data" / "manifests" / "hrfco-stations.json"
 MODEL_DIR = REPO_ROOT / "data" / "models"
 MODEL_FILE = MODEL_DIR / "rise_lgbm_1h.txt"
 STATS_FILE = MODEL_DIR / "rise_station_stats.json"
+Q90_FILE = MODEL_DIR / "rise_lgbm_1h_q90.txt"  # upper-bound (90% quantile) companion model
+QUALITY_DIR = REPO_ROOT / "data" / "processed" / "hrfco-quality"  # masks from data/scripts/audit_hrfco_quality.py
 METRICS_FILE = REPO_ROOT / "data" / "manifests" / "rise-model.json"
 CARD_FILE = MODEL_DIR / "rise_model_card.json"  # same content; shipped with the model because data/manifests is not in the image
 
@@ -45,6 +47,7 @@ HORIZON = 6
 WATER_FEATURES = ["wl_t"] + [f"wl_t_minus_{h}h" for h in LAGS]
 RAIN_FEATURES = ["sfc_rain_1h", "sfc_rain_6h", "sfc_rain_24h"]
 JUMP_M = 3.0  # same threshold as `collect_hrfco_history.py qc`: a 1 h change above this is a sensor/datum fault
+Q90_ALPHA = 0.9
 PARAMS = {"objective": "regression", "learning_rate": 0.03, "num_leaves": 31, "min_data_in_leaf": 200, "feature_fraction": 0.8,
           "bagging_fraction": 0.8, "bagging_freq": 1, "lambda_l2": 1.0, "verbose": -1, "num_threads": 6}
 
@@ -78,12 +81,27 @@ def hourly(path: Path, column: str) -> pd.Series:
     return series.reindex(full)
 
 
-def station_frame(code: str, rain_code: str | None) -> pd.DataFrame:
+QUALITY_DROPS: dict[str, dict[str, int]] = {}
+
+
+def quality_mask(code: str, index: pd.DatetimeIndex) -> pd.Series | None:
+    """Hours whose input lags and 6 future hours are all usable per the audit (explicit quarantines, gaps, invalid values)."""
+    path = QUALITY_DIR / f"waterlevel_{code}_1H_quality.csv"
+    if not path.exists():
+        return None
+    q = pd.read_csv(path, usecols=["timestamp_kst", "training_window_usable"])
+    usable = q["training_window_usable"].astype(str).str.lower().eq("true")
+    usable.index = pd.to_datetime(q["timestamp_kst"])
+    return usable.reindex(index, fill_value=False)
+
+
+def station_frame(code: str, rain_code: str | None, use_masks: bool = True) -> pd.DataFrame:
     wl = hourly(HRFCO / f"waterlevel_{code}_1H.csv", "wl")
     # Drop readings on either side of a > JUMP_M step (sensor/datum fault, see docs/HRFCO_HISTORY.md).
     jump = wl.diff().abs() > JUMP_M
     wl[jump | jump.shift(-1, fill_value=False)] = np.nan
     frame = pd.DataFrame({"wl_t": wl})
+    mask = quality_mask(code, frame.index) if use_masks else None
     for h in LAGS:
         frame[f"wl_t_minus_{h}h"] = wl.shift(h)
     future = pd.concat([wl.shift(-k) for k in range(1, HORIZON + 1)], axis=1)
@@ -101,6 +119,10 @@ def station_frame(code: str, rain_code: str | None) -> pd.DataFrame:
         frame["rain_station"] = ""
     frame["station_id"] = code
     frame = frame.dropna(subset=WATER_FEATURES + ["target_maxrise_6h"])
+    if mask is not None:
+        before = len(frame)
+        frame = frame[mask.reindex(frame.index, fill_value=False).to_numpy()]
+        QUALITY_DROPS[code] = {"rows_before_mask": before, "rows_after_mask": len(frame), "dropped_by_mask": before - len(frame)}
     frame.index.name = "timestamp_kst"
     return frame.reset_index()
 
@@ -116,11 +138,11 @@ def select_rows(frame: pd.DataFrame, calm_keep: float, seed: int) -> pd.DataFram
     return out
 
 
-def build_dataset(codes: list[str], calm_keep: float, seed: int) -> pd.DataFrame:
+def build_dataset(codes: list[str], calm_keep: float, seed: int, use_masks: bool = True) -> pd.DataFrame:
     pairs = rain_pairs()
     parts = []
     for code in codes:
-        frame = station_frame(code, pairs.get(code))
+        frame = station_frame(code, pairs.get(code), use_masks)
         if len(frame):
             parts.append(select_rows(frame, calm_keep, seed))
     data = pd.concat(parts, ignore_index=True)
@@ -160,8 +182,11 @@ def rmse(a: np.ndarray, b: np.ndarray) -> float:
     return float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2))) if len(a) else float("nan")
 
 
-def fit(x: pd.DataFrame, y: np.ndarray, rounds: int, seed: int) -> lgb.Booster:
-    return lgb.train({**PARAMS, "seed": seed}, lgb.Dataset(x, y), rounds)
+def fit(x: pd.DataFrame, y: np.ndarray, rounds: int, seed: int, quantile: float | None = None) -> lgb.Booster:
+    params = {**PARAMS, "seed": seed}
+    if quantile is not None:
+        params.update({"objective": "quantile", "alpha": quantile})
+    return lgb.train(params, lgb.Dataset(x, y), rounds)
 
 
 def official_levels() -> dict[str, dict[str, float]]:
@@ -194,7 +219,7 @@ def threshold_skill(frame: pd.DataFrame, preds: dict[str, np.ndarray]) -> dict:
 
 
 # ---- Osong check ---------------------------------------------------------------------------------
-def osong_check(model: lgb.Booster, stats: dict, frame_all: pd.DataFrame) -> dict:
+def osong_check(model: lgb.Booster, stats: dict, frame_all: pd.DataFrame, q90: lgb.Booster | None = None) -> dict:
     """Lead time of 'forecast level reaches the threshold' for the model vs. no-change and linear extrapolation."""
     w = frame_all[(frame_all["station_id"] == OSONG["station"]) & (frame_all["timestamp_kst"] >= OSONG["start"]) & (frame_all["timestamp_kst"] <= OSONG["end"])].copy()
     if w.empty:
@@ -203,18 +228,22 @@ def osong_check(model: lgb.Booster, stats: dict, frame_all: pd.DataFrame) -> dic
     w["pred_model"] = model.predict(x)
     w["pred_linear"] = (w["wl_t"] - w["wl_t_minus_1h"]).clip(lower=0) * HORIZON
     w["pred_persist"] = 0.0
+    kinds = ("model", "linear", "persist")
+    if q90 is not None:
+        w["pred_q90"] = q90.predict(x)
+        kinds = ("model", "q90", "linear", "persist")
     actual = w["target_maxrise_6h"].to_numpy()
     rows = []
     for _, r in w.iterrows():
         rows.append({"t": r["timestamp_kst"].strftime("%m-%d %H:%M"), "wl": round(r["wl_t"], 2), "actual_rise": round(r["target_maxrise_6h"], 2),
-                     "model": round(float(r["pred_model"]), 2), "linear": round(float(r["pred_linear"]), 2), "rain_6h": None if pd.isna(r["sfc_rain_6h"]) else round(float(r["sfc_rain_6h"]), 1)})
+                     "model": round(float(r["pred_model"]), 2), "q90": None if q90 is None else round(float(r["pred_q90"]), 2), "linear": round(float(r["pred_linear"]), 2), "rain_6h": None if pd.isna(r["sfc_rain_6h"]) else round(float(r["sfc_rain_6h"]), 1)})
     out = {"available": True, "window": [OSONG["start"], OSONG["end"]], "rows": rows,
-           "rmse_m": {k: round(rmse(actual, w[f"pred_{k}"]), 3) for k in ("model", "linear", "persist")}}
+           "rmse_m": {k: round(rmse(actual, w[f"pred_{k}"]), 3) for k in kinds}}
     for name, level in (("planned_flood", OSONG["planned_flood_m"]), ("warning", OSONG["warning_m"])):
         reached = w[w["wl_t"] >= level]
         first_actual = reached["timestamp_kst"].min() if len(reached) else None
         entry = {"level_m": level, "first_observed": first_actual.strftime("%Y-%m-%d %H:%M") if first_actual is not None else None}
-        for k in ("model", "linear", "persist"):
+        for k in kinds:
             hit = w[(w["wl_t"] + w[f"pred_{k}"]) >= level]
             first = hit["timestamp_kst"].min() if len(hit) else None
             entry[f"first_forecast_{k}"] = first.strftime("%Y-%m-%d %H:%M") if first is not None else None
@@ -233,10 +262,13 @@ def main() -> None:
     parser.add_argument("--calm-keep", type=float, default=0.05, help="share of calm hours kept beside every active hour")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--skip-cv", action="store_true")
+    parser.add_argument("--no-quality-masks", action="store_true", help="ignore data/processed/hrfco-quality masks")
+    parser.add_argument("--no-q90", action="store_true", help="skip the 90% quantile upper-bound companion model")
     args = parser.parse_args()
 
     codes = args.stations or sorted(p.stem.split("_")[1] for p in HRFCO.glob("waterlevel_*_1H.csv"))
-    data = build_dataset(codes, args.calm_keep, args.seed)
+    use_masks = not args.no_quality_masks
+    data = build_dataset(codes, args.calm_keep, args.seed, use_masks)
     y_all = data["target_maxrise_6h"].to_numpy(dtype=float)
     train_mask = (data["month"] != args.holdout).to_numpy()
     train, hold = data[train_mask].reset_index(drop=True), data[~train_mask].reset_index(drop=True)
@@ -247,7 +279,10 @@ def main() -> None:
     metrics: dict = {"trained_at": datetime.now().isoformat(timespec="seconds"), "stations": len(codes), "station_codes": codes, "rows": int(len(data)), "train_rows": int(len(train)),
                      "holdout_month": args.holdout, "holdout_rows": int(len(hold)), "rows_with_rain": with_rain, "calm_keep": args.calm_keep, "params": {**PARAMS, "rounds": args.rounds},
                      "contract": "water-level-rise/baseline.py FEATURES (water lags + sfc rain) without imerg/radar/basin; target max(WL(t+1..t+6)) - WL(t)",
-                     "qc": f"readings beside a 1 h step > {JUMP_M} m dropped; rows need all lags and all 6 future hours present"}
+                     "qc": f"readings beside a 1 h step > {JUMP_M} m dropped; rows need all lags and all 6 future hours present",
+                     "quality_masks": {"applied": use_masks, "stations_with_mask": len(QUALITY_DROPS), "dropped_rows_total": int(sum(d["dropped_by_mask"] for d in QUALITY_DROPS.values())),
+                                       "per_station_top": dict(sorted(QUALITY_DROPS.items(), key=lambda kv: -kv[1]["dropped_by_mask"])[:10]),
+                                       "source": "data/processed/hrfco-quality/*_quality.csv training_window_usable (audit_hrfco_quality.py)"}}
     if not args.skip_cv:
         oof = np.full(len(train), np.nan)
         folds = []
@@ -266,8 +301,13 @@ def main() -> None:
         print(json.dumps(metrics["cv"]), flush=True)
 
     stats = station_stats(train)
-    model = fit(make_features(train, stats), y, args.rounds, args.seed)
+    x_train = make_features(train, stats)
+    model = fit(x_train, y, args.rounds, args.seed)
+    q90 = None if args.no_q90 else fit(x_train, y, args.rounds, args.seed, Q90_ALPHA)
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    if q90 is not None:
+        Q90_FILE.write_text(q90.model_to_string(), encoding="utf-8")
+        metrics["q90"] = {"alpha": Q90_ALPHA, "model_file": str(Q90_FILE.relative_to(REPO_ROOT)).replace("\\", "/"), "note": "upper-bound companion; same features and rows as the median model"}
     # LightGBM cannot open non-ASCII paths on Windows; write the model text ourselves (load with Booster(model_str=...)).
     MODEL_FILE.write_text(model.model_to_string(), encoding="utf-8")
     STATS_FILE.write_text(json.dumps(stats, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -276,13 +316,20 @@ def main() -> None:
     metrics["importance_gain"] = {k: v for k, v in list(importance.items())[:12]}
     if len(hold):
         yh = hold["target_maxrise_6h"].to_numpy(dtype=float)
-        ph = model.predict(make_features(hold, stats))
+        x_hold = make_features(hold, stats)
+        ph = model.predict(x_hold)
         lh = (hold["wl_t"] - hold["wl_t_minus_1h"]).clip(lower=0).to_numpy() * HORIZON
-        metrics["holdout"] = {"rows": int(len(hold)), "rmse_model_m": round(rmse(yh, ph), 4), "rmse_no_change_m": round(rmse(yh, np.zeros_like(yh)), 4), "rmse_linear_m": round(rmse(yh, lh), 4),
-                              "threshold_skill": threshold_skill(hold, {"model": ph, "linear": lh, "persist": np.zeros_like(yh)})}
+        preds = {"model": ph, "linear": lh, "persist": np.zeros_like(yh)}
+        metrics["holdout"] = {"rows": int(len(hold)), "rmse_model_m": round(rmse(yh, ph), 4), "rmse_no_change_m": round(rmse(yh, np.zeros_like(yh)), 4), "rmse_linear_m": round(rmse(yh, lh), 4)}
+        if q90 is not None:
+            pq = q90.predict(x_hold)
+            preds["q90"] = pq
+            metrics["holdout"]["rmse_q90_m"] = round(rmse(yh, pq), 4)
+            metrics["holdout"]["q90_coverage"] = round(float(np.mean(yh <= pq)), 4)  # share of actual rises at or below the upper bound
+        metrics["holdout"]["threshold_skill"] = threshold_skill(hold, preds)
     # Osong window from the unsampled series so every hour is present.
-    full = station_frame(OSONG["station"], rain_pairs().get(OSONG["station"])) if OSONG["station"] in codes else pd.DataFrame()
-    metrics["osong_2023_07_15"] = osong_check(model, stats, full) if len(full) else {"available": False}
+    full = station_frame(OSONG["station"], rain_pairs().get(OSONG["station"]), use_masks=False) if OSONG["station"] in codes else pd.DataFrame()
+    metrics["osong_2023_07_15"] = osong_check(model, stats, full, q90) if len(full) else {"available": False}
     metrics["model_file"] = str(MODEL_FILE.relative_to(REPO_ROOT)).replace("\\", "/")
     metrics["lightgbm"] = lgb.__version__
     METRICS_FILE.write_text(json.dumps(metrics, ensure_ascii=False, indent=1), encoding="utf-8")
