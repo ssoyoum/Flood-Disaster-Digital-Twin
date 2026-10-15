@@ -37,6 +37,7 @@ from .seoul_repository import (
 from .case_comparison import get_case_lead_times
 from .twin import FACILITIES as TWIN_FACILITIES, backtest as twin_backtest, criteria_review as twin_criteria_review, facility_status as twin_facility_status, list_facilities as twin_list_facilities, twin_mode
 from . import agent_facility
+from . import facility_registry
 from .water_level_bridge import readiness as water_level_readiness
 from .rise_model import forecast as rise_forecast
 from .layer_payload import slim_layers
@@ -503,11 +504,34 @@ def case_lead_times():
     return get_case_lead_times()
 
 
+def _require_operational_facility(facility_id: str, unknown_detail: str) -> None:
+    """404 for ids nobody registered; 409 for a CANDIDATE whose registration gates are not all confirmed."""
+
+    if facility_id in TWIN_FACILITIES:
+        return
+    candidate = facility_registry.get(facility_id)
+    if candidate is None:
+        raise HTTPException(status_code=404, detail=unknown_detail)
+    raise HTTPException(status_code=409, detail={
+        "code": "FACILITY_NOT_OPERATIONAL",
+        "facility_id": facility_id,
+        "status": candidate["status"],
+        "unmet_gates": facility_registry.unmet_gates(candidate),
+    })
+
+
 @app.get("/api/twin/facilities", tags=["twin"])
 def twin_facilities():
-    """Registered underpasses with their gauges and the current observation mode (replay or live)."""
+    """Operational underpasses with their gauges, registration gates and the current observation mode (replay or live)."""
 
     return twin_list_facilities()
+
+
+@app.get("/api/twin/registry", tags=["twin"])
+def twin_registry():
+    """Registration gates, the operational facilities and the candidate facilities with their unmet gates."""
+
+    return facility_registry.registry_payload()
 
 
 @app.get("/api/twin/mode", tags=["twin"])
@@ -519,8 +543,7 @@ def twin_mode_status():
 def twin_status(facility_id: str, at: str | None = Query(default=None, description="ISO time for replay mode; defaults to the configured replay 'now' or the real clock in live mode")):
     """Current stage, minutes to the planned flood level and the closure-review recommendation for one facility."""
 
-    if facility_id not in TWIN_FACILITIES:
-        raise HTTPException(status_code=404, detail=f"Unknown facility: {facility_id}")
+    _require_operational_facility(facility_id, f"Unknown facility: {facility_id}")
     try:
         return twin_facility_status(facility_id, at)
     except ValueError as exc:
@@ -533,8 +556,7 @@ def twin_status(facility_id: str, at: str | None = Query(default=None, descripti
 def twin_backtest_route(facility_id: str):
     """Apply the facility's control rule to the stored 2023 series and report when it would have fired."""
 
-    if facility_id not in TWIN_FACILITIES:
-        raise HTTPException(status_code=404, detail=f"Unknown facility: {facility_id}")
+    _require_operational_facility(facility_id, f"Unknown facility: {facility_id}")
     return twin_backtest(facility_id)
 
 
@@ -546,8 +568,7 @@ def twin_criteria_review_route(
 ):
     """Replay a closure-review rule over every stored flood season: lead time in the reference event and review episodes elsewhere."""
 
-    if facility_id not in TWIN_FACILITIES:
-        raise HTTPException(status_code=404, detail=f"Unknown facility: {facility_id}")
+    _require_operational_facility(facility_id, f"Unknown facility: {facility_id}")
     try:
         return twin_criteria_review(facility_id, stage_floor, lead_threshold_min)
     except LookupError as exc:
@@ -559,8 +580,7 @@ def twin_criteria_review_route(
 @app.get("/api/twin/facilities/{facility_id}/forecast-readiness", tags=["twin"])
 def twin_forecast_readiness(facility_id: str, at: str | None = None):
     """Real water-level lags and missing inputs for the external research model; not a forecast."""
-    if facility_id not in TWIN_FACILITIES:
-        raise HTTPException(status_code=404, detail="Unknown facility")
+    _require_operational_facility(facility_id, "Unknown facility")
     try:
         return water_level_readiness(facility_id, at)
     except ValueError as exc:
@@ -573,8 +593,7 @@ def twin_forecast_readiness(facility_id: str, at: str | None = None):
 def twin_rise_forecast(facility_id: str, at: str | None = Query(default=None, description="ISO time; same convention as /status")):
     """6-hour maximum rise predicted by the model retrained on real HRFCO stations. Research card; never feeds the recommendation."""
 
-    if facility_id not in TWIN_FACILITIES:
-        raise HTTPException(status_code=404, detail=f"Unknown facility: {facility_id}")
+    _require_operational_facility(facility_id, f"Unknown facility: {facility_id}")
     try:
         return rise_forecast(facility_id, at)
     except ValueError as exc:

@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "note": "손으로 관리하는 운영 시설 레지스트리. 후보 시설은 candidates.json(생성 파일)에 둔다. 임계 수위는 시설마다 그 시설의 관측소 공식 수위에서만 가져온다. 다른 시설의 임계값을 복사하지 않는다.",
+  "gates": [
+    {"id": "inflow_path", "label": "유입 경로", "question": "강물이 넘쳐서 들어오는지, 빗물이 고여서 차는지 실제 유입 경로를 확인했는가"},
+    {"id": "representative_gauge", "label": "대표 관측소", "question": "연결한 관측소가 그 시설의 유입을 설명하는 같은 유역의 관측소인지 확인했는가"},
+    {"id": "site_instrumentation", "label": "현장 계측", "question": "지하차도 침수심·집수정 수위·펌프 상태 같은 현장 계측 자료를 시각과 함께 확보했는가"},
+    {"id": "validation_event", "label": "검증 사건", "question": "시각이 확인된 과거 침수·통제 기록으로 규칙을 백테스트할 수 있는가"}
+  ],
+  "gate_statuses": ["CONFIRMED", "PENDING", "MISSING", "UNKNOWN"],
+  "facilities": [
+    {
+      "id": "gungpyeong2-underpass",
+      "name": "궁평2지하차도",
+      "kind": "underpass",
+      "driver": "river_stage",
+      "status": "OPERATIONAL",
+      "region": "충청북도 청주시",
+      "location": [127.3376, 36.6246],
+      "road": "지방도 508호선",
+      "managing_agency": "충청북도도로관리사업소",
+      "event_id": "osong-2023",
+      "source": {
+        "dataset_id": "twin_registry",
+        "note": "2023-07-15 오송 사건 재구성과 HRFCO 관측소 메타데이터로 손수 등록한 첫 운영 시설. 국토부 시설물 목록 행 15124755:518과 같은 시설이다."
+      },
+      "gauge": {
+        "station_id": "3011665",
+        "name": "청주시(미호강교)",
+        "datum_el_m": 19.643,
+        "levels_m": {"attention": 5.0, "advisory": 7.0, "warning": 8.0, "severe": 9.38, "planned_flood": 9.38},
+        "source": "HRFCO waterlevel info (2026 조회); 계획홍수위 EL 29.023 m = gdt 19.643 + pfh 9.38"
+      },
+      "rain_station": {"station_id": "327", "name": "청주금천", "source": "KMA AWS hourly (2023 CSV)"},
+      "history_series": "miho_3011665_10m_2019_2026.csv.gz",
+      "control_rule": {
+        "id": "river_stage_v1",
+        "review_when": "계획홍수위에 도달했거나, 경보 수위 이상이면서 현재 상승 속도로 계획홍수위까지 60분 이내이면 통제 검토를 권고한다.",
+        "stage_floor": "warning",
+        "rate_window_min": 30,
+        "lead_threshold_min": 60,
+        "basis": "국무조정실 감찰 결과는 계획홍수위 도달(06:40)을 통제 요건 충족 시각으로 봤다. 상승 속도 조건은 그보다 앞서 검토를 시작하게 하는 트윈의 가정이다.",
+        "official_closure_trigger": "행안부 지하차도 통제 기준은 침수심(15 cm → 2026년 5 cm, 보도 기준, 원문 확보 필요). 이 트윈은 침수심을 재지 않고 선행 지표만 보여준다."
+      },
+      "reference_event": {
+        "official_requirement_met": "2023-07-15T06:40:00",
+        "levee_failure": "2023-07-15T08:09:00",
+        "underpass_inflow": "2023-07-15T08:27:00",
+        "full_inundation": "2023-07-15T08:40:00",
+        "source": "국무조정실 발표(06:40) · 사건 재구성 타임라인(출처 쪽수 확인 필요)"
+      },
+      "gates": {
+        "inflow_path": {"status": "CONFIRMED", "note": "미호강 범람 → 임시제방 붕괴 → 유입 (2023-07-15)"},
+        "representative_gauge": {"status": "CONFIRMED", "note": "미호강교 3011665 · 1.17 km · 홍수예보 지점 · 국무조정실 감찰이 본 관측소"},
+        "site_instrumentation": {"status": "MISSING", "note": "현장 침수 센서·집수정 수위 자료 없음 → 하천 수위만 사용 (화면에 한계로 표시)"},
+        "validation_event": {"status": "CONFIRMED", "note": "osong-2023 · 유입 08:27 · 첫 권고 05:50"}
+      }
+    }
+  ]
+}

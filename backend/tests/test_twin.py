@@ -6,7 +6,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.twin import FACILITIES, ReplaySource, _history_series, _review_flags, assess, backtest, criteria_review, facility_status, twin_mode
+from app.twin import FACILITIES, ReplaySource, _episode_quality, _history_series, _review_flags, _series_quality, assess, backtest, criteria_review, facility_status, twin_mode
 
 client = TestClient(app)
 FACILITY = "gungpyeong2-underpass"
@@ -62,9 +62,9 @@ def test_series_rule_matches_assess_row_by_row(floor, lead):
     assert flags == expected
 
 
-def test_history_series_covers_eight_flood_seasons_and_matches_the_event_csv():
+def test_history_series_covers_2019_to_2026_and_matches_the_event_csv():
     series = _history_series(FACILITIES[FACILITY]["history_series"])
-    assert len(series) == 140544 and series[0][0] == datetime(2019, 6, 1) and series[-1][0].year == 2026
+    assert len(series) == 409152 and series[0][0] == datetime(2019, 1, 1) and series[-1][0] == datetime(2026, 10, 12, 7, 50)
     history = dict(series)
     for row in ReplaySource().series("3011665"):
         assert history[row["time"]] == row["water_level_m"]
@@ -97,3 +97,32 @@ def test_criteria_review_api_validates_parameters():
     assert client.get(url, params={"stage_floor": "severe"}).status_code == 422
     assert client.get(url, params={"lead_threshold_min": 361}).status_code == 422
     assert client.get("/api/twin/facilities/nope/criteria-review").status_code == 404
+
+
+def test_series_quality_flags_gaps_and_steps_without_removing_readings():
+    start = datetime(2025, 7, 1)
+    levels = [1.0, 1.1, 1.5, 1.1]  # +0.4 m and -0.4 m steps between consecutive 10-minute readings
+    series = tuple((start + timedelta(minutes=10 * i), wl) for i, wl in enumerate(levels)) + ((start + timedelta(minutes=70), 1.1),)
+    quality = _series_quality(series)
+    assert quality["present_slots"] == 5 and quality["expected_slots"] == 8 and quality["missing_slots"] == 3
+    assert quality["gaps"] == [{"after": "2025-07-01T00:30:00", "before": "2025-07-01T01:10:00", "missing_slots": 3}]
+    assert [s["time"] for s in quality["step_reviews"]] == ["2025-07-01T00:20:00", "2025-07-01T00:30:00"]
+    # An episode is flagged when the readings that drove it (one assess window before its start) carry a flag.
+    near = {"start": "2025-07-01T02:30:00", "end": "2025-07-01T02:40:00"}  # window from 00:30: the second step and the gap
+    far = {"start": "2025-07-01T05:00:00", "end": "2025-07-01T05:30:00"}
+    assert _episode_quality(near, quality) == {"step_reviews": 1, "missing_slots": 3}
+    assert _episode_quality(far, quality) == {"step_reviews": 0, "missing_slots": 0}
+
+
+def test_criteria_review_reports_history_quality():
+    result = criteria_review(FACILITY)
+    quality = result["quality"]
+    excluded = sum(q["readings_excluded"] for q in quality["quarantines"])
+    assert quality["policy_found"] and quality["present_slots"] == result["coverage"]["rows"] + excluded
+    assert quality["expected_slots"] == quality["present_slots"] + quality["missing_slots"]
+    assert all(abs(s["change_m"]) >= quality["step_review_threshold_m"] for s in quality["step_reviews"])
+    assert all("quality_review_required" in e for e in result["episodes"])
+    # The 2023-05-16 step fault (1.51 m -> 11.26 m in 10 minutes, peak 13.28 m) is quarantined, so it never becomes a review episode.
+    assert [q["id"] for q in quality["quarantines"]] == ["mihoganggyo_20230516_research_quarantine"] and excluded == 67
+    assert not any(e["start"].startswith("2023-05-16") for e in result["episodes"])
+    assert any(s["quarantined"] for s in quality["step_reviews"]) and result["other_episode_count"] == 0

@@ -1,0 +1,383 @@
+{
+ "schema_version": 1,
+ "generator": "data/scripts/build_facility_candidates.py",
+ "inputs": {
+  "underpass_coordinates.csv": {
+   "rows": 938,
+   "chungbuk_rows": 32,
+   "chungbuk_rows_with_coordinates": 6,
+   "sha256": "3198f5a7a29d4ec499d2db4fe60a52d18eccc71901e555a4f964674d442ecc42"
+  },
+  "facility_gauge_links.csv": {
+   "rows": 1698,
+   "sha256": "2cb54ff55356c8a0508d553433dca99cba7b7503637e59a38a27dfe4e3b8c50a"
+  },
+  "chungbuk_underpass_candidates.csv": {
+   "rows": 32,
+   "sha256": "6920996ef1e94602a4f463430ba136c49e4b170ae8f13f5c33a4f64b3102d305"
+  },
+  "registry.json": {
+   "operational": 1,
+   "sha256": "9241cd5185f38b59b86be118d06ec70c834fd5f7dc767ad7e1b99dc9bc6b7cf8"
+  }
+ },
+ "excluded": [
+  {
+   "molit_no": "916",
+   "name": "계룡지하차도(복)",
+   "region": "충청북도 영동군",
+   "reason": "목록상 위치는 영동군이지만 OSM 이름 매칭 좌표가 대전 유성구(만년교 0.39 km)에 있음 — 다른 시설을 가리킨 매칭으로 보고 좌표 확인 전까지 제외"
+  }
+ ],
+ "selection": {
+  "sido": "충청북도",
+  "max_gauge_km": 5.0,
+  "rule": "(a) 충청북도 시설 중 좌표가 있고 5 km 안에 홍수예보 수위관측소가 있는 행 + (b) docs/UNDERPASS_EXPANSION.md의 청주 후보 3곳(순번 519, 521, 523)",
+  "not_a_ranking": "후보 순서는 국토부 순번이며 위험 순위가 아니다. 가까운 관측소는 후보일 뿐 대표성이 확인된 것이 아니다."
+ },
+ "counts": {
+  "candidates": 5,
+  "with_coordinates": 3,
+  "with_pending_gauge": 2,
+  "with_review_notes": 1,
+  "excluded": 1
+ },
+ "candidates": [
+  {
+   "id": "cb-519-osong-biopolis",
+   "name": "오송바이오폴리스지하차도",
+   "kind": "underpass",
+   "driver": "unverified",
+   "status": "CANDIDATE",
+   "region": "충청북도 청주시",
+   "location": null,
+   "road": null,
+   "managing_agency": null,
+   "management_category": "공공",
+   "structure_raw": "형식 : 박스형 / 연장 : 455.0 m, 차로수 : 6",
+   "source": {
+    "dataset_id": "15124755",
+    "source_record_id": "15124755:519",
+    "molit_no": "519",
+    "source_url": "https://data.go.kr/data/15124755/fileData.do",
+    "source_date": "20230930",
+    "source_updated_at": "2025-11-18",
+    "coordinates": null
+   },
+   "selected_by": "docs/UNDERPASS_EXPANSION.md 1차 확인 후보",
+   "nearby_gauges": [],
+   "gauge": null,
+   "control_rule": null,
+   "reference_event": null,
+   "gates": {
+    "inflow_path": {
+     "status": "UNKNOWN",
+     "note": "하천 월류형인지 내수 배수형인지 미확인"
+    },
+    "representative_gauge": {
+     "status": "UNKNOWN",
+     "note": "좌표가 없어 관측소를 연결하지 못함"
+    },
+    "site_instrumentation": {
+     "status": "UNKNOWN",
+     "note": "현장 계측(침수심·집수정·펌프) 설치 여부 미조사"
+    },
+    "validation_event": {
+     "status": "UNKNOWN",
+     "note": "시각 있는 침수·통제 기록 미확보"
+    }
+   },
+   "review_notes": []
+  },
+  {
+   "id": "cb-521-yongam",
+   "name": "용암지하차도",
+   "kind": "underpass",
+   "driver": "unverified",
+   "status": "CANDIDATE",
+   "region": "충청북도 청주시",
+   "location": [
+    127.516557,
+    36.6195
+   ],
+   "road": null,
+   "managing_agency": null,
+   "management_category": "공공",
+   "structure_raw": "형식 : 박스형 / 연장 : 470.0 m, 차로수 : 4",
+   "source": {
+    "dataset_id": "15124755",
+    "source_record_id": "15124755:521",
+    "molit_no": "521",
+    "source_url": "https://data.go.kr/data/15124755/fileData.do",
+    "source_date": "20230930",
+    "source_updated_at": "2025-11-18",
+    "coordinates": "underpass_coordinates.csv (OSM 이름 매칭)"
+   },
+   "selected_by": "docs/UNDERPASS_EXPANSION.md 1차 확인 후보",
+   "nearby_gauges": [
+    {
+     "station_id": "3011639",
+     "name": "청주시(운암1교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 1.01,
+     "flood_forecast_station": false,
+     "planned_flood_m": 4.0,
+     "warning_m": 3.3,
+     "advisory_m": 2.6
+    },
+    {
+     "station_id": "3011637",
+     "name": "청주시(월오교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 1.72,
+     "flood_forecast_station": false,
+     "planned_flood_m": 3.16,
+     "warning_m": 2.6,
+     "advisory_m": 2.1
+    },
+    {
+     "station_id": "3011643",
+     "name": "청주시(용평교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 1.93,
+     "flood_forecast_station": false,
+     "planned_flood_m": 4.9,
+     "warning_m": 4.0,
+     "advisory_m": 3.2
+    }
+   ],
+   "gauge": null,
+   "control_rule": null,
+   "reference_event": null,
+   "gates": {
+    "inflow_path": {
+     "status": "UNKNOWN",
+     "note": "하천 월류형인지 내수 배수형인지 미확인"
+    },
+    "representative_gauge": {
+     "status": "UNKNOWN",
+     "note": "5 km 안 홍수예보 관측소 없음"
+    },
+    "site_instrumentation": {
+     "status": "UNKNOWN",
+     "note": "현장 계측(침수심·집수정·펌프) 설치 여부 미조사"
+    },
+    "validation_event": {
+     "status": "UNKNOWN",
+     "note": "시각 있는 침수·통제 기록 미확보"
+    }
+   },
+   "review_notes": []
+  },
+  {
+   "id": "cb-523-hakpyeong",
+   "name": "학평지하차도",
+   "kind": "underpass",
+   "driver": "unverified",
+   "status": "CANDIDATE",
+   "region": "충청북도 청주시",
+   "location": null,
+   "road": null,
+   "managing_agency": null,
+   "management_category": "공공",
+   "structure_raw": "형식 : 박스형 / 연장 : 155.0 m, 차로수 : 4",
+   "source": {
+    "dataset_id": "15124755",
+    "source_record_id": "15124755:523",
+    "molit_no": "523",
+    "source_url": "https://data.go.kr/data/15124755/fileData.do",
+    "source_date": "20230930",
+    "source_updated_at": "2025-11-18",
+    "coordinates": null
+   },
+   "selected_by": "docs/UNDERPASS_EXPANSION.md 1차 확인 후보",
+   "nearby_gauges": [],
+   "gauge": null,
+   "control_rule": null,
+   "reference_event": null,
+   "gates": {
+    "inflow_path": {
+     "status": "UNKNOWN",
+     "note": "하천 월류형인지 내수 배수형인지 미확인"
+    },
+    "representative_gauge": {
+     "status": "UNKNOWN",
+     "note": "좌표가 없어 관측소를 연결하지 못함"
+    },
+    "site_instrumentation": {
+     "status": "UNKNOWN",
+     "note": "현장 계측(침수심·집수정·펌프) 설치 여부 미조사"
+    },
+    "validation_event": {
+     "status": "UNKNOWN",
+     "note": "시각 있는 침수·통제 기록 미확보"
+    }
+   },
+   "review_notes": []
+  },
+  {
+   "id": "cb-921-simgok",
+   "name": "심곡지하차도(복)",
+   "kind": "underpass",
+   "driver": "unverified",
+   "status": "CANDIDATE",
+   "region": "충청북도 영동군",
+   "location": [
+    127.758359,
+    36.194845
+   ],
+   "road": null,
+   "managing_agency": null,
+   "management_category": "공공",
+   "structure_raw": "형식 : 박스형 / 연장 : 11.1 m, 차로수 : 2",
+   "source": {
+    "dataset_id": "15124755",
+    "source_record_id": "15124755:921",
+    "molit_no": "921",
+    "source_url": "https://data.go.kr/data/15124755/fileData.do",
+    "source_date": null,
+    "source_updated_at": null,
+    "coordinates": "underpass_coordinates.csv (OSM 이름 매칭)",
+    "osm_way_ids": "549714958"
+   },
+   "selected_by": "충청북도 · 좌표 있음 · 5 km 안 홍수예보 수위관측소",
+   "nearby_gauges": [
+    {
+     "station_id": "3004680",
+     "name": "영동군(영동제2교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 2.18,
+     "flood_forecast_station": false,
+     "planned_flood_m": 5.77,
+     "warning_m": 4.7,
+     "advisory_m": 3.7
+    },
+    {
+     "station_id": "3004685",
+     "name": "영동군(초강교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 4.22,
+     "flood_forecast_station": true,
+     "planned_flood_m": 7.02,
+     "warning_m": 5.5,
+     "advisory_m": 4.5
+    },
+    {
+     "station_id": "3004690",
+     "name": "영동군(양강교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 4.92,
+     "flood_forecast_station": true,
+     "planned_flood_m": 9.47,
+     "warning_m": 8.0,
+     "advisory_m": 7.0
+    }
+   ],
+   "gauge": null,
+   "control_rule": null,
+   "reference_event": null,
+   "gates": {
+    "inflow_path": {
+     "status": "UNKNOWN",
+     "note": "하천 월류형인지 내수 배수형인지 미확인"
+    },
+    "representative_gauge": {
+     "status": "PENDING",
+     "note": "영동군(초강교) 3004685 · 4.22 km · 홍수예보 지점 — 같은 유역인지, 유입을 설명하는지 확인 전"
+    },
+    "site_instrumentation": {
+     "status": "UNKNOWN",
+     "note": "현장 계측(침수심·집수정·펌프) 설치 여부 미조사"
+    },
+    "validation_event": {
+     "status": "UNKNOWN",
+     "note": "시각 있는 침수·통제 기록 미확보"
+    }
+   },
+   "review_notes": []
+  },
+  {
+   "id": "cb-933-gungpyeong",
+   "name": "궁평지하차도",
+   "kind": "underpass",
+   "driver": "unverified",
+   "status": "CANDIDATE",
+   "region": "충청북도 청주시",
+   "location": [
+    127.337657,
+    36.62464
+   ],
+   "road": null,
+   "managing_agency": null,
+   "management_category": "공공",
+   "structure_raw": "형식 : 미등록 / 연장 : 80.0 m, 차로수 : 6",
+   "source": {
+    "dataset_id": "15124755",
+    "source_record_id": "15124755:933",
+    "molit_no": "933",
+    "source_url": "https://data.go.kr/data/15124755/fileData.do",
+    "source_date": null,
+    "source_updated_at": null,
+    "coordinates": "underpass_coordinates.csv (OSM 이름 매칭)",
+    "osm_way_ids": "556705089;988994037"
+   },
+   "selected_by": "충청북도 · 좌표 있음 · 5 km 안 홍수예보 수위관측소",
+   "nearby_gauges": [
+    {
+     "station_id": "3011665",
+     "name": "청주시(미호강교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 1.16,
+     "flood_forecast_station": true,
+     "planned_flood_m": 9.38,
+     "warning_m": 8.0,
+     "advisory_m": 7.0
+    },
+    {
+     "station_id": "3011675",
+     "name": "세종시(상조천교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 4.63,
+     "flood_forecast_station": true,
+     "planned_flood_m": 4.77,
+     "warning_m": 4.2,
+     "advisory_m": 3.2
+    },
+    {
+     "station_id": "3011685",
+     "name": "세종시(미호교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 5.06,
+     "flood_forecast_station": false,
+     "planned_flood_m": 8.85,
+     "warning_m": 7.1,
+     "advisory_m": 5.4
+    }
+   ],
+   "gauge": null,
+   "control_rule": null,
+   "reference_event": null,
+   "gates": {
+    "inflow_path": {
+     "status": "UNKNOWN",
+     "note": "하천 월류형인지 내수 배수형인지 미확인"
+    },
+    "representative_gauge": {
+     "status": "PENDING",
+     "note": "청주시(미호강교) 3011665 · 1.16 km · 홍수예보 지점 — 같은 유역인지, 유입을 설명하는지 확인 전"
+    },
+    "site_instrumentation": {
+     "status": "UNKNOWN",
+     "note": "현장 계측(침수심·집수정·펌프) 설치 여부 미조사"
+    },
+    "validation_event": {
+     "status": "UNKNOWN",
+     "note": "시각 있는 침수·통제 기록 미확보"
+    }
+   },
+   "review_notes": [
+    "좌표가 운영 시설 궁평2지하차도(gungpyeong2-underpass)과 0.1 km 안에 겹침 — OSM 이름 매칭이 이웃 시설을 가리켰을 수 있어 좌표 확인 필요"
+   ]
+  }
+ ]
+}

@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import csv
 import gzip
+import json
 import os
 import re
 from datetime import datetime, timedelta
@@ -26,54 +27,24 @@ from typing import Any
 
 import httpx
 
+from . import facility_registry
 from .llm_planner import _load_env_file_once
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OSONG_DIR = REPO_ROOT / "data" / "processed" / "osong"
 WATER_LEVEL_FILE = OSONG_DIR / "osong_hrfco_water_level_10m_2023-07-14_17.csv"
 RAINFALL_FILE = OSONG_DIR / "osong_kma_aws_rainfall_2023-07-14_17.csv"
+# Explicit research quarantines (e.g. the 2023-05-16 미호강교 step fault) shared with the hourly audit.
+QUALITY_POLICY_FILE = REPO_ROOT / "data" / "manifests" / "hrfco-quality-policy.json"
 HRFCO_ENDPOINT = "https://api.hrfco.go.kr/{key}/waterlevel/list/{interval}/{station}/{start}/{end}.xml"
 DEFAULT_REPLAY_NOW = "2023-07-15T08:00:00"
 
-# Gauge levels come from the HRFCO station metadata (hrfco_waterlevel_info.xml, queried 2026).
-# attwl=관심, wrnwl=주의보, almwl=경보, srswl=심각, pfh=계획홍수위 (all stage heights in m above the gauge datum gdt).
-FACILITIES: dict[str, dict[str, Any]] = {
-    "gungpyeong2-underpass": {
-        "id": "gungpyeong2-underpass",
-        "name": "궁평2지하차도",
-        "kind": "underpass",
-        "driver": "river_stage",
-        "location": [127.3376, 36.6246],
-        "road": "지방도 508호선",
-        "managing_agency": "충청북도도로관리사업소",
-        "event_id": "osong-2023",
-        "gauge": {
-            "station_id": "3011665",
-            "name": "청주시(미호강교)",
-            "datum_el_m": 19.643,
-            "levels_m": {"attention": 5.0, "advisory": 7.0, "warning": 8.0, "severe": 9.38, "planned_flood": 9.38},
-            "source": "HRFCO waterlevel info (2026 조회); 계획홍수위 EL 29.023 m = gdt 19.643 + pfh 9.38",
-        },
-        "rain_station": {"station_id": "327", "name": "청주금천", "source": "KMA AWS hourly (2023 CSV)"},
-        "history_series": "miho_3011665_10m_floodseason_2019_2026.csv.gz",
-        "control_rule": {
-            "id": "river_stage_v1",
-            "review_when": "계획홍수위에 도달했거나, 경보 수위 이상이면서 현재 상승 속도로 계획홍수위까지 60분 이내이면 통제 검토를 권고한다.",
-            "stage_floor": "warning",
-            "rate_window_min": 30,
-            "lead_threshold_min": 60,
-            "basis": "국무조정실 감찰 결과는 계획홍수위 도달(06:40)을 통제 요건 충족 시각으로 봤다. 상승 속도 조건은 그보다 앞서 검토를 시작하게 하는 트윈의 가정이다.",
-            "official_closure_trigger": "행안부 지하차도 통제 기준은 침수심(15 cm → 2026년 5 cm, 보도 기준, 원문 확보 필요). 이 트윈은 침수심을 재지 않고 선행 지표만 보여준다.",
-        },
-        "reference_event": {
-            "official_requirement_met": "2023-07-15T06:40:00",
-            "levee_failure": "2023-07-15T08:09:00",
-            "underpass_inflow": "2023-07-15T08:27:00",
-            "full_inundation": "2023-07-15T08:40:00",
-            "source": "국무조정실 발표(06:40) · 사건 재구성 타임라인(출처 쪽수 확인 필요)",
-        },
-    },
-}
+# Operational facilities live in data/facilities/registry.json (hand-kept; candidates are generated into
+# candidates.json and never reach this dict). Gauge levels there come from the HRFCO station metadata
+# (hrfco_waterlevel_info.xml, queried 2026): attwl=관심, wrnwl=주의보, almwl=경보, srswl=심각, pfh=계획홍수위
+# (all stage heights in m above the gauge datum gdt). Each facility registers its own gauge's levels;
+# thresholds are never copied between facilities.
+FACILITIES: dict[str, dict[str, Any]] = facility_registry.operational()
 
 STAGE_ORDER = ["normal", "attention", "advisory", "warning", "planned_flood"]
 STAGE_KO = {"normal": "정상", "attention": "관심", "advisory": "주의보 수위", "warning": "경보 수위", "planned_flood": "계획홍수위 도달"}
@@ -306,6 +277,11 @@ CRITERIA_MAX_LEAD = 360
 EPISODE_GAP = timedelta(hours=6)
 REFERENCE_WINDOW = timedelta(hours=24)
 REFERENCE_KEYS = ("official_requirement_met", "levee_failure", "underpass_inflow", "full_inundation")
+HISTORY_STEP = timedelta(minutes=10)
+# 2.5x the largest 10-minute rise on 2023-07-15 (0.12 m). Flagged for review only, never removed,
+# like the hourly policy's jump review (hrfco-quality-policy.json).
+HISTORY_STEP_REVIEW_M = 0.3
+ASSESS_WINDOW = timedelta(minutes=120)
 
 
 @lru_cache(maxsize=4)
@@ -322,7 +298,7 @@ def _review_flags(series: tuple[tuple[datetime, float], ...], levels: dict[str, 
 
     pfh = levels["planned_flood"]
     floor_level = levels[stage_floor]
-    window = timedelta(minutes=120)
+    window = ASSESS_WINDOW
     rate_delta = timedelta(minutes=rate_window_min)
     flags: list[bool] = []
     lo = 0
@@ -340,6 +316,78 @@ def _review_flags(series: tuple[tuple[datetime, float], ...], levels: dict[str, 
             rate = (level - series[base][1]) / span
         flags.append(level >= pfh or (level >= floor_level and rate > 0 and (pfh - level) / rate <= lead_threshold_min))
     return flags
+
+
+@lru_cache(maxsize=1)
+def _quality_policy() -> dict[str, Any]:
+    if not QUALITY_POLICY_FILE.exists():
+        return {}
+    return json.loads(QUALITY_POLICY_FILE.read_text(encoding="utf-8"))
+
+
+def _quarantines(station_id: str) -> list[dict[str, Any]]:
+    return [q for q in _quality_policy().get("quarantines", []) if q.get("station_id") == station_id]
+
+
+def _in_quarantine(t: datetime, quarantines: list[dict[str, Any]]) -> bool:
+    return any(datetime.fromisoformat(q["start"]) <= t <= datetime.fromisoformat(q["end"]) for q in quarantines)
+
+
+@lru_cache(maxsize=4)
+def _review_series(facility_id: str) -> tuple[tuple[datetime, float], ...]:
+    """The stored history without readings inside an explicit quarantine; those never drive a review."""
+
+    facility = FACILITIES[facility_id]
+    quarantines = _quarantines(facility["gauge"]["station_id"])
+    return tuple(row for row in _history_series(facility["history_series"]) if not _in_quarantine(row[0], quarantines))
+
+
+@lru_cache(maxsize=4)
+def _history_quality(facility_id: str) -> dict[str, Any]:
+    facility = FACILITIES[facility_id]
+    series = _history_series(facility["history_series"])
+    quarantines = _quarantines(facility["gauge"]["station_id"])
+    quality = _series_quality(series)
+    for step in quality["step_reviews"]:
+        step["quarantined"] = _in_quarantine(datetime.fromisoformat(step["time"]), quarantines)
+    quality["policy_found"] = bool(_quality_policy())
+    quality["quarantines"] = [{
+        "id": q["id"], "start": q["start"], "end": q["end"], "review_status": q.get("review_status"),
+        "readings_excluded": sum(1 for t, _ in series if _in_quarantine(t, [q])),
+    } for q in quarantines]
+    return quality
+
+
+def _series_quality(series: tuple[tuple[datetime, float], ...]) -> dict[str, Any]:
+    """Missing 10-minute slots and steps of at least HISTORY_STEP_REVIEW_M between consecutive readings."""
+
+    gaps: list[dict[str, Any]] = []
+    steps: list[dict[str, Any]] = []
+    for (t0, w0), (t1, w1) in zip(series, series[1:]):
+        missing = int((t1 - t0) / HISTORY_STEP) - 1
+        if missing > 0:
+            gaps.append({"after": t0.isoformat(), "before": t1.isoformat(), "missing_slots": missing})
+        elif abs(w1 - w0) >= HISTORY_STEP_REVIEW_M:
+            steps.append({"time": t1.isoformat(), "change_m": round(w1 - w0, 2), "water_level_m": w1})
+    expected = int((series[-1][0] - series[0][0]) / HISTORY_STEP) + 1 if series else 0
+    return {
+        "step_review_threshold_m": HISTORY_STEP_REVIEW_M,
+        "expected_slots": expected,
+        "present_slots": len(series),
+        "missing_slots": sum(g["missing_slots"] for g in gaps),
+        "gaps": gaps,
+        "step_reviews": steps,
+    }
+
+
+def _episode_quality(episode: dict[str, Any], quality: dict[str, Any]) -> dict[str, int]:
+    """Flags inside the readings that drove an episode: from one assess window before its start to its end."""
+
+    lo = datetime.fromisoformat(episode["start"]) - ASSESS_WINDOW
+    hi = datetime.fromisoformat(episode["end"])
+    steps = sum(1 for s in quality["step_reviews"] if lo <= datetime.fromisoformat(s["time"]) <= hi)
+    missing = sum(g["missing_slots"] for g in quality["gaps"] if datetime.fromisoformat(g["after"]) < hi and datetime.fromisoformat(g["before"]) > lo)
+    return {"step_reviews": steps, "missing_slots": missing}
 
 
 def _review_episodes(series: tuple[tuple[datetime, float], ...], flags: list[bool], levels: dict[str, float], interval_min: int = 10) -> list[dict[str, Any]]:
@@ -364,16 +412,19 @@ def _review_episodes(series: tuple[tuple[datetime, float], ...], flags: list[boo
 @lru_cache(maxsize=64)
 def _criteria_result(facility_id: str, stage_floor: str, lead_threshold_min: int, rate_window_min: int) -> dict[str, Any]:
     facility = FACILITIES[facility_id]
-    series = _history_series(facility["history_series"])
+    series = _review_series(facility_id)
     levels = facility["gauge"]["levels_m"]
     reference = facility["reference_event"]
     inflow = datetime.fromisoformat(reference["underpass_inflow"])
     flags = _review_flags(series, levels, stage_floor, lead_threshold_min, rate_window_min)
     first = next(((t, wl) for (t, wl), flag in zip(series, flags) if flag and inflow - REFERENCE_WINDOW <= t <= inflow), None)
     episodes = _review_episodes(series, flags, levels)
+    quality = _history_quality(facility_id)
     for episode in episodes:
         start = datetime.fromisoformat(episode["start"])
         episode["reference_event"] = inflow - REFERENCE_WINDOW <= start <= inflow
+        episode["quality"] = _episode_quality(episode, quality)
+        episode["quality_review_required"] = any(episode["quality"].values())
     others = [e for e in episodes if not e["reference_event"]]
     by_year: dict[str, dict[str, Any]] = {}
     for t, wl in series:
@@ -415,7 +466,7 @@ def criteria_review(facility_id: str, stage_floor: str | None = None, lead_thres
     if not 0 <= lead <= CRITERIA_MAX_LEAD:
         raise ValueError(f"lead_threshold_min must be between 0 and {CRITERIA_MAX_LEAD}")
     rate_window = rule["rate_window_min"]
-    series = _history_series(facility["history_series"])
+    series = _review_series(facility_id)
     result = _criteria_result(facility_id, floor, lead, rate_window)
     sweep = []
     for sweep_floor in CRITERIA_FLOORS:
@@ -427,6 +478,10 @@ def criteria_review(facility_id: str, stage_floor: str | None = None, lead_thres
                 "lead_to_inflow_min": row["lead_minutes"]["underpass_inflow"] if row["lead_minutes"] else None,
                 "other_episode_count": row["other_episode_count"], "other_review_minutes": row["other_review_minutes"],
             })
+    quality = _history_quality(facility_id)
+    months = {t.month for t, _ in series}
+    season = "매년 6~9월" if months <= {6, 7, 8, 9} else "연중(1~12월)"
+    flagged = sum(1 for e in result["episodes"] if e["quality_review_required"])
     return {
         "facility_id": facility_id,
         "station": {"station_id": facility["gauge"]["station_id"], "name": facility["gauge"]["name"], "levels_m": facility["gauge"]["levels_m"]},
@@ -436,9 +491,17 @@ def criteria_review(facility_id: str, stage_floor: str | None = None, lead_thres
         "reference_event": facility["reference_event"],
         **result,
         "sweep": sweep,
-        "coverage": {"from": series[0][0].isoformat(), "to": series[-1][0].isoformat(), "rows": len(series), "interval": "10M", "season": "매년 6~9월", "years": sorted({t.year for t, _ in series})},
+        "coverage": {"from": series[0][0].isoformat(), "to": series[-1][0].isoformat(), "rows": len(series), "interval": "10M", "season": season, "years": sorted({t.year for t, _ in series})},
+        "quality": {
+            "step_review_threshold_m": quality["step_review_threshold_m"],
+            "expected_slots": quality["expected_slots"], "present_slots": quality["present_slots"], "missing_slots": quality["missing_slots"],
+            "gap_count": len(quality["gaps"]), "gaps": quality["gaps"][:20],
+            "step_review_count": len(quality["step_reviews"]), "step_reviews": quality["step_reviews"][:50],
+            "quarantines": quality["quarantines"], "policy_found": quality["policy_found"],
+            "episodes_with_flags": flagged,
+        },
         "limitations": [
-            "홍수기(6~9월) 10분 수위만 대상이다. 10~5월 자료와 1시간 품질 감사 마스크는 적용하지 않았다.",
+            f"{'홍수기(6~9월)' if season == '매년 6~9월' else '연중'} 10분 수위를 쓴다. 품질 정책에 연구 격리로 등록된 구간(미호강교 2023-05-16 01:00~12:00 계단 변화 등)만 규칙에서 빼고, 빠진 10분 칸과 10분 사이 {HISTORY_STEP_REVIEW_M} m 이상 변화는 지우지 않고 표시만 한다. 권고 구간 판단에 쓰인 수위에 표시가 있으면 그 구간에 '자료 확인 필요'를 붙인다.",
             "2023년 사건 밖의 권고 구간은 '실제 침수 기록 없이 통제를 검토했을 구간'의 후보다. 그 시기 지하차도 침수·통제 기록을 확인하지 않았으므로 오경보로 단정하지 않는다.",
             "권고가 6시간 넘게 끊기면 다른 구간으로 센다. 계획홍수위 도달은 기준과 관계없이 항상 권고한다.",
             "규칙은 미호강교 수위만 본다. 내수 침수와 강우의 직접 영향은 반영하지 않는다.",
@@ -449,4 +512,4 @@ def criteria_review(facility_id: str, stage_floor: str | None = None, lead_thres
 
 def list_facilities() -> list[dict[str, Any]]:
     mode = twin_mode()
-    return [{**{k: f[k] for k in ("id", "name", "kind", "driver", "location", "road", "managing_agency", "event_id")}, "gauge": {"station_id": f["gauge"]["station_id"], "name": f["gauge"]["name"]}, "mode": mode["mode"]} for f in FACILITIES.values()]
+    return [{**{k: f[k] for k in ("id", "name", "kind", "driver", "location", "road", "managing_agency", "event_id")}, "gauge": {"station_id": f["gauge"]["station_id"], "name": f["gauge"]["name"]}, "mode": mode["mode"], "status": f["status"], "gates": f["gates"]} for f in FACILITIES.values()]
