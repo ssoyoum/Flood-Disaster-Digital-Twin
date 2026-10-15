@@ -16,12 +16,12 @@ def ask(message, **scope):
     return client.post("/api/agent/ask", json={**SCOPE, **scope, "message": message})
 
 
-def test_facility_catalog_and_examples_are_limited_to_three_registered_tools():
+def test_facility_catalog_and_examples_are_limited_to_the_registered_facility_tools():
     params = {"facility_id": FACILITY}
     tools = client.get("/api/agent/tools", params=params).json()
     assert {tool["name"] for tool in tools} == agent_facility.TOOL_NAMES
     examples = client.get("/api/agent/examples", params=params).json()
-    assert len(examples) == 3 and {item["workflow"] for item in examples} == {"facility_status", "control_rule", "facility_backtest"}
+    assert {f"get_{item['workflow']}" for item in examples} == agent_facility.TOOL_NAMES
 
 
 @pytest.mark.parametrize("question,tool", [

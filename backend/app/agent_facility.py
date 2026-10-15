@@ -6,12 +6,25 @@ from typing import Any
 
 from .services import ReconstructionUnavailable
 
-TOOL_NAMES = {"get_facility_status", "get_control_rule", "get_facility_backtest"}
+TOOL_NAMES = {"get_facility_status", "get_control_rule", "get_facility_backtest", "get_criteria_review", "get_rise_forecast"}
 EXAMPLES = [
     {"workflow": "facility_status", "label": "시설 상태", "question": "선택한 시설의 관측 상태와 수위 여유를 설명해줘"},
     {"workflow": "control_rule", "label": "통제 기준", "question": "통제 검토 기준과 그 근거는 무엇인가요?"},
     {"workflow": "facility_backtest", "label": "과거 백테스트", "question": "과거 수위 백테스트에서 언제 통제 검토가 시작됐나요?"},
+    {"workflow": "criteria_review", "label": "기준 비교", "question": "기준을 경보+120분으로 바꾸면 몇 분 먼저 검토하고 다른 해에는 몇 번 권고가 나오나요?"},
+    {"workflow": "rise_forecast", "label": "상승 연구 모델", "question": "연구 모델은 6시간 안에 수위가 얼마나 오른다고 보나요?"},
 ]
+RESEARCH_CAVEAT = "6시간 상승값은 연구용 모델 결과이며 예보가 아니고 통제 권고에 쓰지 않습니다."
+ARCHIVE_MARKER = "보관 수위"
+
+
+def archive_caveat(facility: dict[str, Any]) -> str:
+    """What the backtest minutes rest on; reviewers asked for this beside every lead-time claim."""
+    levels, rule = facility["gauge"]["levels_m"], facility["control_rule"]
+    return (f"백테스트 시각·분은 2026년에 홍수통제소에서 다시 받은 {ARCHIVE_MARKER}와 현재 관측소 기준값"
+            f"(경보 {levels['warning']} m·계획홍수위 {levels['planned_flood']} m)으로 계산했습니다. "
+            "2023년 당시 실시간으로 같은 값이 보였는지, 당시 기준값이 같았는지는 확인하지 않았습니다. "
+            f"규칙은 각 시각의 직전 {rule['rate_window_min']}분 수위만 써서 미래 값을 보지 않습니다.")
 
 
 def require_facility(facility_id: str, event_id: str) -> dict[str, Any]:
@@ -34,6 +47,12 @@ def tools(facility_id: str, event_id: str) -> list[dict[str, Any]]:
         ("get_facility_backtest", "저장된 사건 수위에 같은 규칙을 적용한 과거 백테스트를 설명한다.",
          "처음 통제 검토 시각, 기록된 유입·붕괴까지 시간, DQ-009 시각 차이.",
          "대피 성공·피해 감소·현재 위험 예측, 백테스트 권고를 실제 통제 기록으로 표현."),
+        ("get_criteria_review", "현재 규칙과 다른 기준(주의보·경보 × 0~180분)을 저장된 모든 해의 10분 수위에 적용해 비교한다. 기준을 바꾸면 몇 분 먼저 검토하는지, 다른 해에 권고가 몇 번 나오는지 물을 때.",
+         "기준별 첫 검토 시각과 유입까지 분, 다른 해 권고 구간 수·시간, 연도별 최고 수위, 자료 기간·품질 점검.",
+         "다른 해 권고가 실제로 불필요했는지(통제 기록 없음), 최적 기준 확정, 피해 감소."),
+        ("get_rise_forecast", "외부 연구 모델(실제 홍수예보 관측소 224곳 학습)의 6시간 최대 수위 상승을 설명한다. 앞으로 얼마나 오를지 물을 때만.",
+         "연구 모델의 6시간 최대 상승·예상 수위·단계(중앙값, 있으면 90% 상한), 모델 오차, 입력 관측 시각. 반드시 연구용이라고 말한다.",
+         "예보·도달 시각·침수심, 통제 필요 여부 판단, 규칙 권고 대체. kind=RESEARCH이고 control_decision_usable=false다."),
     ]
     return [{"name": name, "description": description, "input_fields": ["facility_id", "observation_at"],
              "output": "facility-scoped evidence with provenance and limitations", "use_when": description,
@@ -54,7 +73,56 @@ def hints(message: str) -> list[dict[str, Any]]:
             names.append("get_facility_status")
     if historical:
         names.append("get_facility_backtest")
+    if re.search(r"기준을?\s*(?:바꾸|바꿔|바꿨|낮추|낮춰|높이|높여)|다른\s*(?:해|연도|시기|기준)|연도별|해마다|권고가?\s*몇|몇\s*번|맞바꿈|불필요한\s*통제|(?:경보|주의보)\s*\+|기준별|기준\s*비교", message):
+        names.append("get_criteria_review")
+    if re.search(r"앞으로|6\s*시간|더\s*오를|얼마나\s*(?:더\s*)?오르|최대\s*상승|상승\s*(?:예측|전망)|연구\s*모델|예측\s*모델", message):
+        names.append("get_rise_forecast")
     return [{"tool_name": name, "parameters": {}} for name in dict.fromkeys(names)]
+
+
+_STAGE_LABELS = {"advisory": "주의보", "warning": "경보", "attention": "관심", "severe": "심각"}
+
+
+def _rule_label(stage_floor: str | None, lead: int | None) -> str:
+    if not lead:
+        return "계획홍수위만"
+    return f"{_STAGE_LABELS.get(stage_floor or '', stage_floor)}+{lead}분"
+
+
+def _compact_criteria(review: dict[str, Any]) -> dict[str, Any]:
+    """Keep the comparison the answer needs; drop per-reading quality detail."""
+    quality = review.get("quality") or {}
+    others = [{key: episode.get(key) for key in ("start", "end", "review_minutes", "peak_water_level_m", "peak_stage")}
+              for episode in review.get("episodes", []) if not episode.get("reference_event")]
+    compact = {key: review.get(key) for key in ("facility_id", "current_rule", "params", "reference_event", "first_review",
+                                                "lead_minutes", "other_episode_count", "other_review_minutes", "by_year",
+                                                "sweep", "coverage", "limitations")}
+    compact["other_episodes"] = others[:10]
+    if quality:
+        compact["quality"] = {**{key: quality[key] for key in ("missing_slots", "step_review_count", "episodes_with_flags", "policy_found")
+                                 if key in quality},
+                              "quarantines": [{key: item.get(key) for key in ("id", "start", "end", "review_status")}
+                                              for item in quality.get("quarantines", [])]}
+    compact["coverage_note"] = ("BACKTEST_SWEEP: stored gauge levels replayed under each rule. Other-year review episodes "
+                                "were not matched with closure records, so they are not judged necessary or unnecessary.")
+    return compact
+
+
+_RISE_KEYS = ("at", "mode", "kind", "control_decision_usable", "horizon_hours", "as_of", "observation_quality",
+              "observation_age_min", "prediction_available", "reason", "maxrise_6h_m", "forecast_level_m", "forecast_stage",
+              "forecast_stage_label", "reaches_within_6h", "margin_after_rise_m", "maxrise_6h_q90_m", "forecast_level_q90_m",
+              "forecast_stage_q90", "reaches_within_6h_q90", "station_in_training", "limitations")
+_RISE_MODEL_KEYS = ("trained_at", "stations", "cv_oof_rmse_m", "cv_oof_rmse_target_gt_1m", "holdout_q90_coverage",
+                    "osong_planned_flood_lead_min", "osong_planned_flood_lead_min_q90")
+
+
+def _compact_rise(result: dict[str, Any]) -> dict[str, Any]:
+    compact = {key: result[key] for key in _RISE_KEYS if key in result}
+    model = result.get("model") or {}
+    compact["model"] = {key: model[key] for key in _RISE_MODEL_KEYS if key in model} or None
+    compact["coverage_note"] = ("RESEARCH_MODEL: 6-hour maximum rise from an external research model. Not a forecast, "
+                                "no arrival time or depth, and never used for the closure-review recommendation.")
+    return compact
 
 
 def _facility_info(facility: dict[str, Any]) -> dict[str, Any]:
@@ -73,10 +141,26 @@ def run_tool(name: str, event_id: str, request: Any) -> dict[str, Any]:
                 "coverage_note": "REGISTERED_RULE: this is a review rule, not an official closure order.",
                 "limitations": ["상승 속도 조건은 트윈의 가정이다. 실제 통제는 현장 침수심 계측·관리기관 기준·담당자 판단이 우선한다.",
                                 "침수심 통제 기준의 최신 공식 원문은 이 도구에 연결되지 않았다."]}
+    if name == "get_criteria_review":
+        try:
+            review = twin.criteria_review(facility["id"], None, None)
+        except (LookupError, OSError, ValueError) as exc:
+            raise ReconstructionUnavailable("Stored gauge series for the criteria review is unavailable.") from exc
+        compact = _compact_criteria(review)
+        compact["limitations"] = [*(compact.get("limitations") or []), archive_caveat(facility)]
+        return compact
+    if name == "get_rise_forecast":
+        from .rise_model import forecast
+        try:
+            result = forecast(facility["id"], request.observation_at)
+        except Exception as exc:
+            # Live gauge errors may carry a key-bearing URL; keep the message generic.
+            raise ReconstructionUnavailable("Rise research model or its inputs are unavailable.") from exc
+        return _compact_rise(result)
     if name == "get_facility_backtest":
         return {**twin.backtest(facility["id"]), "mode": "historical_backtest",
                 "coverage_note": "NEEDS_SOURCE_PAGE: reference incident times require source-page verification.",
-                "limitations": ["같은 규칙의 과거 수위 백테스트이며 실제 통제·인명·피해 감소를 계산하지 않았다."]}
+                "limitations": ["같은 규칙의 과거 수위 백테스트이며 실제 통제·인명·피해 감소를 계산하지 않았다.", archive_caveat(facility)]}
     try:
         if request.observation_at:
             now = datetime.fromisoformat(request.observation_at.replace("Z", "+00:00"))
@@ -138,6 +222,28 @@ def summarize(calls: list[dict[str, Any]]) -> tuple[str, list[int]]:
                     text += f" 재구성된 유입 시각까지 {result['lead_minutes']['underpass_inflow']}분 앞섭니다."
                 text += " 백테스트 권고이며 실제 통제·피해 감소 결과가 아닙니다."
             text += f" {result['note']}"
+        elif name == "get_criteria_review":
+            params, first, lead = result.get("params") or {}, result.get("first_review") or {}, result.get("lead_minutes") or {}
+            rule = _rule_label(params.get("stage_floor"), params.get("lead_threshold_min"))
+            text = (f"현재 규칙({rule})을 저장된 수위에 적용하면 기준 사건의 첫 검토는 {first.get('time')}이고 유입까지 "
+                    f"{lead.get('underpass_inflow')}분 앞섭니다. 다른 시기 권고 구간은 {result.get('other_episode_count')}건입니다.")
+            # "planned flood only" (lead 0) is the same rule under either stage floor; list it once.
+            rows = list(dict.fromkeys(
+                f"{_rule_label(row['stage_floor'], row['lead_threshold_min'])} {row.get('first_review_time')}·유입 "
+                f"{row.get('lead_to_inflow_min')}분 전·다른 시기 {row.get('other_episode_count')}건"
+                for row in (result.get("sweep") or [])))
+            if rows:
+                text += " 기준별: " + "; ".join(rows) + "."
+            text += " 다른 시기 권고는 통제 기록과 대조하지 않아 필요·불필요를 판단하지 않습니다."
+        elif name == "get_rise_forecast":
+            if result.get("prediction_available"):
+                text = (f"연구 모델은 {result.get('as_of')} 관측 기준 6시간 안 최대 +{result.get('maxrise_6h_m')}m, "
+                        f"예상 수위 {result.get('forecast_level_m')}m({result.get('forecast_stage_label')})로 봅니다.")
+                if result.get("maxrise_6h_q90_m") is not None:
+                    text += f" 90% 상한은 +{result['maxrise_6h_q90_m']}m입니다."
+            else:
+                text = f"연구 모델 값을 낼 수 없습니다({result.get('reason')})."
+            text += f" {RESEARCH_CAVEAT}"
         if text:
             sentences.append(f"{text} [{order}]")
             evidence.append(order)
@@ -148,6 +254,8 @@ def safe_model_answer(answer: str, calls: list[dict[str, Any]]) -> bool:
     if re.search(r"현재\s*안전|지금\s*안전|안전합니다|위험이?\s*없|통제(?:를)?\s*(?:실행|승인|완료)|통제.*불필요|자동\s*차단|침수가?\s*없|피해가?\s*줄|대피\s*성공", answer):
         return False
     for call in calls:
+        if call["tool_name"] == "get_rise_forecast" and "연구" not in answer:
+            return False
         if call["tool_name"] == "get_facility_status":
             result = call["result"]
             if result["observation_quality"] != "fresh":

@@ -43,17 +43,46 @@ from .services import ReconstructionUnavailable
 
 MAX_TOOL_CALLS = 4
 DEFAULT_ASK_TIMEOUT_SECONDS = 25.0
+# A local CPU model reads a 3-5k token prompt in about a minute; 25 s would end every request.
+DEFAULT_OLLAMA_ASK_TIMEOUT_SECONDS = 300.0
+DEFAULT_OLLAMA_MODEL = "qwen2.5:3b"
+DEFAULT_OLLAMA_NUM_CTX = 16384
 _logger = logging.getLogger("floodops.agent")
+
+
+def agent_llm_provider() -> str:
+    _load_env_file_once()
+    return "ollama" if (os.environ.get("AGENT_LLM_PROVIDER") or "").strip().lower() == "ollama" else "gemini"
+
+
+def _ollama_model() -> str:
+    return (os.environ.get("OLLAMA_MODEL") or DEFAULT_OLLAMA_MODEL).strip()
+
+
+def agent_model_id() -> str:
+    return f"ollama:{_ollama_model()}" if agent_llm_provider() == "ollama" else llm_planner_model_id()
+
+
+def agent_model_status() -> dict[str, Any]:
+    """Configuration check only; neither provider is called."""
+
+    if agent_llm_provider() == "gemini":
+        return llm_planner_status()
+    model = _ollama_model()
+    if not re.fullmatch(r"[A-Za-z0-9._:/-]+", model):
+        return {"available": False, "reason": "OLLAMA_MODEL is not a valid model name."}
+    return {"available": True, "reason": f"Ready on Ollama {model}."}
 
 
 def _ask_timeout_seconds() -> float:
     """Shared wall-clock budget for all model decisions and JSON retries."""
 
+    default = DEFAULT_OLLAMA_ASK_TIMEOUT_SECONDS if agent_llm_provider() == "ollama" else DEFAULT_ASK_TIMEOUT_SECONDS
     try:
-        value = float(os.environ.get("AGENT_ASK_TIMEOUT_SECONDS", DEFAULT_ASK_TIMEOUT_SECONDS))
+        value = float(os.environ.get("AGENT_ASK_TIMEOUT_SECONDS", default))
     except ValueError:
-        return DEFAULT_ASK_TIMEOUT_SECONDS
-    return value if math.isfinite(value) and value > 0 else DEFAULT_ASK_TIMEOUT_SECONDS
+        return default
+    return value if math.isfinite(value) and value > 0 else default
 
 
 @dataclass
@@ -165,15 +194,36 @@ _FORECAST_ANSWER = (
     "등록된 과거 사건의 관측·재구성과, 시각을 바꾼 시간 비교만 할 수 있습니다."
 )
 # Tools that compute the effect of an assumption; a what-if answered without one did not compute it.
-_COMPUTING_TOOLS = {"compare_scenarios", "get_exposure_inventory"}
+_COMPUTING_TOOLS = {"compare_scenarios", "get_exposure_inventory", "get_criteria_review"}
 
 
 def _is_forecast_question(message: str) -> bool:
     return bool(_FORECAST.search(message))
 
 
+_ANALYSIS_FAILED_ANSWER = (
+    "요청한 분석 도구가 실행 중 실패해 결과를 계산하지 못했습니다. "
+    "다른 자료로 같은 값을 대신 계산하지 않았습니다. 잠시 뒤 다시 시도하거나 사건 재구성·관측 요약으로 기록된 사실을 확인해 주세요."
+)
+
+
+def _fallback_status(request: AgentAskRequest, hypothetical: bool, calls: list[dict[str, Any]], limitations: list[str]) -> str:
+    """Tool results shown without a model answer: same what-if and forecast rules as a model answer."""
+    if hypothetical and not _computed(calls):
+        limitations.append("No analysis tool computed the assumed change; only recorded facts were cited.")
+        return "NEEDS_DATA"
+    if not request.facility_id and _is_forecast_question(request.message):
+        limitations.append("No registered tool forecasts future rainfall or flooding.")
+        return "NEEDS_DATA"
+    return "ANSWERED"
+
+
+def _is_computing(tool_name: str | None) -> bool:
+    return bool(tool_name) and (tool_name.startswith("analyze_") or tool_name in _COMPUTING_TOOLS)
+
+
 def _computed(calls: list[dict[str, Any]]) -> bool:
-    return any(call["tool_name"].startswith("analyze_") or call["tool_name"] in _COMPUTING_TOOLS for call in calls)
+    return any(_is_computing(call["tool_name"]) for call in calls)
 
 _SYSTEM_PROMPT = """You are FloodOps, an analyst helping a local disaster or road officer review a past flood event. Read the user's question in natural Korean, work out what they actually want to know, and answer it as helpfully as the registered read-only tools allow.
 
@@ -210,6 +260,75 @@ class AgentAction(BaseModel):
     follow_ups: list[str] = Field(default_factory=list)
 
 
+def _system_prompt(context: dict[str, Any]) -> str:
+    if not context.get("selected_facility"):
+        return _SYSTEM_PROMPT
+    return _SYSTEM_PROMPT + (
+        "\nFacility scope overrides the historical tool examples above. Use ONLY available_tools, with {} parameters; "
+        "facility and replay time are fixed by the server. Use get_facility_status for observations, get_control_rule "
+        "for the review rule, get_facility_backtest for the reference event, get_criteria_review to compare rules "
+        "across all stored years, and get_rise_forecast only when asked how much the level may still rise. "
+        "Distinguish replay from live and always state the observation time. Call get_rise_forecast output a "
+        "research model, never a forecast or a reason to close. No prediction of inflow time, depth, safety "
+        "guarantee or actual closure order. If observation is missing/stale, say present assessment is unavailable.")
+
+
+def _model_action(context: dict[str, Any]) -> AgentAction:
+    """One decision from the configured provider; both get the same prompt, catalogue and checks."""
+
+    return _ollama_action(context) if agent_llm_provider() == "ollama" else _gemini_action(context)
+
+
+def _ollama_action(context: dict[str, Any]) -> AgentAction:
+    """Local Ollama decision. Same JSON contract as Gemini; tokens come from prompt_eval_count/eval_count."""
+
+    status = agent_model_status()
+    if not status["available"]:
+        raise LlmPlannerUnavailable(status["reason"])
+    base = (os.environ.get("OLLAMA_BASE_URL") or "http://localhost:11434").strip().rstrip("/")
+    try:
+        num_ctx = int(os.environ.get("OLLAMA_NUM_CTX", DEFAULT_OLLAMA_NUM_CTX))
+    except ValueError:
+        num_ctx = DEFAULT_OLLAMA_NUM_CTX
+    payload = {
+        "model": _ollama_model(),
+        "stream": False,
+        # Ollama silently truncates a prompt longer than num_ctx; the default (2-4k) is shorter than ours.
+        "options": {"temperature": 0, "num_ctx": num_ctx},
+        "format": AgentAction.model_json_schema(),
+        "messages": [{"role": "system", "content": _system_prompt(context)},
+                     {"role": "user", "content": json.dumps(context, ensure_ascii=False, default=str)}],
+    }
+    state = _run_state.get()
+    deadline = state.deadline if state is not None else time.monotonic() + _ask_timeout_seconds()
+    for attempt in range(2):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise _ModelFailure("model_budget_exceeded", "The Agent model time budget was exhausted.")
+        if state is not None:
+            state.model_requests += 1
+        try:
+            response = asyncio.run(_post_gemini(f"{base}/api/chat", headers={}, json=payload, timeout=remaining))
+        except (asyncio.TimeoutError, httpx.TimeoutException) as exc:
+            raise _ModelFailure("model_budget_exceeded", "The Agent model time budget was exhausted.") from exc
+        except httpx.HTTPError as exc:
+            raise _ModelFailure("model_connection_failed", f"Ollama connection failed: {type(exc).__name__}.") from exc
+        if response.status_code != 200:
+            raise _ModelFailure("model_http_error", f"Ollama returned HTTP {response.status_code}.")
+        try:
+            data = response.json()
+            prompt, output = data.get("prompt_eval_count"), data.get("eval_count")
+            if type(prompt) is int and type(output) is int:
+                _record_usage({"promptTokenCount": prompt, "candidatesTokenCount": output, "totalTokenCount": prompt + output})
+            return AgentAction.model_validate_json(data["message"]["content"])
+        except (KeyError, TypeError, ValueError, AttributeError) as exc:
+            if attempt == 0:
+                _record_failure("model", "model_invalid_decision")
+                continue
+            raise _ModelFailure("model_invalid_decision", "Ollama returned no valid tool decision after a retry.") from exc
+    raise AssertionError("The Ollama decision loop must return or raise.")
+
+
 def _gemini_action(context: dict[str, Any]) -> AgentAction:
     """Return one structured model decision; credentials never enter the prompt."""
 
@@ -218,13 +337,7 @@ def _gemini_action(context: dict[str, Any]) -> AgentAction:
         raise LlmPlannerUnavailable(status["reason"])
     _load_env_file_once()
     model = llm_planner_model_id()
-    system_prompt = _SYSTEM_PROMPT
-    if context.get("selected_facility"):
-        system_prompt += ("\nFacility scope overrides the historical tool examples above. Use ONLY available_tools, with {} parameters; "
-                          "facility and replay time are fixed by the server. Use get_facility_status for observations, get_control_rule "
-                          "for the review rule and get_facility_backtest for historical evidence. Distinguish replay from live and "
-                          "always state the observation time. No prediction of inflow, depth, safety guarantee or actual closure order. "
-                          "If observation is missing/stale, say present assessment is unavailable.")
+    system_prompt = _system_prompt(context)
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{quote(model, safe='')}:generateContent"
     state = _run_state.get()
     deadline = state.deadline if state is not None else time.monotonic() + _ask_timeout_seconds()
@@ -395,7 +508,7 @@ def _unavailable_answer(action: AgentAction, request: AgentAskRequest) -> tuple[
     """Explain an unsupported request without trusting an uncited model answer."""
 
     if request.facility_id:
-        return ("시설 Agent는 관측 상태·등록 통제 검토 기준·과거 수위 백테스트를 설명합니다. "
+        return ("시설 Agent는 관측 상태·등록 통제 검토 기준·과거 수위 백테스트·기준별 비교·연구용 상승 모델 값을 설명합니다. "
                 "실제 침수심·유입 예측·피해 감소·통제 실행은 계산하거나 수행하지 않습니다.",
                 "No registered facility tool computes or executes the requested effect.")
     answer, limitation = _unavailable_answer_osong(action, request)
@@ -500,7 +613,8 @@ def _reply(request: AgentAskRequest, status: str, answer: str, calls: list[dict[
            source: str = "model") -> dict[str, Any]:
     state = _run_state.get()
     if request.facility_id:
-        follow_ups = [item["question"] for item in agent_facility.EXAMPLES]
+        used = {call["tool_name"] for call in calls}
+        follow_ups = [item["question"] for item in agent_facility.EXAMPLES if f"get_{item['workflow']}" not in used][:3]
         if not calls and source == "model":
             answer, _ = _unavailable_answer(AgentAction(action="final", gap_kind="outside_scope"), request)
         if calls and (source == "registered_tools" or not agent_facility.safe_model_answer(answer, calls)):
@@ -518,6 +632,11 @@ def _reply(request: AgentAskRequest, status: str, answer: str, calls: list[dict[
                 answer += f"\n{call['result']['note']} [{call['order']}]"
             if call["tool_name"] == "get_facility_status" and "예보" not in answer:
                 answer += "\n상승 속도 외삽은 예보나 지하차도 유입 시각 예측이 아닙니다."
+            if call["tool_name"] == "get_rise_forecast" and agent_facility.RESEARCH_CAVEAT not in answer:
+                answer += f"\n{agent_facility.RESEARCH_CAVEAT}"
+        if (any(call["tool_name"] in {"get_facility_backtest", "get_criteria_review"} for call in calls)
+                and agent_facility.ARCHIVE_MARKER not in answer):
+            answer += "\n" + agent_facility.archive_caveat(agent_facility.require_facility(request.facility_id, request.event_id))
         if calls:
             answer += "\n실제 통제는 현장 계측·관리기관 기준·담당자 판단이 우선합니다."
     if state is not None:
@@ -532,7 +651,7 @@ def _reply(request: AgentAskRequest, status: str, answer: str, calls: list[dict[
         "evidence_calls": evidence or [],
         "limitations": limitations,
         "follow_ups": follow_ups,
-        "model": llm_planner_model_id() if model == "" else model,
+        "model": agent_model_id() if model == "" else model,
         "context_note": state.context_note if state is not None else "",
     }
 
@@ -724,6 +843,31 @@ def _execute_hint(hint: dict[str, Any], request: AgentAskRequest) -> tuple[Agent
     return tool_request, result
 
 
+# The English description, output label and input list repeat use_when/parameters and are resent with every decision.
+_MODEL_CATALOGUE_FIELDS = ("name", "use_when", "parameters", "can_say", "cannot_say", "examples")
+
+
+def _model_catalogue(event_id: str, facility_id: str | None) -> list[dict[str, Any]]:
+    return [{key: tool[key] for key in _MODEL_CATALOGUE_FIELDS if key in tool} for tool in list_agent_tools(event_id, facility_id)]
+
+
+# Map-rendering fields no catalogue entry lets the model cite. The full result still backs the grounding check.
+_MODEL_HIDDEN_FIELDS = {"get_reconstruction": {"envelope_comparison", "trace_reveal", "hand_reconstruction", "map_center"}}
+
+
+def _observation(trace: dict[str, Any]) -> dict[str, Any]:
+    """What the model reads for one call; it resends with every later decision, so size multiplies."""
+
+    name, result = trace["tool_name"], trace["result"]
+    if name == "analyze_hand_threshold":
+        result = {**result, "stages": [{key: value for key, value in stage.items() if not key.endswith("_grid_ids")}
+                                       for stage in result["stages"]]}
+    hidden = _MODEL_HIDDEN_FIELDS.get(name)
+    if hidden:
+        result = {key: value for key, value in result.items() if key not in hidden}
+    return {**trace, "result": result}
+
+
 def _trace_parameters(parameters: dict[str, Any], request: AgentAskRequest) -> dict[str, Any]:
     if request.facility_id:
         return {**parameters, "facility_id": request.facility_id, "observation_at": request.observation_at}
@@ -735,7 +879,7 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
 
     if _is_capability_question(request.message):
         if request.facility_id:
-            return _reply(request, "ANSWERED", "선택 시설의 관측 상태, 통제 검토 기준과 근거, 과거 수위 백테스트를 설명할 수 있습니다.",
+            return _reply(request, "ANSWERED", "선택 시설의 관측 상태, 통제 검토 기준과 근거, 과거 수위 백테스트, 기준을 바꿨을 때의 비교, 연구용 6시간 상승 모델 값을 설명할 수 있습니다.",
                           [], [], [], model=None, source="capability")
         return _reply(request, "ANSWERED", _capability_answer(request.event_id), [], [], _follow_ups(None, event_id=request.event_id), model=None, source="capability")
 
@@ -759,13 +903,13 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
         "question": request.message,
         "parameter_context": resolved.parameter_text,
         "history": [turn.model_dump() for turn in request.history],
-        "available_tools": list_agent_tools(request.event_id, request.facility_id),
+        "available_tools": _model_catalogue(request.event_id, request.facility_id),
         "observations": [],
         "remaining_tool_calls": MAX_TOOL_CALLS,
     }
     if request.facility_id:
         context["selected_facility"] = {"facility_id": request.facility_id, "observation_at": request.observation_at}
-        context["scope_note"] = ("Facility scope: only its three registered read-only tools are allowed. Always identify "
+        context["scope_note"] = ("Facility scope: only its registered read-only facility tools are allowed. Always identify "
                                  "live versus historical replay and observation timestamp. Missing/stale observations cannot "
                                  "support a present safety claim. Review rules/backtests are not forecasts or closure orders.")
     hints = resolved.hints
@@ -787,6 +931,8 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
     failed_keys: set[str | None] = set()
     failed_tools: set[str | None] = set()
     repeats = 0
+    ungrounded = False
+    stalled = False
     limitations: list[str] = []
     last_action: AgentAction | None = None
     anchored = False
@@ -799,7 +945,7 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
                 if time.monotonic() >= state.deadline:
                     raise _ModelFailure("model_budget_exceeded", "The Agent model time budget was exhausted.")
                 state.model_steps += 1
-            action = _gemini_action(context)
+            action = _model_action(context)
         except LlmPlannerUnavailable as exc:
             _record_failure("model", getattr(exc, "code", "model_unavailable"))
             _trace("model", getattr(exc, "code", "model_unavailable"), model_started, by="model")
@@ -821,7 +967,7 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
                               "parameters": _trace_parameters(hint["parameters"], request), "result": result})
             if calls:
                 return _reply(
-                    request, "ANSWERED",
+                    request, _fallback_status(request, hypothetical, calls, limitations),
                     "AI 설명을 완성하지 못했지만 분석 도구 결과는 확인할 수 있습니다. 아래 결과 표를 확인해 주세요.",
                     calls, [str(exc), *limitations], _follow_ups(last_action, event_id=request.event_id),
                     source="registered_tools",
@@ -836,6 +982,12 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
         last_action = action
         called = {call["tool_name"] for call in calls}
         missing = [hint for hint in hints if hint["tool_name"] not in called | failed_tools]
+        if action.action == "final" and any(_is_computing(name) for name in failed_tools) and not _computed(calls):
+            # Otherwise the model redoes the failed analysis from timeline facts and the number has no tool behind it.
+            _trace("answer", "analysis_tool_failed", time.monotonic(), by="server")
+            return _reply(request, "NEEDS_DATA", _ANALYSIS_FAILED_ANSWER, calls,
+                          [*limitations, "The requested analysis tool failed; no substitute calculation was made."],
+                          _follow_ups(action, event_id=request.event_id), source="clarification")
         if action.action == "final" and not anchored and (missing or (hypothetical and not calls)):
             # The model tried to finish without the evidence the question needs: run it once on the user's values.
             anchored = True
@@ -852,7 +1004,7 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
                 hint_key = json.dumps([hint["tool_name"], tool_request.model_dump()], sort_keys=True)
                 seen.add(hint_key)
                 call_orders[hint_key] = trace["order"]
-                context["observations"].append(trace)
+                context["observations"].append(_observation(trace))
             if calls:
                 context["guidance"] = (
                     "The listed tool results were run for you on the user's own values. Answer now from them with [n] "
@@ -882,7 +1034,11 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
                 uncomputed = hypothetical and not physical and not _computed(calls)
                 if uncomputed:
                     limitations.append("No analysis tool computed the assumed change; only recorded facts were cited.")
-                status = "NEEDS_DATA" if physical or action.gap_kind or uncomputed else "ANSWERED"
+                # The model may explain the refusal well yet omit gap_kind; the status must not depend on that.
+                forecast = not request.facility_id and _is_forecast_question(request.message)
+                if forecast:
+                    limitations.append("No registered tool forecasts future rainfall or flooding.")
+                status = "NEEDS_DATA" if physical or action.gap_kind or uncomputed or forecast else "ANSWERED"
                 return _reply(request, status, answer, calls, limitations, follow, action.evidence_calls)
             if action.gap_kind is not None or physical or not calls:
                 # The model's own explanation is kept when it adds no unsourced numbers;
@@ -900,6 +1056,7 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
             limitations.append("The model's final answer lacked valid tool citations or contained unsupported numbers.")
             _record_failure("answer", "answer_not_grounded")
             _trace("answer", "answer_not_grounded", time.monotonic(), by="server")
+            ungrounded = True
             break
         if len(calls) >= MAX_TOOL_CALLS:
             limitations.append("The tool-call limit was reached.")
@@ -937,6 +1094,7 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
                 # A failed call cannot recover, and a model that keeps repeating is not converging.
                 if key in failed_keys or repeats >= 2:
                     limitations.append("The Agent stopped after repeated tool calls.")
+                    stalled = True
                     break
             continue
         _trace("tool", "ok", step_started, action.tool_name, "model")
@@ -944,17 +1102,7 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
         trace = {"order": len(calls) + 1, "tool_name": action.tool_name, "reason": action.reason, "parameters": parameters, "result": result}
         call_orders[key] = trace["order"]
         calls.append(trace)
-        if action.tool_name == "analyze_hand_threshold":
-            compact = {
-                **result,
-                "stages": [
-                    {key: value for key, value in stage.items() if not key.endswith("_grid_ids")}
-                    for stage in result["stages"]
-                ],
-            }
-            context["observations"].append({**trace, "result": compact})
-        else:
-            context["observations"].append(trace)
+        context["observations"].append(_observation(trace))
     called = {call["tool_name"] for call in calls}
     added = False
     for hint in [h for h in hints if h["tool_name"] not in called | failed_tools][: MAX_TOOL_CALLS - len(calls)]:
@@ -967,7 +1115,7 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
         added = True
     if added:
         return _reply(
-            request, "ANSWERED",
+            request, _fallback_status(request, hypothetical, calls, limitations),
             "AI가 근거 있는 설명을 완성하지 못해, 질문에 적힌 값으로 분석 도구를 실행한 결과를 보여 드립니다. 아래 결과 표를 확인해 주세요.",
             calls, limitations, _follow_ups(last_action, event_id=request.event_id),
             source="registered_tools",
@@ -975,6 +1123,14 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
     if physical:
         answer, limitation = _unavailable_answer(AgentAction(action="final", gap_kind="physical_intervention"), request)
         return _reply(request, "NEEDS_DATA", answer, calls, [limitation, *limitations], _follow_ups(last_action, event_id=request.event_id))
+    called = {call["tool_name"] for call in calls}
+    if (ungrounded or stalled) and hints and all(hint["tool_name"] in called for hint in hints):
+        # The model's prose or loop failed, not the data: every tool the question needs ran, so show it.
+        return _reply(
+            request, _fallback_status(request, hypothetical, calls, limitations),
+            "AI 설명이 근거 검사를 통과하지 못해, 질문에 필요한 분석 도구 결과를 그대로 보여 드립니다. 아래 결과 표를 확인해 주세요.",
+            calls, limitations, _follow_ups(last_action, event_id=request.event_id), source="registered_tools",
+        )
     return _reply(
         request, "NEEDS_DATA", "도구 결과를 확인했지만 근거가 확인된 답변을 완성하지 못했습니다. 아래 호출 결과와 한계를 확인해 주세요.",
         calls, limitations or ["The agent reached its decision limit."], _follow_ups(last_action, event_id=request.event_id),

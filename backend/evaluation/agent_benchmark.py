@@ -23,7 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient
 from app import agent_runner
-from app.llm_planner import LlmPlannerUnavailable, llm_planner_model_id, llm_planner_status
+from app.llm_planner import LlmPlannerUnavailable
 from app.main import app
 from app.rate_limit import agent_limiter
 from app.services import ReconstructionUnavailable
@@ -157,8 +157,10 @@ def _versions():
     except (OSError, subprocess.CalledProcessError):
         commit, dirty = None, None
     digest = lambda text: hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
-    return {"git_commit": commit, "agent_code_uncommitted": dirty, "model": llm_planner_model_id(),
+    return {"git_commit": commit, "agent_code_uncommitted": dirty, "provider": agent_runner.agent_llm_provider(),
+            "model": agent_runner.agent_model_id(),
             "system_prompt_sha256": digest(agent_runner._SYSTEM_PROMPT),
+            "facility_prompt_sha256": digest(agent_runner._system_prompt({"selected_facility": True})),
             "cases_sha256": digest(CASES.read_text(encoding="utf-8"))}
 
 
@@ -170,7 +172,17 @@ def main():
     parser.add_argument("--output", type=Path, required=True, help="local JSON report, e.g. docs/local/agent-benchmark.json")
     parser.add_argument("--seconds-per-request", type=float, default=0.0,
                         help="live: pause this long per model request after each case (5 keeps under 12 requests/minute)")
+    parser.add_argument("--provider", choices=("gemini", "ollama"), help="live: overrides AGENT_LLM_PROVIDER for this run")
+    parser.add_argument("--model", help="live: Gemini or Ollama model name for this run")
+    # Measurement switches for A/B runs on one code version; the product has no such flags.
+    parser.add_argument("--no-trim", action="store_true", help="send full tool results to the model (before week-3 O1)")
+    parser.add_argument("--full-catalogue", action="store_true", help="send every catalogue field to the model (before week-3 O2)")
     args = parser.parse_args()
+    # Process-local settings so the report's version block names the provider that actually answered.
+    if args.provider:
+        os.environ["AGENT_LLM_PROVIDER"] = args.provider
+    if args.model:
+        os.environ["OLLAMA_MODEL" if agent_runner.agent_llm_provider() == "ollama" else "GEMINI_MODEL"] = args.model
     cases = json.loads(CASES.read_text(encoding="utf-8"))
     unknown = set(args.case) - {case["id"] for case in cases}
     if unknown:
@@ -179,15 +191,20 @@ def main():
              and (not args.category or case["category"] in args.category)]
     skipped = [case["id"] for case in cases if args.mode == "offline" and case.get("needs_model")]
     cases = [case for case in cases if case["id"] not in skipped]
-    if args.mode == "live" and not llm_planner_status()["available"]:
-        print("Live benchmark unavailable: configure the Gemini credential/model on this server.")
+    if args.mode == "live" and not agent_runner.agent_model_status()["available"]:
+        print(f"Live benchmark unavailable: {agent_runner.agent_model_status()['reason']}")
         return 2
-    outage = patch("app.agent_runner._gemini_action", side_effect=LlmPlannerUnavailable("offline benchmark")) if args.mode == "offline" else nullcontext()
+    outage = patch("app.agent_runner._model_action", side_effect=LlmPlannerUnavailable("offline benchmark")) if args.mode == "offline" else nullcontext()
     # The benchmark is one local process; lift the public per-client limits for it in both modes.
     limits = patch.dict(os.environ, {"FLOODOPS_AGENT_PER_MINUTE": "1000", "FLOODOPS_AGENT_PER_DAY": "1000",
                                     "FLOODOPS_AGENT_GLOBAL_PER_DAY": "1000", "FLOODOPS_TWIN_MODE": "replay"})
+    variant = patch.multiple(agent_runner, **{
+        **({"_MODEL_HIDDEN_FIELDS": {}} if args.no_trim else {}),
+        **({"_MODEL_CATALOGUE_FIELDS": ("name", "description", "input_fields", "output", "use_when", "parameters",
+                                        "can_say", "cannot_say", "examples")} if args.full_catalogue else {}),
+    }) if args.no_trim or args.full_catalogue else nullcontext()
     rows = []
-    with limits, outage, TestClient(app) as client:
+    with limits, outage, variant, TestClient(app) as client:
         agent_limiter.reset()
         for case in cases:
             row = evaluate(case, client)
@@ -197,7 +214,8 @@ def main():
             # Stay under the provider's per-minute quota; an HTTP 429 would score quota, not quality.
             time.sleep(args.seconds_per_request * row["diagnostics"].get("model_requests", 0))
     summary = summarize(rows, skipped, args.mode)
-    report = {"created_at": datetime.now(timezone.utc).isoformat(), "versions": _versions(), "summary": summary, "results": rows}
+    versions = {**_versions(), "variant": {"trim_observations": not args.no_trim, "slim_catalogue": not args.full_catalogue}}
+    report = {"created_at": datetime.now(timezone.utc).isoformat(), "versions": versions, "summary": summary, "results": rows}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False), flush=True)

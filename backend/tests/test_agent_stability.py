@@ -90,3 +90,89 @@ def test_what_if_answered_only_from_recorded_times_is_not_marked_answered(monkey
     result = agent_runner.ask_agent(AgentAskRequest(message="통제를 더 일찍 했다면?"))
     assert result["status"] == "NEEDS_DATA"
     assert "No analysis tool computed the assumed change; only recorded facts were cited." in result["limitations"]
+
+
+def test_failed_analysis_is_not_recomputed_by_the_model_from_the_timeline(monkeypatch):
+    _scripted(monkeypatch,
+              agent_runner.AgentAction(action="tool", tool_name="analyze_closure_timing", parameters={"closure_times": ["08:20"]}),
+              agent_runner.AgentAction(action="final", answer="08:20 통제는 유입 08:27보다 7분 앞섭니다 [1].", evidence_calls=[1]))
+    real = agent_runner.execute_agent_tool
+
+    def closure_broken(name, event_id, request):
+        if name == "analyze_closure_timing":
+            raise ReconstructionUnavailable("fixture missing")
+        return real(name, event_id, request)
+
+    monkeypatch.setattr(agent_runner, "execute_agent_tool", closure_broken)
+    result = agent_runner.ask_agent(AgentAskRequest(message="08:20에 통제했다면?"))
+    assert result["status"] == "NEEDS_DATA" and "7분" not in result["answer"]
+    assert "대신 계산하지 않았습니다" in result["answer"]
+    assert result["diagnostics"]["trace"][-2]["outcome"] == "analysis_tool_failed"
+
+
+def test_model_timeout_after_rejected_what_if_does_not_report_answered(monkeypatch):
+    calls = iter([
+        agent_runner.AgentAction(action="tool", tool_name="analyze_inflow_delay", parameters={"delay_minutes": [500]}),
+        agent_runner.AgentAction(action="final", answer="유입 지연을 계산할 수 없습니다."),
+    ])
+
+    def decide(context):
+        action = next(calls, None)
+        if action is None:
+            raise agent_runner.LlmPlannerUnavailable("timed out")
+        return action
+
+    monkeypatch.setattr(agent_runner, "_gemini_action", decide)
+    result = agent_runner.ask_agent(AgentAskRequest(message="유입을 500분 늦췄다면?"))
+    assert [call["tool_name"] for call in result["tool_calls"]] == ["get_reconstruction"]
+    assert result["status"] == "NEEDS_DATA"
+    assert result["diagnostics"]["completion_source"] == "registered_tools"
+
+
+def test_forecast_refusal_without_gap_kind_is_still_needs_data(monkeypatch):
+    _scripted(monkeypatch,
+              agent_runner.AgentAction(action="tool", tool_name="get_observation_summary"),
+              agent_runner.AgentAction(action="final", answer="미래 강우에 따른 침수 지역 예측은 제공하지 않으며 기록된 관측만 확인할 수 있습니다 [1].",
+                                       evidence_calls=[1]))
+    result = agent_runner.ask_agent(AgentAskRequest(message="내일 비가 오면 어디가 잠겨?"))
+    assert result["status"] == "NEEDS_DATA"
+    assert "No registered tool forecasts future rainfall or flooding." in result["limitations"]
+
+
+def test_ungrounded_prose_with_the_needed_tool_shows_results_as_answered(monkeypatch):
+    _scripted(monkeypatch,
+              agent_runner.AgentAction(action="tool", tool_name="get_observation_summary"),
+              agent_runner.AgentAction(action="final", answer="그날 비는 999mm 왔습니다 [1].", evidence_calls=[1]))
+    result = agent_runner.ask_agent(AgentAskRequest(message="그날 비는 얼마나 왔어?"))
+    assert result["status"] == "ANSWERED" and result["diagnostics"]["completion_source"] == "registered_tools"
+    assert "999" not in result["answer"]
+
+
+def test_ungrounded_prose_without_a_tool_for_the_question_stays_needs_data(monkeypatch):
+    _scripted(monkeypatch,
+              agent_runner.AgentAction(action="tool", tool_name="get_reconstruction"),
+              agent_runner.AgentAction(action="final", answer="침수심은 47.61m였습니다 [1].", evidence_calls=[1]))
+    result = agent_runner.ask_agent(AgentAskRequest(message="궁평2지하차도 침수심은 몇 m였어?"))
+    assert result["status"] == "NEEDS_DATA" and "47.61" not in result["answer"]
+
+
+def test_model_timeout_on_a_forecast_question_is_not_answered(monkeypatch):
+    actions = iter([agent_runner.AgentAction(action="tool", tool_name="get_observation_summary")])
+
+    def decide(context):
+        action = next(actions, None)
+        if action is None:
+            raise agent_runner.LlmPlannerUnavailable("timed out")
+        return action
+
+    monkeypatch.setattr(agent_runner, "_gemini_action", decide)
+    result = agent_runner.ask_agent(AgentAskRequest(message="내일 비가 오면 어디가 잠겨?"))
+    assert result["status"] == "NEEDS_DATA"
+
+
+def test_loop_stalled_on_repeats_still_shows_the_needed_result(monkeypatch):
+    rain = agent_runner.AgentAction(action="tool", tool_name="get_observation_summary")
+    _scripted(monkeypatch, rain, rain, rain, rain)
+    result = agent_runner.ask_agent(AgentAskRequest(message="그날 비는 얼마나 왔어?"))
+    assert [call["tool_name"] for call in result["tool_calls"]] == ["get_observation_summary"]
+    assert result["status"] == "ANSWERED" and result["diagnostics"]["completion_source"] == "registered_tools"
