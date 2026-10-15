@@ -13,6 +13,7 @@ from typing import Any
 from .seoul_repository import (
     DESIGN_RAINFALL_MM_PER_HOUR,
     DORIMCHEON_TUNNEL_STORAGE_M3,
+    FIRST_RESCUE_CALL,
     SEOUL_EVENT_ID,
     analyze_alert_timing,
     analyze_storage_capture,
@@ -192,6 +193,8 @@ def run_tool(tool_name: str, event_id: str, request: Any) -> dict[str, Any]:
         )
         # The full 10-minute excess trace is not needed to answer; keep the result short for the model.
         result = {key: value for key, value in result.items() if key != "excess_timeline"}
+        # The minutes are counted to this reported time; the answer may cite it.
+        result["first_rescue_call"] = FIRST_RESCUE_CALL
     elif tool_name == "analyze_response_timing":
         result = analyze_response_timing(event_id, request.intervention_id or "", request.action_times or [])
     else:

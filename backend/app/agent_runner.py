@@ -157,6 +157,24 @@ _PHYSICAL_CHANGE = re.compile(r"올리|올린|올려|올렸|높|증고|설치|�
 def _is_physical_effect_question(message: str) -> bool:
     return bool(_PHYSICAL_INTERVENTION.search(message) and _PHYSICAL_CHANGE.search(message))
 
+
+# "예측" is left out: registered answers say "경보 수위 도달 예측까지 N분" about past events.
+_FORECAST = re.compile(r"내일|모레|앞으로|다음\s*(?:주|달|해|번|장마)|올\s*여름|이번\s*주말|예보|forecast|will\s+flood", re.IGNORECASE)
+_FORECAST_ANSWER = (
+    "앞으로 내릴 비나 침수 위치를 예측하는 도구는 연결돼 있지 않습니다. "
+    "등록된 과거 사건의 관측·재구성과, 시각을 바꾼 시간 비교만 할 수 있습니다."
+)
+# Tools that compute the effect of an assumption; a what-if answered without one did not compute it.
+_COMPUTING_TOOLS = {"compare_scenarios", "get_exposure_inventory"}
+
+
+def _is_forecast_question(message: str) -> bool:
+    return bool(_FORECAST.search(message))
+
+
+def _computed(calls: list[dict[str, Any]]) -> bool:
+    return any(call["tool_name"].startswith("analyze_") or call["tool_name"] in _COMPUTING_TOOLS for call in calls)
+
 _SYSTEM_PROMPT = """You are FloodOps, an analyst helping a local disaster or road officer review a past flood event. Read the user's question in natural Korean, work out what they actually want to know, and answer it as helpfully as the registered read-only tools allow.
 
 Tool catalogue is provided in the user content. Each tool lists use_when, parameters, can_say, cannot_say and examples: pick tools by use_when, fill parameters as described, and keep the answer within can_say. Return exactly one JSON object per turn:
@@ -370,10 +388,7 @@ def _grounded_answer(answer: str, calls: list[dict[str, Any]], references: list[
     if not any(f"[{index}]" in answer for index in references):
         return False
     evidence = json.dumps([call["result"] for call in calls if call["order"] in references], ensure_ascii=False, default=str)
-    for value in re.findall(r"(?<!\w)\d[\d:,.]*", re.sub(r"\[\d+\]", "", answer)):
-        if value.rstrip(".,") not in evidence:
-            return False
-    return True
+    return all(value in evidence for value in _numbers(answer))
 
 
 def _unavailable_answer(action: AgentAction, request: AgentAskRequest) -> tuple[str, str]:
@@ -440,8 +455,17 @@ _PHYSICAL_CAVEAT = (
 _EFFECT_CLAIM = re.compile(r"줄어|줄였|감소|낮아|낮춰|막을 수|막았|막는|예방|피할 수|피했|reduc|prevent|avoid", re.IGNORECASE)
 
 
+_THOUSANDS = re.compile(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?")
+
+
 def _numbers(text: str) -> set[str]:
-    return {value.rstrip(".,") for value in re.findall(r"(?<!\w)\d[\d:,.]*", re.sub(r"\[\d+\]", "", text))}
+    """Numbers as tool JSON writes them: "1,242,453" in prose is 1242453 in a result."""
+
+    values = set()
+    for value in re.findall(r"(?<!\w)\d[\d:,.]*", re.sub(r"\[\d+\]", "", text)):
+        value = value.rstrip(".,")
+        values.add(value.replace(",", "") if _THOUSANDS.fullmatch(value) else value)
+    return values
 
 
 def _user_text(request: AgentAskRequest) -> str:
@@ -759,6 +783,10 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
         )
     calls: list[dict[str, Any]] = []
     seen: set[str] = set()
+    call_orders: dict[str, int] = {}
+    failed_keys: set[str | None] = set()
+    failed_tools: set[str | None] = set()
+    repeats = 0
     limitations: list[str] = []
     last_action: AgentAction | None = None
     anchored = False
@@ -775,8 +803,16 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
         except LlmPlannerUnavailable as exc:
             _record_failure("model", getattr(exc, "code", "model_unavailable"))
             _trace("model", getattr(exc, "code", "model_unavailable"), model_started, by="model")
+            if not calls and (physical or (not request.facility_id and _is_forecast_question(request.message))):
+                # The server alone can tell these are not computable; an outage should not change that answer.
+                if physical:
+                    answer, limitation = _unavailable_answer(AgentAction(action="final", gap_kind="physical_intervention"), request)
+                else:
+                    answer, limitation = _FORECAST_ANSWER, "No registered tool forecasts future rainfall or flooding."
+                return _reply(request, "NEEDS_DATA", answer, [], [limitation, str(exc)],
+                              _follow_ups(None, event_id=request.event_id), model=None, source="clarification")
             called = {call["tool_name"] for call in calls}
-            for hint in [h for h in hints if h["tool_name"] not in called][: MAX_TOOL_CALLS - len(calls)]:
+            for hint in [h for h in hints if h["tool_name"] not in called | failed_tools][: MAX_TOOL_CALLS - len(calls)]:
                 try:
                     tool_request, result = _execute_hint(hint, request)
                 except (ValueError, ReconstructionUnavailable, KeyError):
@@ -799,7 +835,7 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
                action.tool_name if action.action == "tool" else None, "model")
         last_action = action
         called = {call["tool_name"] for call in calls}
-        missing =[hint for hint in hints if hint["tool_name"] not in called]
+        missing = [hint for hint in hints if hint["tool_name"] not in called | failed_tools]
         if action.action == "final" and not anchored and (missing or (hypothetical and not calls)):
             # The model tried to finish without the evidence the question needs: run it once on the user's values.
             anchored = True
@@ -813,7 +849,9 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
                 trace = {"order": len(calls) + 1, "tool_name": hint["tool_name"], "reason": "질문에 적힌 값으로 등록 도구 실행",
                          "parameters": _trace_parameters(hint["parameters"], request), "result": result}
                 calls.append(trace)
-                seen.add(json.dumps([hint["tool_name"], tool_request.model_dump()], sort_keys=True))
+                hint_key = json.dumps([hint["tool_name"], tool_request.model_dump()], sort_keys=True)
+                seen.add(hint_key)
+                call_orders[hint_key] = trace["order"]
                 context["observations"].append(trace)
             if calls:
                 context["guidance"] = (
@@ -841,7 +879,10 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
                     if "수리모형" not in answer:
                         answer = f"{answer}\n{_PHYSICAL_CAVEAT}"
                     limitations.append(_PHYSICAL_CAVEAT)
-                status = "NEEDS_DATA" if physical or action.gap_kind else "ANSWERED"
+                uncomputed = hypothetical and not physical and not _computed(calls)
+                if uncomputed:
+                    limitations.append("No analysis tool computed the assumed change; only recorded facts were cited.")
+                status = "NEEDS_DATA" if physical or action.gap_kind or uncomputed else "ANSWERED"
                 return _reply(request, status, answer, calls, limitations, follow, action.evidence_calls)
             if action.gap_kind is not None or physical or not calls:
                 # The model's own explanation is kept when it adds no unsourced numbers;
@@ -865,11 +906,15 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
             break
         stage = "validation"
         step_started = time.monotonic()
+        key = None
         try:
             tool_request = _validated_tool_request(action, request, calls, resolved.parameter_text)
             key = json.dumps([action.tool_name, tool_request.model_dump()], sort_keys=True)
+            if key in failed_keys:
+                raise _RepeatedToolCall("This tool call already failed; retrying it cannot succeed.")
             if key in seen:
-                raise _RepeatedToolCall("The same tool call was already made.")
+                raise _RepeatedToolCall(f"This exact call was already made as [{call_orders.get(key, '?')}]; use that result, "
+                                        "call a different tool, or return final.")
             seen.add(key)
             _trace("validation", "accepted", step_started, action.tool_name, "model")
             stage = "tool"
@@ -879,12 +924,25 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
             code = _rejection_code(exc) if stage == "validation" else "tool_execution_failed"
             _record_failure(stage, code, action.tool_name)
             _trace(stage, code, step_started, action.tool_name, "model")
-            context["observations"].append({"tool": action.tool_name, "error": str(exc)})
+            message = str(exc)
+            if code == "tool_execution_failed":
+                failed_keys.add(key)
+                failed_tools.add(action.tool_name)
+                message = ("Tool execution failed; do not retry this call. If no other registered tool answers the "
+                           "question, return final with gap_kind unconnected_data and no numbers.")
+            context["observations"].append({"tool": action.tool_name, "error": message})
             limitations.append(str(exc))
+            if code == "tool_call_repeated":
+                repeats += 1
+                # A failed call cannot recover, and a model that keeps repeating is not converging.
+                if key in failed_keys or repeats >= 2:
+                    limitations.append("The Agent stopped after repeated tool calls.")
+                    break
             continue
         _trace("tool", "ok", step_started, action.tool_name, "model")
         parameters = _trace_parameters({key: getattr(tool_request, key) for key in action.parameters}, request)
         trace = {"order": len(calls) + 1, "tool_name": action.tool_name, "reason": action.reason, "parameters": parameters, "result": result}
+        call_orders[key] = trace["order"]
         calls.append(trace)
         if action.tool_name == "analyze_hand_threshold":
             compact = {
@@ -899,7 +957,7 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
             context["observations"].append(trace)
     called = {call["tool_name"] for call in calls}
     added = False
-    for hint in [h for h in hints if h["tool_name"] not in called][: MAX_TOOL_CALLS - len(calls)]:
+    for hint in [h for h in hints if h["tool_name"] not in called | failed_tools][: MAX_TOOL_CALLS - len(calls)]:
         try:
             tool_request, result = _execute_hint(hint, request)
         except (ValueError, ReconstructionUnavailable, KeyError):
