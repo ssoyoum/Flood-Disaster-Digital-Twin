@@ -68,12 +68,21 @@ def get_event(event_id: str = EVENT_ID) -> dict:
 
 
 def get_layers(event_id: str = EVENT_ID, layer_year: int = 2023) -> dict:
+    """A private copy the caller may change. Read-only callers should use layers_view."""
+    return deepcopy(layers_view(event_id, layer_year))
+
+
+def layers_view(event_id: str = EVENT_ID, layer_year: int = 2023) -> dict:
+    """The shared cached layers; callers must not mutate them.
+
+    A deepcopy of ~30 MB of GeoJSON per call raised the server's peak memory toward its 600 MB limit.
+    """
     if event_id == EVENT_ID:
-        return deepcopy(get_osong_layers(layer_year))
+        return get_osong_layers(layer_year)
     if event_id == SEOUL_EVENT_ID:
-        return deepcopy(get_seoul_layers())
+        return get_seoul_layers()
     if is_timeline_case(event_id):
-        return deepcopy(get_timeline_layers(event_id))
+        return get_timeline_layers(event_id)
     return {
         "aoi": {"data": EMPTY_FEATURE_COLLECTION, "status": "UNAVAILABLE", "feature_count": 0},
         "roads": {"data": EMPTY_FEATURE_COLLECTION, "status": "UNAVAILABLE", "feature_count": 0},

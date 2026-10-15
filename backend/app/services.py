@@ -1,5 +1,5 @@
 from .data import EVENT_ID
-from .data import get_layers
+from .data import layers_view
 from .osong_repository import get_osong_reconstruction, get_osong_summary
 from .schemas import ExposureMetrics, Intervention, ScenarioRecord, ScenarioRunResult
 
@@ -77,7 +77,7 @@ def _connected_building_ids(event_id: str) -> frozenset[int]:
     This function only validates that a requested feature exists. It does not
     turn a derived flood envelope into a risk score or intervention outcome.
     """
-    layers = get_layers(event_id)
+    layers = layers_view(event_id)
     building_features = layers.get("buildings", {}).get("data", {}).get("features", [])
     return frozenset(
         _building_id(feature, index)
@@ -347,7 +347,7 @@ def _focus_layer(layers: dict, event_id: str) -> tuple[dict, str]:
 
 @lru_cache(maxsize=4)
 def _exposure_index(event_id: str) -> dict:
-    layers = get_layers(event_id)
+    layers = layers_view(event_id)
     focus_layer, focus_key = _focus_layer(layers, event_id)
     focus_geom = unary_union(
         [shape(feature["geometry"]) for feature in focus_layer["data"]["features"] if feature.get("geometry")]

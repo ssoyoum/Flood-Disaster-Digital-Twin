@@ -24,7 +24,7 @@ from .agent_runner import ask_agent
 from .hand_sensitivity import analyze_hand_threshold
 from .rate_limit import agent_limiter, client_key
 from .llm_planner import LlmPlannerUnavailable, llm_planner_model_id, llm_planner_status, plan_with_llm
-from .data import EVENT_ID, EVENT_OBSERVATIONS, OBSERVATIONS, get_event, get_events, get_layers
+from .data import EVENT_ID, EVENT_OBSERVATIONS, OBSERVATIONS, get_event, get_events, layers_view
 from .osong_repository import SAFEMAP_WMS_SNAPSHOT, get_osong_data_status, get_osong_reconstruction, get_osong_summary
 from .seoul_repository import (
     SEOUL_EVENT_ID,
@@ -202,16 +202,15 @@ def timeline(event_id: str):
     return EVENT_OBSERVATIONS.get(event_id, OBSERVATIONS)
 
 
-@lru_cache(maxsize=8)
 def _layers_json(event_id: str, layer_year: int) -> bytes:
-    # get_layers deep-copies ~30 MB of GeoJSON; serialising it once keeps repeat requests from blocking others.
     # Only the properties the consoles read are sent; see layer_payload for what is dropped and why.
-    return json.dumps(slim_layers(get_layers(event_id, layer_year)), ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    return json.dumps(slim_layers(layers_view(event_id, layer_year)), ensure_ascii=False, separators=(",", ":")).encode("utf-8")
 
 
 @lru_cache(maxsize=8)
 def _layers_gzip(event_id: str, layer_year: int) -> bytes:
     # Compressing ~30 MB takes seconds on the 1 vCPU demo server, so do it once per layer set.
+    # Only the gzip is kept: caching the plain JSON too held ~32 MB more under the 600 MB container limit.
     return gzip.compress(_layers_json(event_id, layer_year), compresslevel=6)
 
 
@@ -230,7 +229,7 @@ def event_layers(event_id: str, request: Request, layer_year: int = 2023):
             media_type="application/json",
             headers={"Content-Encoding": "gzip", "Vary": "Accept-Encoding"},
         )
-    return Response(content=_layers_json(event_id, layer_year), media_type="application/json")
+    return Response(content=gzip.decompress(_layers_gzip(event_id, layer_year)), media_type="application/json", headers={"Vary": "Accept-Encoding"})
 
 
 @app.get("/api/events/{event_id}/summary")
@@ -284,12 +283,12 @@ async def test_safety_data_api(payload: dict):
 @app.get("/api/events/{event_id}/infrastructure")
 def event_infrastructure(event_id: str):
     _require_event(event_id)
-    return get_layers(event_id)["facilities"]["data"]
+    return layers_view(event_id)["facilities"]["data"]
 
 
 @app.get("/api/infrastructure")
 def infrastructure():
-    return get_layers(EVENT_ID)["facilities"]["data"]
+    return layers_view(EVENT_ID)["facilities"]["data"]
 
 
 @app.get("/api/shelters")
@@ -299,12 +298,12 @@ def shelters():
 
 @app.get("/api/roads")
 def roads():
-    return get_layers(EVENT_ID)["roads"]["data"]
+    return layers_view(EVENT_ID)["roads"]["data"]
 
 
 @app.get("/api/buildings")
 def buildings():
-    return get_layers(EVENT_ID)["buildings"]["data"]
+    return layers_view(EVENT_ID)["buildings"]["data"]
 
 
 @app.get("/api/scenarios/baseline")

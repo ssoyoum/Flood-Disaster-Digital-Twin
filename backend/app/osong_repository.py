@@ -484,10 +484,18 @@ def _osm_path(name: str, year: int) -> Path:
     return OSONG_DIR / f"osong_osm_{name}_{year}.geojson"
 
 
-@lru_cache(maxsize=1)
 def get_osong_repository(layer_year: int = 2023) -> dict[str, Any]:
-    if layer_year != 2023:
-        layer_year = 2023
+    """Every layer year resolves to the 2023 snapshot.
+
+    The cache sits on an argument-free loader: keyed by ``()`` versus ``(2023,)`` the one-slot cache
+    evicted itself whenever map and Agent calls alternated, re-parsing ~140 MB each time.
+    """
+    return _osong_repository()
+
+
+@lru_cache(maxsize=1)
+def _osong_repository() -> dict[str, Any]:
+    layer_year = 2023
     osm_snapshot = _osm_snapshot(layer_year)
     layers = {
         "aoi": _layer(

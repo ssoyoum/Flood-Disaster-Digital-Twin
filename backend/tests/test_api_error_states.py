@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app import osong_repository
-from app.main import _layers_gzip, _layers_json, app
+from app.main import _layers_gzip, app
 
 
 client = TestClient(app)
@@ -15,12 +15,10 @@ AOI_PATH = osong_repository.OSONG_DIR / "osong_sgis_admin_boundary_2023.geojson"
 
 @pytest.fixture
 def uncached_osong_layers():
-    osong_repository.get_osong_repository.cache_clear()
-    _layers_json.cache_clear()
+    osong_repository._osong_repository.cache_clear()
     _layers_gzip.cache_clear()
     yield
-    osong_repository.get_osong_repository.cache_clear()
-    _layers_json.cache_clear()
+    osong_repository._osong_repository.cache_clear()
     _layers_gzip.cache_clear()
 
 
