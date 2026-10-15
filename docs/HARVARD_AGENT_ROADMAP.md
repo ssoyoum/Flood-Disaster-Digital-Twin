@@ -4,7 +4,22 @@
 FloodOps를 근거 추적이 가능하고 반복 측정할 수 있는 홍수 대응 의사결정 지원 Agent로 발전시킨다. Harvard CS2680의 다섯 축인 Mads-Lens(관찰), Mads-Loop(실행 루프), Mads-Opt(비용·지연 최적화), Mads-Serve(모델 서빙), Mads-Stack(전체 스택 최적화)를 프로젝트에 맞게 적용한다.
 
 ## 현재 구조와 원칙
-현재 프로젝트 설명 기준으로 FloodOps는 Gemini 기반 Agent가 등록된 7개 읽기 전용 분석 도구 중 필요한 도구를 선택하고, 최대 4회까지 도구 호출을 이어간다. 서버는 도구명과 인자를 검증하며 답변에 근거와 호출 내역을 제공한다.
+FloodOps는 Gemini 기반 Agent가 사건·시설 범위마다 등록된 읽기 전용 도구 중 필요한 도구를 선택하고, 모델 판단 최대 6회·성공 도구 호출 최대 4회·요청당 25초 안에서 루프를 돈다. 서버는 도구명과 인자를 검증하며 답변에 근거와 호출 내역을 제공한다.
+
+### 코드 위치와 도구 (2026-10-15 확인)
+- 루프: `backend/app/agent_runner.py`의 `ask_agent` → `_ask_agent`(라우팅 → 모델 판단 → `_validated_tool_request` → `execute_agent_tool` → `_grounded_answer` → `_reply`). 모델 호출은 `_gemini_action`.
+- 질문 조건 해석: `backend/app/agent_context.py`(`resolve_question`), 추천 도구: `_router_hints`·`agent_cases.hints`·`agent_facility.hints`.
+- 도구 카탈로그: 오송 `agent_tools.py`, 서울·포항·안동 `agent_cases.py`, 시설 `agent_facility.py`.
+- 별도 경로: `/api/agent/plan`의 `llm_planner.py`는 워크플로 하나만 고르는 라우터이고 이 루프와 다르다.
+
+| 범위 | 도구 수 | 도구 |
+|---|---|---|
+| 오송 2023 | 8 | get_event, get_reconstruction, get_observation_summary, analyze_closure_timing, analyze_inflow_delay, get_exposure_inventory, compare_scenarios, analyze_hand_threshold |
+| 서울 2022 | 5 | get_event, get_reconstruction, get_observation_summary, analyze_alert_timing, analyze_storage_capture |
+| 포항 2022 · 안동·의성 2026 | 4 | get_event, get_reconstruction, get_observation_summary, analyze_response_timing |
+| 시설(궁평2) | 3 | get_facility_status, get_control_rule, get_facility_backtest |
+
+고유 도구 이름은 14개다. 처음 이 문서와 README에 적힌 "7개"는 현재 코드와 맞지 않아 고쳤다.
 
 - 분석값은 도메인 도구가 계산한다. 모델은 값을 지어내지 않고 선택·해석·설명한다.
 - 도구는 읽기 전용으로 유지한다.
@@ -23,17 +38,17 @@ FloodOps를 근거 추적이 가능하고 반복 측정할 수 있는 홍수 대
 | P2 | 전체 경로 프로파일링 | 병목 보고서 | API·도구·LLM·UI 병목을 구분 |
 
 ## Stage 1 — Mads-Lens: 관찰 가능성
-- [ ] 요청별 trace ID를 만든다.
-- [ ] 질문 → 모델 요청 → 선택 도구/인자 → 서버 검증 → 도구 실행 → 도구 결과 → 후속 모델 요청 → 최종 답변을 하나의 trace로 연결한다.
-- [ ] 단계별 소요 시간, 도구명, 검증 결과, 오류 유형, 입력·출력 토큰(제공되는 경우)을 기록한다.
-- [ ] 로그에는 결과 요약과 근거 ID를 남기고, 원본 데이터 전체를 무조건 복제하지 않는다.
-- [ ] UI의 도구 호출 이력과 서버 로그가 일치하는지 확인한다.
-- [ ] 도구 선택 오류, 인자 오류, 빈 결과, 예외/타임아웃, 근거 부족을 별도 분류한다.
+- [x] 요청별 trace ID를 만든다. (`diagnostics.request_id`, 2026-10-09)
+- [x] 질문 → 모델 요청 → 선택 도구/인자 → 서버 검증 → 도구 실행 → 도구 결과 → 후속 모델 요청 → 최종 답변을 하나의 trace로 연결한다. (`diagnostics.trace`, 2026-10-15)
+- [x] 단계별 소요 시간, 도구명, 검증 결과, 오류 유형, 입력·출력 토큰(제공되는 경우)을 기록한다. (`trace[].ms`, `diagnostics.tokens`)
+- [x] 로그에는 결과 요약과 근거 ID를 남기고, 원본 데이터 전체를 무조건 복제하지 않는다. (`FLOODOPS_AGENT_TRACE_LOG` JSONL, 질문·파라미터·도구 결과 제외)
+- [x] UI의 도구 호출 이력과 서버 로그가 일치하는지 확인한다. (API 응답과 JSONL 줄의 request_id·trace·도구 순서 일치를 테스트로 확인. 브라우저 화면 대조는 아직)
+- [~] 도구 선택 오류, 인자 오류, 빈 결과, 예외/타임아웃, 근거 부족을 별도 분류한다. (선택·인자·반복 호출·실행 실패·모델 시간 초과·근거 부족은 분리. 빈 결과는 도구별 정의가 없어 아직 분류하지 않음)
 
 완료 기준: trace 하나만 보고 어떤 도구가 왜 호출됐고 무엇을 반환했으며 답변이 어떤 근거에 기대는지 설명할 수 있다.
 
 ## Stage 2 — Mads-Loop: 실행 루프와 실패 정책
-- [ ] 7개 도구의 목적, 입력 스키마, 출력 스키마, 데이터 전제조건을 표로 정리한다.
+- [ ] 14개 도구의 목적, 입력 스키마, 출력 스키마, 데이터 전제조건을 표로 정리한다.
 - [ ] 루프 상태와 종료 조건을 명시한다: 모델 요청, 도구 검증, 도구 실행, 추가 호출 또는 최종 응답, 완료/실패.
 - [ ] 최대 도구 호출 수, 전체 시간 제한, 반복적인 잘못된 호출, 모델 오류의 종료 정책을 테스트한다.
 - [ ] 입력 검증 실패와 도구 실행 실패를 구분한다.
@@ -52,6 +67,8 @@ FloodOps를 근거 추적이 가능하고 반복 측정할 수 있는 홍수 대
 7. 안전한 표현: 근사 HAND 셀·시설 재고·가정 시나리오를 실제 피해량이나 검증된 예측이라고 부르지 않기
 
 각 테스트는 질문, 사례 ID, 기대 도구/행동, 필수 근거, 금지 주장, 기대 상태를 저장한다. 최소 30개로 시작한다.
+
+→ 2026-10-15: `backend/evaluation/agent_benchmark_cases.json` 39문항, 실행기 `agent_benchmark.py`. 사용법은 [AGENT_VALIDATION.md](AGENT_VALIDATION.md#고정-벤치마크-2026-10-15), 기준선은 [AGENT_EVALUATION_RESULTS.md](AGENT_EVALUATION_RESULTS.md).
 
 ## Stage 3 — Mads-Opt: 품질을 유지하며 비용·지연 개선
 - [ ] 평가 질문, 모델 버전, 프롬프트 버전, 데이터 버전을 고정한다.
@@ -91,10 +108,10 @@ GPU 자체 서빙을 먼저 만들지 않는다. 도메인 도구와 자료의 �
 
 ## 4주 실행안
 ### 1주차: 관찰과 기준선
-- [ ] 7개 도구와 실제 루프 코드 위치 확인
-- [ ] 최소 trace 및 지표 구현
-- [ ] 실제 질문 30개 benchmark 작성
-- [ ] 기준선 결과와 알려진 한계를 커밋
+- [x] 도구와 실제 루프 코드 위치 확인 (위 "코드 위치와 도구")
+- [x] 최소 trace 및 지표 구현
+- [x] 실제 질문 30개 이상 benchmark 작성 (39문항)
+- [x] 기준선 결과와 알려진 한계를 커밋 (2026-10-15, [평가 기록](AGENT_EVALUATION_RESULTS.md))
 
 ### 2주차: 안정성
 - [ ] 입출력 계약, 종료 조건, timeout, 오류 분류 문서화

@@ -2998,3 +2998,33 @@ UI 보완:
   해결: 이번 변경(보드·소개·twin API)은 서울 화면 경로를 건드리지 않아 고치지 않았습니다. 업로드가 끝난 뒤 다시 실행해 재현되면 서울 `layers` 냉시작을 별도로 줄여야 합니다.
 - 문제: 작업 트리에 다른 도구의 미커밋 변경(수위 상승 모델 90% 분위·품질 마스크, `TwinBoard.tsx` RiseCard, `types.ts` RiseForecast)이 있었습니다.
   해결: 그 영역은 건드리지 않고 새 코드는 별도 파일과 떨어진 위치에 넣었습니다. 작업 위치는 OneDrive 사본이 아니라 `Documents\GitHub\Flood-Disaster-Digital-Twin`입니다.
+
+## Harvard 로드맵 1주차: Agent 단계별 trace·고정 벤치마크·기준선
+
+- 작업일: 2026-10-15
+
+주요 작업:
+- `agent_runner.py`: 응답 `diagnostics`에 `trace`(router → model → validation → tool → answer → reply 단계별 outcome·ms·도구명·실행 주체)와 `tokens`(Gemini `usageMetadata` 합계)를 더했다. 검증 실패 코드를 `tool_selection_rejected`(등록되지 않은·범위 밖 도구) / `tool_input_rejected`(값) / `tool_call_repeated`(같은 호출 반복)로 나눴다. `FLOODOPS_AGENT_TRACE_LOG`를 지정하면 요청마다 JSONL 한 줄을 남긴다(질문·파라미터·도구 결과 제외, 기본 꺼짐).
+- `backend/evaluation/agent_benchmark_cases.json` 39문항(정상 8·도구 선택 8·모호 5·자료 부족 4·잘못된 입력 5·도구 실패 3·안전 표현 6)과 실행기 `agent_benchmark.py`: 기대 상태·필수/금지 도구·필수 표현·금지 주장 검사, 도구 실패 주입, 통과율·도구 정확도·근거 유효성·근거 없는 주장 비율·모델 요청·토큰·p50/p95, git 커밋·프롬프트·문항 해시 기록, `--seconds-per-request` 간격.
+- 문서: `HARVARD_AGENT_ROADMAP.md`에 코드 위치·범위별 도구 표를 넣고 1주차·Stage 1 체크, `AGENT_VALIDATION.md`에 trace·새 실패 코드·벤치마크 사용법, `AGENT_EVALUATION_RESULTS.md`에 기준선과 발견 5건. README의 "등록된 7개 도구"를 범위별 실제 수로 고쳤다.
+
+검증 결과:
+- `python -m pytest backend/tests -q` 232 passed(작업 전 226, `test_agent_trace.py` 6개 추가, `test_agent_budget.py`는 새 코드로 1줄 수정).
+- 벤치마크 offline 30/33(모델 필요 6문항 제외), live(`gemini-3.5-flash-lite`, 5초/요청 간격) 37/39, 전송 오류 0. live 모델 요청 83회, 토큰 261,960(프롬프트 95.7%), 지연 p50 3,234 ms·p95 9,531 ms.
+- 범위별 도구 수를 `list_agent_tools`로 확인: 오송 8·서울 5·포항 4·안동 4·시설 3, 고유 14개.
+
+문제/해결:
+- 문제: 로드맵과 README가 "등록된 7개 도구"를 전제로 했는데 실제 오송 범위만 8개였다(시설·다른 사건 도구가 10월에 늘었다).
+  해결: 사건·시설 범위마다 `list_agent_tools`를 호출해 센 값으로 두 문서를 고쳤다.
+- 문제: 기존 `diagnostics`는 요청 합계(소요 시간·모델 요청 수·실패 목록)뿐이라, 느린 요청이 모델 때문인지 자료 적재 때문인지, 모델이 무엇을 골랐다가 거절당했는지 알 수 없었다. 등록되지 않은 도구 선택과 잘못된 값도 같은 `tool_input_rejected`였다.
+  해결: 단계 이벤트를 순서대로 남기고 거절 코드를 셋으로 나눴다. 기존 테스트 1개가 옛 코드를 기대해 새 코드로 바꿨다. 질문·값을 trace에 넣지 않은 것은 기존 failures의 비공개 규칙을 그대로 따른 것이다.
+- 문제: 첫 live 실행(간격 없음)은 9번째 문항부터 거의 모두 첫 모델 요청이 HTTP 오류로 끊겨 29/39(0.795)로 나왔다. 같은 문항을 한도 회복 뒤 단독으로 보내면 정상이었다. 품질이 아니라 Gemini 분당 한도를 잰 것이다.
+  해결: 문항마다 모델 요청 수 × 5초를 쉬는 옵션을 넣고 다시 측정했다. 요약에 `model_transport_errors`를 두어 한도·네트워크 오류가 섞인 실행을 구분한다. 첫 결과는 기준선에서 뺐다.
+- 문제: 공개 서버용 Agent 요청 한도(분당 6회)가 로컬 벤치마크도 막는다. 기존 `evaluate_agent.py`는 live에서 한도를 유지한다.
+  해결: 벤치마크는 로컬 단일 프로세스·고정 문항 수라 두 모드 모두 한도를 풀고, Gemini 쪽 한도는 간격으로 지킨다. 공개 서버 설정은 바꾸지 않았다.
+- 문제: 서울 저류 2문항이 도구 정상인데 `answer_not_grounded` → `NEEDS_DATA`였다. trace만으로는 모델 원문이 버려져 원인을 알 수 없었다.
+  해결: 같은 질문을 한 번 더 보내 모델 원문을 확인했다. 답은 정확했고, `_grounded_answer`가 `1,242,453`·`400,000`(천 단위 쉼표)을 JSON의 `1242453`·`400000`에서 찾지 못하고, `20:59`는 도구 설명에만 있어 거부한 것이다. 검사를 고치는 것은 기준선과 섞이지 않게 2주차 첫 항목으로 남겼다.
+- 문제: 작업 트리에 `MAX_TOOL_CALLS`·`dict[str` 0바이트 파일이 생겼다(훅의 `>` 해석).
+  해결: 비어 있는 것을 확인하고 지웠다. 이 세션 전(04:56)에 생긴 `` `媛 `` 0바이트 파일은 다른 작업의 것이라 두었다.
+- 문제: 원격 `main` 끝에 다른 프로젝트(ST-Rookie)의 로드맵 임시 문서 커밋 `dbc6e5c`가 올라와 있었다. 이 저장소에는 FloodOps 커밋만 쌓기로 했고, 파일은 이미 ST-Rookie 저장소로 옮겨졌다.
+  해결: 사용자 확인을 받고 `main`을 `06bb59a`로 되돌려(`reset --mixed`, 작업 트리 유지) 파일을 지운 뒤 이번 커밋을 쌓아 `--force-with-lease=main:dbc6e5c`로 올렸다. 푸시된 커밋을 다시 쓰지 않는 규칙의 예외다. 그 커밋을 받아 간 다른 작업 환경은 `origin/main`에 맞춰야 한다.

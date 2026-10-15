@@ -44,9 +44,28 @@ Swagger 또는 브라우저 네트워크의 `/api/agent/ask` 응답에서 `diagn
 | model / model_http_error | limitations의 HTTP 상태. 키·할당량·모델 설정은 서버에서 확인 |
 | model / model_budget_exceeded | 전체 대기 예산 초과. 단계별 재시도로 예산을 새로 시작하지 않음 |
 | model / model_invalid_decision | 응답 JSON·스키마가 맞지 않음. 최대 1회 재시도 |
-| validation / tool_input_rejected | 사건에 없는 도구, 사용자 미입력 값, 범위 오류, 중복 도구 요청 |
+| validation / tool_selection_rejected | 등록되지 않은 도구, 또는 이 사건·시설 범위에 없는 도구를 모델이 고름 |
+| validation / tool_input_rejected | 사용자 미입력 값, 범위 오류, 사건·시설·시각을 모델이 바꾼 요청 |
+| validation / tool_call_repeated | 이미 실행한 같은 도구·같은 파라미터를 다시 요청 |
 | tool / tool_execution_failed | 검증을 통과한 호출의 자료·분석 실행 실패 |
 | answer / answer_not_grounded | 최종 답변의 인용·수치 근거 검사를 통과하지 못함 |
+
+### 단계별 trace와 토큰 (2026-10-15)
+
+`diagnostics.trace`는 요청 하나의 경로를 순서대로 남긴다. 각 단계는 `seq`·`stage`·`outcome`·`ms`·`tool_name`·`by`(누가 실행했는지)이며, failures와 같은 규칙으로 질문 원문·파라미터 값·도구 결과·예외 원문은 넣지 않는다.
+
+| stage | outcome 예 | 의미 |
+|---|---|---|
+| router | current / reused / updated / ambiguous | 서버가 질문에서 조건과 추천 도구를 정한 단계 |
+| model | decision_tool / decision_final / model_* 오류 코드 | 모델 판단 1회(JSON 재시도 포함) |
+| validation | accepted / tool_selection_rejected / tool_input_rejected / tool_call_repeated | 모델이 고른 도구·인자 검증 |
+| tool | ok / tool_execution_failed | 도구 실행. `by=model`은 모델 선택, `by=server`는 질문에 적힌 값으로 서버가 실행 |
+| answer | grounded / answer_not_grounded / model_limitation / fixed_limitation | 최종 답변의 근거 검사와 한계 설명 경로 |
+| reply | answered / needs_data / unavailable | 응답 상태, `by`는 completion_source |
+
+`diagnostics.tokens`는 Gemini 응답의 `usageMetadata`를 요청 단위로 합한 값(`prompt`·`output`·`thoughts`·`total`·`responses`)이다. 모델 응답이 없으면 `null`이다.
+
+서버 쪽 기록이 필요하면 `FLOODOPS_AGENT_TRACE_LOG`에 파일 경로를 지정한다. 요청마다 JSON 한 줄(요청 ID·사건·시설·상태·도구 순서·근거 번호·diagnostics)을 덧붙이며, 질문·파라미터·도구 결과는 쓰지 않는다. 지정하지 않으면 쓰지 않는다. 화면의 `request_id`로 같은 줄을 찾아 UI 도구 이력과 대조한다.
 
 ## 후속 질문의 조건
 
@@ -99,6 +118,19 @@ python backend/evaluation/evaluate_agent.py --mode live --limit 4 --output docs/
 
 회귀 범위: HTTP 취소, 재시도·여러 단계의 공유 예산, 입력 검증과 도구 실패 구분, 요청별 상태 초기화, 긴 후속 대화, 요청 중 사건 전환. 실제 서비스 배포·실제 모델 안정성·기관 파일럿은 별도 검증이다.
 
+
+## 고정 벤치마크 (2026-10-15)
+
+`backend/evaluation/agent_benchmark_cases.json` 39문항을 7개 유형(정상 8·도구 선택 8·모호 5·자료 부족 4·잘못된 입력 5·도구 실패 3·안전 표현 6)으로 나눈다. 각 문항은 기대 상태, 호출해야 할 도구와 파라미터, 호출하면 안 되는 도구, 반드시 포함할 표현, 금지 주장(정규식)을 가진다. 도구 실패 문항은 평가 프로세스 안에서만 해당 도구가 예외를 내도록 바꾼다.
+
+```powershell
+python backend/evaluation/agent_benchmark.py --output docs/local/agent-benchmark-offline.json
+python backend/evaluation/agent_benchmark.py --mode live --seconds-per-request 5 --output docs/local/agent-benchmark-live.json
+```
+
+offline은 모델을 장애 상태로 두고 `needs_model` 6문항을 뺀다. live는 39문항 전부를 실제 Gemini로 보낸다. 로컬 단일 프로세스라 공개 서버용 요청 한도는 두 모드 모두 풀지만, Gemini의 분당 한도는 그대로라 `--seconds-per-request`로 간격을 둔다. 간격 없이 돌리면 HTTP 오류가 섞여 품질이 아니라 한도를 재게 되며, 그런 문항은 요약의 `model_transport_errors`에 나온다.
+
+지표: 문항 통과율, 도구 정확도(기대·금지 도구 조건이 있는 문항), 근거 유효성(근거 번호가 있는 답변의 인용·수치 검사), 근거 없는 주장 비율(금지 주장 또는 모델 답변의 출처 없는 숫자), 모델 요청 수, 토큰, p50/p95 지연. 보고서에는 git 커밋, Agent 코드 미커밋 여부, 모델 ID, 시스템 프롬프트·문항 파일 해시가 함께 남는다. 직접 분석 API와 값이 같은지는 기존 `evaluate_agent.py`가 계속 맡는다.
 
 ## 시설 범위 대조 (2026-10-10)
 
