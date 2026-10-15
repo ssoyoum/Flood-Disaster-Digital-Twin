@@ -15,7 +15,7 @@
   grid-template-rows: 58px 1fr;
   background: var(--dk-bg);
   color: var(--dk-text);
-  font-family: Inter, Pretendard, "Noto Sans KR", system-ui, sans-serif;
+  font-family: "Noto Sans KR", "Noto Sans", system-ui, sans-serif;
   overflow: hidden;
 }
 .dk-root * { box-sizing: border-box; }
