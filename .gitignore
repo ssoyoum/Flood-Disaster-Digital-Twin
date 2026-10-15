@@ -52,3 +52,6 @@ docs/presentations/
 # Local Claude/Ruflo tool settings
 .claude/
 .mcp.json
+
+# Hackathon planning notes stay local.
+docs/META_HACKATHON.md

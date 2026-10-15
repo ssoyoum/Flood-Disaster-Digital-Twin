@@ -27,6 +27,10 @@ COPY data/processed/seoul_2022 ./data/processed/seoul_2022
 COPY data/processed/pohang_2022 ./data/processed/pohang_2022
 COPY data/processed/andong_uiseong_2026 ./data/processed/andong_uiseong_2026
 COPY data/models ./data/models
+# The twin loads its facility registry (operational + candidates) at import time.
+COPY data/facilities ./data/facilities
+COPY data/manifests/water-level-research.json ./data/manifests/water-level-research.json
+COPY data/manifests/hrfco-quality-policy.json ./data/manifests/hrfco-quality-policy.json
 COPY --from=frontend-build /web/dist ./dist
 ENV PYTHONPATH=/app/backend \
     FLOODOPS_STATIC_DIR=/app/dist

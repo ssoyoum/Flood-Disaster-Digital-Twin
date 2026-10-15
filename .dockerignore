@@ -9,6 +9,10 @@ docs
 data/raw
 data/interim
 data/manifests
+# The water-level bridge reads this one manifest at runtime; keep it in the image.
+!data/manifests/water-level-research.json
+# The criteria review drops the quarantines registered in this policy.
+!data/manifests/hrfco-quality-policy.json
 # Large Seoul source exports stay out; data/processed/seoul_2022 is what the app serves.
 data/processed/seoul_flood_footprints_2022.geojson
 data/processed/seoul_rainfall_2022_event.csv
