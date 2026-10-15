@@ -1,29 +1,32 @@
 {
-  "generated_at": "2026-10-10T10:08:26+00:00",
+  "generated_at": "2026-10-11T23:01:54+00:00",
   "script": "data/scripts/export_criteria_series.py",
   "station_id": "3011665",
   "station": "청주시(미호강교)",
   "interval": "10M",
-  "season": "06-01..09-30 each year (collect_hrfco_history.py flood-season window)",
+  "season": "all months (collect_hrfco_history.py fetch --interval 10M --months 1-12)",
   "source": {
     "path": "data/processed/hrfco/waterlevel_3011665_10M.csv",
-    "sha256": "7fb6808f6190dc2086c58da9bc2df5a7848efd3f382ec8c3f3cdaf40ce04e4f3",
+    "sha256": "f86f5a5edb50db5908e8022d1255693f805c6af726692c42b8164392625a6962",
     "origin": "HRFCO OpenAPI waterlevel/list/10M"
   },
   "output": {
-    "path": "data/processed/osong/miho_3011665_10m_floodseason_2019_2026.csv.gz",
-    "sha256": "425b76f26a9d38441c2ff637fdafd559deee62d21e709315b412092d1681a66c",
-    "rows": 140544
+    "path": "data/processed/osong/miho_3011665_10m_2019_2026.csv.gz",
+    "sha256": "80bc2efe8d89bdbc5a512d83b50ebc138c4ae53253b4f1e76b6b0eea2f2e5b40",
+    "rows": 409152
   },
+  "source_rows": 420768,
+  "source_empty_values": 11616,
+  "last_value": "2026-10-12 07:50",
   "rows_by_year": {
-    "2019": 17568,
-    "2020": 17568,
-    "2021": 17568,
-    "2022": 17568,
-    "2023": 17568,
-    "2024": 17568,
-    "2025": 17568,
-    "2026": 17568
+    "2019": 52560,
+    "2020": 52704,
+    "2021": 52560,
+    "2022": 52560,
+    "2023": 52560,
+    "2024": 52704,
+    "2025": 52560,
+    "2026": 40944
   },
-  "quality": "Values copied without the hourly quality masks (audit_hrfco_quality.py covers 1H only)."
+  "quality": "Values copied as-is. The criteria review flags missing 10-minute slots and steps >= 0.3 m per 10 minutes at runtime (twin.HISTORY_STEP_REVIEW_M); nothing is removed."
 }

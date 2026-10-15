@@ -1,10 +1,11 @@
-"""Export the 미호강교 flood-season 10-minute water levels used by the closure-criteria review.
+"""Export the 미호강교 10-minute water levels (all months, 2019-2026) used by the closure-criteria review.
 
 Input  : data/processed/hrfco/waterlevel_3011665_10M.csv (collect_hrfco_history.py, gitignored)
-Output : data/processed/osong/miho_3011665_10m_floodseason_2019_2026.csv.gz (tracked, shipped to the server image)
+Output : data/processed/osong/miho_3011665_10m_2019_2026.csv.gz (tracked, shipped to the server image)
          data/manifests/criteria-series.json
 
-Only timestamp and stage height are kept. Values are copied as-is; quality masks are not applied here.
+Only timestamp and stage height are kept. Values are copied as-is: rows with an empty value are left out
+(they show up as missing slots) and nothing is smoothed or removed. backend/app/twin.py flags gaps and steps at runtime.
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 SOURCE = REPO / "data" / "processed" / "hrfco" / "waterlevel_3011665_10M.csv"
-TARGET = REPO / "data" / "processed" / "osong" / "miho_3011665_10m_floodseason_2019_2026.csv.gz"
+TARGET = REPO / "data" / "processed" / "osong" / "miho_3011665_10m_2019_2026.csv.gz"
 MANIFEST = REPO / "data" / "manifests" / "criteria-series.json"
 
 
@@ -30,7 +31,8 @@ def sha256(data: bytes) -> str:
 
 def main() -> None:
     raw = SOURCE.read_bytes()
-    rows = [r for r in csv.DictReader(io.StringIO(raw.decode("utf-8-sig"))) if r.get("wl")]
+    source_rows = list(csv.DictReader(io.StringIO(raw.decode("utf-8-sig"))))
+    rows = [r for r in source_rows if r.get("wl")]
     rows.sort(key=lambda r: r["timestamp_kst"])
     body = io.StringIO()
     writer = csv.writer(body, lineterminator="\n")
@@ -47,11 +49,14 @@ def main() -> None:
         "station_id": "3011665",
         "station": "청주시(미호강교)",
         "interval": "10M",
-        "season": "06-01..09-30 each year (collect_hrfco_history.py flood-season window)",
+        "season": "all months (collect_hrfco_history.py fetch --interval 10M --months 1-12)",
         "source": {"path": str(SOURCE.relative_to(REPO)).replace("\\", "/"), "sha256": sha256(raw), "origin": "HRFCO OpenAPI waterlevel/list/10M"},
         "output": {"path": str(TARGET.relative_to(REPO)).replace("\\", "/"), "sha256": sha256(packed), "rows": len(rows)},
+        "source_rows": len(source_rows),
+        "source_empty_values": len(source_rows) - len(rows),
+        "last_value": rows[-1]["timestamp_kst"] if rows else None,
         "rows_by_year": dict(sorted(years.items())),
-        "quality": "Values copied without the hourly quality masks (audit_hrfco_quality.py covers 1H only).",
+        "quality": "Values copied as-is. The criteria review flags missing 10-minute slots and steps >= 0.3 m per 10 minutes at runtime (twin.HISTORY_STEP_REVIEW_M); nothing is removed.",
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"{len(rows)} rows -> {TARGET.relative_to(REPO)} ({len(packed) / 1024:.0f} KB)")
 

@@ -129,73 +129,6 @@
   },
   {
    "kind": "waterlevel",
-   "station": "3011665",
-   "interval": "10M",
-   "years": [
-    2019,
-    2020,
-    2021,
-    2022,
-    2023,
-    2024,
-    2025,
-    2026
-   ],
-   "months": [
-    6,
-    9
-   ],
-   "rows": 140544,
-   "valid": 140544,
-   "by_year": {
-    "2019": {
-     "rows": 17568,
-     "valid": 17568
-    },
-    "2020": {
-     "rows": 17568,
-     "valid": 17568
-    },
-    "2021": {
-     "rows": 17568,
-     "valid": 17568
-    },
-    "2022": {
-     "rows": 17568,
-     "valid": 17568
-    },
-    "2023": {
-     "rows": 17568,
-     "valid": 17568
-    },
-    "2024": {
-     "rows": 17568,
-     "valid": 17568
-    },
-    "2025": {
-     "rows": 17568,
-     "valid": 17568
-    },
-    "2026": {
-     "rows": 17568,
-     "valid": 17568
-    }
-   },
-   "requests": 72,
-   "processed_file": "data/processed/hrfco/waterlevel_3011665_10M.csv",
-   "sha256": "7FB6808F6190DC2086C58DA9BC2DF5A7848EFD3F382EC8C3F3CDAF40CE04E4F3",
-   "fetched_at": "2026-10-10T08:26:59",
-   "qc_jumps": {
-    "kind": "waterlevel",
-    "station": "3011665",
-    "interval": "10M",
-    "jump_threshold_m": 3.0,
-    "flag_count": 0,
-    "flags": []
-   }
-  },
-  {
-   "kind": "waterlevel",
    "station": "3011635",
    "interval": "10M",
    "years": [
@@ -24635,6 +24568,65 @@
    "processed_file": "data/processed/hrfco/rainfall_50044040_1H.csv",
    "sha256": "FA488D39FB83FECF5AE480AB697A390006579732E6E50025996302B5539358A8",
    "fetched_at": "2026-10-10T09:48:54"
+  },
+  {
+   "kind": "waterlevel",
+   "station": "3011665",
+   "interval": "10M",
+   "years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "months": [
+    1,
+    12
+   ],
+   "rows": 420768,
+   "valid": 409152,
+   "by_year": {
+    "2019": {
+     "rows": 52560,
+     "valid": 52560
+    },
+    "2020": {
+     "rows": 52704,
+     "valid": 52704
+    },
+    "2021": {
+     "rows": 52560,
+     "valid": 52560
+    },
+    "2022": {
+     "rows": 52560,
+     "valid": 52560
+    },
+    "2023": {
+     "rows": 52560,
+     "valid": 52560
+    },
+    "2024": {
+     "rows": 52704,
+     "valid": 52704
+    },
+    "2025": {
+     "rows": 52560,
+     "valid": 52560
+    },
+    "2026": {
+     "rows": 52560,
+     "valid": 40944
+    }
+   },
+   "requests": 200,
+   "processed_file": "data/processed/hrfco/waterlevel_3011665_10M.csv",
+   "sha256": "F86F5A5EDB50DB5908E8022D1255693F805C6AF726692C42B8164392625A6962",
+   "fetched_at": "2026-10-12T08:00:38"
   }
  ],
  "excluded_stations": {

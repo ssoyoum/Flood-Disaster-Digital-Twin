@@ -25,6 +25,8 @@
 
 주의: 비홍수기에는 10분 값이 수십 분 늦게 채워지거나 비어 있을 수 있다(미호강교 2026-10-10 확인). 실시간 보드는 10분 값이 비면 1시간 값으로 대체한다(`backend/app/twin.py`).
 
+미호강교 10분 수위는 2026-10-12에 연중으로 다시 받았다(`--months 1-12`, 200회 호출, 호출당 약 5초). 2019-01-01 00:00~2026-10-12 07:50의 409,152칸이 빈 값·중복 없이 모두 있고, 빈 값 11,616개는 아직 오지 않은 미래 시각이다. 이전에 받은 홍수기 140,544행과 값이 모두 같다. 1시간 자료에 행 자체가 없는 2020-01-01·2024-01-01 00~22시도 10분 자료에는 값이 있다(예: 2020-01-01 00:00 1.33 m). `fetch`는 요청한 달만으로 처리 CSV를 다시 쓰므로 홍수기만 다시 받으면 연중 CSV가 덮어써진다.
+
 ## 스크립트
 
 ```powershell
@@ -32,6 +34,7 @@ python data/scripts/collect_hrfco_history.py catalog                         # �
 python data/scripts/collect_hrfco_history.py nearest --kind rainfall --lon 127.3376 --lat 36.6246 --limit 5
 python data/scripts/collect_hrfco_history.py fetch --kind waterlevel --stations 3011665 3011635 3011685 --interval 1H --years 2019-2026
 python data/scripts/collect_hrfco_history.py fetch --kind rainfall --stations 30114070 30114110 30114020 --interval 10M --years 2019-2026 --months 6-9
+python data/scripts/collect_hrfco_history.py fetch --kind waterlevel --stations 3011665 --interval 10M --years 2019-2026 --months 1-12   # 통제 기준 검토용 연중 10분 수위
 ```
 
 - 원본 응답 JSON은 `data/raw/hrfco/{kind}/{code}/`(git 제외)에 그대로 두고, 관측소별 병합 CSV는 `data/processed/hrfco/{kind}_{code}_{interval}.csv`에 만든다. 10분 CSV는 커서 git에서 제외하고 원본 JSON과 manifest로 다시 만든다.
@@ -53,7 +56,7 @@ python data/scripts/collect_hrfco_history.py fetch --kind rainfall --stations 30
 
 | 관측소 | 행 | 유효 | 비고 |
 | --- | ---: | ---: | --- |
-| 수위 3011665 미호강교 | 70,082 | 68,099 | 2023-05-16 01:00~11:00에 1.5 m → 11.3 → 13.3 → 1.2 m로 뛰는 구간이 있다. 강우 없이 10 m가 계단식으로 오르내려 센서·기준면 오류로 본다. 같은 기간 10분 자료에는 이 급변이 없어 1시간 자료 쪽 오류다. `qc` 명령이 3 m 이상 급변으로 표시한다 |
+| 수위 3011665 미호강교 | 70,082 | 68,099 | 2023-05-16 01:00~11:00에 1.5 m → 11.3 → 13.3 → 1.2 m로 뛰는 구간이 있다. 강우 없이 10 m가 계단식으로 오르내려 센서·기준면 오류로 본다. 2026-10-12에 받은 연중 10분 자료에도 같은 계단(00:50 1.51 → 01:00 11.26 m, 12:00 4.17 → 12:10 1.17 m)이 있어 1시간 집계만의 문제가 아니다(이전 기록의 "10분 자료에는 없다"는 10분 자료가 6~9월뿐이라 확인할 수 없었던 내용이다). `qc` 명령이 3 m 이상 급변으로 표시하고, 품질 정책은 01:00~12:00을 연구 격리로 둔다 |
 | 수위 3011635 팔결교 | 70,082 | 68,098 | |
 | 수위 3011685 미호교 | 70,082 | 68,098 | |
 | 강우 30114070 세종시(농정원) | 70,082 | 68,100 | 전 기간 |
