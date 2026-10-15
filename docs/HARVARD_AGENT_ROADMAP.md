@@ -17,9 +17,9 @@ FloodOps는 Gemini 기반 Agent가 사건·시설 범위마다 등록된 읽기 
 | 오송 2023 | 8 | get_event, get_reconstruction, get_observation_summary, analyze_closure_timing, analyze_inflow_delay, get_exposure_inventory, compare_scenarios, analyze_hand_threshold |
 | 서울 2022 | 5 | get_event, get_reconstruction, get_observation_summary, analyze_alert_timing, analyze_storage_capture |
 | 포항 2022 · 안동·의성 2026 | 4 | get_event, get_reconstruction, get_observation_summary, analyze_response_timing |
-| 시설(궁평2) | 3 | get_facility_status, get_control_rule, get_facility_backtest |
+| 시설(궁평2) | 5 | get_facility_status, get_control_rule, get_facility_backtest, get_criteria_review, get_rise_forecast |
 
-고유 도구 이름은 14개다. 처음 이 문서와 README에 적힌 "7개"는 현재 코드와 맞지 않아 고쳤다.
+고유 도구 이름은 16개다(2026-10-15 시설 도구 2개 추가 전 14개). 처음 이 문서와 README에 적힌 "7개"는 현재 코드와 맞지 않아 고쳤다.
 
 - 분석값은 도메인 도구가 계산한다. 모델은 값을 지어내지 않고 선택·해석·설명한다.
 - 도구는 읽기 전용으로 유지한다.
@@ -48,7 +48,7 @@ FloodOps는 Gemini 기반 Agent가 사건·시설 범위마다 등록된 읽기 
 완료 기준: trace 하나만 보고 어떤 도구가 왜 호출됐고 무엇을 반환했으며 답변이 어떤 근거에 기대는지 설명할 수 있다.
 
 ## Stage 2 — Mads-Loop: 실행 루프와 실패 정책
-- [x] 14개 도구의 목적, 입력 스키마, 출력 스키마, 데이터 전제조건을 표로 정리한다. ([AGENT_TOOL_CONTRACTS.md](AGENT_TOOL_CONTRACTS.md))
+- [x] 16개 도구의 목적, 입력 스키마, 출력 스키마, 데이터 전제조건을 표로 정리한다. ([AGENT_TOOL_CONTRACTS.md](AGENT_TOOL_CONTRACTS.md))
 - [x] 루프 상태와 종료 조건을 명시한다: 모델 요청, 도구 검증, 도구 실행, 추가 호출 또는 최종 응답, 완료/실패. (같은 문서 "루프 상태와 종료 조건")
 - [x] 최대 도구 호출 수, 전체 시간 제한, 반복적인 잘못된 호출, 모델 오류의 종료 정책을 테스트한다. (`test_agent_budget.py`, `test_agent_stability.py`: 실패 호출 재요청 즉시 종료, 성공 호출 반복 2회 종료)
 - [x] 입력 검증 실패와 도구 실행 실패를 구분한다.
@@ -71,14 +71,14 @@ FloodOps는 Gemini 기반 Agent가 사건·시설 범위마다 등록된 읽기 
 → 2026-10-15: `backend/evaluation/agent_benchmark_cases.json` 39문항, 실행기 `agent_benchmark.py`. 사용법은 [AGENT_VALIDATION.md](AGENT_VALIDATION.md#고정-벤치마크-2026-10-15), 기준선은 [AGENT_EVALUATION_RESULTS.md](AGENT_EVALUATION_RESULTS.md).
 
 ## Stage 3 — Mads-Opt: 품질을 유지하며 비용·지연 개선
-- [ ] 평가 질문, 모델 버전, 프롬프트 버전, 데이터 버전을 고정한다.
-- [ ] 요청당 LLM 호출 수, 도구 호출 수, 토큰, p50/p95 지연, 성공률을 기록한다.
-- [ ] 중복 도구 설명과 컨텍스트를 줄이되 단위·전제조건·자료 한계는 유지한다.
-- [ ] 이미 확정된 사례/화면 정보가 중복 전달되는지 확인한다.
+- [x] 평가 질문, 모델 버전, 프롬프트 버전, 데이터 버전을 고정한다. (보고서에 git 커밋·Agent 코드 미커밋 여부·모델·프롬프트 해시·문항 해시·축소 변형 기록)
+- [x] 요청당 LLM 호출 수, 도구 호출 수, 토큰, p50/p95 지연, 성공률을 기록한다.
+- [x] 중복 도구 설명과 컨텍스트를 줄이되 단위·전제조건·자료 한계는 유지한다. (O1 재구성 결과의 지도용 필드, O2 카탈로그 중복 필드: 토큰 −21.1%, [기록](AGENT_OPTIMIZATION_LOG.md))
+- [~] 이미 확정된 사례/화면 정보가 중복 전달되는지 확인한다. (재구성 결과는 정리. 서울 재구성의 강우·노출 값이 관측 요약과 겹치는 것은 남음)
 - [ ] 의존성이 없는 읽기 전용 도구만 병렬화 후보로 삼는다.
 - [ ] 저렴한 모델 라우팅은 별도 실험으로 검증한다.
 - [ ] 캐시는 사례, 질문, 도구 인자, 데이터·코드·프롬프트 버전을 반영해 오래된 결과가 재사용되지 않도록 한다.
-- [ ] 최적화 전후 같은 benchmark를 돌리고 품질이 떨어지면 되돌린다.
+- [x] 최적화 전후 같은 benchmark를 돌리고 품질이 떨어지면 되돌린다. (`--no-trim`·`--full-catalogue` A/B, `prompt_size.py`. 되돌린 변경 없음)
 
 측정 지표:
 - Task success rate: 기대 분석 또는 적절한 한계 설명을 완수한 비율
@@ -91,8 +91,8 @@ FloodOps는 Gemini 기반 Agent가 사건·시설 범위마다 등록된 읽기 
 
 ## Stage 4 — Mads-Serve: 모델 서빙 판단
 GPU 자체 서빙을 먼저 만들지 않는다. 도메인 도구와 자료의 신뢰성이 우선이다.
-- [ ] 현재 Gemini 구성을 기준선으로 고정한다.
-- [ ] 대체 모델은 동일 질문 세트와 동일 도구 계약으로 비교한다.
+- [x] 현재 Gemini 구성을 기준선으로 고정한다.
+- [~] 대체 모델은 동일 질문 세트와 동일 도구 계약으로 비교한다. (Ollama `qwen2.5:3b` 대표 13문항, `AGENT_LLM_PROVIDER=ollama`)
 - [ ] 한국어 도메인 설명, 도구 호출 JSON 유효성, 근거 보존, 지연, 총 운영비를 함께 측정한다.
 - [ ] 자체 서빙 비용에 GPU 유휴 시간, 배포, 모니터링, 장애 대응을 포함한다.
 - [ ] 품질 기준을 충족하지 못하면 전환하지 않는다.
@@ -100,11 +100,11 @@ GPU 자체 서빙을 먼저 만들지 않는다. 도메인 도구와 자료의 �
 산출물은 우선 자체 서빙 구현이 아니라 모델 전환 판단 보고서다.
 
 ## Stage 5 — Mads-Stack: 전체 경로 최적화
-- [ ] 브라우저 → API → Agent loop → 도구 → Gemini → 검증 → UI의 시간을 분해한다.
-- [ ] 병목이 모델 대기인지, 도구/자료 로딩인지, 직렬화나 지도 렌더링인지 확인한다.
-- [ ] 변경 전 검증 가능한 가설을 한 문장으로 작성한다.
-- [ ] 한 번에 주요 변수 하나만 바꾸고 동일 benchmark를 재실행한다.
-- [ ] 성능뿐 아니라 근거성, 도구 정확성, 실패 사례도 기록한다.
+- [x] 브라우저 → API → Agent loop → 도구 → Gemini → 검증 → UI의 시간을 분해한다. (`e2e/agent-latency.spec.ts`, `profile_path.py`, trace)
+- [x] 병목이 모델 대기인지, 도구/자료 로딩인지, 직렬화나 지도 렌더링인지 확인한다. (첫 호출 자료 적재 5~14 s ≫ 모델 1~5 s ≫ 왕복·화면 0.1 s 미만)
+- [x] 변경 전 검증 가능한 가설을 한 문장으로 작성한다. (H1 시작 시 미리 적재)
+- [~] 한 번에 주요 변수 하나만 바꾸고 동일 benchmark를 재실행한다. (H1은 측정 단계에서 메모리 +294 MB로 기각, 코드 변경 없음)
+- [x] 성능뿐 아니라 근거성, 도구 정확성, 실패 사례도 기록한다. ([최적화 기록](AGENT_OPTIMIZATION_LOG.md))
 
 ## 4주 실행안
 ### 1주차: 관찰과 기준선
@@ -119,13 +119,13 @@ GPU 자체 서빙을 먼저 만들지 않는다. 도메인 도구와 자료의 �
 - [x] 근거 없는 수치 생성 방지 회귀 테스트 추가 (천 단위 표기는 통과, 지어낸 값은 거부)
 
 ### 3주차: 최적화
-- [ ] 토큰·호출 수·p50/p95 기준선 측정 (지연은 Gemini 응답 속도가 실행마다 3배까지 달라, 같은 시간대에 3회 이상 반복해 비교)
-- [ ] 프롬프트, 도구 설명, 컨텍스트 중 한 변수씩 실험
-- [ ] 품질을 유지한 변경만 채택
+- [x] 토큰·호출 수·p50/p95 기준선 측정 (지연은 Gemini 응답 속도가 실행마다 3배까지 달라, 같은 시간대에 3회 이상 반복해 비교)
+- [x] 프롬프트, 도구 설명, 컨텍스트 중 한 변수씩 실험 (O1 도구 결과, O2 카탈로그)
+- [x] 품질을 유지한 변경만 채택
 
 ### 4주차: 전체 경로 보고
-- [ ] 프런트/API/도구/LLM 지연 분해
-- [ ] 가설·조건·결과·실패 사례를 재현 가능한 보고서로 작성
+- [x] 프런트/API/도구/LLM 지연 분해
+- [x] 가설·조건·결과·실패 사례를 재현 가능한 보고서로 작성 ([AGENT_OPTIMIZATION_LOG.md](AGENT_OPTIMIZATION_LOG.md))
 
 ## 완료 정의
 - [ ] 전체 요청 trace 확인 가능

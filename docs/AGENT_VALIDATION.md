@@ -132,9 +132,31 @@ offline은 모델을 장애 상태로 두고 `needs_model` 6문항을 뺀다. li
 
 지표: 문항 통과율, 도구 정확도(기대·금지 도구 조건이 있는 문항), 근거 유효성(근거 번호가 있는 답변의 인용·수치 검사), 근거 없는 주장 비율(금지 주장 또는 모델 답변의 출처 없는 숫자), 모델 요청 수, 토큰, p50/p95 지연. 보고서에는 git 커밋, Agent 코드 미커밋 여부, 모델 ID, 시스템 프롬프트·문항 파일 해시가 함께 남는다. 직접 분석 API와 값이 같은지는 기존 `evaluate_agent.py`가 계속 맡는다.
 
+## Ollama 공급자와 3주차 측정 도구 (2026-10-15)
+
+`AGENT_LLM_PROVIDER=ollama`이면 `/api/agent/ask`의 모델 판단을 로컬 Ollama `/api/chat`으로 보낸다. 시스템 프롬프트·카탈로그·검증·근거 검사는 Gemini와 같고, 응답 형식은 `AgentAction` JSON 스키마로 강제한다. 기본값은 Gemini이며 공개 서버 설정은 바꾸지 않았다.
+
+| 변수 | 기본값 | 설명 |
+|---|---|---|
+| `AGENT_LLM_PROVIDER` | gemini | `ollama`이면 로컬 모델 사용 |
+| `OLLAMA_BASE_URL` | http://localhost:11434 | |
+| `OLLAMA_MODEL` | qwen2.5:3b | 응답의 `model`은 `ollama:<이름>` |
+| `OLLAMA_NUM_CTX` | 16384 | Ollama 기본 문맥(2~4k)보다 프롬프트가 길어 늘림. 넘으면 Ollama가 조용히 자른다 |
+| `AGENT_ASK_TIMEOUT_SECONDS` | Ollama 300 / Gemini 25 | CPU 추론은 판단 1회에 1~3분 걸린다 |
+
+토큰은 `prompt_eval_count`·`eval_count`를 `diagnostics.tokens`에 같은 이름으로 합산한다. 연결 실패는 `model_connection_failed`, 시간 초과는 `model_budget_exceeded`다.
+
+```powershell
+python backend/evaluation/agent_benchmark.py --mode live --provider ollama --model qwen2.5:3b --case n-osong-closure --output docs/local/agent-benchmark-ollama.json
+python backend/evaluation/agent_benchmark.py --mode live --provider gemini --seconds-per-request 5 --no-trim --full-catalogue --output docs/local/agent-benchmark-before-week3.json
+python backend/evaluation/prompt_size.py --output docs/local/agent-prompt-size.json
+```
+
+`--no-trim`·`--full-catalogue`는 같은 코드에서 3주차 축소(O1 도구 결과의 지도용 필드, O2 카탈로그 중복 필드)를 끈 비교 측정용이다. 제품에는 이런 스위치가 없다. `prompt_size.py`는 모델을 부르지 않고 문항마다 정해진 도구 순서로 루프를 돌려, 판단마다 실제로 보내질 프롬프트 길이(시스템 프롬프트 + 컨텍스트, 자)를 세므로 실행마다 같은 값이 나온다. Gemini 일일 할당량이 끝나면 HTTP 429로 모든 문항이 `model_transport_errors`에 들어가므로, 그 실행은 품질 측정으로 쓰지 않는다.
+
 ## 시설 범위 대조 (2026-10-10)
 
-시설 범위는 [FACILITY_AGENT.md](FACILITY_AGENT.md)를 따른다. 기존 사건별 분석은 별도 범위로 유지하며, 시설 카탈로그는 상태·규칙·백테스트 세 도구뿐이다. 모델의 시설·시각 변경 거절, 누락·지연 관측, 실시간 실패 시 과거 자료 대체 금지, 키 포함 오류 비노출, 명시적 재생의 live 조회 금지, 근거 없는 안전·통제 완료 주장 폴백을 검증한다. 브라우저에서 범위 변경과 시각 입력 뒤 추천 질문 유지도 확인한다.
+시설 범위는 [FACILITY_AGENT.md](FACILITY_AGENT.md)를 따른다. 기존 사건별 분석은 별도 범위로 유지하며, 시설 카탈로그는 상태·규칙·백테스트에 기준 비교·연구 상승 모델을 더한 다섯 도구다(2026-10-15). 모델의 시설·시각 변경 거절, 누락·지연 관측, 실시간 실패 시 과거 자료 대체 금지, 키 포함 오류 비노출, 명시적 재생의 live 조회 금지, 근거 없는 안전·통제 완료 주장 폴백을 검증한다. 브라우저에서 범위 변경과 시각 입력 뒤 추천 질문 유지도 확인한다.
 
 ```powershell
 python backend/evaluation/evaluate_agent.py --suite facility --output docs/local/facility-agent-offline.json

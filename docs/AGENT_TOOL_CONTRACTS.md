@@ -21,9 +21,11 @@
 | analyze_response_timing | 포항·안동 | `intervention_id`, `action_times` | 등록된 대응 ID(포항 parking_entry_ban, 안동 evacuation_order·landslide_alert), 시각 1~10개는 질문·단계 시각·"N분 일찍" | 대응 시각이 이후 사건보다 앞서는 분 | 대피 성공, 인명·피해 감소 |
 | get_facility_status | 시설 | 없음 | 시설 범위에서만 등록 | 관측 모드·시각·수위·단계·여유, 신선도(`fresh`/`stale`/`missing`) | 침수심, 예보, 실제 통제 명령, 오래된 관측으로 안전 보장 |
 | get_control_rule | 시설 | 없음 | 〃 | 등록 수위·상승 속도 조건과 한계 | 미확인 법정 기준 확정, 통제 승인 |
-| get_facility_backtest | 시설 | 없음 | 〃 | 첫 통제 검토 시각, 유입·붕괴까지 분, DQ-009 | 실제 통제 기록, 피해 감소 |
+| get_facility_backtest | 시설 | 없음 | 〃 | 첫 통제 검토 시각, 유입·붕괴까지 분, DQ-009, 보관 자료·현재 기준값 한계 | 실제 통제 기록, 피해 감소 |
+| get_criteria_review | 시설 | 없음 | 〃 | 8개 기준(주의보·경보 × 0~180분)별 첫 검토·유입까지 분·다른 시기 권고 수, 연도별 최고 수위, 자료 품질, 보관 자료·현재 기준값 한계 | 다른 해 권고의 필요·불필요, 최적 기준 확정 |
+| get_rise_forecast | 시설 | 없음 | 〃 | 연구 모델 6시간 최대 상승·예상 수위(중앙값, 있으면 90% 상한), 모델 오차, `kind=RESEARCH` | 예보·도달 시각·침수심, 통제 필요 판단 |
 
-시설 범위에서는 시설 도구 3개만, 사건 범위에서는 그 사건의 도구만 등록된다(`list_agent_tools`). 범위 밖 도구를 고르면 `tool_selection_rejected`다.
+시설 범위에서는 시설 도구 5개만, 사건 범위에서는 그 사건의 도구만 등록된다(`list_agent_tools`). 범위 밖 도구를 고르면 `tool_selection_rejected`다.
 
 ## 자료 전제와 실패
 
