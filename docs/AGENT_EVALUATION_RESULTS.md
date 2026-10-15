@@ -126,6 +126,7 @@ Ollama `qwen2.5:3b`, 대표 13문항, 같은 코드(Ollama가 드러낸 상태 �
 
 - 배포 이미지(로컬 Docker, `Dockerfile.aws`, 현재 작업 트리): 상한 없이 상시 663 MiB·최대 765 MiB. `--memory 600m`이면 상한 도달 1,086회·스왑 482 MB·Agent 요청 120초 초과(OOM 종료는 없었음, Docker Desktop은 스왑이 있음). 재배포 차단 위험으로 TODO에 올렸다.
 - Gemini 재확인은 두 번 모두 일일 할당량 소진(HTTP 429)으로 무효였다(14:38 핑은 성공했지만 이어진 요청이 막힘).
+- 16:06 할당량 초기화 뒤 최종 코드(O1+O2, 상태 규칙·메모리 수정 포함) 확인 실행: 43/43, 모델 요청 80, 토큰 218,766(3주차 기준 278,200 대비 −21.4%), 근거 유효성 1.0(n=25)·도구 정확도 1.0·근거 없는 주장 0. HTTP 오류 2건(n-andong-landslide, w-osong-casualty)은 서버 경로로 통과했다. 지연 p50 9.8 s·p95 25.0 s는 모델 응답이 느린 시간대라 비교하지 않는다.
 - 메모리 수정 뒤 같은 흐름을 스왑 없는 600 MB 컨테이너로 다시 돌렸다. 변경 전 이미지는 첫 Agent 질문에서 OOM 종료(exit 137), 변경 후는 통과(상한 도달 0회, 정착 506 MiB, 프로세스 최대 RSS 605 MiB). 원인은 `get_osong_repository()`와 `(2023)`이 한 칸짜리 캐시의 다른 키여서 같은 오송 자료를 반복 파싱한 것이었다.
 
 원본: `docs/local/agent-benchmark-live-ollama-ab-{before,after}.json`, `docs/local/agent-profile-20261015.json`.
