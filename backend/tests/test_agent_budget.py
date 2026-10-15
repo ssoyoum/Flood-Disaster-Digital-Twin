@@ -115,7 +115,7 @@ def test_api_distinguishes_input_rejection_from_tool_failure_and_resets_state(mo
     assert response.status_code == 200
     diagnostics = response.json()["diagnostics"]
     assert [(failure["stage"], failure["code"]) for failure in diagnostics["failures"]] == [
-        ("validation", "tool_input_rejected"), ("tool", "tool_execution_failed"),
+        ("validation", "tool_selection_rejected"), ("tool", "tool_execution_failed"),
     ]
     assert diagnostics["failures"][0]["tool_name"] is None
     follow = client.post("/api/agent/ask", json={"message": "무슨 질문을 할 수 있어?"}).json()["diagnostics"]

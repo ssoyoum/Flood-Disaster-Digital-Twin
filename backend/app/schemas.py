@@ -414,6 +414,23 @@ class AgentAskFailure(BaseModel):
     tool_name: str | None = None
 
 
+class AgentAskTraceStep(BaseModel):
+    seq: int = Field(ge=1)
+    stage: Literal["router", "model", "validation", "tool", "answer", "reply"]
+    outcome: str
+    ms: int = Field(ge=0)
+    tool_name: str | None = None
+    by: Literal["model", "server", "registered_tools", "capability", "clarification", "unavailable"] | None = None
+
+
+class AgentAskTokens(BaseModel):
+    prompt: int = Field(ge=0)
+    output: int = Field(ge=0)
+    thoughts: int = Field(ge=0)
+    total: int = Field(ge=0)
+    responses: int = Field(ge=1)
+
+
 class AgentAskDiagnostics(BaseModel):
     request_id: str
     duration_ms: int = Field(ge=0)
@@ -422,6 +439,8 @@ class AgentAskDiagnostics(BaseModel):
     completion_source: Literal["model", "registered_tools", "capability", "clarification", "unavailable"]
     context_mode: Literal["current", "reused", "updated", "ambiguous"] = "current"
     failures: list[AgentAskFailure] = Field(default_factory=list)
+    trace: list[AgentAskTraceStep] = Field(default_factory=list)
+    tokens: AgentAskTokens | None = None
 
 
 class AgentAskResult(BaseModel):

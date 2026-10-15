@@ -10,8 +10,11 @@ from __future__ import annotations
 import asyncio
 from contextvars import ContextVar
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 import json
+import logging
 import math
+import os
 import re
 import time
 from typing import Any, Literal
@@ -40,12 +43,11 @@ from .services import ReconstructionUnavailable
 
 MAX_TOOL_CALLS = 4
 DEFAULT_ASK_TIMEOUT_SECONDS = 25.0
+_logger = logging.getLogger("floodops.agent")
 
 
 def _ask_timeout_seconds() -> float:
     """Shared wall-clock budget for all model decisions and JSON retries."""
-
-    import os
 
     try:
         value = float(os.environ.get("AGENT_ASK_TIMEOUT_SECONDS", DEFAULT_ASK_TIMEOUT_SECONDS))
@@ -63,6 +65,9 @@ class _RunState:
     completion_source: str = "model"
     context_mode: str = "current"
     context_note: str = ""
+    trace: list[dict[str, Any]] = field(default_factory=list)
+    tokens: dict[str, int] = field(default_factory=lambda: {"prompt": 0, "output": 0, "thoughts": 0, "total": 0})
+    token_responses: int = 0
 
 
 _run_state: ContextVar[_RunState | None] = ContextVar("agent_run_state", default=None)
@@ -74,12 +79,50 @@ class _ModelFailure(LlmPlannerUnavailable):
         self.code = code
 
 
+class _ToolSelectionError(ValueError):
+    """The model named a tool that is not registered for this event or facility."""
+
+
+class _RepeatedToolCall(ValueError):
+    """The model asked for a tool call it had already made."""
+
+
+def _rejection_code(exc: Exception) -> str:
+    if isinstance(exc, _ToolSelectionError):
+        return "tool_selection_rejected"
+    if isinstance(exc, _RepeatedToolCall):
+        return "tool_call_repeated"
+    return "tool_input_rejected"
+
+
 def _record_failure(stage: str, code: str, tool_name: str | None = None) -> None:
     state = _run_state.get()
     if state is not None:
         # No question, tool parameters, exception text or credentials in diagnostics.
         state.failures.append({"stage": stage, "code": code, "step": state.model_steps,
                                "tool_name": tool_name if tool_name in _PARAMETERS else None})
+
+
+def _trace(stage: str, outcome: str, started: float, tool_name: str | None = None, by: str | None = None) -> None:
+    """Append one step of the request path; same privacy rule as failures."""
+
+    state = _run_state.get()
+    if state is not None:
+        state.trace.append({"seq": len(state.trace) + 1, "stage": stage, "outcome": outcome,
+                            "ms": max(0, round((time.monotonic() - started) * 1000)),
+                            "tool_name": tool_name if tool_name in _PARAMETERS else None, "by": by})
+
+
+def _record_usage(usage: Any) -> None:
+    state = _run_state.get()
+    if state is None or not isinstance(usage, dict):
+        return
+    state.token_responses += 1
+    for key, source in (("prompt", "promptTokenCount"), ("output", "candidatesTokenCount"),
+                        ("thoughts", "thoughtsTokenCount"), ("total", "totalTokenCount")):
+        value = usage.get(source)
+        if type(value) is int and value >= 0:
+            state.tokens[key] += value
 
 
 async def _post_gemini(url: str, *, headers: dict, json: dict, timeout: float) -> httpx.Response:
@@ -156,8 +199,6 @@ def _gemini_action(context: dict[str, Any]) -> AgentAction:
     if not status["available"]:
         raise LlmPlannerUnavailable(status["reason"])
     _load_env_file_once()
-    import os
-
     model = llm_planner_model_id()
     system_prompt = _SYSTEM_PROMPT
     if context.get("selected_facility"):
@@ -193,7 +234,9 @@ def _gemini_action(context: dict[str, Any]) -> AgentAction:
         if response.status_code != 200:
             raise _ModelFailure("model_http_error", f"Gemini API returned HTTP {response.status_code}.")
         try:
-            parts = response.json()["candidates"][0]["content"]["parts"]
+            data = response.json()
+            _record_usage(data.get("usageMetadata") if isinstance(data, dict) else None)
+            parts = data["candidates"][0]["content"]["parts"]
             return AgentAction.model_validate_json("".join(part.get("text", "") for part in parts))
         except (KeyError, IndexError, TypeError, ValueError) as exc:
             if attempt == 0:
@@ -246,7 +289,7 @@ def _validated_tool_request(action: AgentAction, request: AgentAskRequest, calls
                             parameter_text: str | None = None) -> AgentToolCallRequest:
     name = action.tool_name or ""
     if name not in _PARAMETERS:
-        raise ValueError("The model selected an unregistered tool.")
+        raise _ToolSelectionError("The model selected an unregistered tool.")
     params = dict(action.parameters)
     supplied_event = params.pop("event_id", request.event_id)
     if supplied_event != request.event_id:
@@ -256,7 +299,7 @@ def _validated_tool_request(action: AgentAction, request: AgentAskRequest, calls
     if supplied_facility != request.facility_id or supplied_at != request.observation_at:
         raise ValueError("The model changed the selected facility or observation time.")
     if name not in {tool["name"] for tool in list_agent_tools(request.event_id, request.facility_id)}:
-        raise ValueError("The model selected a tool that is not registered for this event.")
+        raise _ToolSelectionError("The model selected a tool that is not registered for this event.")
     if set(params) - _PARAMETERS[name]:
         raise ValueError("The model supplied unsupported tool parameters.")
     for key in ("delay_minutes", "radii_m"):
@@ -455,6 +498,7 @@ def _reply(request: AgentAskRequest, status: str, answer: str, calls: list[dict[
             answer += "\n실제 통제는 현장 계측·관리기관 기준·담당자 판단이 우선합니다."
     if state is not None:
         state.completion_source = source
+    _trace("reply", status.lower(), time.monotonic(), by=source)
     return {
         "event_id": request.event_id,
         "facility_id": request.facility_id,
@@ -606,22 +650,54 @@ def ask_agent(request: AgentAskRequest) -> dict[str, Any]:
             "completion_source": state.completion_source,
             "context_mode": state.context_mode,
             "failures": state.failures,
+            "trace": state.trace,
+            "tokens": dict(state.tokens, responses=state.token_responses) if state.token_responses else None,
         }
+        _write_trace_log(result)
         return result
     finally:
         _run_state.reset(token)
 
 
+def _write_trace_log(result: dict[str, Any]) -> None:
+    """Append one JSON line per request when FLOODOPS_AGENT_TRACE_LOG names a file."""
+
+    path = os.environ.get("FLOODOPS_AGENT_TRACE_LOG", "").strip()
+    if not path:
+        return
+    # Tool names and orders only: questions, parameters and tool outputs stay out of the log.
+    record = {
+        "logged_at": datetime.now(timezone.utc).isoformat(),
+        "event_id": result["event_id"],
+        "facility_id": result["facility_id"],
+        "status": result["status"],
+        "model": result["model"],
+        "tool_calls": [{"order": call["order"], "tool_name": call["tool_name"]} for call in result["tool_calls"]],
+        "evidence_calls": result["evidence_calls"],
+        "diagnostics": result["diagnostics"],
+    }
+    try:
+        with open(path, "a", encoding="utf-8") as handle:
+            handle.write(json.dumps(record, ensure_ascii=False) + "\n")
+    except OSError:
+        _logger.warning("Agent trace log could not be written.")
+
+
 def _execute_hint(hint: dict[str, Any], request: AgentAskRequest) -> tuple[AgentToolCallRequest, dict[str, Any]]:
     stage = "validation"
+    started = time.monotonic()
     try:
         tool_request = AgentToolCallRequest(event_id=request.event_id, facility_id=request.facility_id,
                                            observation_at=request.observation_at, **hint["parameters"])
         stage = "tool"
-        return tool_request, execute_agent_tool(hint["tool_name"], request.event_id, tool_request)
+        result = execute_agent_tool(hint["tool_name"], request.event_id, tool_request)
     except (ValueError, ReconstructionUnavailable, KeyError):
-        _record_failure(stage, "tool_input_rejected" if stage == "validation" else "tool_execution_failed", hint["tool_name"])
+        code = "tool_input_rejected" if stage == "validation" else "tool_execution_failed"
+        _record_failure(stage, code, hint["tool_name"])
+        _trace(stage, code, started, hint["tool_name"], "server")
         raise
+    _trace("tool", "ok", started, hint["tool_name"], "server")
+    return tool_request, result
 
 
 def _trace_parameters(parameters: dict[str, Any], request: AgentAskRequest) -> dict[str, Any]:
@@ -644,8 +720,10 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
     if request.facility_id and physical:
         answer, limitation = _unavailable_answer(AgentAction(action="final", gap_kind="physical_intervention"), request)
         return _reply(request, "NEEDS_DATA", answer, [], [limitation], [], model=None, source="clarification")
+    route_started = time.monotonic()
     resolved = (resolve_question(request, lambda message, event: agent_facility.hints(message))
                 if request.facility_id else resolve_question(request, _router_hints))
+    _trace("router", resolved.mode, route_started, by="server")
     state = _run_state.get()
     if state is not None:
         state.context_mode, state.context_note = resolved.mode, resolved.note
@@ -686,6 +764,7 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
     anchored = False
     for _ in range(MAX_MODEL_STEPS):
         context["remaining_tool_calls"] = MAX_TOOL_CALLS - len(calls)
+        model_started = time.monotonic()
         try:
             state = _run_state.get()
             if state is not None:
@@ -695,6 +774,7 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
             action = _gemini_action(context)
         except LlmPlannerUnavailable as exc:
             _record_failure("model", getattr(exc, "code", "model_unavailable"))
+            _trace("model", getattr(exc, "code", "model_unavailable"), model_started, by="model")
             called = {call["tool_name"] for call in calls}
             for hint in [h for h in hints if h["tool_name"] not in called][: MAX_TOOL_CALLS - len(calls)]:
                 try:
@@ -715,9 +795,11 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
                 calls, [str(exc)], _follow_ups(None, event_id=request.event_id),
                 source="unavailable",
             )
+        _trace("model", f"decision_{action.action}", model_started,
+               action.tool_name if action.action == "tool" else None, "model")
         last_action = action
         called = {call["tool_name"] for call in calls}
-        missing = [hint for hint in hints if hint["tool_name"] not in called]
+        missing =[hint for hint in hints if hint["tool_name"] not in called]
         if action.action == "final" and not anchored and (missing or (hypothetical and not calls)):
             # The model tried to finish without the evidence the question needs: run it once on the user's values.
             anchored = True
@@ -743,6 +825,7 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
             follow = _follow_ups(action, event_id=request.event_id)
             effect_claim = physical and bool(_EFFECT_CLAIM.search(action.answer))
             if calls and not effect_claim and _readable(action.answer) and _grounded_answer(action.answer, calls, action.evidence_calls):
+                _trace("answer", "grounded", time.monotonic(), by="server")
                 cited = [call["result"] for call in calls if call["order"] in action.evidence_calls]
                 answer = action.answer
                 if any("PRESS_REPORT" in str(result.get("coverage_note", "")) for result in cited):
@@ -763,7 +846,9 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
             if action.gap_kind is not None or physical or not calls:
                 # The model's own explanation is kept when it adds no unsourced numbers;
                 # otherwise the fixed limitation text is used.
-                if not effect_claim and _uncited_answer_ok(action.answer, request):
+                uncited_ok = not effect_claim and _uncited_answer_ok(action.answer, request)
+                _trace("answer", "model_limitation" if uncited_ok else "fixed_limitation", time.monotonic(), by="server")
+                if uncited_ok:
                     answer = action.answer if calls else re.sub(r"\s*\[\d+\](?:,\s*\[\d+\])*", "", action.answer)
                     if physical and "수리모형" not in answer:
                         answer = f"{answer}\n{_PHYSICAL_CAVEAT}"
@@ -773,24 +858,31 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
                 return _reply(request, "NEEDS_DATA", answer, calls, [limitation, *limitations], follow)
             limitations.append("The model's final answer lacked valid tool citations or contained unsupported numbers.")
             _record_failure("answer", "answer_not_grounded")
+            _trace("answer", "answer_not_grounded", time.monotonic(), by="server")
             break
         if len(calls) >= MAX_TOOL_CALLS:
             limitations.append("The tool-call limit was reached.")
             break
         stage = "validation"
+        step_started = time.monotonic()
         try:
             tool_request = _validated_tool_request(action, request, calls, resolved.parameter_text)
             key = json.dumps([action.tool_name, tool_request.model_dump()], sort_keys=True)
             if key in seen:
-                raise ValueError("The same tool call was already made.")
+                raise _RepeatedToolCall("The same tool call was already made.")
             seen.add(key)
+            _trace("validation", "accepted", step_started, action.tool_name, "model")
             stage = "tool"
+            step_started = time.monotonic()
             result = execute_agent_tool(action.tool_name or "", request.event_id, tool_request)
         except (ValueError, ReconstructionUnavailable, KeyError) as exc:
-            _record_failure(stage, "tool_input_rejected" if stage == "validation" else "tool_execution_failed", action.tool_name)
+            code = _rejection_code(exc) if stage == "validation" else "tool_execution_failed"
+            _record_failure(stage, code, action.tool_name)
+            _trace(stage, code, step_started, action.tool_name, "model")
             context["observations"].append({"tool": action.tool_name, "error": str(exc)})
             limitations.append(str(exc))
             continue
+        _trace("tool", "ok", step_started, action.tool_name, "model")
         parameters = _trace_parameters({key: getattr(tool_request, key) for key in action.parameters}, request)
         trace = {"order": len(calls) + 1, "tool_name": action.tool_name, "reason": action.reason, "parameters": parameters, "result": result}
         calls.append(trace)
