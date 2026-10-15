@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Activity, AlertTriangle, ArrowLeft, ArrowRight, Gauge, Radio, RotateCcw, TrendingUp } from "lucide-react";
 import * as api from "../api";
-import type { RiseForecast, TwinBacktest, TwinFacility, TwinStatus, WaterLevelReadiness } from "../types";
+import type { RiseForecast, TwinBacktest, TwinFacility, TwinGateId, TwinGateStatus, TwinStatus, WaterLevelReadiness } from "../types";
 import { FloodOpsLogo } from "./Landing";
 import TwinCriteria from "./TwinCriteria";
 import TwinSpatial from "./TwinSpatial";
@@ -36,6 +36,15 @@ const RECO: Record<string, { label: string; tone: string; hint: string }> = {
   MONITOR: { label: "감시", tone: "#fbbf24", hint: "상승 속도를 지켜봅니다" },
   CLOSURE_REVIEW: { label: "통제 검토", tone: "#f87171", hint: "담당자 판단·현장 확인이 우선" },
 };
+
+// 등록 관문 (data/facilities/registry.json). 순서는 레지스트리와 같다.
+const GATES: Array<{ id: TwinGateId; label: string }> = [
+  { id: "inflow_path", label: "유입 경로" },
+  { id: "representative_gauge", label: "대표 관측소" },
+  { id: "site_instrumentation", label: "현장 계측" },
+  { id: "validation_event", label: "검증 사건" },
+];
+const GATE_STATUS_KO: Record<TwinGateStatus, string> = { CONFIRMED: "✓", PENDING: "확인 중", MISSING: "없음", UNKNOWN: "미확인" };
 
 const STAGE_KO: Record<string, string> = { normal: "정상", attention: "관심", advisory: "주의보 수위", warning: "경보 수위", planned_flood: "계획홍수위 도달" };
 const LEVEL_KO: Record<string, string> = { attention: "관심", advisory: "주의보", warning: "경보", planned_flood: "계획홍수위" };
@@ -173,6 +182,21 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
               <div><dt>구동 유형</dt><dd>{facility.driver === "river_stage" ? "하천 인접형 · 수위 기준" : facility.driver}</dd></div>
               <div><dt>연결 관측소</dt><dd>{facility.gauge.name} ({facility.gauge.station_id})</dd></div>
               <div><dt>검증 사건</dt><dd><a href={`#event/${facility.event_id}`}>{facility.event_id}</a></dd></div>
+              {facility.gates && (
+                <div>
+                  <dt>등록 관문</dt>
+                  <dd className="tw-gates">
+                    {GATES.map((gate) => {
+                      const state = facility.gates[gate.id];
+                      return (
+                        <span key={gate.id} className="tw-gate" data-status={state?.status ?? "UNKNOWN"} title={state?.note}>
+                          {gate.label} {GATE_STATUS_KO[state?.status ?? "UNKNOWN"]}
+                        </span>
+                      );
+                    })}
+                  </dd>
+                </div>
+              )}
             </dl>
           </article>
 
@@ -348,6 +372,9 @@ function RiseCard({ rise, error, levels }: { rise: RiseForecast | null; error: s
             </div>
           </div>
           <div className="ub-kpis tw-kpis tw-rise-kpis">
+            {rise.maxrise_6h_q90_m !== null && rise.maxrise_6h_q90_m !== undefined && (
+              <div><strong>+{num(rise.maxrise_6h_q90_m)} m</strong><span>상한(90% 분위) · 최고 {num(rise.forecast_level_q90_m)} m{rise.reaches_within_6h_q90?.planned_flood ? " · 계획홍수위 도달 가능" : rise.reaches_within_6h_q90?.warning ? " · 경보 수위 도달 가능" : ""}</span></div>
+            )}
             <div><strong>{num(rise.linear_6h_m)} m</strong><span>단순 외삽(최근 1시간 상승 × 6)</span></div>
             <div><strong>{rise.inputs.rain.sfc_rain_6h === null ? "—" : `${num(rise.inputs.rain.sfc_rain_6h, 1)} mm`}</strong><span>최근 6시간 강우{rise.inputs.rain.station ? ` · ${rise.inputs.rain.station}` : " · 실시간 강우 미연결"}</span></div>
           </div>
@@ -368,12 +395,14 @@ function RiseCard({ rise, error, levels }: { rise: RiseForecast | null; error: s
           </p>
           {skill && skill.model && skill.linear && (
             <p>
-              제외한 달에서 «6시간 안 계획홍수위 도달»을 맞힌 횟수: 모델 {skill.model.hit}/{skill.hours_reaching_within_6h} (오경보 {skill.model.false_alarm}), 단순 외삽 {skill.linear.hit}/{skill.hours_reaching_within_6h} (오경보 {skill.linear.false_alarm}).
+              제외한 달에서 «6시간 안 계획홍수위 도달»을 맞힌 횟수: 모델 {skill.model.hit}/{skill.hours_reaching_within_6h} (오경보 {skill.model.false_alarm}){skill.q90 && `, 상한 ${skill.q90.hit}/${skill.hours_reaching_within_6h} (오경보 ${skill.q90.false_alarm})`}, 단순 외삽 {skill.linear.hit}/{skill.hours_reaching_within_6h} (오경보 {skill.linear.false_alarm}).
+              {model.holdout_q90_coverage !== null && ` 실제 상승의 ${Math.round(model.holdout_q90_coverage * 100)}%가 상한 아래였습니다.`}
             </p>
           )}
           {model.osong_planned_flood_lead_min !== null && (
-            <p>오송 2023-07-15: 모델은 계획홍수위 도달 {model.osong_planned_flood_lead_min}분 전에 «6시간 안 도달»을 냈습니다. 단순 외삽은 {model.osong_planned_flood_lead_min_linear}분 전이지만 전날 저녁부터 경보 수위 도달을 잘못 예고했습니다.</p>
+            <p>오송 2023-07-15: 모델은 계획홍수위 도달 {model.osong_planned_flood_lead_min}분 전에 «6시간 안 도달»을 냈습니다{model.osong_planned_flood_lead_min_q90 !== null && ` (상한 기준 ${model.osong_planned_flood_lead_min_q90}분 전)`}. 단순 외삽은 {model.osong_planned_flood_lead_min_linear}분 전이지만 전날 저녁부터 경보 수위 도달을 잘못 예고했습니다.</p>
           )}
+          {model.quality_masks?.applied && <p>품질 감사 마스크를 적용해 관측소 {model.quality_masks.stations_with_mask}곳에서 {model.quality_masks.dropped_rows_total.toLocaleString()}행을 학습에서 뺐습니다.</p>}
           <small className="ub-note">{rise?.limitations.join(" ")}</small>
         </details>
       )}

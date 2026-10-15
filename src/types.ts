@@ -541,9 +541,15 @@ export type CaseLeadTimes = {
 // ---- Underpass control-decision twin (backend/app/twin.py) ----
 export type TwinMode = { mode: "replay" | "live"; hrfco_key_configured: boolean; kma_key_configured: boolean; replay_now_default: string };
 
+// Registration gates (data/facilities/registry.json): a facility is OPERATIONAL only when none is UNKNOWN.
+export type TwinGateId = "inflow_path" | "representative_gauge" | "site_instrumentation" | "validation_event";
+export type TwinGateStatus = "CONFIRMED" | "PENDING" | "MISSING" | "UNKNOWN";
+export type TwinGates = Record<TwinGateId, { status: TwinGateStatus; note: string }>;
+
 export type TwinFacility = {
   id: string; name: string; kind: string; driver: string; location: [number, number]; road: string; managing_agency: string; event_id: string;
   gauge: { station_id: string; name: string }; mode: "replay" | "live";
+  status: "OPERATIONAL" | "CANDIDATE"; gates: TwinGates;
 };
 
 export type CriteriaFloor = "advisory" | "warning";
@@ -558,10 +564,20 @@ export type TwinCriteriaReview = {
   first_review: { time: string; water_level_m: number } | null;
   lead_minutes: Record<"official_requirement_met" | "levee_failure" | "underpass_inflow" | "full_inundation", number> | null;
   other_episode_count: number; other_review_minutes: number;
-  episodes: Array<{ start: string; end: string; review_minutes: number; peak_water_level_m: number; peak_stage: string; reference_event: boolean }>;
+  episodes: Array<{
+    start: string; end: string; review_minutes: number; peak_water_level_m: number; peak_stage: string; reference_event: boolean;
+    quality: { step_reviews: number; missing_slots: number }; quality_review_required: boolean;
+  }>;
   by_year: Array<{ year: number; rows: number; max_water_level_m: number; episodes: number; review_minutes: number; reference_event: boolean }>;
   sweep: Array<{ stage_floor: CriteriaFloor; lead_threshold_min: number; first_review_time: string | null; lead_to_inflow_min: number | null; other_episode_count: number; other_review_minutes: number }>;
   coverage: { from: string; to: string; rows: number; interval: string; season: string; years: number[] };
+  quality: {
+    step_review_threshold_m: number; expected_slots: number; present_slots: number; missing_slots: number;
+    gap_count: number; gaps: Array<{ after: string; before: string; missing_slots: number }>;
+    step_review_count: number; step_reviews: Array<{ time: string; change_m: number; water_level_m: number; quarantined: boolean }>;
+    quarantines: Array<{ id: string; start: string; end: string; review_status: string | null; readings_excluded: number }>; policy_found: boolean;
+    episodes_with_flags: number;
+  };
   limitations: string[];
 };
 
@@ -596,6 +612,8 @@ export type WaterLevelReadiness = {
   limitations: string[];
 };
 
+export type RiseSkill = { hit: number; miss: number; false_alarm: number; pod: number | null; far: number | null };
+
 export type RiseForecast = {
   facility_id: string; station_id: string; at: string; mode: "replay" | "live"; kind: "RESEARCH"; control_decision_usable: false; horizon_hours: number;
   as_of: string | null; observation_quality: "fresh" | "stale" | "missing"; observation_age_min: number | null; interval: string | null;
@@ -603,10 +621,16 @@ export type RiseForecast = {
   model: {
     trained_at: string | null; stations: number | null; train_rows: number | null; rows_with_rain: number | null;
     cv_oof_rmse_m: number | null; cv_oof_rmse_target_gt_1m: number | null; cv_linear_rmse_m: number | null; cv_no_change_rmse_m: number | null;
-    holdout_month: string | null; holdout_pfh_skill: { hours_reaching_within_6h: number; model: { hit: number; miss: number; false_alarm: number; pod: number | null; far: number | null }; linear: { hit: number; miss: number; false_alarm: number; pod: number | null; far: number | null } } | null;
-    osong_planned_flood_lead_min: number | null; osong_planned_flood_lead_min_linear: number | null; osong_window_rmse_m: Record<string, number> | null; contract: string | null; lightgbm: string | null;
+    holdout_month: string | null;
+    holdout_pfh_skill: { hours_reaching_within_6h: number; model: RiseSkill; q90?: RiseSkill | null; linear: RiseSkill } | null;
+    holdout_q90_coverage: number | null;
+    quality_masks: { applied: boolean; stations_with_mask: number; dropped_rows_total: number } | null;
+    osong_planned_flood_lead_min: number | null; osong_planned_flood_lead_min_q90: number | null; osong_planned_flood_lead_min_linear: number | null;
+    osong_window_rmse_m: Record<string, number> | null; contract: string | null; lightgbm: string | null;
   } | null;
   prediction_available: boolean; reason?: string; missing_inputs?: string[];
+  maxrise_6h_q90_m?: number | null; forecast_level_q90_m?: number | null; forecast_stage_q90?: string | null;
+  reaches_within_6h_q90?: { advisory: boolean; warning: boolean; planned_flood: boolean } | null;
   maxrise_6h_m?: number; forecast_level_m?: number; forecast_level_el_m?: number; forecast_stage?: string; forecast_stage_label?: string;
   reaches_within_6h?: { advisory: boolean; warning: boolean; planned_flood: boolean }; margin_after_rise_m?: number; linear_6h_m?: number; station_in_training?: boolean;
   limitations: string[];

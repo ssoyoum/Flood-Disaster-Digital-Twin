@@ -17,6 +17,12 @@
 .tw-facility dl div { display: grid; grid-template-columns: 96px 1fr; gap: 10px; align-items: baseline; }
 .tw-facility dt { margin: 0; color: var(--dk-muted); font-size: 12px; }
 .tw-facility dd { margin: 0; font-size: 14px; }
+/* 등록 관문 칩: 확인 ✓ · 확인 중 · 없음 · 미확인 (data/facilities/registry.json) */
+.tw-gates { display: flex; flex-wrap: wrap; gap: 4px 6px; }
+.tw-gate { padding: 1px 7px; border: 1px solid var(--dk-line); border-radius: 999px; color: var(--dk-muted); font-size: 11px; font-weight: 800; white-space: nowrap; }
+.tw-gate[data-status="CONFIRMED"] { border-color: #34d399; color: #34d399; }
+.tw-gate[data-status="PENDING"] { border-color: #fbbf24; color: #fbbf24; }
+.tw-gate[data-status="MISSING"] { border-color: #f87171; color: #f87171; }
 
 .tw-reco { border-color: var(--tone); }
 .tw-reco-badge { display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 10px; background: color-mix(in srgb, var(--tone) 18%, transparent); color: var(--tone); font-size: 26px; font-weight: 900; }

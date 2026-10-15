@@ -41,13 +41,15 @@ test("the criteria tab trades 2023 lead time against review episodes in other fl
   await expect(result).toContainText("현재 규칙");
   await expect(result).toContainText("05:50");
   await expect(result).toContainText("157분 전");
-  await expect(result).toContainText("다른 홍수기에는 권고가 없었습니다");
+  await expect(result).toContainText("다른 시기에는 권고가 없었습니다");
 
   await page.getByRole("group", { name: "계획홍수위 도달 예상 시간" }).getByRole("button", { name: /^120분/ }).click();
   await expect(result).toContainText("04:40");
   await expect(result).toContainText("227분 전");
   await expect(result).toContainText("2025.07.17");
   await expect(page.locator('[aria-label="연도별 권고"]')).toContainText("검증 사건(오송)");
+  await expect(page.locator('[aria-label="연도별 권고"]')).toContainText("연중 10분 수위");
+  await expect(page.locator('[aria-label="연도별 권고"]')).toContainText("연구 격리 2023-05-16 01:00~12:00(67개 값)");
 
   await page.locator('[aria-label="기준 비교표"] tr', { hasText: "계획홍수위 도달만" }).click();
   await expect(result).toContainText("06:50");

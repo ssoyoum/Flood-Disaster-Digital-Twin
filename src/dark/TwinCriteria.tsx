@@ -5,7 +5,7 @@ import type { CriteriaFloor, TwinCriteriaReview } from "../types";
 
 /*
  * 통제 기준 검토 탭.
- * 같은 규칙을 2019~2026년 홍수기 10분 수위 전체에 적용해, 2023년 사건에서 얻는 선행 시간과
+ * 같은 규칙을 2019~2026년 연중 10분 수위 전체에 적용해, 2023년 사건에서 얻는 선행 시간과
  * 다른 해에 생기는 통제 검토 구간(실제 침수 기록 미확인)을 함께 보여준다. 기준을 바꾸는 쪽은 담당자다.
  */
 
@@ -86,20 +86,20 @@ export default function TwinCriteria({ facilityId }: { facilityId: string }) {
                 <div><strong>{clock(review.first_review?.time)}</strong><span>2023-07-15 첫 «통제 검토» 권고</span></div>
                 <div><strong>{ahead(review.lead_minutes?.underpass_inflow)}</strong><span>지하차도 유입(08:27) 기준</span></div>
                 <div><strong>{ahead(review.lead_minutes?.official_requirement_met)}</strong><span>국무조정실 통제 요건(06:40) 기준</span></div>
-                <div className={review.other_episode_count ? "tw-kpi-cost" : ""}><strong>{review.other_episode_count}건{review.other_episode_count > 0 && <small> · {duration(review.other_review_minutes)}</small>}</strong><span>{years}년 다른 홍수기 권고 구간</span></div>
+                <div className={review.other_episode_count ? "tw-kpi-cost" : ""}><strong>{review.other_episode_count}건{review.other_episode_count > 0 && <small> · {duration(review.other_review_minutes)}</small>}</strong><span>{years}년 다른 시기 권고 구간</span></div>
               </div>
               <p className="tw-criteria-sentence">
                 이 기준이면 2023년에는 <b>{clock(review.first_review?.time)}</b>에 통제 검토를 권고해 지하차도 유입 <b>{ahead(review.lead_minutes?.underpass_inflow)}</b>이었습니다.{" "}
                 {review.other_episode_count === 0
-                  ? `${years}년 다른 홍수기에는 권고가 없었습니다.`
-                  : `대신 ${others.map((item) => `${day(item.start)} ${clock(item.start)}~${clock(item.end)}(최고 ${item.peak_water_level_m.toFixed(2)} m)`).join(", ")}에도 권고가 나왔습니다. 그때 지하차도 침수·통제 기록은 확인하지 않았습니다.`}
+                  ? `${years}년 다른 시기에는 권고가 없었습니다.`
+                  : `대신 ${others.map((item) => `${day(item.start)} ${clock(item.start)}~${clock(item.end)}(최고 ${item.peak_water_level_m.toFixed(2)} m${item.quality_review_required ? ", 자료 확인 필요" : ""})`).join(", ")}에도 권고가 나왔습니다. 그때 지하차도 침수·통제 기록은 확인하지 않았습니다.`}
               </p>
             </>
           )}
         </article>
 
         <article className="tw-card" aria-label="연도별 권고">
-          <p className="tw-eyebrow">연도별 · 홍수기(6~9월) 10분 수위 {review?.coverage.rows.toLocaleString() ?? "—"}개</p>
+          <p className="tw-eyebrow">연도별 · {review?.coverage.season === "매년 6~9월" ? "홍수기(6~9월)" : "연중"} 10분 수위 {review?.coverage.rows.toLocaleString() ?? "—"}개</p>
           {review ? (
             <table className="ub-table tw-table">
               <thead><tr><th>연도</th><th>최고 수위</th><th>최고 단계</th><th>권고 구간</th></tr></thead>
@@ -113,6 +113,13 @@ export default function TwinCriteria({ facilityId }: { facilityId: string }) {
               ))}</tbody>
             </table>
           ) : <small className="ub-note">불러오는 중…</small>}
+          {review && (
+            <small className="ub-note">
+              자료 점검: 10분 칸 {review.quality.expected_slots.toLocaleString()}개 중 빠진 칸 {review.quality.missing_slots.toLocaleString()}개({review.quality.gap_count}곳),
+              10분 사이 {review.quality.step_review_threshold_m} m 이상 변화 {review.quality.step_review_count}건. 지우지 않고 표시만 하며, 권고 구간과 겹친 표시는 {review.quality.episodes_with_flags}건입니다.
+              {review.quality.quarantines.map((item) => ` 연구 격리 ${item.start.slice(0, 10)} ${item.start.slice(11, 16)}~${item.end.slice(11, 16)}(${item.readings_excluded}개 값)는 규칙에서 뺐습니다(원출처 확인 전).`).join("")}
+            </small>
+          )}
         </article>
       </section>
 
