@@ -1,0 +1,1187 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FloodOps | 하천 접점 시설 감시 보드</title>
+<!--
+  FloodOps · 하천 접점 시설 감시 보드(#watch) — 통합용 단일 파일 (시안 v4 + KPI 접기·범례 가운데)
+
+  ▣ 충돌 방지 규칙
+    - 컴포넌트 전체가 <div class="wx" id="wx-root"> 하나 안에 있다.
+    - 클래스·id·CSS 변수·@keyframes·SVG id 는 전부 wx- 접두사 (앱의 dk- · ub- · tw- · wb- · fo- 와 겹치지 않음).
+    - :root, html, body, *, button 같은 전역 규칙이 없다. 버튼·입력 초기화는 :where(.wx) 로 우선순위 0.
+    - MapLibre 기본 클래스(.maplibregl-*) 덮어쓰기는 모두 .wx 아래로 한정 → 앱의 다른 지도(#twin, 사건 콘솔)에 영향 없음.
+    - 스크립트는 즉시실행함수(IIFE). 전역 변수 없음. DOM 조회는 루트 안으로 한정.
+    - 문서 전체에 거는 리스너는 두 개(바깥 클릭 → 지역 판 닫기, Esc → 지역 판/드로어 닫기)뿐이고,
+      둘 다 이 컴포넌트가 무언가 열려 있을 때만 동작한다. root.wx.destroy() 로 제거된다.
+    - 위치는 화면이 아니라 루트 기준(position: absolute). 부모가 높이를 주면 그 안을 채운다(최소 600px).
+
+  ▣ 의존성
+    - maplibre-gl 4.7.1 (저장소 package.json 의 maplibre-gl ^4.7.1 과 같은 메이저)
+    - Noto Sans KR (저장소 dark.css 와 같은 글꼴)
+
+  ▣ 설정 (루트 data- 속성)
+    data-api        백엔드 주소. 기본 http://127.0.0.1:8033 (로컬 개발 계약 포트)
+    data-at         기준 시각. 빈 값이면 «지금(실시간)», 예: 2023-07-15T06:00:00
+    data-twin-href  운영 시설 링크. 기본 #twin (앱 라우트)
+
+  ▣ 읽는 API
+    GET  /api/watch/facility-risk?at=&rain_mode=live&limit=2000
+    GET  /api/agent/examples?event_id=osong-2023&board=watch
+    POST /api/agent/ask   { event_id, message, history, board: "watch", observation_at }
+
+  ▣ 바깥과 주고받는 것
+    root.wx.reload()         다시 불러오기
+    root.wx.destroy()        지도·리스너 정리 (React 언마운트 때 호출)
+    root 에 "wx:mode" 이벤트  { mode, stations, rain }  → 수위·강우 모드를 앱 상단 바에 표시
+
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+
+<!-- FloodOps 감시 보드 헤더와 전체 화면 레이아웃 -->
+<style id="demo-style">
+html, body { margin: 0; height: 100%; background: #05080f; color: #e8eef7; font-family: "Noto Sans KR", system-ui, sans-serif; overflow: hidden; word-break: keep-all; }
+body { display: flex; flex-direction: column; }
+.demo-top { position: relative; height: 56px; flex: 0 0 56px; display: flex; align-items: center; gap: 18px; padding: 0 18px; box-sizing: border-box; background: #05080f; border-bottom: 1px solid rgba(148,163,184,.16); }
+.demo-brand b { font-size: 16px; } .demo-brand small { display: block; color: #95a4ba; font-size: 12px; }
+.demo-menu { position: relative; z-index: 100; flex: none; color: #e8eef7; }
+.demo-menu > summary { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid #34445e; border-radius: 8px; background: #111a2b; color: #c7d3e2; cursor: pointer; list-style: none; font-size: 12px; font-weight: 750; white-space: nowrap; }
+.demo-menu > summary::-webkit-details-marker { display: none; }
+.demo-menu > summary:hover, .demo-menu[open] > summary { border-color: #38bdf8; color: #e8eef7; }
+.demo-menu nav { position: absolute; top: calc(100% + 7px); left: 0; display: grid; width: 208px; padding: 6px; border: 1px solid #34445e; border-radius: 10px; background: #111a2b; box-shadow: 0 16px 36px #0009; }
+.demo-menu nav a { padding: 9px 10px; border-radius: 6px; color: #b7c5d8; text-decoration: none; font-size: 12px; font-weight: 700; }
+.demo-menu nav a:hover, .demo-menu nav a[aria-current="page"] { background: #1a2940; color: #7dd3fc; }
+.demo-top .sp { flex: 1; }
+.demo-mode { padding: 6px 12px; border: 1px solid #34d399; color: #34d399; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+.demo-mode[data-mode="replay"] { border-color: #fbbf24; color: #fbbf24; }
+.demo-rain-mode[data-mode="replay"] { border-color: #fbbf24; color: #fbbf24; }
+.demo-rain-mode[data-available="false"] { border-color: #f87171; color: #f87171; }
+.demo-stage { flex: 1; min-height: 0; height: auto; }
+@media (max-width: 760px) {
+  .demo-top { height: auto; min-height: 56px; flex: 0 0 auto; flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+  .demo-brand { flex: 1; min-width: 160px; }
+  .demo-brand small { display: none; }
+  .demo-menu { margin-left: auto; }
+  .demo-menu nav { left: auto; right: 0; }
+  .demo-top .sp { display: none; }
+  .demo-mode { padding: 5px 8px; font-size: 11px; }
+}
+</style>
+
+<style id="wx-style">
+/* v3 · 관제 문법: 지도는 늘 화면 전체, 패널은 지도 위에 뜬다. 바탕은 무채색(zinc), 색은 상태 코드에만 쓴다. */
+.wx { --wx-bg: #09090b; --wx-panel: rgba(24,24,27,.94); --wx-card: #27272a; --wx-line: rgba(255,255,255,.08); --wx-line-2: rgba(255,255,255,.14);
+  --wx-text: #f4f4f5; --wx-muted: #a1a1aa; --wx-dim: #71717a; --wx-ui: #e4e4e7;
+  --wx-red: #f87171; --wx-orange: #fb923c; --wx-amber: #fbbf24; --wx-green: #34d399; --wx-tone: #a1a1aa;
+  position: relative; width: 100%; height: 100%; min-height: 600px; overflow: hidden; isolation: isolate;
+  background: var(--wx-bg); color: var(--wx-text); font-family: "Noto Sans KR", system-ui, sans-serif; font-size: 15px; line-height: 1.45; word-break: keep-all; }
+.wx, .wx * { box-sizing: border-box; }
+:where(.wx) button, :where(.wx) input, :where(.wx) select { font: inherit; color: inherit; }
+.wx h2, .wx h3 { margin: 0; letter-spacing: normal; }
+.wx p { margin: 0; }
+.wx-eyebrow { color: var(--wx-muted); font-size: 13px; font-weight: 600; }
+@keyframes wx-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes wx-ping { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--wx-tone) 70%, transparent); } 70%, 100% { box-shadow: 0 0 0 10px transparent; } }
+@keyframes wx-spin { to { transform: rotate(360deg); } }
+.wx-float { background: var(--wx-panel); border: 1px solid var(--wx-line-2); border-radius: 14px; box-shadow: 0 18px 40px rgba(0,0,0,.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+
+/* ===== 지도: 전체 화면 ===== */
+.wx-mapcol { position: absolute; inset: 0; }
+#wx-map { position: absolute; inset: 0; }
+.wx .maplibregl-ctrl-attrib { background: rgba(9,9,11,.7) !important; color: var(--wx-dim) !important; font-size: 11px; }
+.wx .maplibregl-ctrl-attrib a { color: var(--wx-muted) !important; }
+.wx .maplibregl-ctrl-group { background: var(--wx-panel); border: 1px solid var(--wx-line-2); }
+.wx .maplibregl-ctrl-group button + button { border-top-color: var(--wx-line-2); }
+.wx .maplibregl-ctrl-icon { filter: invert(1) brightness(.85); }
+.wx .maplibregl-popup-content { background: rgba(24,24,27,.96); color: var(--wx-text); border: 1px solid var(--wx-line-2); border-radius: 8px; padding: 7px 10px; font-size: 13px; }
+.wx .maplibregl-popup-tip { display: none; }
+.wx { --wx-rgap: 14px; }
+.wx-drawer-open { --wx-rgap: 408px; }
+/* 범례: 보이는 지도 영역의 가운데 = 50% + (왼쪽 408px − 오른쪽 여백)/2 */
+.wx-legend { position: absolute; z-index: 3; left: calc(50% + (408px - var(--wx-rgap)) / 2); transform: translateX(-50%); transition: left .32s cubic-bezier(.2,.7,.2,1); bottom: 14px; display: flex; gap: 12px; padding: 6px 14px; border-radius: 999px; font-size: 12px; color: var(--wx-muted); white-space: nowrap; }
+.wx-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+.wx-legend i.wx-ring { background: transparent; border: 1.5px solid #a1a1aa; }
+.wx-map-layer { position: absolute; z-index: 4; top: 64px; right: 14px; padding: 8px 12px; border: 1px solid var(--wx-line-2); border-radius: 9px; background: var(--wx-panel); color: var(--wx-text); box-shadow: 0 18px 40px rgba(0,0,0,.45); cursor: pointer; font-size: 12px; font-weight: 750; }
+.wx-map-layer:hover, .wx-map-layer[aria-pressed="true"] { border-color: #38bdf8; color: #7dd3fc; background: rgba(8,47,73,.9); }
+.wx-fmk { display: flex; align-items: center; gap: 8px; pointer-events: none; }
+.wx-fmk .wx-dot { width: 16px; height: 16px; border-radius: 50%; background: var(--wx-tone); border: 2.5px solid #fff; animation: wx-ping 1.8s infinite; }
+.wx-fmk .wx-tip { padding: 6px 10px; border-radius: 8px; background: rgba(24,24,27,.95); border: 1px solid var(--wx-line-2); font-size: 13px; line-height: 1.35; white-space: nowrap; }
+.wx-fmk .wx-tip b { display: block; font-size: 14px; } .wx-fmk .wx-tip span { color: var(--wx-muted); } .wx-fmk .wx-tip em { font-style: normal; font-weight: 800; color: var(--wx-tone); }
+
+/* ===== 왼쪽: 실시간 위험 순위 (380px 고정, 지도 위) ===== */
+.wx-list { position: absolute; z-index: 10; top: 14px; left: 14px; max-height: calc(100% - 28px); width: 380px; display: flex; flex-direction: column; min-height: 0; }
+.wx-lhead { padding: 14px 16px 10px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--wx-line); }
+.wx-title { display: flex; align-items: center; gap: 8px; }
+.wx-title h2 { font-size: 17px; font-weight: 800; }
+.wx-live { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; font-size: 12px; font-weight: 700; color: var(--wx-muted); }
+.wx-live i { width: 7px; height: 7px; border-radius: 50%; background: var(--wx-amber); }
+.wx-live.wx-is-live i { background: var(--wx-green); box-shadow: 0 0 0 3px rgba(52,211,153,.2); }
+.wx-status { font-size: 13px; color: var(--wx-muted); font-variant-numeric: tabular-nums; }
+.wx-status b { color: var(--wx-text); font-weight: 700; }
+.wx-ctrl { display: flex; gap: 6px; }
+.wx-rbtn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--wx-line-2); background: rgba(255,255,255,.04); cursor: pointer; font-size: 14px; font-weight: 700; }
+.wx-rbtn:hover, .wx-rbtn[aria-expanded="true"] { border-color: var(--wx-ui); background: rgba(255,255,255,.08); }
+.wx-rbtn small { font-size: 12px; font-weight: 500; color: var(--wx-muted); }
+.wx-caret { font-size: 10px; color: var(--wx-muted); }
+.wx-time, .wx-sort { appearance: none; padding: 6px 26px 6px 10px; border-radius: 8px; border: 1px solid var(--wx-line-2); background-color: rgba(255,255,255,.04); font-size: 13px; font-weight: 600; cursor: pointer; min-width: 0;
+  background-image: linear-gradient(45deg, transparent 50%, #a1a1aa 50%), linear-gradient(135deg, #a1a1aa 50%, transparent 50%); background-position: calc(100% - 13px) 55%, calc(100% - 8px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+.wx-time { flex: 1; }
+.wx-time option, .wx-sort option { background: #18181b; }
+/* 단계 칩: 누적, 누르면 필터. 한 줄 */
+.wx-sumcap { font-size: 11px; color: var(--wx-dim); margin-bottom: -6px; }
+.wx-sum { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.wx-sum button { display: flex; flex-direction: column; align-items: flex-start; gap: 0; padding: 5px 9px 6px; border-radius: 8px; border: 1px solid transparent; background: rgba(255,255,255,.04); cursor: pointer; text-align: left; min-width: 0; }
+.wx-sum strong { font-size: 20px; line-height: 1.15; font-weight: 800; color: var(--wx-c); font-variant-numeric: tabular-nums; }
+.wx-sum span { font-size: 12px; color: var(--wx-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wx-sum button.wx-zero strong { color: #52525b; }
+.wx-sum button:hover { background: rgba(255,255,255,.08); }
+.wx-sum button.wx-on { border-color: var(--wx-c); background: color-mix(in srgb, var(--wx-c) 12%, transparent); }
+.wx-tools { display: flex; gap: 6px; align-items: center; }
+.wx-search { flex: 1; min-width: 0; position: relative; }
+.wx-search input { width: 100%; padding: 6px 10px 6px 28px; border-radius: 8px; border: 1px solid var(--wx-line-2); background: rgba(255,255,255,.04); font-size: 13px; }
+.wx-search input:focus { outline: none; border-color: var(--wx-ui); }
+.wx-search svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); }
+.wx-togbtn { padding: 6px 9px; border-radius: 8px; border: 1px solid var(--wx-line-2); background: rgba(255,255,255,.04); font-size: 12px; font-weight: 700; color: var(--wx-muted); cursor: pointer; white-space: nowrap; }
+.wx-togbtn[aria-pressed="true"] { border-color: var(--wx-green); color: var(--wx-green); background: rgba(52,211,153,.1); }
+.wx-meta { display: flex; gap: 12px; font-size: 12px; color: var(--wx-dim); }
+.wx-meta b { color: var(--wx-muted); font-variant-numeric: tabular-nums; }
+/* 목록 */
+.wx-cols { display: grid; grid-template-columns: 22px minmax(0, 1fr) 74px 58px; gap: 8px; padding: 7px 16px 5px; font-size: 11px; color: var(--wx-dim); font-weight: 700; border-bottom: 1px solid var(--wx-line); }
+.wx-cols span:nth-child(n+3) { text-align: right; }
+.wx-body { flex: 1; overflow: auto; min-height: 0; scrollbar-width: thin; scrollbar-color: #3f3f46 transparent; }
+.wx-sec { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 7px; padding: 5px 16px; background: #1c1c1f; border-bottom: 1px solid var(--wx-line); font-size: 12px; font-weight: 800; color: var(--wx-c); }
+.wx-sec i { width: 7px; height: 7px; border-radius: 50%; background: var(--wx-c); }
+.wx-sec small { color: var(--wx-dim); font-weight: 600; }
+.wx-row { position: relative; display: grid; grid-template-columns: 22px minmax(0, 1fr) 74px 58px; gap: 8px; align-items: center; width: 100%; padding: 8px 16px; border: 0; border-bottom: 1px solid rgba(255,255,255,.04); background: transparent; cursor: pointer; text-align: left; animation: wx-in .25s ease both; }
+.wx-row::before { content: ""; position: absolute; left: 0; top: 7px; bottom: 7px; width: 3px; border-radius: 0 2px 2px 0; background: var(--wx-c); }
+.wx-row:hover { background: rgba(255,255,255,.05); }
+.wx-row.wx-sel { background: rgba(255,255,255,.09); }
+.wx-row:focus-visible { outline: 1px solid var(--wx-ui); outline-offset: -1px; }
+.wx-rk { font-size: 12px; font-weight: 700; color: var(--wx-dim); text-align: center; font-variant-numeric: tabular-nums; }
+.wx-nm { min-width: 0; }
+.wx-nm b { display: block; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wx-nm small { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--wx-muted); white-space: nowrap; overflow: hidden; font-variant-numeric: tabular-nums; }
+.wx-fac { padding: 0 5px; border-radius: 4px; background: rgba(255,255,255,.08); color: var(--wx-muted); font-size: 11px; font-weight: 700; }
+.wx-fac.wx-op { background: rgba(52,211,153,.14); color: var(--wx-green); }
+.wx-badge { padding: 0 5px; border-radius: 4px; font-size: 11px; font-weight: 800; }
+.wx-badge.wx-up { background: rgba(248,113,113,.16); color: var(--wx-red); }
+.wx-badge.wx-fast { background: rgba(255,255,255,.08); color: var(--wx-ui); }
+.wx-q { color: var(--wx-amber); font-size: 11px; font-weight: 700; }
+.wx-lv { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; line-height: 1.25; }
+.wx-lv b { display: block; font-size: 14px; font-weight: 700; }
+.wx-lv b small { font-size: 11px; color: var(--wx-muted); font-weight: 500; margin-left: 1px; }
+.wx-lv span { display: block; font-size: 11px; color: var(--wx-muted); }
+.wx-lv span.wx-over { color: var(--wx-red); font-weight: 700; }
+.wx-eta { min-width: 0; max-width: 76px; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wx-eta strong { font-size: 17px; font-weight: 800; }
+.wx-eta small { font-size: 11px; color: var(--wx-muted); margin-left: 1px; }
+.wx-eta.wx-hit strong { color: var(--wx-red); }
+.wx-eta.wx-soon strong { color: var(--wx-orange); }
+.wx-eta.wx-none strong { font-size: 12px; color: var(--wx-dim); font-weight: 600; }
+.wx-empty { padding: 24px 16px; text-align: center; color: var(--wx-muted); font-size: 13px; }
+.wx-empty b { display: block; font-size: 15px; color: var(--wx-text); margin-bottom: 4px; }
+.wx-lfoot { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-top: 1px solid var(--wx-line); font-size: 12px; color: var(--wx-dim); }
+.wx-lfoot button { margin-left: auto; padding: 4px 9px; border-radius: 6px; border: 1px solid var(--wx-line-2); background: transparent; color: var(--wx-muted); font-size: 12px; font-weight: 700; cursor: pointer; }
+.wx-lfoot button:hover { color: var(--wx-text); border-color: var(--wx-ui); }
+/* 판정 기준 i */
+.wx-info { position: relative; }
+.wx-info-btn { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--wx-line-2); background: transparent; color: var(--wx-muted); font-size: 12px; font-weight: 800; cursor: pointer; }
+.wx-info-btn:hover, .wx-info.wx-pinned .wx-info-btn { background: var(--wx-ui); color: #18181b; }
+.wx-info-pop { position: absolute; z-index: 30; left: 0; top: calc(100% + 8px); width: 330px; padding: 12px 34px 12px 12px; border-radius: 10px; background: #18181b; border: 1px solid var(--wx-line-2);
+  font-size: 13px; color: #d4d4d8; box-shadow: 0 12px 30px rgba(0,0,0,.5); opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity .2s, transform .2s; }
+.wx-info:hover .wx-info-pop, .wx-info.wx-pinned .wx-info-pop { opacity: 1; transform: none; pointer-events: auto; }
+.wx-info.wx-closed:not(.wx-pinned) .wx-info-pop { opacity: 0; pointer-events: none; }
+.wx-info-pop b { display: block; margin-bottom: 4px; color: var(--wx-text); }
+.wx-info-pop ul { margin: 0; padding-left: 16px; } .wx-info-pop li { margin-bottom: 4px; }
+.wx-info-x { position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; border-radius: 6px; border: 0; background: rgba(255,255,255,.08); color: var(--wx-muted); cursor: pointer; }
+/* 지역 판 */
+.wx-rpop { position: absolute; z-index: 40; left: calc(100% + 10px); top: 70px; width: 460px; max-height: calc(100% - 90px); overflow: auto; padding: 12px; border-radius: 12px;
+  background: #18181b; border: 1px solid var(--wx-line-2); box-shadow: 0 16px 40px rgba(0,0,0,.55); opacity: 0; transform: translateX(-6px); pointer-events: none; transition: opacity .2s, transform .2s; }
+.wx-rpop.wx-open { opacity: 1; transform: none; pointer-events: auto; }
+.wx-rpop-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.wx-rpop-head b { flex: 1; font-size: 14px; }
+.wx-seg { display: inline-flex; padding: 2px; border-radius: 7px; background: rgba(255,255,255,.06); }
+.wx-seg button { padding: 4px 9px; border: 0; border-radius: 5px; background: transparent; color: var(--wx-muted); font-size: 12px; font-weight: 700; cursor: pointer; }
+.wx-seg button.wx-on { background: rgba(255,255,255,.14); color: var(--wx-text); }
+.wx-rgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+.wx-rtile { display: flex; flex-direction: column; gap: 5px; padding: 8px 9px 9px; border-radius: 8px; border: 1px solid var(--wx-line); background: rgba(255,255,255,.03); cursor: pointer; text-align: left; }
+.wx-rtile:hover { border-color: var(--wx-line-2); background: rgba(255,255,255,.07); }
+.wx-rtile.wx-on { border-color: var(--wx-ui); background: rgba(255,255,255,.1); }
+.wx-rtile.wx-all { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 12px; }
+.wx-rtile.wx-all .wx-mini { flex: 1; }
+.wx-rtile:disabled { cursor: default; opacity: .35; }
+.wx-rt-top { display: flex; align-items: baseline; gap: 6px; }
+.wx-rt-top b { font-size: 14px; } .wx-rt-top small { margin-left: auto; font-size: 12px; color: var(--wx-muted); }
+.wx-mini { display: flex; height: 5px; border-radius: 3px; overflow: hidden; background: rgba(255,255,255,.06); }
+.wx-mini span { height: 100%; }
+.wx-rt-flag { width: max-content; max-width: 100%; padding: 0 5px; border-radius: 4px; background: color-mix(in srgb, var(--wx-c) 20%, transparent); color: var(--wx-c); font-size: 11px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wx-rt-calm { font-size: 11px; color: var(--wx-dim); }
+.wx-rpop-foot { margin-top: 8px; font-size: 11px; color: var(--wx-dim); }
+
+/* ===== 오른쪽: 관측소를 누르면 열리는 드로어 ===== */
+.wx-right { position: absolute; z-index: 11; top: 14px; right: 14px; bottom: 14px; width: 380px; display: flex; flex-direction: column; min-height: 0;
+  transform: translateX(calc(100% + 24px)); opacity: 0; pointer-events: none; transition: transform .32s cubic-bezier(.2,.7,.2,1), opacity .2s; }
+.wx-right.wx-open { transform: none; opacity: 1; pointer-events: auto; }
+.wx-rtabs { display: flex; align-items: center; gap: 2px; padding: 6px 8px 0 12px; border-bottom: 1px solid var(--wx-line); }
+.wx-rtab { padding: 9px 10px; border: 0; background: transparent; color: var(--wx-dim); font-size: 13px; font-weight: 700; border-bottom: 2px solid transparent; cursor: pointer; }
+.wx-rtab.wx-on { color: var(--wx-text); border-color: var(--wx-ui); }
+.wx-close { margin-left: auto; width: 28px; height: 28px; border-radius: 7px; border: 0; background: transparent; color: var(--wx-muted); font-size: 16px; cursor: pointer; }
+.wx-close:hover { background: rgba(255,255,255,.08); color: var(--wx-text); }
+.wx-pane { flex: 1; overflow: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; scrollbar-width: thin; scrollbar-color: #3f3f46 transparent; }
+.wx-pane[hidden] { display: none; }
+.wx-card { padding: 12px 14px; border-radius: 10px; background: rgba(255,255,255,.03); border: 1px solid var(--wx-line); }
+.wx-st-head { display: flex; align-items: center; gap: 8px; }
+.wx-st-head h3 { font-size: 18px; font-weight: 800; }
+.wx-bubble { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 6px; background: color-mix(in srgb, var(--wx-tone) 18%, transparent); color: var(--wx-tone); font-size: 13px; font-weight: 800; white-space: nowrap; }
+.wx-bubble i { width: 7px; height: 7px; border-radius: 50%; background: var(--wx-tone); }
+.wx-st-sub { margin-top: 3px; font-size: 12px; color: var(--wx-muted); }
+/* 값 4개: 같은 크기·같은 굵기, 색은 상태가 위험할 때만 */
+.wx-kv { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 10px; border-radius: 8px; overflow: hidden; background: var(--wx-line); }
+.wx-m { padding: 9px 10px; background: #1c1c1f; }
+.wx-m .wx-lbl { display: block; font-size: 12px; color: var(--wx-muted); }
+.wx-m strong { display: block; margin-top: 2px; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; white-space: nowrap; }
+.wx-m strong small { font-size: 12px; font-weight: 500; color: var(--wx-muted); margin-left: 2px; }
+.wx-m.wx-hot strong { color: var(--wx-red); }
+.wx-quality { margin-top: 8px; padding: 6px 10px; border-radius: 6px; background: rgba(251,191,36,.12); color: var(--wx-amber); font-size: 12px; font-weight: 700; }
+.wx-note { margin-top: 8px; font-size: 12px; color: var(--wx-dim); }
+.wx-chart { position: relative; }
+.wx-chart-cap { display: block; margin-bottom: 4px; font-size: 12px; color: var(--wx-muted); font-weight: 600; }
+.wx-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.wx-chart .wx-ln { fill: none; stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: wx-draw .7s ease forwards; }
+.wx-chart .wx-area { opacity: 0; animation: wx-fade .5s ease .25s forwards; }
+@keyframes wx-draw { to { stroke-dashoffset: 0; } }
+@keyframes wx-fade { to { opacity: 1; } }
+.wx-faclist { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.wx-faclist li { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; align-items: baseline; padding: 8px 9px; border-radius: 8px; background: rgba(255,255,255,.04); font-size: 14px; }
+.wx-faclist li small { grid-column: 2; font-size: 12px; color: var(--wx-muted); }
+.wx-faclist a { color: inherit; text-decoration: none; }
+.wx-tier { padding: 0 7px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+.wx-tier.wx-op { background: rgba(52,211,153,.14); color: var(--wx-green); }
+.wx-tier.wx-wt { background: rgba(255,255,255,.08); color: var(--wx-muted); }
+.wx-li-op { box-shadow: inset 2px 0 0 var(--wx-green); }
+.wx-go-twin { grid-column: 2; font-size: 12px; font-weight: 700; color: var(--wx-green); }
+.wx .maplibregl-ctrl-bottom-right { transition: right .32s cubic-bezier(.2,.7,.2,1); right: 4px; bottom: 4px; }
+.wx-drawer-open .maplibregl-ctrl-bottom-right { right: 398px; }
+.wx-attr { margin-top: auto; font-size: 11px; color: var(--wx-dim); }
+/* 에이전트 열기 버튼 (드로어가 닫혀 있을 때) */
+.wx-launch { position: absolute; z-index: 10; top: 14px; right: 14px; display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--wx-ui); transition: opacity .2s; }
+.wx-launch:hover { border-color: var(--wx-ui); }
+.wx-launch svg { flex: none; }
+.wx-right.wx-open ~ .wx-launch { opacity: 0; pointer-events: none; }
+.wx-mapctl { position: absolute; z-index: 9; right: 14px; top: 64px; transition: right .32s cubic-bezier(.2,.7,.2,1); }
+.wx-right.wx-open ~ .wx-mapctl { right: 408px; }
+/* 에이전트 */
+.wx-ag-head { display: flex; align-items: center; gap: 8px; }
+.wx-ag-head h3 { flex: 1; font-size: 16px; }
+.wx-ag-badge { padding: 1px 8px; border-radius: 999px; border: 1px solid rgba(52,211,153,.5); color: var(--wx-green); font-size: 11px; font-weight: 800; }
+.wx-ag-intro { font-size: 13px; color: var(--wx-muted); }
+.wx-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.wx-chip { padding: 5px 10px; border-radius: 999px; border: 1px solid var(--wx-line-2); background: rgba(255,255,255,.03); font-size: 12px; font-weight: 700; color: #d4d4d8; cursor: pointer; }
+.wx-chip:hover:not(:disabled) { border-color: var(--wx-ui); }
+.wx-chip:disabled { opacity: .45; }
+.wx-ask { display: flex; gap: 6px; }
+.wx-ask input { flex: 1; min-width: 0; padding: 9px 11px; border-radius: 8px; border: 1px solid var(--wx-line-2); background: rgba(255,255,255,.04); font-size: 13px; }
+.wx-ask input:focus { outline: none; border-color: var(--wx-ui); }
+.wx-ask button { padding: 0 14px; border-radius: 8px; border: 0; background: var(--wx-ui); color: #18181b; font-weight: 800; cursor: pointer; }
+.wx-ask button:disabled { opacity: .45; }
+.wx-ag-status { font-size: 12px; color: var(--wx-muted); }
+.wx-ag-status.wx-busy::before { content: ""; display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 50%; border: 2px solid var(--wx-ui); border-right-color: transparent; vertical-align: -1px; animation: wx-spin .8s linear infinite; }
+.wx-turns { display: flex; flex-direction: column; gap: 8px; }
+.wx-turn { padding: 12px 14px; border-radius: 10px; background: rgba(255,255,255,.03); border: 1px solid var(--wx-line); animation: wx-in .3s ease both; }
+.wx-turn.wx-needs_data { border-color: rgba(251,191,36,.4); }
+.wx-turn.wx-unavailable { border-color: rgba(248,113,113,.4); }
+.wx-turn-q { display: block; font-size: 14px; font-weight: 700; color: var(--wx-text); margin-bottom: 6px; }
+.wx-turn-state { display: inline-block; margin-bottom: 6px; padding: 0 7px; border-radius: 5px; font-size: 11px; font-weight: 800; background: rgba(251,191,36,.15); color: var(--wx-amber); }
+.wx-answer { font-size: 14px; line-height: 1.6; white-space: pre-wrap; color: #d4d4d8; }
+.wx-cite { display: inline-block; padding: 0 4px; border-radius: 4px; background: rgba(255,255,255,.1); color: var(--wx-ui); font-size: 11px; font-weight: 800; }
+.wx-follow { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.wx-follow button { padding: 5px 10px; border-radius: 999px; border: 1px solid var(--wx-line-2); background: transparent; color: var(--wx-ui); font-size: 12px; font-weight: 600; cursor: pointer; }
+.wx-follow button:hover { border-color: var(--wx-ui); }
+.wx-toolt { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.wx-toolt em { font-style: normal; padding: 1px 7px; border-radius: 5px; background: rgba(255,255,255,.07); font-size: 11px; font-weight: 700; color: var(--wx-muted); font-family: ui-monospace, Consolas, monospace; }
+.wx-evi { margin-top: 6px; border-top: 1px solid var(--wx-line); padding-top: 6px; }
+.wx-evi summary { cursor: pointer; font-size: 12px; color: var(--wx-muted); }
+.wx-evi small { display: block; margin-top: 4px; font-size: 12px; color: var(--wx-muted); }
+.wx-evi pre { margin: 6px 0 0; max-height: 200px; overflow: auto; padding: 8px; border-radius: 6px; background: #09090b; font-size: 11px; color: #a1a1aa; }
+.wx-limit { display: block; margin-top: 6px; font-size: 12px; color: var(--wx-dim); }
+.wx-viewed { display: inline-flex; margin-top: 8px; padding: 2px 8px; border-radius: 5px; background: rgba(255,255,255,.07); color: var(--wx-ui); font-size: 11px; font-weight: 700; }
+.wx-ag-error { padding: 8px 10px; border-radius: 6px; background: rgba(248,113,113,.12); color: var(--wx-red); font-size: 12px; }
+/* ===== v4: 레퍼런스 패턴 ===== */
+/* (1) 상단 KPI 띠 — 차량 관제·교통 혼잡 대시보드의 KPI 줄: 왼쪽 얇은 색 막대 + 큰 숫자 + 단위 */
+.wx-kpiwrap { position: absolute; z-index: 9; top: 14px; left: 408px; right: var(--wx-rgap); display: flex; justify-content: center; pointer-events: none; transition: right .32s cubic-bezier(.2,.7,.2,1); }
+.wx-kpihandle { pointer-events: auto; display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--wx-muted); transition: opacity .18s, transform .18s; }
+.wx-kpihandle i { width: 7px; height: 7px; border-radius: 50%; background: #52525b; }
+.wx-kpihandle i.wx-alert { background: var(--wx-red); box-shadow: 0 0 0 3px rgba(248,113,113,.25); }
+.wx-kpihandle .wx-caret { font-size: 10px; }
+.wx-kpis { pointer-events: auto; position: absolute; top: 0; left: 0; right: 126px; /* 오른쪽 «에이전트» 버튼 자리 */ display: flex; flex-wrap: wrap; gap: 8px 0; padding: 10px 6px; overflow: hidden;
+  opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity .2s, transform .2s, visibility 0s linear .2s; }
+.wx-drawer-open .wx-kpis { right: 0; }
+.wx-kpiwrap:hover .wx-kpis, .wx-kpiwrap:focus-within .wx-kpis, .wx-kpiwrap.wx-pin .wx-kpis { opacity: 1; visibility: visible; transform: none; transition: opacity .2s, transform .2s; }
+.wx-kpiwrap:hover .wx-kpihandle, .wx-kpiwrap:focus-within .wx-kpihandle, .wx-kpiwrap.wx-pin .wx-kpihandle { opacity: 0; transform: translateY(-4px); }
+.wx-kpi { position: relative; flex: 1 1 108px; min-width: 108px; padding: 0 14px 0 16px; }
+.wx-kpi::before { content: ""; position: absolute; left: 6px; top: 3px; bottom: 3px; width: 3px; border-radius: 2px; background: var(--wx-c, #52525b); }
+.wx-kpi span { display: block; font-size: 12px; color: var(--wx-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wx-kpi strong { display: block; font-size: 22px; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wx-kpi strong small { font-size: 12px; font-weight: 500; color: var(--wx-muted); margin-left: 3px; }
+.wx-kpi.wx-hotk strong { color: var(--wx-c); }
+/* (2) 필터 탭 — 배차 큐의 All / On route / Waiting 탭: 단계 이상 누적 개수를 탭에 싣는다 */
+.wx-tabs { display: flex; gap: 0; justify-content: space-between; border-bottom: 1px solid var(--wx-line); margin: 0 -16px; padding: 0 10px; }
+.wx-tabs button { position: relative; display: inline-flex; align-items: center; gap: 5px; padding: 8px 6px 9px; border: 0; background: transparent; color: var(--wx-muted); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.wx-tabs button b { min-width: 20px; padding: 0 6px; border-radius: 999px; background: rgba(255,255,255,.08); color: var(--wx-ui); font-size: 12px; text-align: center; font-variant-numeric: tabular-nums; }
+.wx-tabs button.wx-on { color: var(--wx-text); }
+.wx-tabs button.wx-on::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: -1px; height: 2px; border-radius: 2px; background: var(--wx-c, var(--wx-ui)); }
+.wx-tabs button.wx-on b { background: color-mix(in srgb, var(--wx-c, #e4e4e7) 22%, transparent); color: var(--wx-c, var(--wx-ui)); }
+.wx-tabs button:hover { color: var(--wx-text); }
+.wx-tabs button.wx-zero b { color: #52525b; }
+/* (3) 순위 행 + 단계 게이지 — 혼잡 구간 순위의 진행 막대: 관심→계획홍수위 구간에서 지금 수위 위치 */
+.wx-cols, .wx-row { grid-template-columns: 22px minmax(0, 1fr) 76px; }
+.wx-row { align-items: start; padding: 10px 16px 11px; }
+.wx-row .wx-rk { padding-top: 2px; }
+.wx-row .wx-eta { padding-top: 0; }
+.wx-nmtop { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.wx-nmtop b { flex: 0 1 auto; min-width: 0; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wx-rise { flex: none; padding: 0 6px; border-radius: 4px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,.07); color: var(--wx-muted); font-variant-numeric: tabular-nums; }
+.wx-rise.wx-fastr { background: rgba(251,146,60,.15); color: var(--wx-orange); }
+.wx-rain { flex: none; padding: 0 6px; border-radius: 4px; font-size: 11px; font-weight: 700; background: rgba(56,189,248,.12); color: #7dd3fc; font-variant-numeric: tabular-nums; }
+.wx-gauge { position: relative; height: 6px; margin: 7px 0 5px; border-radius: 3px; overflow: hidden; }
+.wx-gauge .wx-g-dim, .wx-gauge .wx-g-on { position: absolute; inset: 0; display: flex; }
+.wx-gauge .wx-g-dim { opacity: .2; }
+.wx-gauge span { height: 100%; }
+.wx-gauge i { position: absolute; top: -1px; bottom: -1px; width: 2px; margin-left: -1px; background: #fff; box-shadow: 0 0 6px rgba(255,255,255,.8); }
+.wx-gline { display: flex; gap: 6px; font-size: 12px; color: var(--wx-muted); white-space: nowrap; overflow: hidden; font-variant-numeric: tabular-nums; }
+.wx-gline > * { flex: none; }
+.wx-gline > span:not(.wx-over) { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.wx-gline b { color: var(--wx-text); font-weight: 700; }
+.wx-gline .wx-over { color: var(--wx-red); font-weight: 700; }
+.wx-driver { display: inline-flex; align-items: center; margin-left: 5px; padding: 1px 6px; border: 1px solid rgba(125,211,252,.25); border-radius: 999px; color: #bae6fd; font-size: 10px; font-weight: 700; }
+.wx-driver[data-driver="pluvial"] { border-color: rgba(56,189,248,.35); color: #7dd3fc; }
+.wx-risk-track { display: flex; gap: 3px; margin: 5px 0 4px; }
+.wx-risk-track i { display: block; height: 4px; flex: 1; border-radius: 4px; background: rgba(148,163,184,.18); }
+.wx-risk-track i.wx-active { background: var(--wx-c); }
+.wx-why { overflow: hidden; color: var(--wx-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.wx-eta .wx-why { display: block; max-width: 76px; white-space: normal; line-height: 1.2; }
+/* (4) 지도 위 정보 카드 — 배차 지도의 선택 차량 카드: 이름·단계·핵심 값 3개 */
+.wx-fmk .wx-tip { padding: 10px 12px; border-radius: 10px; min-width: 210px; box-shadow: 0 10px 26px rgba(0,0,0,.5); }
+.wx-mc-top { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.wx-mc-top b { font-size: 14px; }
+.wx-mc-pill { padding: 0 6px; border-radius: 4px; font-size: 11px; font-weight: 800; background: color-mix(in srgb, var(--wx-tone) 20%, transparent); color: var(--wx-tone); }
+.wx-mc-grid { display: grid; grid-template-columns: repeat(3, auto); gap: 2px 14px; }
+.wx-mc-grid span { font-size: 11px; color: var(--wx-muted); }
+.wx-mc-grid strong { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.wx-mc-grid strong.wx-over { color: var(--wx-red); }
+/* (5) 드로어 지표 줄 — 교통 대시보드 오른쪽 패널: 아이콘 원 + 큰 값 + 설명 */
+.wx-crumb { font-size: 12px; color: var(--wx-dim); margin-bottom: 4px; }
+.wx-irows { margin-top: 10px; display: flex; flex-direction: column; }
+.wx-irow { display: grid; grid-template-columns: 34px 1fr; gap: 0 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--wx-line); }
+.wx-irow:last-child { border-bottom: 0; }
+.wx-ico { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.06); color: var(--wx-muted); font-size: 13px; font-weight: 800; }
+.wx-irow.wx-hot .wx-ico { background: color-mix(in srgb, var(--wx-red) 18%, transparent); color: var(--wx-red); }
+.wx-irow strong { display: block; font-size: 18px; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.wx-irow strong small { font-size: 12px; font-weight: 500; color: var(--wx-muted); margin-left: 2px; }
+.wx-irow.wx-hot strong { color: var(--wx-red); }
+.wx-irow span { font-size: 12px; color: var(--wx-muted); }
+.wx-gauge.wx-big { height: 8px; margin: 12px 0 4px; }
+.wx-gscale { position: relative; height: 14px; font-size: 10.5px; color: var(--wx-dim); }
+.wx-gscale span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.wx-factable { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 13px; }
+.wx-factable th { text-align: left; font-size: 11px; color: var(--wx-dim); font-weight: 700; padding: 0 6px 6px 0; }
+.wx-factable td { padding: 7px 6px 7px 0; border-top: 1px solid var(--wx-line); vertical-align: top; }
+.wx-factable td small { display: block; font-size: 11px; color: var(--wx-dim); }
+.wx-factable a { color: var(--wx-green); font-weight: 700; text-decoration: none; }
+/* (6) 에이전트 대화 — AI 어시스턴트 패널: 질문 말풍선(오른쪽) + 답(왼쪽) + 세로 제안 목록 */
+.wx-sugs { display: flex; flex-direction: column; gap: 4px; }
+.wx-sugs button { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 11px; border-radius: 8px; border: 1px solid var(--wx-line); background: rgba(255,255,255,.03); color: #d4d4d8; font-size: 13px; text-align: left; cursor: pointer; }
+.wx-sugs button::after { content: "›"; color: var(--wx-dim); font-size: 16px; }
+.wx-sugs button:hover:not(:disabled) { border-color: var(--wx-line-2); background: rgba(255,255,255,.06); }
+.wx-sugs button:disabled { opacity: .45; }
+.wx-sugs button b { font-weight: 700; color: var(--wx-text); margin-right: 6px; }
+.wx-thread { display: flex; flex-direction: column; gap: 10px; }
+#wx-pane-ag .wx-thread { order: 5; } #wx-pane-ag .wx-ag-error { order: 6; } #wx-pane-ag .wx-ag-status { order: 7; }
+#wx-pane-ag .wx-ask { order: 8; position: sticky; bottom: -14px; margin: auto -14px -14px; padding: 10px 14px 14px; background: linear-gradient(180deg, rgba(24,24,27,0), #18181b 30%); }
+#wx-pane-ag.wx-talking .wx-sugs, #wx-pane-ag.wx-talking .wx-ag-intro { display: none; }
+.wx-me { align-self: flex-end; max-width: 85%; padding: 8px 12px; border-radius: 12px 12px 3px 12px; background: rgba(255,255,255,.1); font-size: 14px; animation: wx-in .25s ease both; }
+.wx-ai { display: grid; grid-template-columns: 26px 1fr; gap: 8px; animation: wx-in .3s ease both; }
+.wx-av { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: rgba(52,211,153,.14); color: var(--wx-green); font-size: 11px; font-weight: 900; }
+.wx-ai-body { min-width: 0; padding: 10px 12px; border-radius: 3px 12px 12px 12px; background: rgba(255,255,255,.04); border: 1px solid var(--wx-line); }
+.wx-ai.wx-needs_data .wx-ai-body { border-color: rgba(251,191,36,.4); }
+.wx-ai.wx-unavailable .wx-ai-body { border-color: rgba(248,113,113,.4); }
+
+@media (prefers-reduced-motion: reduce) {
+  .wx-me, .wx-ai { animation: none; }
+  .wx-row, .wx-turn { animation: none; } .wx-chart .wx-ln, .wx-chart .wx-area { animation: none; stroke-dashoffset: 0; opacity: 1; }
+  .wx-fmk .wx-dot { animation: none; } .wx-right { transition: none; }
+}
+</style>
+</head>
+<body>
+<header class="demo-top">
+  <div class="demo-brand"><b>하천 접점 시설 감시 보드</b><small>FloodOps · 시설별 침수 원인에 맞춰 수위와 강우 위험을 평가합니다</small></div>
+  <details class="demo-menu">
+    <summary>화면 이동 <span aria-hidden="true">⌄</span></summary>
+    <nav aria-label="FloodOps 화면">
+      <a href="#watch" target="_top" aria-current="page">전국 감시 보드</a>
+      <a href="#twin" target="_top">운영 시설 통제 판단</a>
+      <a href="#cases" target="_top">사례 검증</a>
+      <a href="#compare" target="_top">사례 간 비교</a>
+      <a href="#intro" target="_top">FloodOps 소개</a>
+    </nav>
+  </details>
+  <div class="sp"></div>
+  <span class="demo-mode" id="demo-mode" data-mode="live">● 수위 실시간</span>
+  <span class="demo-mode demo-rain-mode" id="demo-rain-mode" data-mode="live" data-available="false">● 강우 실시간</span>
+</header>
+
+<main class="demo-stage">
+<!-- ===== 컴포넌트 시작 ===== -->
+<div class="wx" id="wx-root" data-api="" data-twin-href="#twin">
+
+  <!-- 지도: 늘 화면 전체 -->
+  <section class="wx-mapcol" aria-label="지도">
+    <div id="wx-map"></div>
+    <button class="wx-map-layer" type="button" id="wx-rain-toggle" aria-pressed="false" title="관측 강우량을 측정소 위치에 표시합니다">강우 관측소 표시</button>
+    <div class="wx-legend wx-float"><span><i style="background:#f87171"></i>심각</span><span><i style="background:#fb923c"></i>경계</span><span><i style="background:#fbbf24"></i>주의</span><span><i style="background:#60a5fa"></i>관심</span><span><i style="background:#38bdf8"></i>평상</span><span><i style="background:#52525b"></i>자료 없음</span><span><i class="wx-ring"></i>시설 위치</span></div>
+  </section>
+
+  <!-- 상단 KPI 띠 -->
+  <div class="wx-kpiwrap" id="wx-kpiwrap">
+    <button class="wx-kpihandle wx-float" type="button" id="wx-kpihandle" aria-expanded="false" aria-controls="wx-kpis" title="마우스를 올리면 현황 요약이 펼쳐집니다 · 누르면 고정"><i id="wx-kpidot"></i>현황 요약<span class="wx-caret">▼</span></button>
+    <section class="wx-kpis wx-float" id="wx-kpis" aria-label="현황 요약"></section>
+  </div>
+
+  <!-- 왼쪽: 실시간 위험 순위 -->
+  <section class="wx-list wx-float" aria-label="실시간 위험 순위">
+    <div class="wx-lhead">
+      <div class="wx-title">
+        <h2>실시간 위험 순위</h2>
+        <div class="wx-info" id="wx-info">
+          <button class="wx-info-btn" type="button" id="wx-info-btn" aria-label="판정 기준" aria-expanded="false">i</button>
+          <div class="wx-info-pop" role="dialog" aria-label="판정 기준">
+            <button class="wx-info-x" type="button" id="wx-info-x" aria-label="닫기">✕</button>
+            <b>판정 기준과 한계</b>
+            <ul id="wx-limits"></ul>
+          </div>
+        </div>
+        <span class="wx-live" id="wx-live"><i></i><span id="wx-mode">—</span></span>
+      </div>
+      <p class="wx-status" id="wx-asof">—</p>
+      <div class="wx-ctrl">
+        <button class="wx-rbtn" type="button" id="wx-rbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="wx-rpop">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2.4" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/></svg>
+          <span id="wx-rname">전국</span><small id="wx-rcount">—</small><span class="wx-caret">▼</span>
+        </button>
+        <select class="wx-time" id="wx-time" aria-label="기준 시각">
+          <option value="">지금 (실시간)</option>
+          <option value="2023-07-15T06:00:00" selected>2023.07.15 06:00 · 오송 사건</option>
+        </select>
+      </div>
+      <div class="wx-tabs" id="wx-sum" role="tablist" aria-label="단계 이상 누적 · 누르면 거르기"></div>
+      <div class="wx-tools">
+        <label class="wx-search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2.4" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="wx-q" placeholder="시설명 또는 시군 검색" aria-label="시설 검색"></label>
+        <select class="wx-sort" id="wx-sort" aria-label="정렬"><option value="risk">위험 우선</option><option value="rain">3시간 강우순</option><option value="name">시설명순</option></select>
+        <button class="wx-togbtn" type="button" id="wx-faconly" aria-pressed="false" title="하천형·내수형 시설 필터">전체 유형</button>
+      </div>
+    </div>
+    <div class="wx-cols" aria-hidden="true"><span>#</span><span>시설 · 잠김 원인과 판단 근거</span><span>단계</span></div>
+    <div class="wx-body" id="wx-body" role="list"></div>
+    <div class="wx-lfoot" id="wx-lfoot"></div>
+    <div class="wx-rpop" id="wx-rpop" role="dialog" aria-label="지역 선택">
+      <div class="wx-rpop-head"><b>지역</b><span class="wx-seg" role="group" aria-label="지역 정렬"><button type="button" class="wx-on" data-rsort="risk">위험 순</button><button type="button" data-rsort="name">가나다</button></span></div>
+      <div class="wx-rgrid" id="wx-rgrid"></div>
+      <p class="wx-rpop-foot">막대: 지역 내 시설 위험 단계 분포 · 표시 색: 지역의 가장 높은 단계 · 회색: 자료 없음</p>
+    </div>
+  </section>
+
+  <!-- 오른쪽: 관측소를 누르면 열리는 드로어 -->
+  <section class="wx-right wx-float" id="wx-drawer" aria-label="상세" aria-hidden="true">
+    <div class="wx-rtabs" role="tablist">
+      <button class="wx-rtab wx-on" type="button" role="tab" id="wx-tab-st" aria-selected="true">시설 상세</button>
+      <button class="wx-rtab" type="button" role="tab" id="wx-tab-ag" aria-selected="false">에이전트</button>
+      <button class="wx-close" type="button" id="wx-close" aria-label="상세 닫기">✕</button>
+    </div>
+    <div class="wx-pane" id="wx-pane-st" role="tabpanel">
+      <article class="wx-card" id="wx-st">
+        <p class="wx-crumb" id="wx-st-crumb">—</p>
+        <div class="wx-st-head"><h3 id="wx-st-name">—</h3><span class="wx-bubble" id="wx-st-bubble"><i></i><span id="wx-st-stage">—</span></span></div>
+        <p class="wx-st-sub" id="wx-st-sub">—</p>
+        <div id="wx-st-gauge"></div>
+        <div class="wx-irows">
+          <div class="wx-irow" id="wx-i-rank"><span class="wx-ico">#</span><div><strong id="wx-v-rank">—</strong><span id="wx-l-rank">위험 순위</span></div></div>
+          <div class="wx-irow" id="wx-i-margin"><span class="wx-ico">▲</span><div><strong id="wx-v-margin">—</strong><span id="wx-l-margin">계획홍수위까지 여유</span></div></div>
+          <div class="wx-irow" id="wx-i-rate"><span class="wx-ico">↗</span><div><strong id="wx-v-rate">—</strong><span id="wx-l-rate">상승 속도</span></div></div>
+          <div class="wx-irow" id="wx-i-eta"><span class="wx-ico">◷</span><div><strong id="wx-v-eta">—</strong><span>현재 속도로 계획홍수위까지 · 예보 아님</span></div></div>
+          <div class="wx-irow" id="wx-i-rain"><span class="wx-ico">☂</span><div><strong id="wx-v-rain">—</strong><span id="wx-l-rain">주변 실시간 강우</span></div></div>
+        </div>
+        <p class="wx-quality" id="wx-quality" hidden></p>
+      </article>
+       <article class="wx-card wx-chart">
+        <span class="wx-chart-cap" id="wx-chart-cap">판정 기준</span>
+        <svg id="wx-chart" viewBox="0 0 316 196" role="img" aria-label="최근 수위 그래프"></svg>
+      </article>
+       <article class="wx-card" aria-label="시설 판정 근거">
+        <span class="wx-chart-cap" id="wx-fac-cap">시설 판정 근거</span>
+        <div id="wx-fac-list"></div>
+      </article>
+       <p class="wx-attr">Tiles © Esri · 수위·강우 © 한강홍수통제소 OpenAPI · 특보 기준량 © 기상청 · 시설 © 국토교통부 · OSM</p>
+    </div>
+    <div class="wx-pane" id="wx-pane-ag" role="tabpanel" hidden>
+      <div class="wx-ag-head"><h3>보드 운영 에이전트</h3><span class="wx-ag-badge">등록 도구</span></div>
+      <p class="wx-ag-intro">수치는 서버 도구가 계산하고 AI는 설명만 합니다. 답에 지역·시설이 있으면 목록과 지도가 따라갑니다.</p>
+      <div class="wx-sugs" id="wx-ag-chips" aria-label="추천 질문"></div>
+      <form class="wx-ask" id="wx-ag-form"><input type="text" id="wx-ag-input" maxlength="1000" placeholder="예: 충북 보여줘 · 가장 위험한 곳 5곳" aria-label="질문"><button type="submit" id="wx-ag-send">질문</button></form>
+      <small class="wx-ag-status" id="wx-ag-status" aria-live="polite">지역 이동, 우선순위, 변화 요약, 상황 보고를 물어보세요.</small>
+      <p class="wx-ag-error" id="wx-ag-error" hidden></p>
+      <div class="wx-thread" id="wx-turns"></div>
+    </div>
+  </section>
+
+  <button class="wx-launch wx-float" type="button" id="wx-launch"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e4e4e7" stroke-width="2.2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>에이전트</button>
+</div>
+<!-- ===== 컴포넌트 끝 ===== -->
+</main>
+
+<script>
+(() => {
+  const root = document.getElementById("wx-root");
+  const params = new URLSearchParams(window.location.search);
+  const API = params.has("api") ? params.get("api") : root.dataset.api || "http://127.0.0.1:8033";
+  const $ = (id) => root.querySelector(`#${id}`);
+  const get = (path) => fetch(API + path).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
+  const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  const COLOR = { unrated: "#52525b", normal: "#38bdf8", attention: "#60a5fa", advisory: "#fbbf24", warning: "#fb923c", planned_flood: "#f87171" };
+  const KO = { unrated: "기준 없음", normal: "정상", attention: "관심", advisory: "주의보", warning: "경보", planned_flood: "계획홍수위" };
+  const ORDER = ["unrated", "normal", "attention", "advisory", "warning", "planned_flood"];
+  const WATCH = ["planned_flood", "warning", "advisory", "attention"];
+  const REGION_CENTER = { 서울: [126.98, 37.56], 부산: [129.05, 35.18], 대구: [128.6, 35.87], 인천: [126.7, 37.46], 광주: [126.85, 35.16], 대전: [127.38, 36.35], 울산: [129.31, 35.54], 세종: [127.29, 36.48], 경기: [127.2, 37.45], 강원: [128.3, 37.6], 충북: [127.7, 36.75], 충남: [126.9, 36.5], 전북: [127.1, 35.75], 전남: [126.9, 34.85], 경북: [128.75, 36.4], 경남: [128.3, 35.35], 제주: [126.55, 33.4] };
+
+  const TWIN_HREF = root.dataset.twinHref || "#twin";
+  const st = { at: params.get("at") ?? root.dataset.at ?? "", overview: null, changes: null, region: params.get("region") ?? "", minStage: params.get("stage") || null, q: "", sort: "risk", facOnly: false, driver: params.get("driver") || "all", showCalm: true, selected: params.get("facility") || params.get("station") || null, rsort: "risk", rainLayer: false };
+  let map = null, marker = null, hoverPop = null, stSeq = 0, prevStage = null, liveRefresh = null;
+  const rank = (r) => ORDER.indexOf(r.stage ?? "unrated");
+  const clock = (iso) => (iso ? `${iso.slice(5, 7)}.${iso.slice(8, 10)} ${iso.slice(11, 16)}` : "—");
+
+  /* ---------------- 목록 ---------------- */
+  function base() { return (st.overview?.stations ?? []).filter((r) => (!st.region || r.region === st.region)); }
+  function filtered() {
+    const q = st.q.trim().toLowerCase();
+    return base().filter((r) => (st.minStage === null || rank(r) >= ORDER.indexOf(st.minStage))
+      && (!q || `${r.name} ${r.short_name ?? ""} ${r.address ?? ""}`.toLowerCase().includes(q))
+      && (!st.facOnly || r.facilities.length));
+  }
+  const hit = (r) => (r.margin_to_planned_flood_m ?? 1) <= 0 || r.minutes_to_planned_flood === 0;
+  const sorters = {
+    eta: (a, b) => (hit(b) - hit(a)) || ((a.minutes_to_planned_flood ?? 1e9) - (b.minutes_to_planned_flood ?? 1e9)) || ((b.rate_m_per_10min ?? -9) - (a.rate_m_per_10min ?? -9)),
+    rate: (a, b) => ((b.rate_m_per_10min ?? -9) - (a.rate_m_per_10min ?? -9)),
+    margin: (a, b) => ((a.margin_to_planned_flood_m ?? 1e9) - (b.margin_to_planned_flood_m ?? 1e9)),
+  };
+  function renderSummary() {
+    const rows = base(); const by = Object.fromEntries(ORDER.map((k) => [k, 0]));
+    rows.forEach((r) => { by[r.stage ?? "unrated"] += 1; });
+    const atLeast = (s) => ORDER.slice(ORDER.indexOf(s)).reduce((a, k) => a + by[k], 0);
+    // 탭: 관심 이상(=목록 전체) · 주의보 이상 · 경보 이상 · 계획홍수위 — 누적
+    const tabs = [[null, "관심 이상", atLeast("attention"), "#e4e4e7"], ["advisory", "주의보 이상", atLeast("advisory"), COLOR.advisory], ["warning", "경보 이상", atLeast("warning"), COLOR.warning], ["planned_flood", "계획홍수위", atLeast("planned_flood"), COLOR.planned_flood]];
+    const cur = st.minStage;
+    $("wx-sum").innerHTML = tabs.map(([k, l, n, c]) => `<button type="button" role="tab" class="${cur === k ? "wx-on" : ""}${n ? "" : " wx-zero"}" data-s="${k ?? ""}" style="--wx-c:${c}" aria-selected="${cur === k}">${l}<b>${n}</b></button>`).join("");
+    $("wx-sum").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { st.minStage = b.dataset.s || null; renderAll(); notifyView(); }));
+    // 상단 KPI 띠
+    const ups = new Set((st.changes?.stage_up ?? []).map((i) => i.code));
+    const hitN = rows.filter(hit).length, rising = rows.filter((r) => (r.rate_m_per_10min ?? 0) >= 0.02).length, upN = rows.filter((r) => ups.has(r.code)).length;
+    const facs = rows.reduce((a, r) => a + r.facilities.length, 0), ops = rows.reduce((a, r) => a + r.facilities.filter((f) => f.tier === "operational").length, 0);
+    const rain = st.overview?.rain;
+    const kpi = (label, val, unit, c, hot) => `<div class="wx-kpi${hot ? " wx-hotk" : ""}" style="--wx-c:${c}"><span>${label}</span><strong>${val}<small>${unit}</small></strong></div>`;
+    $("wx-kpidot").classList.toggle("wx-alert", hitN > 0 || upN > 0);
+    $("wx-kpis").innerHTML = kpi(`관측소 · ${esc(st.region || "전국")}`, rows.length, "곳", "#71717a")
+      + kpi("계획홍수위 도달", hitN, "곳", COLOR.planned_flood, hitN > 0)
+      + kpi("주의보 이상", atLeast("advisory"), "곳", COLOR.advisory, atLeast("advisory") > 0)
+      + kpi("상승 중", rising, "곳", "#71717a")
+      + kpi("60분 단계 상승", upN, "곳", COLOR.warning, upN > 0)
+      + kpi("연결 · 운영 시설", `${facs}<small>곳 · </small>${ops}`, "", "#34d399")
+      + kpi("실시간 강우 관측", rain?.gauges_reporting ?? 0, `/${rain?.gauges_total ?? 0}곳`, "#38bdf8")
+      + kpi("비 내리는 관측소", rain?.raining ?? 0, `곳 · 강한 비 ${rain?.heavy_or_above ?? 0}`, "#0ea5e9", (rain?.heavy_or_above ?? 0) > 0);
+  }
+  // 관심 → 계획홍수위 구간 게이지: 단계별 색 구간(흐리게) 위에 지금 수위까지 밝게, 흰 선이 지금 수위
+  function gauge(level, lv, big = false) {
+    if (level === null || level === undefined || !lv?.planned_flood) return "";
+    const att = lv.attention ?? lv.advisory ?? lv.planned_flood * .6, span = Math.max(.5, lv.planned_flood - att);
+    const lo = Math.min(att - span * .25, level), hi = Math.max(lv.planned_flood + span * .2, level);
+    const pctOf = (v) => Math.max(0, Math.min(100, ((v - lo) / (hi - lo)) * 100));
+    const cuts = [[lo, "normal"], [att, "attention"], [lv.advisory ?? att, "advisory"], [lv.warning ?? lv.advisory ?? att, "warning"], [lv.planned_flood, "planned_flood"]];
+    const segs = cuts.map(([v, k], i) => { const end = i + 1 < cuts.length ? cuts[i + 1][0] : hi; return `<span style="width:${Math.max(0, pctOf(end) - pctOf(v))}%;background:${COLOR[k]}"></span>`; }).join("");
+    const now = pctOf(level);
+    const scale = big ? `<div class="wx-gscale">${[["관심", att], ["주의보", lv.advisory], ["경보", lv.warning], ["계획", lv.planned_flood]].filter(([, v]) => v !== undefined).map(([l, v]) => `<span style="left:${pctOf(v)}%">${l} ${v}</span>`).join("")}</div>` : "";
+    return `<div class="wx-gauge${big ? " wx-big" : ""}" role="img" aria-label="관심부터 계획홍수위까지 가운데 지금 수위 위치"><div class="wx-g-dim">${segs}</div><div class="wx-g-on" style="clip-path:inset(0 ${100 - now}% 0 0)">${segs}</div><i style="left:${now}%"></i></div>${scale}`;
+  }
+  function rowHtml(r, i, up, fast) {
+    const m = r.margin_to_planned_flood_m, rate = r.rate_m_per_10min, eta = r.minutes_to_planned_flood;
+    const ops = r.facilities.filter((f) => f.tier === "operational").length, wts = r.facilities.length - ops;
+    const facs = (ops ? `<span class="wx-fac wx-op" title="운영 시설 ${ops}">운영 ${ops}</span>` : "") + (wts ? `<span class="wx-fac" title="감시 시설 ${wts} · 대표성 미검증">시설 ${wts}</span>` : "");
+    const upb = up ? `<span class="wx-badge wx-up" title="최근 60분 사이 단계가 올랐습니다">▲ ${KO[up.to]}</span>` : "";
+    const rise = rate === null || rate === undefined ? "" : `<span class="wx-rise${r.rise_class === "fast" || rate >= 0.1 ? " wx-fastr" : ""}" title="최근 ${r.rate_window_min ?? ""}분 상승 속도">${rate > 0 ? "↑" : rate < 0 ? "↓" : "→"}${Math.abs(rate).toFixed(3)}</span>`;
+    const rain = r.rain_nearby;
+    const rainTag = rain ? `<span class="wx-rain" title="${esc(`${rain.short_name ?? rain.name} · ${rain.distance_km} km · ${rain.time?.slice(0, 16).replace("T", " ") ?? "관측 시각 없음"}`)}">☂ ${rain.intensity_mm_h === null ? "—" : rain.intensity_mm_h.toFixed(1)} mm/h</span>` : "";
+    const q = r.quality && r.quality !== "fresh" ? `<span class="wx-q">${r.quality === "stale" ? "지연 자료" : r.quality === "suspect" ? "급변 확인" : "관측 없음"}</span>` : "";
+    const lvl = r.observation ? r.observation.water_level_m : null;
+    const mg = m === null || m === undefined ? "" : m <= 0 ? `<span class="wx-over">+${Math.abs(m).toFixed(2)} m 초과</span>` : `<span>계획까지 ${m.toFixed(2)} m</span>`;
+    const et = hit(r) ? `<span class="wx-eta wx-hit"><strong>도달</strong></span>` : eta === null || eta === undefined ? `<span class="wx-eta wx-none"><strong>상승 없음</strong></span>`
+      : eta >= 600 ? `<span class="wx-eta"><strong>10h+</strong></span>` : `<span class="wx-eta${eta <= 60 ? " wx-soon" : ""}"><strong>${eta}</strong><small>분</small></span>`;
+    return `<button type="button" role="listitem" class="wx-row${r.code === st.selected ? " wx-sel" : ""}" data-code="${r.code}" style="--wx-c:${COLOR[r.stage ?? "unrated"]};animation-delay:${Math.min(i, 20) * 12}ms">
+      <span class="wx-rk">${i + 1}</span>
+      <span class="wx-nm"><span class="wx-nmtop"><b>${esc(r.name)}</b>${rainTag}${rise}${upb}</span>${gauge(lvl, r.levels_m)}<span class="wx-gline"><b>${lvl === null ? "—" : `${lvl.toFixed(2)} m`}</b>${mg}<span>${esc(r.region)}</span>${facs}${q}</span></span>
+      ${et}</button>`;
+  }
+  function renderList() {
+    const rows = filtered();
+    const ups = new Map((st.changes?.stage_up ?? []).map((i) => [i.code, i]));
+    const fasts = new Set((st.changes?.new_rising ?? []).map((i) => i.code));
+    const stages = st.showCalm ? ORDER.slice().reverse() : WATCH;
+    let html = "", n = 0;
+    stages.forEach((s) => {
+      const list = rows.filter((r) => (r.stage ?? "unrated") === s).sort(sorters[st.sort]);
+      if (!list.length) return;
+      html += `<div class="wx-sec" style="--wx-c:${COLOR[s]}"><i></i>${KO[s]}<small>${list.length}곳</small></div>`;
+      list.forEach((r) => { html += rowHtml(r, n, ups.get(r.code), fasts.has(r.code)); n += 1; });
+    });
+    const calm = rows.filter((r) => !WATCH.includes(r.stage ?? "unrated")).length;
+    if (!n) html = st.q || st.facOnly || st.minStage || st.region
+      ? `<div class="wx-empty"><b>조건에 맞는 관측소가 없습니다</b>검색어·지역·단계 조건을 줄여 보세요.</div>`
+      : `<div class="wx-empty"><b>관심 수위 이상인 관측소가 없습니다</b>모든 관측소가 정상 범위입니다.</div>`;
+    $("wx-body").innerHTML = html;
+    $("wx-body").querySelectorAll(".wx-row").forEach((b) => {
+      b.addEventListener("click", () => select(b.dataset.code, true));
+      b.addEventListener("mouseenter", () => hoverOn(b.dataset.code));
+      b.addEventListener("mouseleave", hoverOff);
+    });
+    $("wx-lfoot").innerHTML = `<span>목록 ${n}곳${calm && !st.showCalm ? ` · 정상·기준 없음 ${calm}곳은 숨김` : ""}</span>${calm || st.showCalm ? `<button type="button" id="wx-calm">${st.showCalm ? "관심 이상만" : "모두 보기"}</button>` : ""}`;
+    $("wx-calm")?.addEventListener("click", () => { st.showCalm = !st.showCalm; renderList(); });
+  }
+
+  /* ---------------- 지역 ---------------- */
+  function regionStats() {
+    const rows = st.overview?.stations ?? [];
+    const names = [...new Set([...Object.keys(REGION_CENTER), "기타", ...rows.map((r) => r.region)])];
+    return names.map((name) => { const list = rows.filter((r) => r.region === name); const by = Object.fromEntries(ORDER.map((k) => [k, 0])); list.forEach((r) => { by[r.stage ?? "unrated"] += 1; });
+      return { name, n: list.length, by, max: list.reduce((a, r) => Math.max(a, rank(r)), 0), hot: list.filter((r) => rank(r) >= ORDER.indexOf("advisory")).length }; });
+  }
+  const mini = (by, n) => (n ? ORDER.slice().reverse().filter((k) => by[k]).map((k) => `<span style="width:${(by[k] / n) * 100}%;background:${COLOR[k]}"></span>`).join("") : "");
+  function renderRegions() {
+    const stats = regionStats(), all = st.overview?.stations ?? [];
+    const cur = stats.find((x) => x.name === st.region);
+    $("wx-rname").textContent = st.region || "전국"; $("wx-rcount").textContent = `${st.region ? cur?.n ?? 0 : all.length}곳`;
+    const sorted = stats.slice().sort(st.rsort === "name" ? (a, b) => a.name.localeCompare(b.name, "ko") : (a, b) => b.max - a.max || b.hot - a.hot || b.n - a.n || a.name.localeCompare(b.name, "ko"));
+    const byAll = Object.fromEntries(ORDER.map((k) => [k, all.filter((r) => (r.stage ?? "unrated") === k).length]));
+    $("wx-rgrid").innerHTML = `<button type="button" class="wx-rtile wx-all${st.region ? "" : " wx-on"}" data-r=""><span class="wx-rt-top"><b>전국</b></span><span class="wx-mini">${mini(byAll, all.length)}</span><small style="font-size:13px;color:var(--wx-muted)">${all.length}곳</small></button>`
+      + sorted.map((x) => `<button type="button" class="wx-rtile${st.region === x.name ? " wx-on" : ""}" data-r="${x.name}" ${x.n ? "" : "disabled"}><span class="wx-rt-top"><b>${x.name}</b><small>${x.n}곳</small></span><span class="wx-mini">${mini(x.by, x.n)}</span>${x.hot ? `<span class="wx-rt-flag" style="--wx-c:${COLOR[ORDER[x.max]]}" title="가장 높은 단계 ${KO[ORDER[x.max]]}">주의보 이상 ${x.hot}곳</span>` : `<span class="wx-rt-calm">${x.n ? "주의보 미만" : "관측 없음"}</span>`}</button>`).join("");
+    $("wx-rgrid").querySelectorAll(".wx-rtile").forEach((b) => b.addEventListener("click", () => { setRegion(b.dataset.r); openRegions(false); }));
+  }
+  function setRegion(next) {
+    st.region = next || ""; renderAll(); notifyView();
+    if (map) map.flyTo({ center: st.region && REGION_CENTER[st.region] ? REGION_CENTER[st.region] : [127.8, 36.3], zoom: st.region && REGION_CENTER[st.region] ? 8 : 6.3, duration: 900, padding: { top: 0, left: 400, bottom: 0, right: 0 } });
+  }
+  function openRegions(on) { $("wx-rpop").classList.toggle("wx-open", on); $("wx-rbtn").setAttribute("aria-expanded", on); }
+
+  /* ---------------- 지도 ---------------- */
+  function paintMap() {
+    if (!map?.getSource("wx-st")) return;
+    const vis = new Set(filtered().map((r) => r.code)); const rows = st.overview?.stations ?? [];
+    map.getSource("wx-st").setData({ type: "FeatureCollection", features: rows.map((r) => ({ type: "Feature", geometry: { type: "Point", coordinates: [r.lon, r.lat] },
+      properties: { code: r.code, name: r.name, color: COLOR[r.stage ?? "unrated"], rank: rank(r), label: KO[r.stage ?? "unrated"], dim: !vis.has(r.code), sel: r.code === st.selected } })) });
+    map.getSource("wx-fac").setData({ type: "FeatureCollection", features: rows.flatMap((r) => r.facilities.map((f) => ({ type: "Feature", geometry: { type: "Point", coordinates: [f.lon, f.lat] }, properties: { tier: f.tier } }))) });
+    const row = rows.find((r) => r.code === st.selected);
+    if (marker) { marker.getElement().style.display = row ? "flex" : "none"; if (row) marker.setLngLat([row.lon, row.lat]); }
+  }
+  function hoverOn(code) {
+    const r = st.overview?.stations.find((x) => x.code === code); if (!r || !map) return;
+    if (code === st.selected) { hoverOff(); return; }
+    map.setFilter("wx-hover", ["==", ["get", "code"], code]);
+    hoverPop.setLngLat([r.lon, r.lat]).setHTML(`<b>${esc(r.name)}</b><br>${KO[r.stage ?? "unrated"]} · ${r.observation?.water_level_m?.toFixed(2) ?? "—"} m`).addTo(map);
+    if (!map.getBounds().contains([r.lon, r.lat])) map.easeTo({ center: [r.lon, r.lat], duration: 500 });
+  }
+  function hoverOff() { if (!map) return; map.setFilter("wx-hover", ["==", ["get", "code"], "__none__"]); hoverPop.remove(); }
+
+  /* ---------------- 선택 관측소 ---------------- */
+  function openDrawer(on) { root.classList.toggle("wx-drawer-open", on); $("wx-drawer").classList.toggle("wx-open", on); $("wx-drawer").setAttribute("aria-hidden", !on); }
+  function select(code, fly, keepTab = false) {
+    st.selected = code; renderList(); paintMap(); renderStation(code);
+    openDrawer(true);
+    if (!keepTab) showTab("st");
+    const r = st.overview?.stations.find((x) => x.code === code);
+    if (r && fly && map) map.flyTo({ center: [r.lon, r.lat], zoom: Math.max(map.getZoom(), 10), duration: 900, padding: { top: 40, left: 400, bottom: 60, right: 400 } });
+    notifyView();
+  }
+  async function renderStation(code) {
+    if (!code) return; const my = ++stSeq;
+    const params = new URLSearchParams();
+    if (st.at) { params.set("at", st.at); params.set("rain_mode", "live"); }
+    const query = params.toString();
+    let d; try { d = await get(`/api/watch/stations/${encodeURIComponent(code)}${query ? `?${query}` : ""}`); } catch { return; }
+    if (my !== stSeq) return;
+    const stage = d.stage ?? "unrated"; root.style.setProperty("--wx-tone", COLOR[stage]);
+    $("wx-st-crumb").textContent = `${d.region} › ${d.address ?? ""}`;
+    $("wx-st-name").textContent = d.name; $("wx-st-stage").textContent = KO[stage];
+    const obs = d.observation;
+    $("wx-st-sub").textContent = `${obs ? `${obs.water_level_m.toFixed(2)} m · ${obs.time.slice(11, 16)} ${obs.interval === "1H" ? "1시간" : "10분"} 자료` : "이 시각 관측 없음"} · ${d.flood_forecast ? "홍수예보 지점" : "일반 관측소"} · ${d.agency ?? ""}`;
+    $("wx-st-gauge").innerHTML = gauge(obs?.water_level_m ?? null, d.levels_m ?? {}, true);
+    const order = [...root.querySelectorAll(".wx-row")].map((b) => b.dataset.code), pos = order.indexOf(d.code);
+    $("wx-v-rank").innerHTML = pos >= 0 ? `${pos + 1}<small>위 / ${order.length}곳</small>` : "—";
+    $("wx-l-rank").textContent = `${st.region || "전국"} 위험 순위 · 지금 목록 기준`;
+    const m = d.margin_to_planned_flood_m, over = m !== null && m <= 0;
+    $("wx-v-margin").innerHTML = m === null ? "—" : `${over ? "+" : ""}${Math.abs(m).toFixed(2)}<small>m</small>`;
+    $("wx-l-margin").textContent = over ? "계획홍수위 초과" : "계획홍수위까지 여유";
+    $("wx-i-margin").classList.toggle("wx-hot", over);
+    const r = d.rate_m_per_10min;
+    $("wx-v-rate").innerHTML = r === null ? "—" : `${r > 0 ? "↑" : r < 0 ? "↓" : "→"}${Math.abs(r).toFixed(3)}<small>m/10분</small>`;
+    $("wx-l-rate").textContent = `상승 속도 · ${d.rise_label ?? ""}${d.rate_window_min ? ` · 최근 ${d.rate_window_min}분` : ""}`;
+    const rain = d.rain_nearby;
+    if (rain) {
+      $("wx-v-rain").innerHTML = rain.intensity_mm_h === null ? "—" : `${rain.intensity_mm_h.toFixed(1)}<small>mm/h</small>`;
+      const amount = (value) => value === null || value === undefined ? "미수신" : `${value.toFixed(1)} mm`;
+      $("wx-l-rain").textContent = `${rain.short_name ?? rain.name} · ${rain.distance_km} km · 10분 ${amount(rain.rain_10m_mm)} · 1시간 ${amount(rain.rain_1h_mm)} · ${rain.time?.slice(0, 16).replace("T", " ") ?? "관측 시각 없음"}`;
+      $("wx-i-rain").classList.toggle("wx-hot", (rain.intensity_mm_h ?? 0) >= 15);
+    } else {
+      $("wx-v-rain").textContent = "관측 없음";
+      $("wx-l-rain").textContent = "10 km 이내에 현재 강우를 보고한 관측소가 없습니다.";
+      $("wx-i-rain").classList.remove("wx-hot");
+    }
+    const eta = d.minutes_to_planned_flood;
+    $("wx-v-eta").innerHTML = over || eta === 0 ? "도달" : eta === null ? "상승 없음" : `${eta}<small>분</small>`;
+    $("wx-i-eta").classList.toggle("wx-hot", over || (eta !== null && eta <= 60));
+    $("wx-quality").hidden = d.quality === "fresh";
+    if (d.quality !== "fresh") $("wx-quality").textContent = d.quality === "stale" ? `오래된 자료 (${obs?.age_min}분 전)` : d.quality === "suspect" ? "급변 · 정합성 확인 필요" : "관측 없음";
+    drawChart(d.recent ?? [], d.levels_m ?? {});
+    $("wx-chart-cap").textContent = d.recent?.length ? `최근 ${d.recent.length}개 관측 · ${clock(d.recent[0].time)} → ${d.recent[d.recent.length - 1].time.slice(11, 16)}` : "최근 수위";
+    const ops = d.facilities.filter((f) => f.tier === "operational"), wts = d.facilities.filter((f) => f.tier === "watch");
+    $("wx-fac-cap").textContent = `연결 시설 · 운영 ${ops.length} · 감시 ${wts.length}`;
+    $("wx-fac-list").innerHTML = d.facilities.length ? `<table class="wx-factable"><thead><tr><th>시설</th><th>등급</th><th></th></tr></thead><tbody>`
+      + ops.map((f) => `<tr><td><b>${esc(f.name)}</b><small>시설별 규칙·백테스트 검증됨</small></td><td><span class="wx-tier wx-op">운영</span></td><td><a href="${esc(TWIN_HREF)}" target="_top" title="통제 판단 보드">→</a></td></tr>`).join("")
+      + wts.map((f) => `<tr><td>${esc(f.name)}<small>${f.sgg ? `${esc(f.sgg)} · ` : ""}${f.distance_km !== null && f.distance_km !== undefined ? `${f.distance_km} km · ` : ""}대표성 미검증</small></td><td><span class="wx-tier wx-wt">감시</span></td><td></td></tr>`).join("")
+      + `</tbody></table>` : `<p class="wx-note">이 관측소에 연결된 시설이 아직 없습니다.</p>`;
+    // 지도 위 정보 카드
+    if (marker) marker.getElement().querySelector(".wx-tip").innerHTML = `<div class="wx-mc-top"><b>${esc(d.name)}</b><span class="wx-mc-pill">${KO[stage]}</span></div>
+      <div class="wx-mc-grid"><span>수위</span><span>${over ? "초과" : "여유"}</span><span>계획홍수위까지</span>
+      <strong>${obs ? obs.water_level_m.toFixed(2) : "—"}</strong><strong class="${over ? "wx-over" : ""}">${m === null ? "—" : `${over ? "+" : ""}${Math.abs(m).toFixed(2)}`}</strong><strong class="${over || eta === 0 ? "wx-over" : ""}">${over || eta === 0 ? "도달" : eta === null ? "—" : `${eta}분`}</strong></div>`;
+  }
+  function drawChart(points, lv) {
+    const svg = $("wx-chart");
+    const pts = points.map((p, i) => [i, p.water_level_m]).filter((p) => p[1] !== null);
+    if (pts.length < 2 || !lv.planned_flood) { svg.innerHTML = `<text x="10" y="90" fill="#6b7a90" font-size="13">그래프로 그릴 관측이 부족합니다</text>`; return; }
+    const lo = Math.floor(Math.min(lv.attention ?? Infinity, ...pts.map((p) => p[1])) - 0.6), hi = Math.max(lv.planned_flood + 1.0, ...pts.map((p) => p[1] + .6));
+    const X0 = 8, X1 = 300, Y0 = 18, Y1 = 168, n = pts.length - 1;
+    const x = (i) => X0 + (i / n) * (X1 - X0), y = (v) => Y1 - ((v - lo) / (hi - lo)) * (Y1 - Y0);
+    const P = pts.map(([i, v]) => [x(i), y(v)]);
+    let d = `M${P[0][0]},${P[0][1]}`;
+    for (let i = 0; i < P.length - 1; i++) { const p0 = P[i - 1] ?? P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] ?? p2; d += ` C${p1[0] + (p2[0] - p0[0]) / 6},${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6},${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]},${p2[1]}`; }
+    const area = `${d} L${P[P.length - 1][0]},${Y1} L${P[0][0]},${Y1} Z`;
+    const off = (v) => Math.max(0, Math.min(1, (y(v) - Y1) / (Y0 - Y1)));
+    const att = lv.attention ?? lo, adv = lv.advisory ?? att, war = lv.warning ?? adv;
+    const stops = [[0, "#22d3ee"], [off(att), "#38bdf8"], [off((att + adv) / 2), "#34d399"], [off(adv), "#fbbf24"], [off(war), "#fb923c"], [off(lv.planned_flood), "#f87171"], [1, "#e879f9"]].map(([o, c]) => `<stop offset="${o}" stop-color="${c}"/>`).join("");
+    const refs = [["attention", "관심", "#60a5fa"], ["advisory", "주의보", "#fbbf24"], ["warning", "경보", "#fb923c"], ["planned_flood", "계획홍수위", "#f87171"]].filter(([k]) => lv[k] !== undefined)
+      .map(([k, l, c]) => `<line x1="${X0}" x2="${X1}" y1="${y(lv[k])}" y2="${y(lv[k])}" stroke="${c}" stroke-opacity="${k === "planned_flood" ? .8 : .35}" stroke-dasharray="${k === "planned_flood" ? "0" : "2 4"}"/><text x="${X0 + 2}" y="${y(lv[k]) - 4}" fill="${c}" font-size="11" font-weight="700">${l} ${lv[k]}</text>`).join("");
+    const [lx, ly] = P[P.length - 1], last = pts[pts.length - 1][1];
+    svg.innerHTML = `<defs><linearGradient id="wx-grad" gradientUnits="userSpaceOnUse" x1="0" y1="${Y1}" x2="0" y2="${Y0}">${stops}</linearGradient>
+      <linearGradient id="wx-fd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <mask id="wx-mask"><rect x="0" y="0" width="316" height="196" fill="url(#wx-fd)"/></mask>
+      <filter id="wx-glow" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      ${refs}<path class="wx-area" d="${area}" fill="url(#wx-grad)" mask="url(#wx-mask)"/><path class="wx-ln" d="${d}" pathLength="1" stroke="url(#wx-grad)" filter="url(#wx-glow)"/>
+      <line x1="${lx}" x2="${lx}" y1="${ly + 8}" y2="${Y1}" stroke="#fff" stroke-opacity=".7" stroke-dasharray="3 4"/>
+      <circle class="wx-ringc" cx="${lx}" cy="${ly}" r="7" fill="none" stroke="url(#wx-grad)" stroke-width="2"/>
+      <circle cx="${lx}" cy="${ly}" r="6" fill="var(--wx-tone)" stroke="#fff" stroke-width="2.4" filter="url(#wx-glow)"/>
+      <text x="${lx - 10}" y="${ly - 10}" text-anchor="end" fill="#fff" font-size="15" font-weight="900">${last.toFixed(2)} m</text>
+      <text x="${X0}" y="190" fill="#6b7a90" font-size="11">${clock(points[0].time)}</text><text x="${X1}" y="190" fill="#6b7a90" font-size="11" text-anchor="end">${points[points.length - 1].time.slice(11, 16)}</text>`;
+  }
+
+  /* ---------------- 에이전트 ---------------- */
+  const turns = []; let agBusy = false;
+  const withCites = (t) => esc(t).replace(/\[(\d+)\]/g, '<span class="wx-cite">[$1]</span>');
+  async function loadExamples() {
+    let items = []; try { items = await get(`/api/agent/examples?event_id=osong-2023&board=watch`); } catch { /* 입력만 */ }
+    $("wx-ag-chips").innerHTML = items.map((i) => `<button type="button" class="wx-chip" data-q="${esc(i.question)}"><span><b>${esc(i.label)}</b>${esc(i.question)}</span></button>`).join("");
+    $("wx-ag-chips").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => ask(b.dataset.q)));
+  }
+  function applyView(v) {
+    if (!v) return;
+    if (v.min_stage !== undefined) st.minStage = v.min_stage ?? null;
+    const nextRegion = v.region ?? (v.station_code ? st.region : "");
+    if ((nextRegion || "") !== st.region) setRegion(nextRegion || ""); else renderAll();
+    if (v.station_code) select(v.station_code, false, true);
+    if (map && v.center) map.flyTo({ center: v.center, zoom: v.zoom ?? 10, duration: 1000 });
+    notifyView();
+  }
+  function setBusy(on) {
+    agBusy = on; $("wx-ag-send").disabled = on; $("wx-ag-input").disabled = on;
+    root.querySelectorAll(".wx-sugs button, .wx-follow button").forEach((b) => { b.disabled = on; });
+    const s = $("wx-ag-status"); s.classList.toggle("wx-busy", on);
+    s.textContent = on ? "자료를 확인하고 다음 도구를 판단하는 중…" : turns.length ? "다른 조건이나 후속 질문을 이어서 물어보세요." : "지역·관측소 이동, 우선순위, 변화 요약, 상황 보고를 물어보세요.";
+  }
+  function renderTurns() {
+    // 오래된 대화가 위, 새 대화가 아래(채팅 순서). 새 답이 오면 그 위치로 스크롤
+    $("wx-turns").innerHTML = turns.map((t, i) => {
+      const r = t.response, latest = i === turns.length - 1;
+      const state = r.status === "ANSWERED" ? "" : `<span class="wx-turn-state">${r.status === "UNAVAILABLE" ? "응답 실패 · 다시 시도할 수 있습니다" : "분석 근거 부족"}</span>`;
+      const follow = latest && r.follow_ups?.length ? `<div class="wx-follow">${r.follow_ups.map((f) => `<button type="button" data-q="${esc(f)}">${esc(f)}</button>`).join("")}</div>` : "";
+      const tools = r.tool_calls.length ? `<div class="wx-toolt">${r.tool_calls.map((c) => `<em>[${c.order}] ${esc(c.tool_name)}</em>`).join("")}</div>` : "";
+      const evi = r.tool_calls.map((c) => `<details class="wx-evi"><summary>[${c.order}] ${esc(c.tool_name)} · 호출 결과 보기</summary>${c.reason ? `<small>선택 이유 · ${esc(c.reason)}</small>` : ""}${Object.keys(c.parameters ?? {}).length ? `<small>입력 · ${esc(JSON.stringify(c.parameters))}</small>` : ""}${Array.isArray(c.result?.limitations) ? c.result.limitations.slice(0, 3).map((l) => `<small>한계 · ${esc(l)}</small>`).join("") : ""}<pre>${esc(JSON.stringify(c.result, null, 2))}</pre></details>`).join("");
+      return `<div class="wx-me">${esc(t.question)}</div><div class="wx-ai wx-${r.status.toLowerCase()}"><span class="wx-av">AI</span><div class="wx-ai-body">${state}<p class="wx-answer">${withCites(r.answer)}</p>${t.viewed ? `<span class="wx-viewed">↳ 목록·지도를 답에 맞춰 옮겼습니다</span>` : ""}${tools}${evi}${(r.limitations ?? []).map((l) => `<span class="wx-limit">제한 · ${esc(l)}</span>`).join("")}${follow}</div></div>`;
+    }).join("");
+    $("wx-turns").querySelectorAll(".wx-follow button").forEach((b) => b.addEventListener("click", () => ask(b.dataset.q)));
+    $("wx-pane-ag").classList.toggle("wx-talking", turns.length > 0);
+    $("wx-turns").lastElementChild?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+  async function ask(question) {
+    const text = (question ?? "").trim(); if (!text || agBusy) return;
+    openDrawer(true); showTab("ag"); $("wx-ag-error").hidden = true; setBusy(true);
+    const history = turns.flatMap((t) => [{ role: "user", content: t.question }, { role: "assistant", content: t.response.answer }]).slice(-6);
+    try {
+      const res = await fetch(API + "/api/agent/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event_id: "osong-2023", message: text, history, board: "watch", observation_at: st.at || null }) });
+      if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
+      const response = await res.json();
+      const view = response.tool_calls.map((c) => c.result?.view).find((v) => v && (v.center || v.region || v.min_stage || v.station_code));
+      turns.push({ question: text, response, viewed: Boolean(view) });
+      $("wx-ag-input").value = response.status === "UNAVAILABLE" ? text : "";
+      renderTurns(); applyView(view);
+    } catch (e) {
+      $("wx-ag-input").value = text; const d = e instanceof Error ? e.message : "";
+      $("wx-ag-error").hidden = false;
+      $("wx-ag-error").textContent = d.includes("API 429") ? d.replace(/^API 429:\s*/, "") : d.includes("API 422") ? "질문 형식이 API 조건과 맞지 않습니다." : "Agent API에 연결하지 못했습니다. 서버 실행 상태를 확인해 주세요.";
+    } finally { setBusy(false); }
+  }
+
+  /* ---------------- 공통 ---------------- */
+  function showTab(which) {
+    const s = which === "st";
+    $("wx-tab-st").classList.toggle("wx-on", s); $("wx-tab-ag").classList.toggle("wx-on", !s);
+    $("wx-tab-st").setAttribute("aria-selected", s); $("wx-tab-ag").setAttribute("aria-selected", !s);
+    $("wx-pane-st").hidden = !s; $("wx-pane-ag").hidden = s;
+  }
+  function renderAll() {
+    $("wx-asof").innerHTML = `<b>${clock(st.overview?.observed_at ?? st.at)}</b> 관측 기준 · ${esc(st.region || "전국")} · ${base().length}곳`;
+    $("wx-mode").textContent = st.overview?.mode === "replay" ? "저장 자료 재생" : "실시간";
+    $("wx-live").classList.toggle("wx-is-live", st.overview?.mode === "live");
+    renderSummary(); renderRegions(); renderList(); paintMap();
+  }
+  function notifyView() {
+    if (window.parent === window) return;
+    window.parent.postMessage({ type: "floodops-watch-view", view: { at: st.at || null, region: st.region || null, stage: st.minStage, station: st.selected } }, window.location.origin);
+  }
+  function scheduleLiveRefresh() {
+    if (liveRefresh) window.clearInterval(liveRefresh);
+    liveRefresh = window.setInterval(() => load().catch(() => undefined), 5 * 60_000);
+  }
+  async function load() {
+    const viewParams = new URLSearchParams();
+    if (st.at) { viewParams.set("at", st.at); viewParams.set("rain_mode", "live"); }
+    const overviewParams = new URLSearchParams(viewParams); overviewParams.set("limit", "2000");
+    const changeParams = new URLSearchParams();
+    if (st.at) changeParams.set("at", st.at);
+    changeParams.set("since_min", "60");
+    const [ov, ch] = await Promise.all([get(`/api/watch/overview?${overviewParams}`), get(`/api/watch/changes?${changeParams}`).catch(() => null)]);
+    st.overview = ov; st.changes = ch;
+    root.dispatchEvent(new CustomEvent("wx:mode", { detail: { mode: ov.mode, stations: ov.stations_total, observed: ov.stations_observed, observed_at: ov.observed_at, rain: ov.rain } }));
+    $("wx-limits").innerHTML = (ov.limitations ?? []).map((t) => `<li>${esc(t)}</li>`).join("");
+    if (st.selected && !ov.stations.some((r) => r.code === st.selected)) { st.selected = null; openDrawer(false); }
+    renderAll(); if (st.selected) renderStation(st.selected);
+  }
+
+  // 전국 관측소 순위를 시설별 잠김 원인과 강우·수위 근거로 전환한다.
+  Object.assign(KO, { normal: "평상", attention: "관심", advisory: "주의", warning: "경계", planned_flood: "심각", unrated: "자료 없음" });
+  function adaptFacilityRisk(data) {
+    const riskStages = ["normal", "attention", "advisory", "warning", "planned_flood"];
+    const stations = (data.facilities ?? []).map((risk) => {
+      const rain = risk.rain ? { ...risk.rain, short_name: risk.rain.name, time: data.rain_at,
+        intensity_mm_h: risk.rain.rain_10m_mm !== null && risk.rain.rain_10m_mm !== undefined ? risk.rain.rain_10m_mm * 6 : risk.rain.rain_1h_mm } : null;
+      return { ...risk, code: risk.facility_id, short_name: risk.name, address: risk.sgg ?? "", stage: riskStages[risk.level] ?? "unrated",
+        facilities: [], observation: null, levels_m: null, rate_m_per_10min: null, rain_nearby: rain, quality: "fresh", risk };
+    });
+    return { ...data, stations, stations_total: data.counts?.total ?? stations.length, stations_observed: stations.length };
+  }
+  function facilityRiskRows() { return st.overview?.stations ?? []; }
+  function base() { return facilityRiskRows().filter((r) => !st.region || r.region === st.region); }
+  function filtered() {
+    const q = st.q.trim().toLowerCase();
+    return base().filter((r) => (st.minStage === null || rank(r) >= ORDER.indexOf(st.minStage))
+      && (!st.driver || st.driver === "all" || r.driver === st.driver)
+      && (!q || `${r.name} ${r.address} ${r.region} ${r.sgg ?? ""}`.toLowerCase().includes(q)));
+  }
+  function riskTrack(level) {
+    const active = Number(level) || 0;
+    return `<span class="wx-risk-track" aria-label="위험 단계 ${active}/4">${[1, 2, 3, 4].map((n) => `<i class="${n <= active ? "wx-active" : ""}"></i>`).join("")}</span>`;
+  }
+  function renderSummary() {
+    const rows = base(), all = facilityRiskRows(); const by = Object.fromEntries(ORDER.map((k) => [k, 0]));
+    rows.forEach((r) => { by[r.stage ?? "unrated"] += 1; });
+    const atLeast = (s) => ORDER.slice(ORDER.indexOf(s)).reduce((a, k) => a + by[k], 0);
+    const tabs = [[null, "전체 시설", rows.length, "#e4e4e7"], ["advisory", "주의 이상", atLeast("advisory"), COLOR.advisory], ["warning", "경계 이상", atLeast("warning"), COLOR.warning], ["planned_flood", "심각", atLeast("planned_flood"), COLOR.planned_flood]];
+    const cur = st.minStage;
+    $("wx-sum").innerHTML = tabs.map(([k, label, count, color]) => `<button type="button" role="tab" class="${cur === k ? "wx-on" : ""}${count ? "" : " wx-zero"}" data-s="${k ?? ""}" style="--wx-c:${color}" aria-selected="${cur === k}">${label}<b>${count}</b></button>`).join("");
+    $("wx-sum").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { st.minStage = b.dataset.s || null; renderAll(); notifyView(); }));
+    const serious = rows.filter((r) => r.risk.level >= 3).length;
+    const river = rows.filter((r) => r.driver === "river").length, pluvial = rows.length - river;
+    const rainy = rows.filter((r) => (r.risk.rain?.rain_3h_mm ?? r.risk.rain?.rain_1h_mm ?? 0) > 0).length;
+    const rainTime = st.overview?.rain_at ? clock(st.overview.rain_at) : "자료 없음";
+    const kpi = (label, value, unit, color, hot) => `<div class="wx-kpi${hot ? " wx-hotk" : ""}" style="--wx-c:${color}"><span>${label}</span><strong>${value}<small>${unit}</small></strong></div>`;
+    $("wx-kpidot").classList.toggle("wx-alert", serious > 0);
+    $("wx-kpis").innerHTML = kpi(`전국 시설 · ${esc(st.region || "전국")}`, rows.length, "곳", "#71717a")
+      + kpi("경계 이상", serious, "곳", COLOR.warning, serious > 0)
+      + kpi("주의 이상", atLeast("advisory"), "곳", COLOR.advisory, atLeast("advisory") > 0)
+      + kpi("하천형", river, "곳", "#38bdf8") + kpi("내수형", pluvial, "곳", "#0ea5e9")
+      + kpi("강우 자료 연결", rainy, "곳", "#38bdf8")
+      + kpi("강우 관측 기준", rainTime, "KST", "#71717a")
+      + kpi("위험 판정 대상", all.length, "곳", "#34d399");
+  }
+  function rowHtml(r, i) {
+    const f = r.risk, stage = r.stage ?? "unrated", isRiver = f.driver === "river";
+    const driver = isRiver ? "하천형" : "내수형", driverTag = `<span class="wx-driver" data-driver="${f.driver}">${driver}</span>`;
+    const rain = f.rain, rainAmounts = rain ? [["12시간", rain.rain_12h_mm], ["3시간", rain.rain_3h_mm], ["1시간", rain.rain_1h_mm]].filter(([, amount]) => amount !== null && amount !== undefined).map(([window, amount]) => `${window} ${Number(amount).toFixed(1)} mm`) : [];
+    const rainText = rain ? (rainAmounts.join(" · ") || "강우 자료 대기") : "강우 관측 없음";
+    const value = isRiver ? f.minutes_to_planned_flood : (rain?.rain_12h_mm ?? rain?.rain_3h_mm ?? rain?.rain_1h_mm ?? rain?.rain_10m_mm);
+    const unit = isRiver ? "분" : "mm";
+    const urgency = isRiver ? (value !== null && value !== undefined && value <= 60) : f.level >= 2;
+    return `<button type="button" role="listitem" class="wx-row${r.code === st.selected ? " wx-sel" : ""}" data-code="${esc(r.code)}" style="--wx-c:${COLOR[stage]};animation-delay:${Math.min(i, 20) * 12}ms">
+      <span class="wx-rk">${i + 1}</span><span class="wx-nm"><span class="wx-nmtop"><b>${esc(f.name)}</b>${driverTag}<span class="wx-fac">${esc(f.kind_ko)}</span></span>
+      ${riskTrack(f.level)}<span class="wx-gline"><b>${esc(f.level_label)}</b><span>${esc(f.why)}</span></span></span>
+      <span class="wx-eta${urgency ? " wx-soon" : ""}"><strong>${value === null || value === undefined ? "—" : isRiver ? value : Number(value).toFixed(1)}</strong><small>${unit}</small><span class="wx-why">${rainText}</span></span></button>`;
+  }
+  function renderList() {
+    const rows = filtered(), stages = ORDER.slice().reverse(); let html = "", n = 0;
+    for (const stage of stages) {
+      const list = rows.filter((r) => (r.stage ?? "unrated") === stage).slice().sort((a, b) => {
+        if (st.sort === "name") return a.name.localeCompare(b.name, "ko");
+        if (st.sort === "rain") return ((b.risk.rain?.rain_3h_mm ?? b.risk.rain?.rain_1h_mm ?? -1) - (a.risk.rain?.rain_3h_mm ?? a.risk.rain?.rain_1h_mm ?? -1)) || a.name.localeCompare(b.name, "ko");
+        return (b.risk.level - a.risk.level) || ((a.risk.minutes_to_planned_flood ?? 1e9) - (b.risk.minutes_to_planned_flood ?? 1e9))
+          || ((b.risk.rain?.rain_3h_mm ?? 0) - (a.risk.rain?.rain_3h_mm ?? 0)) || a.name.localeCompare(b.name, "ko");
+      });
+      if (!list.length) continue;
+      html += `<div class="wx-sec" style="--wx-c:${COLOR[stage]}"><i></i>${KO[stage]}<small>${list.length}곳</small></div>`;
+      list.forEach((r) => { html += rowHtml(r, n++); });
+    }
+    if (!n) html = `<div class="wx-empty"><b>조건에 맞는 시설이 없습니다</b>검색어·지역·유형·위험 단계 조건을 확인하세요.</div>`;
+    $("wx-body").innerHTML = html;
+    $("wx-body").querySelectorAll(".wx-row").forEach((b) => {
+      b.addEventListener("click", () => select(b.dataset.code, true));
+      b.addEventListener("mouseenter", () => hoverOn(b.dataset.code)); b.addEventListener("mouseleave", hoverOff);
+    });
+    $("wx-lfoot").innerHTML = `<span>시설 ${n}곳 · 위험 단계순</span>`;
+  }
+  function regionStats() {
+    const rows = facilityRiskRows(), names = [...new Set([...Object.keys(REGION_CENTER), "기타", ...rows.map((r) => r.region || "기타")])];
+    return names.map((name) => { const list = rows.filter((r) => (r.region || "기타") === name), by = Object.fromEntries(ORDER.map((k) => [k, 0]));
+      list.forEach((r) => { by[r.stage ?? "unrated"] += 1; });
+      return { name, n: list.length, by, max: list.reduce((a, r) => Math.max(a, rank(r)), 0), hot: list.filter((r) => r.risk.level >= 2).length }; });
+  }
+  function renderRegions() {
+    const stats = regionStats(), all = facilityRiskRows(), cur = stats.find((x) => x.name === st.region);
+    $("wx-rname").textContent = st.region || "전국"; $("wx-rcount").textContent = `${st.region ? cur?.n ?? 0 : all.length}곳`;
+    const sorted = stats.slice().sort(st.rsort === "name" ? (a, b) => a.name.localeCompare(b.name, "ko") : (a, b) => b.max - a.max || b.hot - a.hot || b.n - a.n || a.name.localeCompare(b.name, "ko"));
+    const byAll = Object.fromEntries(ORDER.map((k) => [k, all.filter((r) => (r.stage ?? "unrated") === k).length]));
+    $("wx-rgrid").innerHTML = `<button type="button" class="wx-rtile wx-all${st.region ? "" : " wx-on"}" data-r=""><span class="wx-rt-top"><b>전국</b></span><span class="wx-mini">${mini(byAll, all.length)}</span><small style="font-size:13px;color:var(--wx-muted)">${all.length}곳</small></button>`
+      + sorted.map((x) => `<button type="button" class="wx-rtile${st.region === x.name ? " wx-on" : ""}" data-r="${esc(x.name)}" ${x.n ? "" : "disabled"}><span class="wx-rt-top"><b>${esc(x.name)}</b><small>${x.n}곳</small></span><span class="wx-mini">${mini(x.by, x.n)}</span>${x.hot ? `<span class="wx-rt-flag" style="--wx-c:${COLOR[ORDER[x.max]]}">주의 이상 ${x.hot}곳</span>` : `<span class="wx-rt-calm">${x.n ? "주의 미만" : "자료 없음"}</span>`}</button>`).join("");
+    $("wx-rgrid").querySelectorAll(".wx-rtile").forEach((b) => b.addEventListener("click", () => { setRegion(b.dataset.r); openRegions(false); }));
+  }
+  function paintMap() {
+    if (!map?.getSource("wx-st")) return;
+    const vis = new Set(filtered().map((r) => r.code)), rows = facilityRiskRows();
+    const rainRows = st.overview?.rain_gauges ?? [];
+    map.getSource("wx-rain").setData({ type: "FeatureCollection", features: rainRows.filter((g) => Number.isFinite(g.lon) && Number.isFinite(g.lat)).map((g) => ({ type: "Feature", geometry: { type: "Point", coordinates: [g.lon, g.lat] },
+      properties: { code: g.code, name: g.name, rain10: g.rain_10m_mm, rain1: g.rain_1h_mm, rain3: g.rain_3h_mm, rain12: g.rain_12h_mm } })) });
+    map.getSource("wx-st").setData({ type: "FeatureCollection", features: rows.map((r) => ({ type: "Feature", geometry: { type: "Point", coordinates: [r.lon, r.lat] },
+      properties: { code: r.code, name: r.name, color: COLOR[r.stage ?? "unrated"], rank: rank(r), label: r.risk.level_label, dim: !vis.has(r.code), sel: r.code === st.selected } })) });
+    map.getSource("wx-fac").setData({ type: "FeatureCollection", features: [] });
+    const row = rows.find((r) => r.code === st.selected);
+    if (marker) { marker.getElement().style.display = row ? "flex" : "none"; if (row) marker.setLngLat([row.lon, row.lat]); }
+  }
+  function hoverOn(code) {
+    const r = facilityRiskRows().find((x) => x.code === code); if (!r || !map) return;
+    if (code === st.selected) { hoverOff(); return; }
+    map.setFilter("wx-hover", ["==", ["get", "code"], code]);
+    hoverPop.setLngLat([r.lon, r.lat]).setHTML(`<b>${esc(r.name)}</b><br>${esc(r.risk.level_label)} · ${esc(r.risk.driver === "river" ? "하천형" : "내수형")}<br>${esc(r.risk.why)}`).addTo(map);
+    if (!map.getBounds().contains([r.lon, r.lat])) map.easeTo({ center: [r.lon, r.lat], duration: 500 });
+  }
+  function select(code, fly, keepTab = false) {
+    st.selected = code; renderList(); paintMap(); renderStation(code); openDrawer(true);
+    if (!keepTab) showTab("st");
+    const r = facilityRiskRows().find((x) => x.code === code);
+    if (r && fly && map) map.flyTo({ center: [r.lon, r.lat], zoom: Math.max(map.getZoom(), 10), duration: 900, padding: { top: 40, left: 400, bottom: 60, right: 400 } });
+    notifyView();
+  }
+  function renderStation(code) {
+    const r = facilityRiskRows().find((x) => x.code === code); if (!r) return;
+    const f = r.risk, stage = r.stage ?? "unrated", rain = f.rain; root.style.setProperty("--wx-tone", COLOR[stage]);
+    $("wx-st-crumb").textContent = `${f.region || "전국"}${f.sgg ? ` · ${f.sgg}` : ""} · ${f.group === "riverside" ? "하천변 출입구" : "지하차도"}`;
+    $("wx-st-name").textContent = f.name; $("wx-st-stage").textContent = f.level_label;
+    $("wx-st-sub").textContent = `${f.driver === "river" ? "하천형" : "내수형"} · ${f.tier === "operational" ? "운영 등록" : f.tier === "rain_only" ? "강우 감시" : "감시 후보"}`;
+    $("wx-st-gauge").innerHTML = `<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--wx-muted)"><b style="color:var(--wx-text)">${esc(f.level_label)}</b><span>위험 단계 ${f.level}/4</span></div>${riskTrack(f.level)}<div class="wx-why">${esc(f.why)}</div>`;
+    const order = [...root.querySelectorAll(".wx-row")].map((b) => b.dataset.code), pos = order.indexOf(r.code);
+    $("wx-v-rank").innerHTML = pos >= 0 ? `${pos + 1}<small>위 / ${order.length}곳</small>` : "—";
+    $("wx-l-rank").textContent = `${st.region || "전국"} 시설 위험 순위`;
+    $("wx-v-margin").textContent = f.gauge || "수위계 미연결"; $("wx-l-margin").textContent = f.driver === "river" ? "판정에 사용한 하천 관측소" : "내수형 · 주변 강우 기준";
+    $("wx-v-rate").textContent = f.driver === "river" ? (f.stage ? KO[f.stage] : "수위 자료 없음") : "현장 배수 자료 없음";
+    $("wx-l-rate").textContent = f.driver_reason;
+    const eta = f.minutes_to_planned_flood;
+    const rainMetric = rain?.rain_12h_mm != null ? [rain.rain_12h_mm, "12시간"] : rain?.rain_3h_mm != null ? [rain.rain_3h_mm, "3시간"] : rain?.rain_1h_mm != null ? [rain.rain_1h_mm, "1시간"] : [null, null];
+    $("wx-v-eta").innerHTML = f.driver === "river" ? (eta === null || eta === undefined ? "계산 자료 없음" : `${eta}<small>분</small>`) : (rainMetric[0] == null ? "강우 자료 없음" : `${rainMetric[0].toFixed(1)}<small>mm / ${rainMetric[1]}</small>`);
+    $("wx-v-eta").nextElementSibling.textContent = f.driver === "river" ? "계획홍수위까지 예상 시간 · 예보 아님" : `기상청 호우특보 ${rainMetric[1] || "누적"} 기준 비교 · 침수 판정 아님`;
+    $("wx-i-eta").classList.toggle("wx-hot", f.level >= 3 || (eta !== null && eta <= 60));
+    $("wx-v-rain").innerHTML = rainMetric[0] == null ? "—" : `${rainMetric[0].toFixed(1)}<small>mm / ${rainMetric[1]}</small>`;
+    const rainWindows = rain ? [["10분", rain.rain_10m_mm, "mm"], ["1시간", rain.rain_1h_mm, "mm"], ["3시간", rain.rain_3h_mm, "mm"], ["12시간", rain.rain_12h_mm, "mm"]].filter(([, amount]) => amount !== null && amount !== undefined).map(([window, amount, unit]) => `${window} ${Number(amount).toFixed(1)} ${unit}`).join(" · ") : "";
+    $("wx-l-rain").textContent = rain ? `${rain.name} · ${rain.distance_km} km · ${rainWindows || "누적 자료 대기"} · ${st.overview.rain_at ? clock(st.overview.rain_at) : "관측 시각 없음"}` : "10 km 안에 현재 강우를 보고한 관측소가 없습니다.";
+    $("wx-i-rain").classList.toggle("wx-hot", (rain?.rain_12h_mm ?? 0) >= 110 || (rain?.rain_3h_mm ?? 0) >= 60);
+    $("wx-i-margin").classList.toggle("wx-hot", f.level >= 3); $("wx-i-rate").classList.toggle("wx-hot", f.level >= 2);
+    $("wx-limits").innerHTML = (st.overview?.limitations ?? []).map((x) => `<li>${esc(x)}</li>`).join("");
+    $("wx-quality").hidden = true;
+    $("wx-chart-cap").textContent = "수위 시계열"; $("wx-chart").closest(".wx-card").hidden = true;
+    $("wx-fac-cap").textContent = "판정 근거와 자료 출처";
+    const tier = f.tier === "operational" ? "시설별 통제 기준 등록" : f.tier === "rain_only" ? "수위계 없이 강우만 감시" : "감시 등급 · 대표성 미검증";
+    $("wx-fac-list").innerHTML = `<div class="wx-detail-row"><b>잠김 원인</b><span>${f.driver === "river" ? "하천 수위" : "지역 강우(내수)"}</span></div><div class="wx-detail-row"><b>분류</b><span>${esc(f.kind_ko)} · ${tier}</span></div><div class="wx-detail-row"><b>판정 이유</b><span>${esc(f.why)}</span></div><div class="wx-detail-row"><b>강우 기준</b><span>${esc(st.overview.rain_basis || "자료 없음")}</span></div>${f.tier === "operational" ? `<a class="wx-link" href="${esc(TWIN_HREF)}" target="_top">운영 시설 상세로 이동 →</a>` : ""}`;
+  }
+  function renderAll() {
+    const driverButton = $("wx-faconly");
+    driverButton.textContent = st.driver === "river" ? "하천형만" : st.driver === "pluvial" ? "내수형만" : "전체 유형";
+    driverButton.setAttribute("aria-pressed", String(st.driver !== "all"));
+    $("wx-asof").innerHTML = `<b>${clock(st.overview?.observed_at ?? st.overview?.rain_at ?? st.at)}</b> 강우·수위 판단 기준 · ${esc(st.region || "전국")} · ${base().length}곳`;
+    $("wx-mode").textContent = st.overview?.mode === "replay" ? "과거 수위 재생" : "실시간 수위";
+    $("wx-live").classList.toggle("wx-is-live", st.overview?.mode === "live");
+    renderSummary(); renderRegions(); renderList(); paintMap();
+  }
+  function notifyView() {
+    if (window.parent === window) return;
+    window.parent.postMessage({ type: "floodops-watch-view", view: { at: st.at || null, region: st.region || null, stage: st.minStage, station: st.selected, facility_id: st.selected, driver: st.driver } }, window.location.origin);
+  }
+  async function load() {
+    const query = new URLSearchParams({ limit: "2000", rain_mode: "live" });
+    if (st.at) query.set("at", st.at);
+    const data = adaptFacilityRisk(await get(`/api/watch/facility-risk?${query}`)); st.overview = data; st.changes = null;
+    const rainAvailable = Boolean(data.rain_at);
+    root.dispatchEvent(new CustomEvent("wx:mode", { detail: { mode: data.mode, stations: data.counts?.total ?? data.stations.length,
+      observed: data.stations.length, observed_at: data.observed_at, rain: { mode: rainAvailable ? "live" : "unavailable", available: rainAvailable, observed_at: data.rain_at, basis: data.rain_basis } } }));
+    $("wx-limits").innerHTML = (data.limitations ?? []).map((x) => `<li>${esc(x)}</li>`).join("");
+    if (st.selected && !data.stations.some((r) => r.code === st.selected)) { st.selected = null; openDrawer(false); }
+    renderAll(); if (st.selected) renderStation(st.selected);
+  }
+  function applyView(view) {
+    if (!view) return;
+    if (view.min_stage !== undefined) st.minStage = view.min_stage ?? null;
+    const nextRegion = view.region ?? (view.station_code || view.facility_id ? st.region : "");
+    if ((nextRegion || "") !== st.region) st.region = nextRegion || "";
+    st.selected = view.facility_id ?? view.station_code ?? st.selected; renderAll();
+    if (st.selected) { select(st.selected, false, true); } else openDrawer(false);
+    if (map && view.center) map.flyTo({ center: view.center, zoom: view.zoom ?? 10, duration: 1000 });
+    notifyView();
+  }
+
+  // 이벤트
+  $("wx-tab-st").addEventListener("click", () => showTab("st"));
+  $("wx-tab-ag").addEventListener("click", () => showTab("ag"));
+  $("wx-kpihandle").addEventListener("click", () => { const w = $("wx-kpiwrap"), on = !w.classList.contains("wx-pin"); w.classList.toggle("wx-pin", on); $("wx-kpihandle").setAttribute("aria-expanded", on); });
+  $("wx-kpis").addEventListener("click", () => { $("wx-kpiwrap").classList.remove("wx-pin"); $("wx-kpihandle").setAttribute("aria-expanded", "false"); });
+  $("wx-close").addEventListener("click", () => { openDrawer(false); st.selected = null; renderList(); paintMap(); notifyView(); });
+  $("wx-launch").addEventListener("click", () => { openDrawer(true); showTab("ag"); $("wx-ag-input").focus(); });
+  $("wx-ag-form").addEventListener("submit", (e) => { e.preventDefault(); ask($("wx-ag-input").value); });
+  $("wx-q").addEventListener("input", (e) => { st.q = e.target.value; renderList(); paintMap(); });
+  $("wx-faconly").addEventListener("click", (e) => { st.driver = st.driver === "all" ? "river" : st.driver === "river" ? "pluvial" : "all"; e.currentTarget.textContent = st.driver === "all" ? "전체 유형" : st.driver === "river" ? "하천형만" : "내수형만"; e.currentTarget.setAttribute("aria-pressed", String(st.driver !== "all")); renderList(); paintMap(); });
+  $("wx-sort").addEventListener("change", (e) => { st.sort = e.target.value; renderList(); });
+  root.querySelectorAll("[data-rsort]").forEach((b) => b.addEventListener("click", () => { st.rsort = b.dataset.rsort; root.querySelectorAll("[data-rsort]").forEach((x) => x.classList.toggle("wx-on", x === b)); renderRegions(); }));
+  $("wx-time").addEventListener("change", (e) => { st.at = e.target.value; notifyView(); scheduleLiveRefresh(); load(); });
+  $("wx-rbtn").addEventListener("click", () => { openRegions(!$("wx-rpop").classList.contains("wx-open")); });
+  const onDocClick = (e) => { if ($("wx-rpop").classList.contains("wx-open") && !e.target.closest?.("#wx-rpop, #wx-rbtn")) openRegions(false); };
+  document.addEventListener("click", onDocClick);
+  // Esc: 지역 판이 열려 있으면 그것부터, 아니면 드로어를 닫는다 (포커스가 화면 밖에 있어도 동작)
+  const onDocKey = (e) => { if (e.key !== "Escape") return; if ($("wx-rpop").classList.contains("wx-open")) openRegions(false); else if ($("wx-drawer").classList.contains("wx-open")) $("wx-close").click(); };
+  document.addEventListener("keydown", onDocKey);
+  root.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") return;
+    // 목록에서 ↑↓ 로 이동, Enter 로 선택
+    const row = e.target.closest?.(".wx-row"); if (!row || !["ArrowDown", "ArrowUp"].includes(e.key)) return;
+    e.preventDefault(); const rows = [...root.querySelectorAll(".wx-row")]; const i = rows.indexOf(row);
+    const next = rows[Math.max(0, Math.min(rows.length - 1, i + (e.key === "ArrowDown" ? 1 : -1)))]; next.focus(); hoverOn(next.dataset.code);
+  });
+  const info = $("wx-info");
+  $("wx-info-btn").addEventListener("click", () => { const on = !info.classList.contains("wx-pinned"); info.classList.toggle("wx-pinned", on); info.classList.remove("wx-closed"); $("wx-info-btn").setAttribute("aria-expanded", on); });
+  $("wx-info-x").addEventListener("click", () => { info.classList.remove("wx-pinned"); info.classList.add("wx-closed"); $("wx-info-btn").setAttribute("aria-expanded", "false"); });
+  info.addEventListener("mouseleave", () => info.classList.remove("wx-closed"));
+
+  async function init() {
+    $("wx-time").value = st.at;
+    const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas";
+    map = new maplibregl.Map({ container: $("wx-map"), attributionControl: false, center: [127.8, 36.3], zoom: 6.3, maxZoom: 15,
+      style: { version: 8, sources: { base: { type: "raster", tiles: [`${ESRI}/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}`], tileSize: 256, maxzoom: 16 }, refs: { type: "raster", tiles: [`${ESRI}/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}`], tileSize: 256, maxzoom: 16 } },
+        layers: [{ id: "bg", type: "background", paint: { "background-color": "#0b1220" } }, { id: "base", type: "raster", source: "base", paint: { "raster-brightness-max": .8 } }, { id: "refs", type: "raster", source: "refs", paint: { "raster-opacity": .5 } }] } });
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
+    await new Promise((res) => map.once("style.load", res));
+    map.addSource("wx-st", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addSource("wx-fac", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addSource("wx-rain", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addLayer({ id: "wx-fac", type: "circle", source: "wx-fac", paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 6, 2, 12, 6], "circle-color": "#0b1220", "circle-stroke-color": ["case", ["==", ["get", "tier"], "operational"], "#34d399", "#9aa9c2"], "circle-stroke-width": 1.5 } });
+    map.addLayer({ id: "wx-rain", type: "circle", source: "wx-rain", layout: { visibility: st.rainLayer ? "visible" : "none" }, paint: {
+      "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 3, 10, 6, 14, 9],
+      "circle-color": ["case",
+        ["any", [">=", ["get", "rain12"], 180], [">=", ["get", "rain3"], 90]], "#f87171",
+        ["any", [">=", ["get", "rain12"], 110], [">=", ["get", "rain3"], 60]], "#fb923c",
+        ["any", [">=", ["get", "rain12"], 80], [">=", ["get", "rain3"], 30], [">=", ["get", "rain1"], 15]], "#fbbf24",
+        ["any", [">=", ["get", "rain12"], 30], [">=", ["get", "rain3"], 10], [">=", ["get", "rain1"], 5]], "#60a5fa",
+        ["any", ["!=", ["get", "rain12"], null], ["!=", ["get", "rain3"], null], ["!=", ["get", "rain1"], null]], "#38bdf8", "#71717a"],
+      "circle-opacity": 0.9, "circle-stroke-color": "#e4e4e7", "circle-stroke-width": 1.2 } });
+    map.addLayer({ id: "wx-halo", type: "circle", source: "wx-st", filter: [">=", ["get", "rank"], 4], paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 11, 12, 24], "circle-color": ["get", "color"], "circle-blur": 1, "circle-opacity": ["case", ["boolean", ["get", "dim"], false], 0.08, 0.5] } });
+    map.addLayer({ id: "wx-st", type: "circle", source: "wx-st", paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, ["case", [">=", ["get", "rank"], 2], 5, 3], 12, ["case", [">=", ["get", "rank"], 2], 10, 6]],
+      "circle-color": ["get", "color"], "circle-opacity": ["case", ["boolean", ["get", "dim"], false], 0.2, 0.95], "circle-stroke-color": ["case", ["boolean", ["get", "sel"], false], "#fff", "#0b1220"], "circle-stroke-width": ["case", ["boolean", ["get", "sel"], false], 2.5, 0.8] } });
+    map.addLayer({ id: "wx-hover", type: "circle", source: "wx-st", filter: ["==", ["get", "code"], "__none__"], paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 12, 12, 20], "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#fff", "circle-stroke-width": 2.5 } });
+    hoverPop = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 14 });
+    map.on("mousemove", "wx-st", (e) => { const p = e.features?.[0]?.properties; if (!p) return; map.getCanvas().style.cursor = "pointer"; hoverPop.setLngLat(e.lngLat).setHTML(`<b>${esc(p.name)}</b><br>${p.label}`).addTo(map);
+      root.querySelectorAll(".wx-row").forEach((r) => { r.style.outline = r.dataset.code === p.code ? "1px solid rgba(255,255,255,.5)" : ""; }); });
+    map.on("mouseleave", "wx-st", () => { map.getCanvas().style.cursor = ""; hoverPop.remove(); root.querySelectorAll(".wx-row").forEach((r) => { r.style.outline = ""; }); });
+    map.on("click", "wx-st", (e) => { const c = e.features?.[0]?.properties?.code; if (c) { select(String(c), false); root.querySelector(`.wx-row[data-code="${c}"]`)?.scrollIntoView({ block: "nearest", behavior: "smooth" }); } });
+    map.on("mousemove", "wx-rain", (e) => { const p = e.features?.[0]?.properties; if (!p) return; map.getCanvas().style.cursor = "help";
+      const amount = (value) => value === null || value === undefined ? "자료 없음" : `${Number(value).toFixed(1)} mm`;
+      hoverPop.setLngLat(e.lngLat).setHTML(`<b>${esc(p.name)}</b><br>강우 관측소 · 10분 ${amount(p.rain10)} · 1시간 ${amount(p.rain1)} · 3시간 ${amount(p.rain3)} · 12시간 ${amount(p.rain12)}`).addTo(map); });
+    map.on("mouseleave", "wx-rain", () => { map.getCanvas().style.cursor = ""; hoverPop.remove(); });
+    $("wx-rain-toggle").addEventListener("click", () => { st.rainLayer = !st.rainLayer; $("wx-rain-toggle").setAttribute("aria-pressed", String(st.rainLayer));
+      $("wx-rain-toggle").textContent = st.rainLayer ? "강우 관측소 숨기기" : "강우 관측소 표시"; map.setLayoutProperty("wx-rain", "visibility", st.rainLayer ? "visible" : "none"); });
+    const el = document.createElement("div"); el.className = "wx-fmk"; el.innerHTML = `<span class="wx-dot"></span><span class="wx-tip"></span>`; el.style.display = "none";
+    marker = new maplibregl.Marker({ element: el, anchor: "left", offset: [-8, 0] }).setLngLat([127.8, 36.3]).addTo(map);
+    await load();
+    loadExamples();
+    scheduleLiveRefresh();
+    if (st.selected) openDrawer(true);
+    // Start at an explicitly linked station, otherwise frame the currently visible risk stations.
+    const selected = st.overview?.stations.find((r) => r.code === st.selected);
+    if (selected) map.jumpTo({ center: [selected.lon, selected.lat], zoom: 12 });
+    else {
+      const rows = filtered().filter((r) => WATCH.includes(r.stage));
+      if (rows.length) { const b = new maplibregl.LngLatBounds(); rows.forEach((r) => b.extend([r.lon, r.lat])); map.fitBounds(b, { padding: { top: 80, left: 440, bottom: 80, right: 200 }, maxZoom: 10, duration: 1200 }); }
+    }
+  }
+  window.addEventListener("message", (e) => {
+    if (e.source !== window.parent || e.origin !== window.location.origin || e.data?.type !== "floodops-watch-set-view") return;
+    const view = e.data.view ?? {};
+    const nextAt = view.at ?? "";
+    const changedAt = nextAt !== st.at;
+    st.at = nextAt; st.region = view.region ?? ""; st.minStage = view.stage ?? null; st.selected = view.facility_id ?? view.station ?? null; st.driver = view.driver ?? st.driver;
+    $("wx-time").value = st.at;
+    if (changedAt) { scheduleLiveRefresh(); load().catch(() => undefined); }
+    else { renderAll(); if (st.selected) { openDrawer(true); renderStation(st.selected); } else openDrawer(false); }
+  });
+  root.wx = { reload: load, destroy: () => { document.removeEventListener("click", onDocClick); document.removeEventListener("keydown", onDocKey); if (liveRefresh) window.clearInterval(liveRefresh); map?.remove(); map = null; } };
+  init().catch((e) => { $("wx-body").innerHTML = `<div class="wx-empty"><b>불러오지 못했습니다</b>${esc(e.message)} · API(${API || window.location.origin}) 연결을 확인하세요</div>`; });
+})();
+</script>
+<script>
+  // 관측 데이터의 실시간/재생 모드를 헤더 배지에 표시한다.
+  document.getElementById("wx-root").addEventListener("wx:mode", (e) => {
+    const badge = document.getElementById("demo-mode");
+    badge.dataset.mode = e.detail.mode;
+    badge.textContent = `${e.detail.mode === "replay" ? "↺ 수위 재생" : "● 수위 실시간"} · ${e.detail.stations}곳`;
+    const rainBadge = document.getElementById("demo-rain-mode");
+    const rain = e.detail.rain;
+    rainBadge.dataset.mode = rain?.mode ?? "unavailable";
+    rainBadge.dataset.available = String(Boolean(rain?.available));
+    const rainLabel = rain?.mode === "live" ? "● 강우 실시간" : rain?.mode === "replay" ? "↺ 강우 재생" : "강우 자료 없음";
+    const rainTime = rain?.observed_at ? ` · ${rain.observed_at.slice(0, 16).replace("T", " ")}` : rain?.available ? "" : " · 자료 없음";
+    rainBadge.textContent = `${rainLabel}${rainTime}`;
+    rainBadge.title = rain?.error ? `강우 API 조회 실패: ${rain.error}` : rain?.basis ?? "현재 관측된 강우 자료";
+    if (window.parent !== window) window.parent.postMessage({ type: "floodops-watch-status", ...e.detail }, window.location.origin);
+  });
+</script>
+</body>
+</html>

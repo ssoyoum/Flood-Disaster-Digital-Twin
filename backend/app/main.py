@@ -787,19 +787,20 @@ def watch_overview(
     region: str | None = Query(default=None, max_length=20),
     min_stage: Literal["attention", "advisory", "warning", "planned_flood"] | None = None,
     limit: int = Query(default=400, ge=1, le=2000),
+    rain_mode: Literal["live", "replay"] | None = Query(default=None, description="Use current live rainfall independently from the selected river replay time"),
 ):
     """Every river gauge against its own official levels, with the facilities linked to it."""
 
     try:
-        return national_watch.overview(at, national_watch.match_region(region) if region else None, min_stage, limit)
+        return national_watch.overview(at, national_watch.match_region(region) if region else None, min_stage, limit, rain_mode)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.get("/api/watch/stations/{code}", tags=["watch"])
-def watch_station(code: str, at: str | None = None):
+def watch_station(code: str, at: str | None = None, rain_mode: Literal["live", "replay"] | None = None):
     try:
-        return national_watch.station_detail(code, at)
+        return national_watch.station_detail(code, at, rain_mode)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
@@ -827,11 +828,30 @@ def watch_facility_status(
     region: str | None = Query(default=None, max_length=20),
     group: Literal["underpass", "riverside"] | None = None,
     limit: int = Query(default=2000, ge=1, le=2000),
+    rain_mode: Literal["live", "replay"] | None = Query(default=None, description="Use current live rainfall independently from the selected river replay time"),
 ):
     """Facilities ordered by the stage of the gauge standing in for them, then by the rain beside them."""
 
     try:
-        return national_watch.facility_status(at, national_watch.match_region(region) if region else None, group, limit)
+        return national_watch.facility_status(at, national_watch.match_region(region) if region else None, group, limit, rain_mode)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/api/watch/facility-risk", tags=["watch"])
+def watch_facility_risk(
+    at: str | None = Query(default=None, description="ISO time to replay from the stored hourly series; omit for live"),
+    region: str | None = Query(default=None, max_length=20),
+    driver: Literal["river", "pluvial"] | None = None,
+    limit: int = Query(default=300, ge=1, le=2000),
+    rain_mode: Literal["live", "replay"] | None = Query(default=None, description="Use current live rainfall independently from the selected river replay time"),
+):
+    """Every facility ranked by the driver that floods it: river stage for river-type, local rain totals for pluvial."""
+
+    from . import facility_risk  # kept local so this route stays a self-contained addition
+
+    try:
+        return facility_risk.facility_risk(at, national_watch.match_region(region) if region else None, driver, limit, rain_mode)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 

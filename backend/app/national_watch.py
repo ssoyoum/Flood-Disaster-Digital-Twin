@@ -37,6 +37,7 @@ FACILITY_LINK_KM = 5.0
 KIND_KO = {"underpass": "지하차도", "riverside_parking": "둔치·하천변 주차장", "riverside_park": "하천 둔치 공원", "riverbed_road": "하상도로"}
 GROUP_KO = {"underpass": "지하차도", "riverside": "하천변 출입구"}
 HOURLY_DIR = REPO_ROOT / "data" / "processed" / "hrfco"
+LIVE_RAIN_HISTORY_FILE = REPO_ROOT / "data" / "interim" / "hrfco_live_rainfall_1h.json"
 BULK_ENDPOINT = "https://api.hrfco.go.kr/{key}/{kind}/list/{interval}.json"
 DEFAULT_REPLAY_AT = "2023-07-15T08:00:00"
 
@@ -301,9 +302,13 @@ class _LiveState:
     hourly_fetched: datetime | None = None
     dams: list[dict[str, Any]] = field(default_factory=list)
     rainfall: list[dict[str, Any]] = field(default_factory=list)
-    # 10-minute rain kept per gauge for two hours so a rolling 60-minute total builds up while the server runs.
+    # 10-minute rain stays in memory while the server runs; hourly rain history is persisted separately.
     rain_slots: dict[str, dict[datetime, float]] = field(default_factory=dict)
     rain_hourly: dict[str, tuple[datetime, float]] = field(default_factory=dict)
+    rain_hourly_history: dict[str, dict[datetime, float]] = field(default_factory=dict)
+    rain_fetched_at: datetime | None = None
+    rain_hourly_fetched: datetime | None = None
+    rain_error: str | None = None
     last_error: str | None = None
 
 
@@ -353,6 +358,81 @@ def _rain_rows(rows: list[dict[str, Any]]) -> dict[str, tuple[datetime, float]]:
     return observed
 
 
+def _load_live_rain_hourly_history() -> dict[str, dict[datetime, float]]:
+    """Restore recent hourly rain readings so a process restart does not erase the 12-hour window."""
+    try:
+        payload = json.loads(LIVE_RAIN_HISTORY_FILE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    now = datetime.now()
+    cutoff = now - timedelta(hours=14)
+    history: dict[str, dict[datetime, float]] = {}
+    gauges = payload.get("gauges", {}) if isinstance(payload, dict) else {}
+    if not isinstance(gauges, dict):
+        return {}
+    for code, samples in gauges.items():
+        if not isinstance(code, str) or not isinstance(samples, list):
+            continue
+        slots: dict[datetime, float] = {}
+        for sample in samples:
+            try:
+                stamp = datetime.fromisoformat(sample["at"]).replace(tzinfo=None)
+                value = float(sample["mm"])
+            except (KeyError, TypeError, ValueError):
+                continue
+            if cutoff <= stamp <= now + timedelta(minutes=5) and math.isfinite(value) and value >= 0:
+                slots[stamp] = value
+        if slots:
+            history[code] = slots
+    return history
+
+
+def _persist_live_rain_hourly_history() -> None:
+    payload = {
+        "version": 1,
+        "gauges": {
+            code: [{"at": stamp.isoformat(), "mm": value} for stamp, value in sorted(slots.items())]
+            for code, slots in sorted(_LIVE.rain_hourly_history.items()) if slots
+        },
+    }
+    try:
+        LIVE_RAIN_HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
+        temporary = LIVE_RAIN_HISTORY_FILE.with_name(LIVE_RAIN_HISTORY_FILE.name + ".tmp")
+        temporary.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+        os.replace(temporary, LIVE_RAIN_HISTORY_FILE)
+    except OSError:
+        # Keep the in-memory window usable if the local cache directory is read-only.
+        pass
+
+
+def _store_live_rain_hourly(rows: list[dict[str, Any]]) -> None:
+    observed = _rain_rows(rows)
+    _LIVE.rain_hourly = observed
+    changed = False
+    for code, (stamp, value) in observed.items():
+        slots = _LIVE.rain_hourly_history.setdefault(code, {})
+        if slots.get(stamp) != value:
+            slots[stamp] = value
+            changed = True
+        cutoff = stamp - timedelta(hours=14)
+        for old in [moment for moment in slots if moment < cutoff]:
+            slots.pop(old)
+    if changed:
+        _persist_live_rain_hourly_history()
+
+
+_LIVE.rain_hourly_history = _load_live_rain_hourly_history()
+
+
+def _store_live_rainfall(rows: list[dict[str, Any]], now: datetime) -> None:
+    _LIVE.rainfall = rows
+    for code, (stamp, value) in _rain_rows(rows).items():
+        slots = _LIVE.rain_slots.setdefault(code, {})
+        slots[stamp] = value
+        for old in [moment for moment in slots if (stamp - moment).total_seconds() > 7200]:
+            slots.pop(old)
+
+
 def live_available() -> bool:
     from .llm_planner import _load_env_file_once  # imported here: llm_planner imports the agent tool catalogue
 
@@ -377,16 +457,46 @@ def refresh_live(force: bool = False) -> _LiveState:
                 _LIVE.hourly = _water_rows(_bulk(key, "waterlevel", "1H"))
                 _LIVE.hourly_fetched = now
             _LIVE.dams = _bulk(key, "dam", "10M")
-            _LIVE.rainfall = _bulk(key, "rainfall", "10M")
-            for code, (stamp, value) in _rain_rows(_LIVE.rainfall).items():
-                slots = _LIVE.rain_slots.setdefault(code, {})
-                slots[stamp] = value
-                for old in [moment for moment in slots if (stamp - moment).total_seconds() > 7200]:
-                    slots.pop(old)
-            _LIVE.rain_hourly = _rain_rows(_bulk(key, "rainfall", "1H"))
+            _store_live_rainfall(_bulk(key, "rainfall", "10M"), now)
+            _LIVE.rain_fetched_at = now
+            if _LIVE.rain_hourly_fetched is None or (now - _LIVE.rain_hourly_fetched).total_seconds() >= 3600:
+                _store_live_rain_hourly(_bulk(key, "rainfall", "1H"))
+                _LIVE.rain_hourly_fetched = now
+            _LIVE.rain_error = None
             _LIVE.last_error = None
         except Exception as exc:  # the key sits in the URL; never surface it
             _LIVE.last_error = f"{type(exc).__name__} while refreshing the HRFCO bulk feed"
+    return _LIVE
+
+
+def refresh_live_rain(force: bool = False) -> _LiveState:
+    """Refresh only rainfall feeds so a historical river replay can show current rain."""
+    from .llm_planner import _load_env_file_once  # national_watch can be used without loading the agent first
+
+    _load_env_file_once()
+    key = os.environ.get("HRFCO_API_KEY", "")
+    now = datetime.now().replace(microsecond=0)
+    with _LOCK:
+        if not force and _LIVE.rain_fetched_at and (now - _LIVE.rain_fetched_at).total_seconds() < REFRESH_SECONDS:
+            return _LIVE
+        if not key:
+            _LIVE.rain_error = "HRFCO_API_KEY is not configured"
+            _LIVE.rain_fetched_at = now
+            return _LIVE
+        try:
+            _store_live_rainfall(_bulk(key, "rainfall", "10M", timeout=10.0), now)
+            _LIVE.rain_fetched_at = now
+            _LIVE.rain_error = None
+        except Exception as exc:  # never expose the credential embedded in the URL
+            _LIVE.rain_error = f"{type(exc).__name__} while refreshing the HRFCO rainfall feed"
+            _LIVE.rain_fetched_at = now
+            return _LIVE
+        if _LIVE.rain_hourly_fetched is None or (now - _LIVE.rain_hourly_fetched).total_seconds() >= 3600:
+            try:
+                _store_live_rain_hourly(_bulk(key, "rainfall", "1H", timeout=10.0))
+                _LIVE.rain_hourly_fetched = now
+            except Exception as exc:  # the current 10-minute readings are still usable
+                _LIVE.rain_error = f"{type(exc).__name__} while refreshing the HRFCO hourly rainfall feed"
     return _LIVE
 
 
@@ -440,7 +550,7 @@ def _rain_reading(gauge: RainGauge, rain_10m: float | None, rain_1h: float | Non
 def rain_frame(at: str | None, live: bool | None = None) -> tuple[str, datetime | None, dict[str, dict[str, Any]]]:
     """Latest rain per gauge: (mode, observed time, readings). Live uses the 10-minute feed, replay the stored hours.
 
-    `live` pins the mode to the one the water levels were judged in, so one response never mixes the two.
+    `live` can select current rainfall independently of the river-level replay time.
     """
     gauges = rain_gauges()
     readings: dict[str, dict[str, Any]] = {}
@@ -453,9 +563,9 @@ def rain_frame(at: str | None, live: bool | None = None) -> tuple[str, datetime 
             if value is not None and code in gauges:
                 readings[code] = _rain_reading(gauges[code], None, value, "hourly", hour, hour)
         return "replay", hour if readings else None, readings
-    state = refresh_live()
+    state = refresh_live_rain()
     latest_stamp = max((max(slots) for slots in state.rain_slots.values() if slots), default=None)
-    if latest_stamp is None:
+    if latest_stamp is None or (datetime.now() - latest_stamp).total_seconds() > FRESH_MINUTES["10M"] * 60:
         return "live", None, readings
     for code, slots in state.rain_slots.items():
         if code not in gauges or not slots:
@@ -492,6 +602,7 @@ def rain_summary(at: str | None = None, region: str | None = None, limit: int = 
     raining = sorted((row for row in rows if (row["intensity_mm_h"] or 0) > 0), key=lambda row: -(row["intensity_mm_h"] or 0))
     return {
         "available": bool(readings), "mode": mode, "observed_at": observed.isoformat() if observed else None,
+        "error": _LIVE.rain_error if mode == "live" else None,
         "basis": "최근 10분 강우 × 6 (시간당 환산)" if mode == "live" else "저장된 1시간 강우",
         "gauges_total": len(rain_gauges()), "gauges_reporting": len(rows), "raining": len(raining),
         "heavy_or_above": by["heavy"] + by["very_heavy"], "by_intensity": by,
@@ -611,9 +722,10 @@ def _frame(at: str | None) -> tuple[str, datetime, Snapshot, dict[str, tuple[dat
     return "live", datetime.now().replace(second=0, microsecond=0), latest, state.hourly, list(state.snapshots)[:-1], state.last_error
 
 
-def _assess_all(at: str | None, region: str | None = None) -> tuple[dict[str, Any], list[dict[str, Any]], tuple]:
+def _assess_all(at: str | None, region: str | None = None, rain_mode: str | None = None) -> tuple[dict[str, Any], list[dict[str, Any]], tuple]:
     mode, now, snapshot, baselines, history, error = _frame(at)
-    rain = rain_frame(at, live=mode == "live")
+    rain_live = mode == "live" if rain_mode is None else rain_mode == "live"
+    rain = rain_frame(at, live=rain_live)
     rows = []
     for station in stations().values():
         if region and station.region != region:
@@ -638,8 +750,9 @@ def _assess_all(at: str | None, region: str | None = None) -> tuple[dict[str, An
     return meta, rows, rain
 
 
-def overview(at: str | None = None, region: str | None = None, min_stage: str | None = None, limit: int = 300) -> dict[str, Any]:
-    meta, rows, rain = _assess_all(at, region)
+def overview(at: str | None = None, region: str | None = None, min_stage: str | None = None, limit: int = 300,
+             rain_mode: str | None = None) -> dict[str, Any]:
+    meta, rows, rain = _assess_all(at, region, rain_mode)
     floor = STAGE_ORDER.index(min_stage) if min_stage in STAGE_ORDER else -1
     counts = {stage: 0 for stage in STAGE_ORDER}
     quality = {"fresh": 0, "stale": 0, "suspect": 0, "missing": 0}
@@ -707,9 +820,10 @@ def _facility_priority(row: dict[str, Any]) -> tuple:
     return (-elevated, minutes if elevated else 0, -rain, minutes, row["name"])
 
 
-def facility_status(at: str | None = None, region: str | None = None, group: str | None = None, limit: int = 2000) -> dict[str, Any]:
+def facility_status(at: str | None = None, region: str | None = None, group: str | None = None, limit: int = 2000,
+                    rain_mode: str | None = None) -> dict[str, Any]:
     """Each facility with the stage of the gauge standing in for it (if any) and the rain beside it."""
-    meta, rows, rain = _assess_all(at, None)
+    meta, rows, rain = _assess_all(at, None, rain_mode)
     by_code = {row["code"]: row for row in rows}
     out = []
     for facility in facility_catalog():
@@ -739,14 +853,15 @@ def facility_status(at: str | None = None, region: str | None = None, group: str
             ]}
 
 
-def station_detail(code: str, at: str | None = None) -> dict[str, Any]:
+def station_detail(code: str, at: str | None = None, rain_mode: str | None = None) -> dict[str, Any]:
     station = stations().get(code)
     if station is None:
         raise KeyError(f"Unknown station: {code}")
     mode, now, snapshot, baselines, history, error = _frame(at)
     latest = snapshot.observed.get(code)
     baseline = (_baseline_for(code, latest, history, baselines) if latest and mode == "live" else baselines.get(code)) if latest else None
-    row = {**assess_station(station, latest, baseline, now, snapshot.interval), "rain_nearby": nearby_rain(code, rain_frame(at, live=mode == "live")[2])}
+    rain_live = mode == "live" if rain_mode is None else rain_mode == "live"
+    row = {**assess_station(station, latest, baseline, now, snapshot.interval), "rain_nearby": nearby_rain(code, rain_frame(at, live=rain_live)[2])}
     series = [{"time": snap.observed[code][0].isoformat(), "water_level_m": snap.observed[code][1]} for snap in [*history, snapshot] if code in snap.observed]
     if mode == "replay":
         series = []
