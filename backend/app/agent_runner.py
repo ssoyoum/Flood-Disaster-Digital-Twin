@@ -24,7 +24,7 @@ from uuid import uuid4
 import httpx
 from pydantic import BaseModel, Field
 
-from . import agent_cases, agent_facility
+from . import agent_cases, agent_facility, agent_watch
 from .agent_context import resolve_question
 from .agent_tools import (
     _extract_clock_times,
@@ -166,6 +166,7 @@ async def _post_gemini(url: str, *, headers: dict, json: dict, timeout: float) -
 MAX_MODEL_STEPS = 6
 _PARAMETERS: dict[str, set[str]] = {
     **{name: set() for name in agent_facility.TOOL_NAMES},
+    **agent_watch.PARAMETERS,
     "get_event": set(),
     "get_reconstruction": set(),
     "get_observation_summary": set(),
@@ -261,6 +262,16 @@ class AgentAction(BaseModel):
 
 
 def _system_prompt(context: dict[str, Any]) -> str:
+    if context.get("board") == "watch":
+        return _SYSTEM_PROMPT + (
+            "\nWatch-board scope overrides the historical examples above: the user is a duty officer looking at a national "
+            "map of river gauges and the facilities linked to them. Use ONLY available_tools. Parameters may carry only "
+            "words the user wrote: a 시도 name as region, a gauge name as station, a facility name as facility, a stage "
+            "word (관심/주의보/경보/계획홍수위) as min_stage, a count as limit, a span in minutes as since_min. When the "
+            "user asks to see, show, go to or open a place, call navigate_board. Stages are gauge stages against each "
+            "station's official levels, never facility flood depth. Linked facilities are watch-tier unless tier is "
+            "operational: say the gauge link is unverified. Minutes to planned flood are a persistence baseline, not a "
+            "forecast. Never say a place is safe, never predict flooding, never order or confirm a closure.")
     if not context.get("selected_facility"):
         return _SYSTEM_PROMPT
     return _SYSTEM_PROMPT + (
@@ -429,10 +440,15 @@ def _validated_tool_request(action: AgentAction, request: AgentAskRequest, calls
     supplied_at = params.pop("observation_at", request.observation_at)
     if supplied_facility != request.facility_id or supplied_at != request.observation_at:
         raise ValueError("The model changed the selected facility or observation time.")
-    if name not in {tool["name"] for tool in list_agent_tools(request.event_id, request.facility_id)}:
+    if name not in {tool["name"] for tool in list_agent_tools(request.event_id, request.facility_id, request.board)}:
         raise _ToolSelectionError("The model selected a tool that is not registered for this event.")
     if set(params) - _PARAMETERS[name]:
         raise ValueError("The model supplied unsupported tool parameters.")
+    if request.board == "watch":
+        supplied = parameter_text if parameter_text is not None else request.message
+        clean = agent_watch.validate(name, params, supplied)
+        return AgentToolCallRequest(event_id=request.event_id, facility_id=None, observation_at=request.observation_at,
+                                    board="watch", **clean)
     for key in ("delay_minutes", "radii_m"):
         if key in params:
             params[key] = _as_int_list(params[key])
@@ -489,7 +505,7 @@ def _validated_tool_request(action: AgentAction, request: AgentAskRequest, calls
         if kind not in {"closure_timing", "inflow_delay"} or ("closure_times" if kind == "closure_timing" else "delay_minutes") not in params:
             raise ValueError("Scenario comparison needs a type and an explicit parameter.")
     return AgentToolCallRequest(event_id=request.event_id, facility_id=request.facility_id,
-                               observation_at=request.observation_at, **params)
+                               observation_at=request.observation_at, board=request.board, **params)
 
 
 def _grounded_answer(answer: str, calls: list[dict[str, Any]], references: list[int]) -> bool:
@@ -507,6 +523,8 @@ def _grounded_answer(answer: str, calls: list[dict[str, Any]], references: list[
 def _unavailable_answer(action: AgentAction, request: AgentAskRequest) -> tuple[str, str]:
     """Explain an unsupported request without trusting an uncited model answer."""
 
+    if request.board == "watch":
+        return agent_watch.unavailable_answer()
     if request.facility_id:
         return ("시설 Agent는 관측 상태·등록 통제 검토 기준·과거 수위 백테스트·기준별 비교·연구용 상승 모델 값을 설명합니다. "
                 "실제 침수심·유입 예측·피해 감소·통제 실행은 계산하거나 수행하지 않습니다.",
@@ -612,7 +630,25 @@ def _reply(request: AgentAskRequest, status: str, answer: str, calls: list[dict[
            follow_ups: list[str], evidence: list[int] | None = None, model: str | None = "",
            source: str = "model") -> dict[str, Any]:
     state = _run_state.get()
-    if request.facility_id:
+    if request.board == "watch":
+        used = {call["tool_name"] for call in calls}
+        follow_ups = [item["question"] for item in agent_watch.EXAMPLES if not any(item["workflow"] in name for name in used)][:3]
+        if not calls and source == "model":
+            answer, _ = agent_watch.unavailable_answer()
+        if calls and (source == "registered_tools" or not agent_watch.safe_model_answer(answer, calls)):
+            summary, references = agent_watch.summarize(calls)
+            if summary:
+                answer, evidence, source = summary, references, "registered_tools"
+        if any(call["tool_name"] == "get_station_status" and call["result"].get("quality") != "fresh" for call in calls):
+            status = "NEEDS_DATA"
+        if calls and any(call["result"].get("facilities") or (call["result"].get("station") or {}).get("facilities") for call in calls) \
+                and agent_watch.WATCH_CAVEAT not in answer:
+            answer += f"\n{agent_watch.WATCH_CAVEAT}"
+        if calls and any("minutes_to_planned_flood" in json.dumps(call["result"], ensure_ascii=False) for call in calls) and "예보" not in answer:
+            answer += f"\n{agent_watch.BASELINE_CAVEAT}"
+        if calls and "현장 확인과 담당자 판단이 우선" not in answer:
+            answer += "\n실제 통제·대피 결정은 현장 확인과 담당자 판단이 우선합니다."
+    elif request.facility_id:
         used = {call["tool_name"] for call in calls}
         follow_ups = [item["question"] for item in agent_facility.EXAMPLES if f"get_{item['workflow']}" not in used][:3]
         if not calls and source == "model":
@@ -830,8 +866,9 @@ def _execute_hint(hint: dict[str, Any], request: AgentAskRequest) -> tuple[Agent
     stage = "validation"
     started = time.monotonic()
     try:
+        parameters = agent_watch.validate(hint["tool_name"], hint["parameters"], request.message) if request.board == "watch" else hint["parameters"]
         tool_request = AgentToolCallRequest(event_id=request.event_id, facility_id=request.facility_id,
-                                           observation_at=request.observation_at, **hint["parameters"])
+                                           observation_at=request.observation_at, board=request.board, **parameters)
         stage = "tool"
         result = execute_agent_tool(hint["tool_name"], request.event_id, tool_request)
     except (ValueError, ReconstructionUnavailable, KeyError):
@@ -847,8 +884,8 @@ def _execute_hint(hint: dict[str, Any], request: AgentAskRequest) -> tuple[Agent
 _MODEL_CATALOGUE_FIELDS = ("name", "use_when", "parameters", "can_say", "cannot_say", "examples")
 
 
-def _model_catalogue(event_id: str, facility_id: str | None) -> list[dict[str, Any]]:
-    return [{key: tool[key] for key in _MODEL_CATALOGUE_FIELDS if key in tool} for tool in list_agent_tools(event_id, facility_id)]
+def _model_catalogue(event_id: str, facility_id: str | None, board: str | None = None) -> list[dict[str, Any]]:
+    return [{key: tool[key] for key in _MODEL_CATALOGUE_FIELDS if key in tool} for tool in list_agent_tools(event_id, facility_id, board)]
 
 
 # Map-rendering fields no catalogue entry lets the model cite. The full result still backs the grounding check.
@@ -871,6 +908,8 @@ def _observation(trace: dict[str, Any]) -> dict[str, Any]:
 def _trace_parameters(parameters: dict[str, Any], request: AgentAskRequest) -> dict[str, Any]:
     if request.facility_id:
         return {**parameters, "facility_id": request.facility_id, "observation_at": request.observation_at}
+    if request.board == "watch" and request.observation_at:
+        return {**parameters, "observation_at": request.observation_at}
     return parameters
 
 
@@ -878,6 +917,10 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
     """Run a bounded observe-decide-act loop and return an auditable answer."""
 
     if _is_capability_question(request.message):
+        if request.board == "watch":
+            examples = "\n".join(f"- {item['question']}" for item in agent_watch.EXAMPLES)
+            return _reply(request, "ANSWERED", f"감시 보드에서는 이런 질문을 해보세요:\n{examples}\n\n단계는 관측소 공식 기준 수위 기준이고, 남은 분은 기준선이며 예보가 아닙니다.",
+                          [], [], [], model=None, source="capability")
         if request.facility_id:
             return _reply(request, "ANSWERED", "선택 시설의 관측 상태, 통제 검토 기준과 근거, 과거 수위 백테스트, 기준을 바꿨을 때의 비교, 연구용 6시간 상승 모델 값을 설명할 수 있습니다.",
                           [], [], [], model=None, source="capability")
@@ -889,8 +932,12 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
         answer, limitation = _unavailable_answer(AgentAction(action="final", gap_kind="physical_intervention"), request)
         return _reply(request, "NEEDS_DATA", answer, [], [limitation], [], model=None, source="clarification")
     route_started = time.monotonic()
-    resolved = (resolve_question(request, lambda message, event: agent_facility.hints(message))
-                if request.facility_id else resolve_question(request, _router_hints))
+    if request.board == "watch":
+        resolved = resolve_question(request, lambda message, event: agent_watch.hints(message))
+    elif request.facility_id:
+        resolved = resolve_question(request, lambda message, event: agent_facility.hints(message))
+    else:
+        resolved = resolve_question(request, _router_hints)
     _trace("router", resolved.mode, route_started, by="server")
     state = _run_state.get()
     if state is not None:
@@ -903,10 +950,14 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
         "question": request.message,
         "parameter_context": resolved.parameter_text,
         "history": [turn.model_dump() for turn in request.history],
-        "available_tools": _model_catalogue(request.event_id, request.facility_id),
+        "available_tools": _model_catalogue(request.event_id, request.facility_id, request.board),
         "observations": [],
         "remaining_tool_calls": MAX_TOOL_CALLS,
     }
+    if request.board == "watch":
+        context["board"] = "watch"
+        context["scope_note"] = ("Watch-board scope: national gauge stages and linked facilities. Parameters only from the user's words; "
+                                 "navigate_board moves the screen. Gauge links to facilities are unverified watch-tier unless operational.")
     if request.facility_id:
         context["selected_facility"] = {"facility_id": request.facility_id, "observation_at": request.observation_at}
         context["scope_note"] = ("Facility scope: only its registered read-only facility tools are allowed. Always identify "
@@ -954,7 +1005,8 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
                 if physical:
                     answer, limitation = _unavailable_answer(AgentAction(action="final", gap_kind="physical_intervention"), request)
                 else:
-                    answer, limitation = _FORECAST_ANSWER, "No registered tool forecasts future rainfall or flooding."
+                    answer = agent_watch.FORECAST_ANSWER if request.board == "watch" else _FORECAST_ANSWER
+                    limitation = "No registered tool forecasts future rainfall or flooding."
                 return _reply(request, "NEEDS_DATA", answer, [], [limitation, str(exc)],
                               _follow_ups(None, event_id=request.event_id), model=None, source="clarification")
             called = {call["tool_name"] for call in calls}
@@ -991,7 +1043,7 @@ def _ask_agent(request: AgentAskRequest) -> dict[str, Any]:
         if action.action == "final" and not anchored and (missing or (hypothetical and not calls)):
             # The model tried to finish without the evidence the question needs: run it once on the user's values.
             anchored = True
-            todo = missing or [{"tool_name": "get_facility_backtest" if request.facility_id else "get_reconstruction", "parameters": {}}]
+            todo = missing or [{"tool_name": "get_watch_overview" if request.board == "watch" else "get_facility_backtest" if request.facility_id else "get_reconstruction", "parameters": {}}]
             for hint in todo[: MAX_TOOL_CALLS - len(calls)]:
                 try:
                     tool_request, result = _execute_hint(hint, request)

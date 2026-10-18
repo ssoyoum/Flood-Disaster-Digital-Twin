@@ -36,7 +36,7 @@ from .seoul_repository import (
 )
 from .case_comparison import get_case_lead_times
 from .twin import FACILITIES as TWIN_FACILITIES, backtest as twin_backtest, criteria_review as twin_criteria_review, facility_status as twin_facility_status, list_facilities as twin_list_facilities, twin_mode
-from . import agent_facility
+from . import agent_facility, agent_watch, national_watch
 from . import facility_registry
 from .water_level_bridge import readiness as water_level_readiness
 from .rise_model import forecast as rise_forecast
@@ -90,7 +90,11 @@ from .services import (
 )
 
 
-def _require_agent_scope(event_id: str, facility_id: str | None, observation_at: str | None = None) -> None:
+def _require_agent_scope(event_id: str, facility_id: str | None, observation_at: str | None = None, board: str | None = None) -> None:
+    if board == "watch":
+        if facility_id is not None:
+            raise HTTPException(status_code=422, detail="The watch board scope cannot select a facility.")
+        return
     if facility_id is None:
         if observation_at is not None:
             raise HTTPException(status_code=422, detail="Select a facility before setting observation_at.")
@@ -603,12 +607,12 @@ def twin_rise_forecast(facility_id: str, at: str | None = Query(default=None, de
 
 
 @app.get("/api/agent/tools", response_model=list[AgentToolDescriptor], tags=["agent"])
-def agent_tools(event_id: str = "osong-2023", facility_id: str | None = None):
+def agent_tools(event_id: str = "osong-2023", facility_id: str | None = None, board: Literal["watch"] | None = None):
     """List the deterministic tools currently available to the Agent layer."""
 
     _require_event(event_id)
-    _require_agent_scope(event_id, facility_id)
-    return list_agent_tools(event_id, facility_id)
+    _require_agent_scope(event_id, facility_id, None, board)
+    return list_agent_tools(event_id, facility_id, board)
 
 
 @app.post(
@@ -620,7 +624,7 @@ def run_agent_tool(tool_name: str, request: AgentToolCallRequest):
     """Execute one registered analysis/data tool without LLM-side invention."""
 
     _require_event(request.event_id)
-    _require_agent_scope(request.event_id, request.facility_id, request.observation_at)
+    _require_agent_scope(request.event_id, request.facility_id, request.observation_at, request.board)
     try:
         result = execute_agent_tool(tool_name, request.event_id, request)
     except KeyError as exc:
@@ -641,7 +645,7 @@ def ask_agent_question(request: AgentAskRequest, http_request: Request):
     """Let Gemini choose registered tools iteratively and explain their evidence."""
 
     _require_event(request.event_id)
-    _require_agent_scope(request.event_id, request.facility_id, request.observation_at)
+    _require_agent_scope(request.event_id, request.facility_id, request.observation_at, request.board)
     agent_limiter.check(client_key(http_request))
     return ask_agent(request)
 
@@ -733,7 +737,7 @@ def exposure_inventory(
     response_model=list[AgentExampleQuestion],
     tags=["agent"],
 )
-def agent_examples(event_id: str = "osong-2023", facility_id: str | None = None):
+def agent_examples(event_id: str = "osong-2023", facility_id: str | None = None, board: Literal["watch"] | None = None):
     """Starter questions the registered tools can actually answer.
 
     The UI seeds its chips from here so an empty input box never invites a
@@ -741,8 +745,50 @@ def agent_examples(event_id: str = "osong-2023", facility_id: str | None = None)
     """
 
     _require_event(event_id)
-    _require_agent_scope(event_id, facility_id)
+    _require_agent_scope(event_id, facility_id, None, board)
+    if board == "watch":
+        return agent_watch.EXAMPLES
     return agent_facility.EXAMPLES if facility_id else list_example_questions(event_id)
+
+
+@app.get("/api/watch/overview", tags=["watch"])
+def watch_overview(
+    at: str | None = Query(default=None, description="ISO time to replay from the stored hourly series; omit for live"),
+    region: str | None = Query(default=None, max_length=20),
+    min_stage: Literal["attention", "advisory", "warning", "planned_flood"] | None = None,
+    limit: int = Query(default=400, ge=1, le=2000),
+):
+    """Every river gauge against its own official levels, with the facilities linked to it."""
+
+    try:
+        return national_watch.overview(at, national_watch.match_region(region) if region else None, min_stage, limit)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/api/watch/stations/{code}", tags=["watch"])
+def watch_station(code: str, at: str | None = None):
+    try:
+        return national_watch.station_detail(code, at)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/api/watch/changes", tags=["watch"])
+def watch_changes(since_min: int = Query(default=60, ge=10, le=1440), at: str | None = None, region: str | None = Query(default=None, max_length=20)):
+    try:
+        return national_watch.changes(since_min, at, national_watch.match_region(region) if region else None)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/api/watch/facilities", tags=["watch"])
+def watch_facilities():
+    """Facilities linked to a gauge, with their tier (operational vs watch)."""
+
+    return list(national_watch.facility_index().values())
 
 
 @app.get("/api/agent/planner-status", tags=["agent"])

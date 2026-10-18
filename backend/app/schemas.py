@@ -251,6 +251,8 @@ class AgentToolDescriptor(BaseModel):
 class FacilityAgentScope(BaseModel):
     facility_id: str | None = Field(default=None, min_length=1, max_length=100)
     observation_at: str | None = None
+    # "watch" switches the Agent to the national board tools; it cannot be combined with a facility.
+    board: Literal["watch"] | None = None
 
     @field_validator("observation_at")
     @classmethod
@@ -259,6 +261,13 @@ class FacilityAgentScope(BaseModel):
             if "T" not in value:
                 raise ValueError("observation_at must be an ISO date-time; select a replay time in the facility view.")
             datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return value
+
+    @field_validator("board")
+    @classmethod
+    def _board_excludes_facility(cls, value: str | None, info) -> str | None:
+        if value and info.data.get("facility_id"):
+            raise ValueError("board scope and facility_id are mutually exclusive.")
         return value
 
 
@@ -280,6 +289,13 @@ class AgentToolCallRequest(FacilityAgentScope):
     # Pohang 2022 / Andong-Uiseong 2026 tool
     intervention_id: str | None = None
     action_times: list[str] | None = None
+    # National watch board tools
+    region: str | None = Field(default=None, max_length=20)
+    station: str | None = Field(default=None, max_length=60)
+    facility: str | None = Field(default=None, max_length=100)
+    min_stage: Literal["attention", "advisory", "warning", "planned_flood"] | None = None
+    limit: Annotated[int, Field(ge=1, le=20)] | None = None
+    since_min: Annotated[int, Field(ge=10, le=1440)] | None = None
 
 
 class AgentToolCallResult(BaseModel):

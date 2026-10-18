@@ -8,7 +8,7 @@ from collections.abc import Callable
 import re
 from typing import Any
 
-from . import agent_cases, agent_facility
+from . import agent_cases, agent_facility, agent_watch
 from .data import get_event
 from .hand_sensitivity import analyze_hand_threshold
 from .osong_repository import get_osong_reconstruction, get_osong_summary
@@ -130,9 +130,11 @@ _TOOL_CATALOG: tuple[dict[str, Any], ...] = (
 )
 
 
-def list_agent_tools(event_id: str = "osong-2023", facility_id: str | None = None) -> list[dict[str, Any]]:
+def list_agent_tools(event_id: str = "osong-2023", facility_id: str | None = None, board: str | None = None) -> list[dict[str, Any]]:
     """Return a copy of the tools that are actually executable for this event."""
 
+    if board == "watch":
+        return agent_watch.tools()
     if facility_id:
         return agent_facility.tools(facility_id, event_id)
     if agent_cases.handles(event_id):
@@ -281,6 +283,10 @@ def execute_agent_tool(
 ) -> dict[str, Any]:
     """Execute one registered tool and return only domain-derived values."""
 
+    if getattr(request, "board", None) == "watch":
+        return agent_watch.run_tool(tool_name, request)
+    if tool_name in agent_watch.TOOL_NAMES:
+        raise ValueError("A watch-board tool needs the board scope.")
     if request.facility_id:
         return agent_facility.run_tool(tool_name, event_id, request)
     if tool_name in agent_facility.TOOL_NAMES:
