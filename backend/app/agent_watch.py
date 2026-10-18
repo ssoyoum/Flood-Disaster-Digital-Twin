@@ -12,7 +12,7 @@ from typing import Any
 from . import national_watch as nw
 
 TOOL_NAMES = {"get_watch_overview", "navigate_board", "rank_priority", "summarize_changes", "get_station_status",
-              "draft_situation_report", "rule_scorecard", "get_rain_status"}
+              "draft_situation_report", "rule_scorecard", "get_rain_status", "rank_facilities"}
 PARAMETERS: dict[str, set[str]] = {
     "get_watch_overview": {"region", "min_stage"},
     "navigate_board": {"region", "station", "facility", "min_stage"},
@@ -22,6 +22,7 @@ PARAMETERS: dict[str, set[str]] = {
     "draft_situation_report": {"region"},
     "rule_scorecard": {"facility"},
     "get_rain_status": {"region", "limit"},
+    "rank_facilities": {"region", "group", "limit"},
 }
 EXAMPLES = [
     {"workflow": "watch_overview", "label": "전국 현황", "question": "지금 전국에서 주의보 이상인 관측소가 몇 곳이야?"},
@@ -32,6 +33,7 @@ EXAMPLES = [
     {"workflow": "situation_report", "label": "상황 보고", "question": "지금 상황 보고 초안 써줘"},
     {"workflow": "rule_scorecard", "label": "규칙 성적표", "question": "궁평2지하차도 규칙 성적표 보여줘"},
     {"workflow": "rain_status", "label": "강우", "question": "지금 비 많이 오는 곳 어디야?"},
+    {"workflow": "rank_facilities", "label": "시설 우선순위", "question": "하천변 출입구 중 먼저 볼 곳 5곳 알려줘"},
 ]
 WATCH_CAVEAT = "감시 등급 연결은 5 km 안 가장 가까운 관측소 기준이며 그 관측소가 시설 유입을 대표하는지는 검증하지 않았습니다."
 BASELINE_CAVEAT = "남은 분은 최근 상승 속도를 그대로 늘린 기준선이며 예보가 아닙니다."
@@ -61,6 +63,9 @@ def tools() -> list[dict[str, Any]]:
         ("get_rain_status", "지금 비가 오는 강우 관측소와 강도(최근 10분 강우의 시간당 환산), 강한 비 아래에 있는 하천 관측소를 센다. 비·강우·호우·폭우를 물을 때.",
          "region: 사용자가 쓴 시도(없으면 전국). limit: 사용자가 쓴 개수(기본 5).",
          "강우 관측소 수, 비 오는 곳 수, 강도별 수, 많이 오는 곳 상위 N곳, 강한 비 아래 하천 관측소의 단계·상승 속도.", "앞으로 내릴 비(예보), 침수 발생, 수위 상승 시각."),
+        ("rank_facilities", "지하차도·하천변 출입구(둔치 주차장·공원·하상도로) 같은 시설을 대신하는 하천 관측소의 단계, 계획홍수위까지 남은 분, 옆 강우 순으로 정렬한다. 시설 중 먼저 볼 곳, 위험한 시설을 물을 때.",
+         "region: 사용자가 쓴 시도(없으면 전국). group: 사용자가 '지하차도'라고 쓰면 underpass, '하천변·둔치·출입구·하상도로'라고 쓰면 riverside(쓰지 않으면 생략). limit: 사용자가 쓴 개수(기본 5).",
+         "시설 이름·종류·지역, 대신하는 관측소와 거리, 단계, 남은 분, 옆 강우, 등급(운영·감시·강우만).", "시설 침수 여부, 통제 실행, 시설 단위 수위(관측소 수위만 있음)."),
     ]
     return [{"name": name, "description": description, "input_fields": sorted(PARAMETERS[name]),
              "output": "national watch evidence with provenance and limitations", "use_when": description,
@@ -75,6 +80,9 @@ _RANK = re.compile(r"위험한|우선|먼저\s*볼|상위|순위|top|가장")
 _CHANGE = re.compile(r"바뀌|변화|달라|지난\s*\d|최근\s*\d|새로")
 _REPORT = re.compile(r"보고|브리핑|정리해|요약해")
 _SCORE = re.compile(r"성적|적중|오경보|근접|채점|믿을")
+_GROUP_WORDS = [("지하차도", "underpass"), ("하천변", "riverside"), ("둔치", "riverside"), ("고수부지", "riverside"), ("하상도로", "riverside"),
+                ("출입구", "riverside"), ("천변", "riverside")]
+_FACILITY_WORD = re.compile(r"시설|지하차도|하천변|둔치|고수부지|하상도로|출입구|천변")
 _RAIN = re.compile(r"강우|호우|폭우|소나기|빗줄기|비\s*(?:가|는|도)?\s*(?:많이|오|와|내리|온|쏟|퍼붓)")
 _OVERVIEW = re.compile(r"몇\s*곳|현황|전체|전국|몇\s*개")
 _STATUS = re.compile(r"단계|수위|남았|상태|여유|얼마")
@@ -95,6 +103,13 @@ def _written_minutes(message: str) -> int | None:
     return int(minutes.group(1)) if minutes else None
 
 
+def _written_group(message: str) -> str | None:
+    for word, group in _GROUP_WORDS:
+        if word in message:
+            return group
+    return None
+
+
 def _written_limit(message: str) -> int | None:
     match = re.search(r"(\d{1,2})\s*(?:곳|개|군데|위)", message)
     return int(match.group(1)) if match else None
@@ -112,6 +127,8 @@ def hints(message: str) -> list[dict[str, Any]]:
 
     if _SCORE.search(message) and facility and facility["tier"] == "operational":
         add("rule_scorecard", facility=facility["name"])
+    elif _FACILITY_WORD.search(message) and not facility and (_RANK.search(message) or _OVERVIEW.search(message) or "먼저" in message):
+        add("rank_facilities", region=region, group=_written_group(message), limit=_written_limit(message))
     elif _RAIN.search(message) and station:
         add("get_station_status", station=station.short_name)
     elif _RAIN.search(message) and not facility:
@@ -158,6 +175,11 @@ def validate(name: str, params: dict[str, Any], supplied: str) -> dict[str, Any]
         if stage is None or stage != _written_stage(supplied):
             raise ValueError("The stage must be one the user wrote.")
         clean["min_stage"] = stage
+    if params.get("group") is not None:
+        group = params["group"] if params["group"] in ("underpass", "riverside") else _written_group(str(params["group"]))
+        if group is None or group != _written_group(supplied):
+            raise ValueError("The facility kind must be one the user wrote (지하차도 or 하천변).")
+        clean["group"] = group
     if params.get("limit") is not None:
         limit = int(params["limit"]) if str(params["limit"]).isdigit() else None
         if limit is None or limit != _written_limit(supplied) or not 1 <= limit <= 20:
@@ -238,10 +260,11 @@ def run_tool(name: str, request: Any) -> dict[str, Any]:
         facility = None
         if getattr(request, "facility", None):
             facility = nw.facility_index()[request.facility]
-            station = nw.station_detail(facility["station_code"], at)
+            station = nw.station_detail(facility["station_code"], at) if facility["station_code"] else None
         elif getattr(request, "station", None):
             station = nw.station_detail(request.station, at)
-        data = nw.overview(at, region or (station["region"] if station else None), min_stage, limit=5) if not station else None
+        scope = region or (station["region"] if station else facility["region"] if facility else None)
+        data = nw.overview(at, scope, min_stage, limit=5) if not station else None
         result: dict[str, Any] = {"view": _view(region=region, station=station, facility=facility, min_stage=min_stage), "mode": (station or data)["mode"],
                                   "moved_to": facility["name"] if facility else station["name"] if station else region or nw.STAGE_KO.get(min_stage or "", "전국"),
                                   "coverage_note": "NAVIGATION: the board follows this view; numbers describe the destination only.",
@@ -249,7 +272,9 @@ def run_tool(name: str, request: Any) -> dict[str, Any]:
         if station:
             result["station"] = _station_brief(station)
         if facility:
-            result["facility"] = {key: facility.get(key) for key in ("facility_id", "name", "tier", "distance_km", "region", "sgg", "event_id")}
+            result["facility"] = {key: facility.get(key) for key in ("facility_id", "name", "kind_ko", "tier", "distance_km", "region", "sgg", "event_id", "river_name")}
+            if not facility["station_code"]:
+                result["facility"]["note"] = "5 km 안에 하천 관측소가 없어 단계를 매기지 않는 시설(강우만)."
         if data:
             result["counts"] = data["counts"]
             result["top"] = [_station_brief(row) for row in data["stations"][:5]]
@@ -277,6 +302,19 @@ def run_tool(name: str, request: Any) -> dict[str, Any]:
                 "limitations": [*data["limitations"], "보고 문안은 수치 근거를 인용하되 피해·원인을 단정하지 않는다."]}
     if name == "rule_scorecard":
         return scorecard(getattr(request, "facility"))
+    if name == "rank_facilities":
+        limit = getattr(request, "limit", None) or 5
+        group = getattr(request, "group", None)
+        data = nw.facility_status(at, region, group, limit=limit)
+        keys = ("facility_id", "name", "kind_ko", "group", "tier", "region", "distance_km", "stage", "stage_label", "minutes_to_planned_flood",
+                "rate_m_per_10min", "rain_nearby")
+        ranked = [{"rank": index + 1, **{key: row.get(key) for key in keys}, "gauge": (row.get("gauge") or {}).get("name")} for index, row in enumerate(data["facilities"])]
+        top = data["facilities"][0] if data["facilities"] else None
+        return {"mode": data["mode"], "at": data["at"], "region": region or "전국", "group": nw.GROUP_KO.get(group or "", "전체 시설"), "limit": limit,
+                "counts": data["counts"], "ranked": ranked,
+                "view": _view(region=region, facility={**top, "station_code": top["station_code"]} if top and not region else None) if top else _view(region=region),
+                "coverage_note": "FACILITY_WATCH: ordered by the stage of the gauge standing in for each facility, then minutes, then rain beside it.",
+                "limitations": data["limitations"]}
     if name == "get_rain_status":
         limit = getattr(request, "limit", None) or 5
         data = nw.overview(at, region, None, limit=2000)
@@ -386,6 +424,8 @@ def summarize(calls: list[dict[str, Any]]) -> tuple[str, list[int]]:
                 text += f" 관측 품질이 {result.get('quality')}라 현재 판단에 쓰기 어렵습니다."
         elif name == "navigate_board":
             text = f"{result.get('moved_to')}(으)로 이동했습니다."
+            if (result.get("facility") or {}).get("note"):
+                text += " " + result["facility"]["note"]
             if result.get("station"):
                 text += " " + _fmt_station(result["station"]) + "."
             elif result.get("counts"):
@@ -396,6 +436,24 @@ def summarize(calls: list[dict[str, Any]]) -> tuple[str, list[int]]:
             text = (f"{result.get('facility')} 규칙 성적표: 기준 사건 적중 {card.get('hit')}·누락 {card.get('miss')}, 다른 해 권고 구간(오경보 후보) {card.get('false_alarm_candidates')}건, "
                     f"권고 없이 경보 수위에 닿은 해(근접) {len(card.get('close_call_years', []))}개({', '.join(map(str, card.get('close_call_years', []))) or '없음'}), "
                     f"계획홍수위 미도달 권고 {card.get('review_without_planned_flood')}건입니다. 다른 해 권고는 통제 기록과 대조 전이라 오경보로 확정하지 않습니다.")
+        elif name == "rank_facilities":
+            rows = result.get("ranked", [])
+            counts = result.get("counts", {})
+            text = (f"{result.get('region')} {result.get('group')} {counts.get('total', 0)}곳 중 대신하는 관측소가 관심 이상인 곳 {counts.get('attention_or_above', 0)}곳, "
+                    f"주의보 이상 {counts.get('advisory_or_above', 0)}곳, 강한 비 옆 {counts.get('under_heavy_rain', 0)}곳입니다.")
+            if rows:
+                parts = []
+                for row in rows:
+                    bit = f"{row['rank']}위 {row['name']}({row['kind_ko']}, {row['region']}) {row['stage_label']}"
+                    if row.get("gauge"):
+                        bit += f" · {row['gauge']} {row.get('distance_km')} km"
+                    if row.get("minutes_to_planned_flood") is not None:
+                        bit += f" · 계획홍수위까지 {row['minutes_to_planned_flood']}분"
+                    rain = row.get("rain_nearby") or {}
+                    if (rain.get("intensity_mm_h") or 0) > 0:
+                        bit += f" · 옆 강우 {rain.get('intensity_label')}"
+                    parts.append(bit)
+                text += " " + "; ".join(parts) + "."
         elif name == "get_rain_status":
             if not result.get("available"):
                 text = "이 시각의 강우 관측 자료가 없습니다."

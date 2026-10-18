@@ -294,6 +294,7 @@ class AgentToolCallRequest(FacilityAgentScope):
     station: str | None = Field(default=None, max_length=60)
     facility: str | None = Field(default=None, max_length=100)
     min_stage: Literal["attention", "advisory", "warning", "planned_flood"] | None = None
+    group: Literal["underpass", "riverside"] | None = None
     limit: Annotated[int, Field(ge=1, le=20)] | None = None
     since_min: Annotated[int, Field(ge=10, le=1440)] | None = None
 

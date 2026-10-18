@@ -641,7 +641,7 @@ def _reply(request: AgentAskRequest, status: str, answer: str, calls: list[dict[
                 answer, evidence, source = summary, references, "registered_tools"
         if any(call["tool_name"] == "get_station_status" and call["result"].get("quality") != "fresh" for call in calls):
             status = "NEEDS_DATA"
-        if calls and any(call["result"].get("facilities") or (call["result"].get("station") or {}).get("facilities") for call in calls) \
+        if calls and any(call["result"].get("facilities") or call["tool_name"] == "rank_facilities" or (call["result"].get("station") or {}).get("facilities") for call in calls) \
                 and agent_watch.WATCH_CAVEAT not in answer:
             answer += f"\n{agent_watch.WATCH_CAVEAT}"
         if calls and any("minutes_to_planned_flood" in json.dumps(call["result"], ensure_ascii=False) for call in calls) and "예보" not in answer:

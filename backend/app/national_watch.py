@@ -32,6 +32,10 @@ import httpx
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CATALOG_FILE = REPO_ROOT / "data" / "manifests" / "hrfco-stations.json"
 LINKS_FILE = REPO_ROOT / "data" / "processed" / "facilities" / "facility_gauge_links.csv"
+RIVERSIDE_FILE = REPO_ROOT / "data" / "processed" / "facilities" / "riverside_access.csv"
+FACILITY_LINK_KM = 5.0
+KIND_KO = {"underpass": "지하차도", "riverside_parking": "둔치·하천변 주차장", "riverside_park": "하천 둔치 공원", "riverbed_road": "하상도로"}
+GROUP_KO = {"underpass": "지하차도", "riverside": "하천변 출입구"}
 HOURLY_DIR = REPO_ROOT / "data" / "processed" / "hrfco"
 BULK_ENDPOINT = "https://api.hrfco.go.kr/{key}/{kind}/list/{interval}.json"
 DEFAULT_REPLAY_AT = "2023-07-15T08:00:00"
@@ -149,38 +153,87 @@ def stations() -> dict[str, Station]:
     return out
 
 
+def _nearest_station(lon: float, lat: float, max_km: float) -> tuple[Station, float] | None:
+    best: tuple[float, Station] | None = None
+    for station in stations().values():
+        if abs(station.lat - lat) > 0.06 or abs(station.lon - lon) > 0.08:
+            continue
+        distance = _km(lon, lat, station.lon, station.lat)
+        if distance <= max_km and (best is None or distance < best[0]):
+            best = (distance, station)
+    return (best[1], round(best[0], 2)) if best else None
+
+
 @lru_cache(maxsize=1)
-def facility_links() -> dict[str, list[dict[str, Any]]]:
-    """Nearest water-level gauge within 5 km per facility, keyed by station code. Tier is decided here."""
+def facility_catalog() -> tuple[dict[str, Any], ...]:
+    """Every river-contact facility with coordinates, whether or not a river gauge is near it.
+
+    - operational: registry facilities with their own verified gauge and rule (data/facilities/registry.json)
+    - watch: the nearest water-level gauge is within FACILITY_LINK_KM; its stage stands in for the facility,
+      which is a proximity link, not a verified inflow driver
+    - rain_only: no gauge that close; the board shows the rain next to it and nothing about river stage
+    """
     from .twin import FACILITIES
-    operational = {facility["gauge"]["station_id"]: facility for facility in FACILITIES.values()}
-    by_station: dict[str, list[dict[str, Any]]] = {}
+    out: list[dict[str, Any]] = []
     seen: set[str] = set()
-    for station_id, facility in operational.items():
-        by_station.setdefault(station_id, []).append({
-            "facility_id": facility["id"], "name": facility["name"], "kind": facility["kind"], "tier": "operational",
-            "region": region_of(facility.get("region", "")) if facility.get("region") else None,
-            "lon": facility["location"][0], "lat": facility["location"][1], "distance_km": None, "event_id": facility.get("event_id"),
-        })
+    for facility in FACILITIES.values():
+        station = stations().get(facility["gauge"]["station_id"])
+        out.append({"facility_id": facility["id"], "name": facility["name"], "kind": facility["kind"], "kind_ko": KIND_KO.get(facility["kind"], facility["kind"]),
+                    "group": "underpass" if facility["kind"] == "underpass" else "riverside", "tier": "operational",
+                    "region": station.region if station else "기타", "sgg": None, "lon": facility["location"][0], "lat": facility["location"][1],
+                    "station_code": facility["gauge"]["station_id"], "distance_km": None, "river_name": None,
+                    "event_id": facility.get("event_id"), "source": "운영 등록(data/facilities/registry.json)"})
         seen.add(facility["id"])
+    raw: list[dict[str, Any]] = []
     if LINKS_FILE.exists():
         with LINKS_FILE.open(encoding="utf-8-sig", newline="") as handle:
             for row in csv.DictReader(handle):
-                if row["kind"] != "waterlevel" or row["rank"] != "1" or row["within_max_km"] != "True" or row["facility_id"] in seen:
-                    continue
-                seen.add(row["facility_id"])
-                station = stations().get(row["station_code"])
-                by_station.setdefault(row["station_code"], []).append({
-                    "facility_id": row["facility_id"], "name": row["facility_name"], "kind": "underpass", "tier": "watch",
-                    "region": region_of(row["sido"]) if row.get("sido") else (station.region if station else "기타"), "sgg": row.get("sgg") or None,
-                    "lon": float(row["facility_lon"]), "lat": float(row["facility_lat"]),
-                    "distance_km": float(row["distance_km"]) if row.get("distance_km") else None, "event_id": None,
-                })
+                if row["kind"] == "waterlevel" and row["rank"] == "1" and row["facility_source"] != "twin_registry":
+                    raw.append({"facility_id": row["facility_id"], "name": row["facility_name"], "kind": "underpass", "sido": row.get("sido", ""),
+                                "sgg": row.get("sgg") or None, "lon": float(row["facility_lon"]), "lat": float(row["facility_lat"]),
+                                "river_name": None, "source": "국토교통부 지하차도 현황 + OSM 좌표"})
+    if RIVERSIDE_FILE.exists():
+        with RIVERSIDE_FILE.open(encoding="utf-8", newline="") as handle:
+            for row in csv.DictReader(handle):
+                raw.append({"facility_id": row["facility_id"], "name": row["name"], "kind": row["kind"], "sido": row["sido"], "sgg": None,
+                            "lon": float(row["lon"]), "lat": float(row["lat"]), "river_name": row["river_name"] or None,
+                            "source": "OpenStreetMap 이름 + WAMIS 하천 선형 거리"})
+    placed: dict[str, list[tuple[float, float]]] = {}
+    for row in raw:
+        if row["facility_id"] in seen:
+            continue
+        seen.add(row["facility_id"])
+        # "하상도로", "천변공원" and the like say nothing on their own; the river name tells them apart.
+        if row["river_name"] and len(row["name"]) <= 5 and row["river_name"] not in row["name"]:
+            row["name"] = f"{row['river_name']} {row['name']}"
+        if any(_km(row["lon"], row["lat"], lon, lat) < 2.0 for lon, lat in placed.get(row["name"], [])):
+            continue  # two OSM segments of one road or park
+        placed.setdefault(row["name"], []).append((row["lon"], row["lat"]))
+        near = _nearest_station(row["lon"], row["lat"], FACILITY_LINK_KM)
+        region = region_of(row["sido"]) if row["sido"] else "기타"
+        if region == "기타" and near:
+            region = near[0].region
+        out.append({"facility_id": row["facility_id"], "name": row["name"], "kind": row["kind"], "kind_ko": KIND_KO.get(row["kind"], row["kind"]),
+                    "group": "underpass" if row["kind"] == "underpass" else "riverside", "tier": "watch" if near else "rain_only",
+                    "region": region, "sgg": row["sgg"], "lon": row["lon"], "lat": row["lat"],
+                    "station_code": near[0].code if near else None, "distance_km": near[1] if near else None,
+                    "river_name": row["river_name"], "event_id": None, "source": row["source"]})
+    return tuple(out)
+
+
+@lru_cache(maxsize=1)
+def facility_links() -> dict[str, list[dict[str, Any]]]:
+    """Facilities keyed by the gauge that stands in for them (operational and watch tiers only)."""
+    keys = ("facility_id", "name", "kind", "kind_ko", "group", "tier", "region", "sgg", "lon", "lat", "distance_km", "event_id")
+    by_station: dict[str, list[dict[str, Any]]] = {}
+    for facility in facility_catalog():
+        if facility["station_code"]:
+            by_station.setdefault(facility["station_code"], []).append({key: facility[key] for key in keys})
     return by_station
 
 
 def facility_index() -> dict[str, dict[str, Any]]:
-    return {item["facility_id"]: {**item, "station_code": code} for code, items in facility_links().items() for item in items}
+    return {facility["facility_id"]: dict(facility) for facility in facility_catalog()}
 
 
 @dataclass(frozen=True)
@@ -628,6 +681,62 @@ def overview(at: str | None = None, region: str | None = None, min_stage: str | 
         "rain": rain_summary(region=region, frame=rain),
         "stations": selected[:limit],
     }
+
+
+def _rain_near_point(lon: float, lat: float, readings: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
+    best: tuple[float, dict[str, Any]] | None = None
+    for reading in readings.values():
+        if abs(reading["lat"] - lat) > 0.1 or abs(reading["lon"] - lon) > 0.13:
+            continue
+        distance = _km(lon, lat, reading["lon"], reading["lat"])
+        if distance <= RAIN_LINK_KM and (best is None or distance < best[0]):
+            best = (distance, reading)
+    if best is None:
+        return None
+    reading = best[1]
+    return {key: reading[key] for key in ("code", "name", "short_name", "rain_10m_mm", "rain_1h_mm", "rain_1h_basis", "intensity_mm_h", "intensity", "intensity_label", "time")} | {"distance_km": round(best[0], 1)}
+
+
+def _facility_priority(row: dict[str, Any]) -> tuple:
+    """관심 이상이면 단계 → 남은 분 순. 정상 이하에서는 남은 분(수천 분)이 의미가 없으므로 옆 강우가 먼저다."""
+    stage_rank = STAGE_ORDER.index(row["stage"]) if row.get("stage") in STAGE_ORDER else 0
+    elevated = stage_rank if stage_rank >= STAGE_ORDER.index("attention") else 0
+    minutes = row.get("minutes_to_planned_flood")
+    minutes = minutes if minutes is not None else 10**9
+    rain = (row.get("rain_nearby") or {}).get("intensity_mm_h") or 0
+    return (-elevated, minutes if elevated else 0, -rain, minutes, row["name"])
+
+
+def facility_status(at: str | None = None, region: str | None = None, group: str | None = None, limit: int = 2000) -> dict[str, Any]:
+    """Each facility with the stage of the gauge standing in for it (if any) and the rain beside it."""
+    meta, rows, rain = _assess_all(at, None)
+    by_code = {row["code"]: row for row in rows}
+    out = []
+    for facility in facility_catalog():
+        if region and facility["region"] != region or group and facility["group"] != group:
+            continue
+        gauge = by_code.get(facility["station_code"]) if facility["station_code"] else None
+        item = {**facility, "gauge": None, "stage": None, "stage_label": "하천 관측소 없음" if not facility["station_code"] else "관측 없음",
+                "minutes_to_planned_flood": None, "rate_m_per_10min": None, "rain_nearby": _rain_near_point(facility["lon"], facility["lat"], rain[2])}
+        if gauge:
+            item.update(gauge={key: gauge.get(key) for key in ("code", "name", "short_name", "observation", "quality", "levels_m", "rise_label", "flood_forecast")},
+                        stage=gauge.get("stage"), stage_label=gauge.get("stage_label") or "기준 없음",
+                        minutes_to_planned_flood=gauge.get("minutes_to_planned_flood"), rate_m_per_10min=gauge.get("rate_m_per_10min"))
+        out.append(item)
+    out.sort(key=_facility_priority)
+    counts = {"total": len(out), "by_group": {key: sum(1 for f in out if f["group"] == key) for key in GROUP_KO},
+              "by_tier": {key: sum(1 for f in out if f["tier"] == key) for key in ("operational", "watch", "rain_only")},
+              "attention_or_above": sum(1 for f in out if f["stage"] in STAGE_ORDER[2:]),
+              "advisory_or_above": sum(1 for f in out if f["stage"] in STAGE_ORDER[3:]),
+              "under_heavy_rain": sum(1 for f in out if ((f["rain_nearby"] or {}).get("intensity_mm_h") or 0) >= RAIN_CLASSES[1][0])}
+    return {"mode": meta["mode"], "at": meta["at"], "observed_at": meta["observed_at"], "filter": {"region": region, "group": group},
+            "counts": counts, "facilities": out[:limit],
+            "limitations": [
+                "감시 등급 시설의 단계는 5 km 안 가장 가까운 하천 관측소의 단계이며, 그 관측소가 시설을 대표하는지는 검증하지 않았다.",
+                "하천 관측소가 5 km 안에 없는 시설은 단계를 매기지 않고 10 km 안 강우만 보여준다.",
+                "하천변 출입구는 OpenStreetMap 이름과 하천 선형 거리로 고른 후보이며 지자체 통제 대상 목록과 대조하지 않았다.",
+                *RAIN_LIMITATIONS[:1],
+            ]}
 
 
 def station_detail(code: str, at: str | None = None) -> dict[str, Any]:

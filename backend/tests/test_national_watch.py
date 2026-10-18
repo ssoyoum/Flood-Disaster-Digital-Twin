@@ -190,3 +190,43 @@ def test_env_file_flag_is_set_only_after_the_file_is_read(monkeypatch):
     for thread in threads:
         thread.join()
     assert seen == [True] * 4
+
+
+def test_facility_catalog_keeps_facilities_without_a_gauge_and_riverside_entrances():
+    catalog = nw.facility_catalog()
+    tiers = {(f["group"], f["tier"]) for f in catalog}
+    assert ("underpass", "operational") in tiers and ("underpass", "watch") in tiers and ("underpass", "rain_only") in tiers
+    assert ("riverside", "watch") in tiers
+    assert all(f["station_code"] is None for f in catalog if f["tier"] == "rain_only")
+    assert all(f["distance_km"] <= nw.FACILITY_LINK_KM for f in catalog if f["tier"] == "watch")
+    riverside = [f for f in catalog if f["group"] == "riverside"]
+    assert len(riverside) >= 100 and all(f["river_name"] for f in riverside)
+    assert len({f["facility_id"] for f in catalog}) == len(catalog)
+
+
+def test_facility_status_orders_by_gauge_stage_then_rain():
+    data = nw.facility_status(at=AT)
+    rows = data["facilities"]
+    assert rows[0]["facility_id"] == "gungpyeong2-underpass" or rows[0]["stage"] in ("warning", "planned_flood")
+    ranks = [nw.STAGE_ORDER.index(row["stage"]) if row["stage"] in nw.STAGE_ORDER[2:] else 0 for row in rows]
+    assert ranks == sorted(ranks, reverse=True)
+    calm = [row for row in rows if row["stage"] not in nw.STAGE_ORDER[2:]]
+    rain = [(row["rain_nearby"] or {}).get("intensity_mm_h") or 0 for row in calm]
+    assert rain == sorted(rain, reverse=True)  # below 관심 the rain beside a facility leads, not the far-off minutes
+    rain_only = next(row for row in rows if row["tier"] == "rain_only")
+    assert rain_only["stage"] is None and rain_only["stage_label"] == "하천 관측소 없음"
+    riverside = nw.facility_status(at=AT, group="riverside")
+    assert riverside["counts"]["by_group"]["underpass"] == 0 and riverside["counts"]["total"] >= 100
+    assert client.get("/api/watch/facility-status", params={"at": AT, "region": "충북", "group": "underpass", "limit": 3}).json()["filter"] == {"region": "충북", "group": "underpass"}
+
+
+def test_rank_facilities_tool_takes_the_kind_from_the_users_words():
+    assert agent_watch.hints("하천변 출입구 중 먼저 볼 곳 5곳 알려줘")[0] == {"tool_name": "rank_facilities", "parameters": {"group": "riverside", "limit": 5}}
+    assert agent_watch.hints("충북 지하차도 중 위험한 곳 3곳")[0]["parameters"] == {"region": "충북", "group": "underpass", "limit": 3}
+    with pytest.raises(ValueError):
+        agent_watch.validate("rank_facilities", {"group": "riverside"}, "충북 지하차도 중 위험한 곳")
+    request = agent_runner.AgentToolCallRequest(event_id="osong-2023", tool_name="rank_facilities", board="watch", observation_at=AT, group="riverside", limit=3)
+    result = agent_watch.run_tool("rank_facilities", request)
+    assert len(result["ranked"]) == 3 and all(row["group"] == "riverside" for row in result["ranked"])
+    text, _ = agent_watch.summarize([{"tool_name": "rank_facilities", "result": result, "order": 1}])
+    assert "하천변 출입구" in text and "1위" in text

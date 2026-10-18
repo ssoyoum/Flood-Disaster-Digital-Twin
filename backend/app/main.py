@@ -786,9 +786,24 @@ def watch_changes(since_min: int = Query(default=60, ge=10, le=1440), at: str | 
 
 @app.get("/api/watch/facilities", tags=["watch"])
 def watch_facilities():
-    """Facilities linked to a gauge, with their tier (operational vs watch)."""
+    """Every river-contact facility with coordinates and its tier (operational, watch, rain_only)."""
 
     return list(national_watch.facility_index().values())
+
+
+@app.get("/api/watch/facility-status", tags=["watch"])
+def watch_facility_status(
+    at: str | None = Query(default=None, description="ISO time to replay from the stored hourly series; omit for live"),
+    region: str | None = Query(default=None, max_length=20),
+    group: Literal["underpass", "riverside"] | None = None,
+    limit: int = Query(default=2000, ge=1, le=2000),
+):
+    """Facilities ordered by the stage of the gauge standing in for them, then by the rain beside them."""
+
+    try:
+        return national_watch.facility_status(at, national_watch.match_region(region) if region else None, group, limit)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.get("/api/agent/planner-status", tags=["agent"])
