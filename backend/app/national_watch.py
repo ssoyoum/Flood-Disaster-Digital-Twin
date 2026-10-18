@@ -658,8 +658,22 @@ def _baseline_for(code: str, latest: tuple[datetime, float], snapshots: list[Sna
     return None
 
 
+def _previous_live_step(code: str, latest: tuple[datetime, float], snapshots: list[Snapshot]) -> tuple[datetime, float] | None:
+    """Return the immediately previous distinct 10-minute reading, if no slot was skipped."""
+    for snap in reversed(snapshots):
+        earlier = snap.observed.get(code)
+        if earlier is None:
+            continue
+        if earlier[0] > latest[0]:
+            return None  # a source timestamp moved backwards; do not compare out of order
+        if earlier[0] == latest[0]:
+            continue  # refreshes can repeat the same 10-minute source reading
+        return earlier if latest[0] - earlier[0] == timedelta(minutes=10) else None
+    return None
+
+
 def assess_station(station: Station, latest: tuple[datetime, float] | None, baseline: tuple[datetime, float] | None,
-                   now: datetime, interval: str) -> dict[str, Any]:
+                   now: datetime, interval: str, quality_reference: tuple[datetime, float] | None = None) -> dict[str, Any]:
     links = facility_links().get(station.code, [])
     base = {
         "code": station.code, "name": station.name, "short_name": station.short_name, "agency": station.agency,
@@ -681,8 +695,11 @@ def assess_station(station: Station, latest: tuple[datetime, float] | None, base
         if span > 0:
             rate = (level - baseline[1]) / span * 10
             window_min = int(round(span))
-            if abs(level - baseline[1]) >= STEP_SUSPECT_M:
-                quality = "suspect"
+    if quality_reference is not None:
+        expected_step = timedelta(minutes=10 if interval == "10M" else 60)
+        if (stamp - quality_reference[0] == expected_step
+                and abs(level - quality_reference[1]) >= STEP_SUSPECT_M):
+            quality = "suspect"
     stage = classify_stage(level, station.levels_m)
     pfh = station.levels_m.get("planned_flood")
     margin = round(pfh - level, 2) if pfh is not None else None
@@ -734,7 +751,8 @@ def _assess_all(at: str | None, region: str | None = None, rain_mode: str | None
         if mode == "replay" and station.code not in stored_station_codes():
             continue
         baseline = (_baseline_for(station.code, latest, history, baselines) if latest and mode == "live" else baselines.get(station.code)) if latest else None
-        rows.append({**assess_station(station, latest, baseline, now, snapshot.interval), "rain_nearby": nearby_rain(station.code, rain[2])})
+        quality_reference = (_previous_live_step(station.code, latest, history) if mode == "live" else baseline) if latest else None
+        rows.append({**assess_station(station, latest, baseline, now, snapshot.interval, quality_reference), "rain_nearby": nearby_rain(station.code, rain[2])})
     observed_at = max((row["observation"]["time"] for row in rows if row["observation"]), default=None)
     meta = {
         "mode": mode, "at": now.isoformat(), "observed_at": observed_at, "fetched_at": snapshot.fetched_at.isoformat(),
@@ -860,8 +878,9 @@ def station_detail(code: str, at: str | None = None, rain_mode: str | None = Non
     mode, now, snapshot, baselines, history, error = _frame(at)
     latest = snapshot.observed.get(code)
     baseline = (_baseline_for(code, latest, history, baselines) if latest and mode == "live" else baselines.get(code)) if latest else None
+    quality_reference = (_previous_live_step(code, latest, history) if mode == "live" else baseline) if latest else None
     rain_live = mode == "live" if rain_mode is None else rain_mode == "live"
-    row = {**assess_station(station, latest, baseline, now, snapshot.interval), "rain_nearby": nearby_rain(code, rain_frame(at, live=rain_live)[2])}
+    row = {**assess_station(station, latest, baseline, now, snapshot.interval, quality_reference), "rain_nearby": nearby_rain(code, rain_frame(at, live=rain_live)[2])}
     series = [{"time": snap.observed[code][0].isoformat(), "water_level_m": snap.observed[code][1]} for snap in [*history, snapshot] if code in snap.observed]
     if mode == "replay":
         series = []
