@@ -133,3 +133,24 @@
 .wb-legend .wb-legend-rain.active { opacity: 1; }
 .wb-legend .wb-legend-rain i { background: radial-gradient(circle, #e879f9, #818cf8); }
 .wb-side .tw-card .wb-rain-toggle { font-size: 11.5px; line-height: 1.45; font-weight: 400; }
+
+/* Facilities: list beside the gauges, rings on the map */
+.wb-check { display: flex; align-items: center; gap: 6px; margin-top: 8px; color: var(--dk-muted); font-size: 11.5px; cursor: pointer; }
+.wb-check input { accent-color: #2dd4bf; }
+.wb-group-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+.wb-side .wb-group-chips button { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border: 1px solid var(--dk-line); border-radius: 999px; background: transparent; color: var(--dk-muted); font-size: 11px; }
+.wb-group-chips button i { width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--c, #9aa9c2); }
+.wb-group-chips button.active { border-color: var(--c, #93c5fd); color: var(--dk-text); }
+.wb-facility-list ol { margin: 0 0 6px; padding: 0; list-style: none; display: grid; gap: 4px; }
+.wb-facility-list ol button { display: grid; grid-template-columns: 12px 1fr auto auto; align-items: center; gap: 8px; width: 100%; padding: 7px 8px; border: 1px solid var(--dk-line); border-radius: 8px; background: transparent; color: var(--dk-text); text-align: left; }
+.wb-facility-list ol button:hover, .wb-facility-list li.is-selected button { border-color: var(--g); background: color-mix(in srgb, var(--g) 8%, transparent); }
+.wb-fac-ring { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--g); background: var(--c); }
+.wb-facility-list .wb-pri-stage { color: var(--c); }
+.wb-facility-list small.ub-note { display: block; font-size: 10.5px; }
+.wb-fac-rain { flex: none; }
+.wb-facility-card { border-color: var(--tone); }
+.wb-facility-card h2 { margin: 2px 0 6px; font-size: 18px; }
+.wb-facility-card .tw-eyebrow { display: flex; align-items: center; gap: 4px; }
+.wb-fac-gauge { display: grid; gap: 3px; margin: 0; font-size: 12.5px; }
+.wb-fac-gauge small { color: var(--dk-muted); font-size: 10.5px; }
+.wb-fac-source { display: block; margin-top: 8px; font-size: 10.5px; }

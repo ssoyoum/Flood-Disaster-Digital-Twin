@@ -639,9 +639,22 @@ export type RiseForecast = {
 // ---- National watch board ----------------------------------------------------------------------
 export type WatchStage = "unrated" | "normal" | "attention" | "advisory" | "warning" | "planned_flood";
 export type WatchQuality = "fresh" | "stale" | "suspect" | "missing";
+export type WatchFacilityGroup = "underpass" | "riverside";
 export type WatchFacilityLink = {
-  facility_id: string; name: string; kind: string; tier: "operational" | "watch"; region: string | null; sgg?: string | null;
+  facility_id: string; name: string; kind: string; kind_ko?: string; group?: WatchFacilityGroup; tier: "operational" | "watch" | "rain_only"; region: string | null; sgg?: string | null;
   lon: number; lat: number; distance_km: number | null; event_id: string | null;
+};
+export type WatchFacilityState = WatchFacilityLink & {
+  kind_ko: string; group: WatchFacilityGroup; station_code: string | null; river_name: string | null; source: string;
+  gauge: { code: string; name: string; short_name: string; quality: WatchQuality; flood_forecast: boolean; rise_label: string;
+    observation: { time: string; water_level_m: number; interval: string; age_min: number } | null; levels_m: Record<string, number> } | null;
+  stage: WatchStage | null; stage_label: string; minutes_to_planned_flood: number | null; rate_m_per_10min: number | null; rain_nearby: WatchRainNearby | null;
+};
+export type WatchFacilityStatus = {
+  mode: "live" | "replay"; at: string; observed_at: string | null; filter: { region: string | null; group: WatchFacilityGroup | null };
+  counts: { total: number; by_group: Record<WatchFacilityGroup, number>; by_tier: Record<"operational" | "watch" | "rain_only", number>;
+    attention_or_above: number; advisory_or_above: number; under_heavy_rain: number };
+  facilities: WatchFacilityState[]; limitations: string[];
 };
 export type WatchStation = {
   code: string; name: string; short_name: string; agency: string; address: string; region: string; lon: number; lat: number;

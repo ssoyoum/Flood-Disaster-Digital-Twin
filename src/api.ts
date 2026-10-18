@@ -1,6 +1,6 @@
 import type { CriteriaFloor, RiseForecast, TwinBacktest, TwinCriteriaReview, TwinFacility, TwinMode, TwinStatus, CaseLeadTimes, ResponseTimingResult, TimelineReconstructionResponse, AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
 import { boundedAgentHistory, type ConversationMessage } from "./agentConversation";
-import type { WaterLevelReadiness, WatchChanges, WatchFacilityLink, WatchOverview, WatchStage, WatchStationDetail } from "./types";
+import type { WaterLevelReadiness, WatchChanges, WatchFacilityLink, WatchFacilityStatus, WatchOverview, WatchStage, WatchStationDetail } from "./types";
 
 const configuredApiBase = import.meta.env.VITE_API_BASE;
 const API_BASE = configuredApiBase === "same-origin" ? "" : configuredApiBase ?? (import.meta.env.PROD ? "" : "http://localhost:8033");
@@ -164,4 +164,6 @@ export const getWatchStation = (code: string, at?: string | null, signal?: Abort
   request<WatchStationDetail>(`/api/watch/stations/${encodeURIComponent(code)}${watchQuery({ at })}`, { signal });
 export const getWatchChanges = (options: { at?: string | null; since_min?: number; region?: string | null } = {}, signal?: AbortSignal) =>
   request<WatchChanges>(`/api/watch/changes${watchQuery(options)}`, { signal });
+export const getWatchFacilityStatus = (options: { at?: string | null } = {}, signal?: AbortSignal) =>
+  request<WatchFacilityStatus>(`/api/watch/facility-status${watchQuery(options)}`, { signal });
 export const getWatchFacilities = () => request<Array<WatchFacilityLink & { station_code: string }>>("/api/watch/facilities");
