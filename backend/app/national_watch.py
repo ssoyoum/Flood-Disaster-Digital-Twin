@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import csv
 import json
+import math
 import mmap
 import os
 import re
@@ -43,6 +44,14 @@ RISE_CLASSES = [(0.30, "rapid", "급격"), (0.10, "fast", "빠름"), (0.02, "slo
 STEP_SUSPECT_M = 3.0  # same jump rule as data/scripts/audit_hrfco_quality.py
 REFRESH_SECONDS = 300
 FRESH_MINUTES = {"10M": 30, "1H": 90}
+# 기상청 강수강도 구분(시간당 mm): 약한 비 3 미만, 보통 비 3~15, 강한 비 15~30, 매우 강한 비 30 이상.
+RAIN_CLASSES = [(30.0, "very_heavy", "매우 강한 비"), (15.0, "heavy", "강한 비"), (3.0, "moderate", "보통 비")]
+RAIN_LINK_KM = 10.0  # a water-level gauge borrows the nearest rain gauge within this distance
+RAIN_LIMITATIONS = [
+    "실시간 강도는 최근 10분 강우를 6배 한 시간당 환산값이고, 재생은 저장된 1시간 강우다.",
+    "하천 관측소 옆 강우는 10 km 안 가장 가까운 강우 관측소 값이며 유역 평균 강우가 아니다.",
+    "비가 하천 수위에 반영되기까지 시간차가 있어 강우만으로 단계·침수를 판정하지 않는다.",
+]
 
 _REGION_ALIASES: dict[str, tuple[str, ...]] = {
     "서울": ("서울특별시", "서울시", "서울"),
@@ -174,6 +183,56 @@ def facility_index() -> dict[str, dict[str, Any]]:
     return {item["facility_id"]: {**item, "station_code": code} for code, items in facility_links().items() for item in items}
 
 
+@dataclass(frozen=True)
+class RainGauge:
+    code: str
+    name: str
+    region: str
+    lon: float
+    lat: float
+
+    @property
+    def short_name(self) -> str:
+        inner = re.search(r"\(([^)]+)\)", self.name)
+        return inner.group(1) if inner else self.name
+
+
+@lru_cache(maxsize=1)
+def rain_gauges() -> dict[str, RainGauge]:
+    raw = json.loads(CATALOG_FILE.read_text(encoding="utf-8"))["kinds"]["rainfall"]
+    rows = raw["stations"] if isinstance(raw, dict) else raw
+    return {str(row["code"]): RainGauge(str(row["code"]), row["name"], region_of(row.get("address", "")), float(row["lon"]), float(row["lat"]))
+            for row in rows if row.get("lon") not in (None, "") and row.get("lat") not in (None, "")}
+
+
+def _km(lon1: float, lat1: float, lon2: float, lat2: float) -> float:
+    # Equirectangular is within a few metres of haversine at 10 km in Korea.
+    x = math.radians(lon2 - lon1) * math.cos(math.radians((lat1 + lat2) / 2))
+    y = math.radians(lat2 - lat1)
+    return 6371.0 * math.hypot(x, y)
+
+
+@lru_cache(maxsize=1)
+def rain_neighbours() -> dict[str, tuple[tuple[str, float], ...]]:
+    """Rain gauges within RAIN_LINK_KM of each water-level gauge, nearest first."""
+    gauges = list(rain_gauges().values())
+    out: dict[str, tuple[tuple[str, float], ...]] = {}
+    for station in stations().values():
+        near = sorted((_km(station.lon, station.lat, gauge.lon, gauge.lat), gauge.code) for gauge in gauges
+                      if abs(gauge.lat - station.lat) < 0.1 and abs(gauge.lon - station.lon) < 0.13)
+        out[station.code] = tuple((code, round(distance, 1)) for distance, code in near if distance <= RAIN_LINK_KM)
+    return out
+
+
+def rain_class(mm_per_hour: float | None) -> tuple[str, str]:
+    if not mm_per_hour:
+        return "none", "강우 없음"
+    for threshold, key, label in RAIN_CLASSES:
+        if mm_per_hour >= threshold:
+            return key, label
+    return "light", "약한 비"
+
+
 # ---- observations ---------------------------------------------------------------------------------
 @dataclass
 class Snapshot:
@@ -189,6 +248,9 @@ class _LiveState:
     hourly_fetched: datetime | None = None
     dams: list[dict[str, Any]] = field(default_factory=list)
     rainfall: list[dict[str, Any]] = field(default_factory=list)
+    # 10-minute rain kept per gauge for two hours so a rolling 60-minute total builds up while the server runs.
+    rain_slots: dict[str, dict[datetime, float]] = field(default_factory=dict)
+    rain_hourly: dict[str, tuple[datetime, float]] = field(default_factory=dict)
     last_error: str | None = None
 
 
@@ -225,6 +287,19 @@ def _water_rows(rows: list[dict[str, Any]]) -> dict[str, tuple[datetime, float]]
     return observed
 
 
+def _rain_rows(rows: list[dict[str, Any]]) -> dict[str, tuple[datetime, float]]:
+    observed: dict[str, tuple[datetime, float]] = {}
+    for row in rows:
+        stamp = _parse_stamp(row.get("ymdhm", ""))
+        try:
+            value = float(row.get("rf", ""))
+        except (TypeError, ValueError):
+            continue  # a blank rf means the gauge has not reported this slot yet
+        if stamp is not None and row.get("rfobscd") and value >= 0:
+            observed[str(row["rfobscd"])] = (stamp, value)
+    return observed
+
+
 def live_available() -> bool:
     from .llm_planner import _load_env_file_once  # imported here: llm_planner imports the agent tool catalogue
 
@@ -250,20 +325,30 @@ def refresh_live(force: bool = False) -> _LiveState:
                 _LIVE.hourly_fetched = now
             _LIVE.dams = _bulk(key, "dam", "10M")
             _LIVE.rainfall = _bulk(key, "rainfall", "10M")
+            for code, (stamp, value) in _rain_rows(_LIVE.rainfall).items():
+                slots = _LIVE.rain_slots.setdefault(code, {})
+                slots[stamp] = value
+                for old in [moment for moment in slots if (stamp - moment).total_seconds() > 7200]:
+                    slots.pop(old)
+            _LIVE.rain_hourly = _rain_rows(_bulk(key, "rainfall", "1H"))
             _LIVE.last_error = None
         except Exception as exc:  # the key sits in the URL; never surface it
             _LIVE.last_error = f"{type(exc).__name__} while refreshing the HRFCO bulk feed"
     return _LIVE
 
 
-def _hourly_file(code: str) -> Path:
-    return HOURLY_DIR / f"waterlevel_{code}_1H.csv"
+def _hourly_file(code: str, kind: str = "waterlevel") -> Path:
+    return HOURLY_DIR / f"{kind}_{code}_1H.csv"
 
 
-@lru_cache(maxsize=4096)
 def hourly_value(code: str, at_hour: str) -> float | None:
+    return stored_value("waterlevel", code, at_hour)
+
+
+@lru_cache(maxsize=8192)
+def stored_value(kind: str, code: str, at_hour: str) -> float | None:
     """One stored hourly reading via mmap.find; the files are too large to load for 227 stations."""
-    path = _hourly_file(code)
+    path = _hourly_file(code, kind)
     if not path.exists() or path.stat().st_size == 0:
         return None
     needle = f"{at_hour},{code},".encode()
@@ -283,6 +368,82 @@ def hourly_value(code: str, at_hour: str) -> float | None:
 @lru_cache(maxsize=1)
 def stored_station_codes() -> tuple[str, ...]:
     return tuple(sorted(path.name.split("_")[1] for path in HOURLY_DIR.glob("waterlevel_*_1H.csv")))
+
+
+@lru_cache(maxsize=1)
+def stored_rain_codes() -> tuple[str, ...]:
+    return tuple(sorted(path.name.split("_")[1] for path in HOURLY_DIR.glob("rainfall_*_1H.csv")))
+
+
+def _rain_reading(gauge: RainGauge, rain_10m: float | None, rain_1h: float | None, basis: str, time: datetime, window_end: datetime | None) -> dict[str, Any]:
+    rate = rain_10m * 6 if rain_10m is not None else rain_1h
+    key, label = rain_class(rate)
+    return {"code": gauge.code, "name": gauge.name, "short_name": gauge.short_name, "region": gauge.region, "lon": gauge.lon, "lat": gauge.lat,
+            "time": time.isoformat(), "rain_10m_mm": rain_10m, "rain_1h_mm": rain_1h, "rain_1h_basis": basis,
+            "rain_1h_end": window_end.isoformat() if window_end else None,
+            "intensity_mm_h": None if rate is None else round(rate, 1), "intensity": key, "intensity_label": label}
+
+
+def rain_frame(at: str | None, live: bool | None = None) -> tuple[str, datetime | None, dict[str, dict[str, Any]]]:
+    """Latest rain per gauge: (mode, observed time, readings). Live uses the 10-minute feed, replay the stored hours.
+
+    `live` pins the mode to the one the water levels were judged in, so one response never mixes the two.
+    """
+    gauges = rain_gauges()
+    readings: dict[str, dict[str, Any]] = {}
+    if live is None:
+        live = not at and live_available()
+    if not live:
+        hour = (datetime.fromisoformat(at) if at else datetime.fromisoformat(DEFAULT_REPLAY_AT)).replace(minute=0, second=0, microsecond=0)
+        for code in stored_rain_codes():
+            value = stored_value("rainfall", code, hour.strftime("%Y-%m-%d %H:%M"))
+            if value is not None and code in gauges:
+                readings[code] = _rain_reading(gauges[code], None, value, "hourly", hour, hour)
+        return "replay", hour if readings else None, readings
+    state = refresh_live()
+    latest_stamp = max((max(slots) for slots in state.rain_slots.values() if slots), default=None)
+    if latest_stamp is None:
+        return "live", None, readings
+    for code, slots in state.rain_slots.items():
+        if code not in gauges or not slots:
+            continue
+        stamp = max(slots)
+        if (latest_stamp - stamp).total_seconds() > 1800:
+            continue  # a gauge that stopped reporting is not "dry"
+        window = [value for moment, value in slots.items() if 0 <= (stamp - moment).total_seconds() < 3600]
+        if len(window) >= 6:
+            rain_1h, basis, end = round(sum(window), 1), "rolling", stamp
+        else:
+            hourly = state.rain_hourly.get(code)
+            rain_1h, basis, end = (hourly[1], "last_hour", hourly[0]) if hourly else (None, "none", None)
+        readings[code] = _rain_reading(gauges[code], slots[stamp], rain_1h, basis, stamp, end)
+    return "live", latest_stamp, readings
+
+
+def nearby_rain(code: str, readings: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
+    for rain_code, distance in rain_neighbours().get(code, ()):
+        reading = readings.get(rain_code)
+        if reading:
+            return {key: reading[key] for key in ("code", "name", "short_name", "rain_10m_mm", "rain_1h_mm", "rain_1h_basis", "intensity_mm_h", "intensity", "intensity_label", "time")} | {"distance_km": distance}
+    return None
+
+
+def rain_summary(at: str | None = None, region: str | None = None, limit: int = 200, frame: tuple | None = None) -> dict[str, Any]:
+    mode, observed, readings = frame or rain_frame(at)
+    rows = [row for row in readings.values() if not region or row["region"] == region]
+    by = {key: 0 for _, key, _ in RAIN_CLASSES}
+    by["light"] = 0
+    for row in rows:
+        if row["intensity"] in by:
+            by[row["intensity"]] += 1
+    raining = sorted((row for row in rows if (row["intensity_mm_h"] or 0) > 0), key=lambda row: -(row["intensity_mm_h"] or 0))
+    return {
+        "available": bool(readings), "mode": mode, "observed_at": observed.isoformat() if observed else None,
+        "basis": "최근 10분 강우 × 6 (시간당 환산)" if mode == "live" else "저장된 1시간 강우",
+        "gauges_total": len(rain_gauges()), "gauges_reporting": len(rows), "raining": len(raining),
+        "heavy_or_above": by["heavy"] + by["very_heavy"], "by_intensity": by,
+        "stations": raining[:limit], "limitations": RAIN_LIMITATIONS,
+    }
 
 
 def replay_snapshot(at: datetime) -> tuple[Snapshot, dict[str, tuple[datetime, float]]]:
@@ -397,8 +558,9 @@ def _frame(at: str | None) -> tuple[str, datetime, Snapshot, dict[str, tuple[dat
     return "live", datetime.now().replace(second=0, microsecond=0), latest, state.hourly, list(state.snapshots)[:-1], state.last_error
 
 
-def _assess_all(at: str | None, region: str | None = None) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+def _assess_all(at: str | None, region: str | None = None) -> tuple[dict[str, Any], list[dict[str, Any]], tuple]:
     mode, now, snapshot, baselines, history, error = _frame(at)
+    rain = rain_frame(at, live=mode == "live")
     rows = []
     for station in stations().values():
         if region and station.region != region:
@@ -407,7 +569,7 @@ def _assess_all(at: str | None, region: str | None = None) -> tuple[dict[str, An
         if mode == "replay" and station.code not in stored_station_codes():
             continue
         baseline = (_baseline_for(station.code, latest, history, baselines) if latest and mode == "live" else baselines.get(station.code)) if latest else None
-        rows.append(assess_station(station, latest, baseline, now, snapshot.interval))
+        rows.append({**assess_station(station, latest, baseline, now, snapshot.interval), "rain_nearby": nearby_rain(station.code, rain[2])})
     observed_at = max((row["observation"]["time"] for row in rows if row["observation"]), default=None)
     meta = {
         "mode": mode, "at": now.isoformat(), "observed_at": observed_at, "fetched_at": snapshot.fetched_at.isoformat(),
@@ -420,15 +582,16 @@ def _assess_all(at: str | None, region: str | None = None) -> tuple[dict[str, An
             "남은 분은 최근 상승 속도를 그대로 늘린 기준선이며 예보가 아니다.",
         ],
     }
-    return meta, rows
+    return meta, rows, rain
 
 
 def overview(at: str | None = None, region: str | None = None, min_stage: str | None = None, limit: int = 300) -> dict[str, Any]:
-    meta, rows = _assess_all(at, region)
+    meta, rows, rain = _assess_all(at, region)
     floor = STAGE_ORDER.index(min_stage) if min_stage in STAGE_ORDER else -1
     counts = {stage: 0 for stage in STAGE_ORDER}
     quality = {"fresh": 0, "stale": 0, "suspect": 0, "missing": 0}
     rising = 0
+    under_heavy_rain = 0
     regions: dict[str, dict[str, Any]] = {}
     for row in rows:
         if row.get("stage"):
@@ -436,21 +599,33 @@ def overview(at: str | None = None, region: str | None = None, min_stage: str | 
         quality[row["quality"]] += 1
         if (row.get("rate_m_per_10min") or 0) >= RISE_CLASSES[-1][0]:
             rising += 1
-        bucket = regions.setdefault(row["region"], {"region": row["region"], "stations": 0, "max_stage": "unrated", "advisory_or_above": 0, "facilities": 0})
+        if ((row.get("rain_nearby") or {}).get("intensity_mm_h") or 0) >= RAIN_CLASSES[1][0]:
+            under_heavy_rain += 1
+        bucket = regions.setdefault(row["region"], {"region": row["region"], "stations": 0, "max_stage": "unrated", "advisory_or_above": 0, "facilities": 0,
+                                                    "raining": 0, "heavy_rain": 0})
         bucket["stations"] += 1
         bucket["facilities"] += len(row["facilities"])
         if row.get("stage") and STAGE_ORDER.index(row["stage"]) > STAGE_ORDER.index(bucket["max_stage"]):
             bucket["max_stage"] = row["stage"]
         if row.get("stage") and STAGE_ORDER.index(row["stage"]) >= STAGE_ORDER.index("advisory"):
             bucket["advisory_or_above"] += 1
+    for reading in rain[2].values():
+        bucket = regions.get(reading["region"])
+        if bucket is None or not (reading["intensity_mm_h"] or 0) > 0:
+            continue
+        bucket["raining"] += 1
+        if reading["intensity_mm_h"] >= RAIN_CLASSES[1][0]:
+            bucket["heavy_rain"] += 1
     selected = [row for row in rows if floor < 0 or (row.get("stage") and STAGE_ORDER.index(row["stage"]) >= floor)]
     selected.sort(key=_priority)
     facilities_total = sum(len(row["facilities"]) for row in rows)
     return {
         **meta, "filter": {"region": region, "min_stage": min_stage},
         "counts": {"by_stage": counts, "quality": quality, "rising": rising, "facilities": facilities_total,
-                   "facilities_operational": sum(1 for row in rows for f in row["facilities"] if f["tier"] == "operational")},
+                   "facilities_operational": sum(1 for row in rows for f in row["facilities"] if f["tier"] == "operational"),
+                   "under_heavy_rain": under_heavy_rain},
         "regions": sorted(regions.values(), key=lambda item: item["region"]),
+        "rain": rain_summary(region=region, frame=rain),
         "stations": selected[:limit],
     }
 
@@ -462,7 +637,7 @@ def station_detail(code: str, at: str | None = None) -> dict[str, Any]:
     mode, now, snapshot, baselines, history, error = _frame(at)
     latest = snapshot.observed.get(code)
     baseline = (_baseline_for(code, latest, history, baselines) if latest and mode == "live" else baselines.get(code)) if latest else None
-    row = assess_station(station, latest, baseline, now, snapshot.interval)
+    row = {**assess_station(station, latest, baseline, now, snapshot.interval), "rain_nearby": nearby_rain(code, rain_frame(at, live=mode == "live")[2])}
     series = [{"time": snap.observed[code][0].isoformat(), "water_level_m": snap.observed[code][1]} for snap in [*history, snapshot] if code in snap.observed]
     if mode == "replay":
         series = []

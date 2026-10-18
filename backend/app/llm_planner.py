@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import os
 import re
+import threading
 from pathlib import Path
 from typing import Any, Literal
 from urllib.parse import quote
@@ -87,6 +88,7 @@ class LlmPlan(BaseModel):
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _env_file_loaded = False
+_env_file_lock = threading.Lock()
 
 
 def _load_env_file_once() -> None:
@@ -94,18 +96,24 @@ def _load_env_file_once() -> None:
 
     uvicorn only reads ``.env`` when started with ``--env-file`` and pytest never
     does, so a key pasted into ``.env`` would otherwise be invisible here. Real
-    environment variables always win over the file.
+    environment variables always win over the file. The flag is set only after
+    the file is read: concurrent first requests otherwise saw it early and ran
+    without the key.
     """
 
     global _env_file_loaded
     if _env_file_loaded:
         return
-    _env_file_loaded = True
-    try:
-        from dotenv import load_dotenv
-    except ModuleNotFoundError:
-        return
-    load_dotenv(_REPO_ROOT / ".env", override=False)
+    with _env_file_lock:
+        if _env_file_loaded:
+            return
+        try:
+            from dotenv import load_dotenv
+        except ModuleNotFoundError:
+            _env_file_loaded = True
+            return
+        load_dotenv(_REPO_ROOT / ".env", override=False)
+        _env_file_loaded = True
 
 
 def _timeout_seconds() -> float:

@@ -646,6 +646,8 @@ def _reply(request: AgentAskRequest, status: str, answer: str, calls: list[dict[
             answer += f"\n{agent_watch.WATCH_CAVEAT}"
         if calls and any("minutes_to_planned_flood" in json.dumps(call["result"], ensure_ascii=False) for call in calls) and "예보" not in answer:
             answer += f"\n{agent_watch.BASELINE_CAVEAT}"
+        if any(call["tool_name"] == "get_rain_status" for call in calls) and agent_watch.RAIN_CAVEAT not in answer:
+            answer += f"\n{agent_watch.RAIN_CAVEAT}"
         if calls and "현장 확인과 담당자 판단이 우선" not in answer:
             answer += "\n실제 통제·대피 결정은 현장 확인과 담당자 판단이 우선합니다."
     elif request.facility_id:

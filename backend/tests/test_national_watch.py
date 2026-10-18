@@ -119,3 +119,74 @@ def test_model_answer_claiming_safety_is_replaced_by_the_tool_summary(monkeypatc
     monkeypatch.setattr(agent_runner, "_gemini_action", lambda context: next(actions))
     body = client.post("/api/agent/ask", json={"board": "watch", "message": "미호강교 지금 몇 단계야?", "observation_at": AT}).json()
     assert body["diagnostics"]["completion_source"] == "registered_tools" and "안전합니다" not in body["answer"]
+
+
+def test_rain_classes_follow_kma_intensity_bins():
+    assert nw.rain_class(0) == ("none", "강우 없음") and nw.rain_class(None)[0] == "none"
+    assert nw.rain_class(2.9)[0] == "light" and nw.rain_class(3)[0] == "moderate"
+    assert nw.rain_class(15)[0] == "heavy" and nw.rain_class(30)[0] == "very_heavy"
+
+
+def test_rain_rows_skip_blank_slots():
+    rows = nw._rain_rows([{"rfobscd": "1", "ymdhm": "202610182030", "rf": "13.0"}, {"rfobscd": "2", "ymdhm": "202610182030", "rf": " "}])
+    assert list(rows) == ["1"] and rows["1"][1] == 13.0
+
+
+def test_replay_rain_links_the_nearest_gauge_and_counts_regions():
+    data = nw.overview(at=AT, limit=2000)
+    rain = data["rain"]
+    assert rain["available"] and rain["mode"] == "replay" and rain["raining"] > 0 and rain["heavy_or_above"] > 0
+    assert rain["stations"] == sorted(rain["stations"], key=lambda row: -row["intensity_mm_h"])
+    miho = nw.station_detail("3011665", at=AT)["rain_nearby"]
+    assert miho["distance_km"] <= nw.RAIN_LINK_KM and miho["rain_1h_mm"] == 17.0 and miho["intensity"] == "heavy"
+    assert data["counts"]["under_heavy_rain"] >= 1
+    assert sum(item["raining"] for item in data["regions"]) <= rain["raining"]
+
+
+def test_rain_tool_routes_and_reports_observed_rain_only():
+    assert agent_watch.hints("지금 비 많이 오는 곳 어디야?")[0]["tool_name"] == "get_rain_status"
+    assert agent_watch.hints("경남에 비 오는 곳 3곳")[0]["parameters"] == {"region": "경남", "limit": 3}
+    assert agent_watch.hints("미호강교 비 와?")[0]["tool_name"] == "get_station_status"
+    assert agent_watch.hints("비교해줘") == []
+    request = agent_runner.AgentToolCallRequest(event_id="osong-2023", tool_name="get_rain_status", board="watch", observation_at=AT)
+    result = agent_watch.run_tool("get_rain_status", request)
+    assert result["view"]["layer"] == "rain" and result["wettest"] and result["gauges_under_heavy_rain_total"] >= 1
+    text, _ = agent_watch.summarize([{"tool_name": "get_rain_status", "result": result, "order": 1}])
+    assert "강한 비" in text and "예보" not in text
+    assert not agent_watch.safe_model_answer("장흥군이 시간당 144.0mm로 가장 강합니다.", [{"tool_name": "get_rain_status", "result": result, "order": 1}])
+
+
+def test_model_answer_with_a_wrong_stage_count_is_replaced():
+    calls = [{"tool_name": "navigate_board", "order": 1, "result": {"counts": {"by_stage": {"normal": 22, "attention": 3, "advisory": 1}}}}]
+    assert not agent_watch.safe_model_answer("정상 22곳, 주의보 3곳, 주의보 1곳입니다.", calls)
+    assert agent_watch.safe_model_answer("정상 22곳, 관심 3곳, 주의보 1곳입니다.", calls)
+
+
+def test_env_file_flag_is_set_only_after_the_file_is_read(monkeypatch):
+    import sys
+    import threading
+    import time
+    import types
+
+    from app import llm_planner
+
+    seen = []
+
+    def slow_load(path, override=False):
+        time.sleep(0.2)
+        monkeypatch.setenv("FLOODOPS_TEST_ENV_RACE", "1")
+
+    monkeypatch.setitem(sys.modules, "dotenv", types.SimpleNamespace(load_dotenv=slow_load))
+    monkeypatch.setattr(llm_planner, "_env_file_loaded", False)
+    monkeypatch.delenv("FLOODOPS_TEST_ENV_RACE", raising=False)
+
+    def call():
+        llm_planner._load_env_file_once()
+        seen.append(bool(__import__("os").environ.get("FLOODOPS_TEST_ENV_RACE")))
+
+    threads = [threading.Thread(target=call) for _ in range(4)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    assert seen == [True] * 4

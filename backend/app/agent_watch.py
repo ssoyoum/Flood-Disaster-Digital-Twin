@@ -12,7 +12,7 @@ from typing import Any
 from . import national_watch as nw
 
 TOOL_NAMES = {"get_watch_overview", "navigate_board", "rank_priority", "summarize_changes", "get_station_status",
-              "draft_situation_report", "rule_scorecard"}
+              "draft_situation_report", "rule_scorecard", "get_rain_status"}
 PARAMETERS: dict[str, set[str]] = {
     "get_watch_overview": {"region", "min_stage"},
     "navigate_board": {"region", "station", "facility", "min_stage"},
@@ -21,6 +21,7 @@ PARAMETERS: dict[str, set[str]] = {
     "get_station_status": {"station"},
     "draft_situation_report": {"region"},
     "rule_scorecard": {"facility"},
+    "get_rain_status": {"region", "limit"},
 }
 EXAMPLES = [
     {"workflow": "watch_overview", "label": "전국 현황", "question": "지금 전국에서 주의보 이상인 관측소가 몇 곳이야?"},
@@ -30,9 +31,11 @@ EXAMPLES = [
     {"workflow": "summarize_changes", "label": "변화 요약", "question": "지난 1시간 동안 뭐가 바뀌었어?"},
     {"workflow": "situation_report", "label": "상황 보고", "question": "지금 상황 보고 초안 써줘"},
     {"workflow": "rule_scorecard", "label": "규칙 성적표", "question": "궁평2지하차도 규칙 성적표 보여줘"},
+    {"workflow": "rain_status", "label": "강우", "question": "지금 비 많이 오는 곳 어디야?"},
 ]
 WATCH_CAVEAT = "감시 등급 연결은 5 km 안 가장 가까운 관측소 기준이며 그 관측소가 시설 유입을 대표하는지는 검증하지 않았습니다."
 BASELINE_CAVEAT = "남은 분은 최근 상승 속도를 그대로 늘린 기준선이며 예보가 아닙니다."
+RAIN_CAVEAT = "강우는 하천 수위에 시간차를 두고 반영되며, 강우만으로 단계나 침수를 판정하지 않습니다."
 
 _STAGE_WORDS = [("계획홍수위", "planned_flood"), ("경보", "warning"), ("주의보", "advisory"), ("관심", "attention")]
 
@@ -55,6 +58,9 @@ def tools() -> list[dict[str, Any]]:
          "region: 사용자가 쓴 시도(없으면 전국).", "보고 시각, 단계별 수, 상위 5곳, 운영 등록 시설 상태, 품질 주의, 한계 문구.", "피해·사망, 원인 단정, 예보."),
         ("rule_scorecard", "운영 등록 시설의 통제 검토 규칙을 적중·누락·오경보 후보·근접으로 나눠 채점한다(Barnes et al. 2007의 네 분류를 따른다). 규칙이 얼마나 믿을 만한지, 성적표를 물을 때.",
          "facility: 사용자가 쓴 운영 시설 이름(예: 궁평2지하차도).", "기준 사건 적중 여부와 선행 분, 다른 해 권고 구간(오경보 후보) 수, 권고 없이 경보 수위에 닿은 해(근접) 수, 계획홍수위 미도달 권고 수.", "오경보 확정(통제 기록 대조 전), 피해 감소, 최적 기준 확정."),
+        ("get_rain_status", "지금 비가 오는 강우 관측소와 강도(최근 10분 강우의 시간당 환산), 강한 비 아래에 있는 하천 관측소를 센다. 비·강우·호우·폭우를 물을 때.",
+         "region: 사용자가 쓴 시도(없으면 전국). limit: 사용자가 쓴 개수(기본 5).",
+         "강우 관측소 수, 비 오는 곳 수, 강도별 수, 많이 오는 곳 상위 N곳, 강한 비 아래 하천 관측소의 단계·상승 속도.", "앞으로 내릴 비(예보), 침수 발생, 수위 상승 시각."),
     ]
     return [{"name": name, "description": description, "input_fields": sorted(PARAMETERS[name]),
              "output": "national watch evidence with provenance and limitations", "use_when": description,
@@ -69,6 +75,7 @@ _RANK = re.compile(r"위험한|우선|먼저\s*볼|상위|순위|top|가장")
 _CHANGE = re.compile(r"바뀌|변화|달라|지난\s*\d|최근\s*\d|새로")
 _REPORT = re.compile(r"보고|브리핑|정리해|요약해")
 _SCORE = re.compile(r"성적|적중|오경보|근접|채점|믿을")
+_RAIN = re.compile(r"강우|호우|폭우|소나기|빗줄기|비\s*(?:가|는|도)?\s*(?:많이|오|와|내리|온|쏟|퍼붓)")
 _OVERVIEW = re.compile(r"몇\s*곳|현황|전체|전국|몇\s*개")
 _STATUS = re.compile(r"단계|수위|남았|상태|여유|얼마")
 
@@ -105,6 +112,10 @@ def hints(message: str) -> list[dict[str, Any]]:
 
     if _SCORE.search(message) and facility and facility["tier"] == "operational":
         add("rule_scorecard", facility=facility["name"])
+    elif _RAIN.search(message) and station:
+        add("get_station_status", station=station.short_name)
+    elif _RAIN.search(message) and not facility:
+        add("get_rain_status", region=region, limit=_written_limit(message))
     elif _MOVE.search(message) and (region or station or facility):
         add("navigate_board", region=region, station=station.short_name if station else None, facility=facility["name"] if facility else None, min_stage=stage)
     elif _CHANGE.search(message):
@@ -174,11 +185,13 @@ def _station_brief(row: dict[str, Any]) -> dict[str, Any]:
     brief["observation"] = row.get("observation")
     brief["levels_m"] = row.get("levels_m")
     brief["facilities"] = [{"facility_id": f["facility_id"], "name": f["name"], "tier": f["tier"], "distance_km": f.get("distance_km")} for f in row.get("facilities", [])]
+    brief["rain_nearby"] = row.get("rain_nearby")
     return brief
 
 
-def _view(region: str | None = None, station: dict[str, Any] | None = None, facility: dict[str, Any] | None = None, min_stage: str | None = None) -> dict[str, Any]:
-    view: dict[str, Any] = {"region": region, "min_stage": min_stage, "station_code": None, "facility_id": None, "center": None, "zoom": None}
+def _view(region: str | None = None, station: dict[str, Any] | None = None, facility: dict[str, Any] | None = None, min_stage: str | None = None,
+          layer: str | None = None) -> dict[str, Any]:
+    view: dict[str, Any] = {"region": region, "min_stage": min_stage, "station_code": None, "facility_id": None, "center": None, "zoom": None, "layer": layer}
     if facility:
         view.update(station_code=facility["station_code"], facility_id=facility["facility_id"], center=[facility["lon"], facility["lat"]], zoom=13)
     elif station:
@@ -264,6 +277,21 @@ def run_tool(name: str, request: Any) -> dict[str, Any]:
                 "limitations": [*data["limitations"], "보고 문안은 수치 근거를 인용하되 피해·원인을 단정하지 않는다."]}
     if name == "rule_scorecard":
         return scorecard(getattr(request, "facility"))
+    if name == "get_rain_status":
+        limit = getattr(request, "limit", None) or 5
+        data = nw.overview(at, region, None, limit=2000)
+        rain = data["rain"]
+        rained_on = [row for row in data["stations"] if ((row.get("rain_nearby") or {}).get("intensity_mm_h") or 0) >= nw.RAIN_CLASSES[1][0]]
+        return {"mode": rain["mode"], "at": data["at"], "observed_at": rain["observed_at"], "region": region or "전국", "available": rain["available"],
+                "basis": rain["basis"], "gauges_reporting": rain["gauges_reporting"], "raining": rain["raining"], "heavy_or_above": rain["heavy_or_above"],
+                "by_intensity": rain["by_intensity"],
+                "wettest": [{key: row[key] for key in ("code", "name", "region", "rain_10m_mm", "rain_1h_mm", "rain_1h_basis", "intensity_mm_h", "intensity_label", "time")}
+                            for row in rain["stations"][:limit]],
+                "gauges_under_heavy_rain": [{**_station_brief(row), "rain_nearby": row.get("rain_nearby")} for row in rained_on[:limit]],
+                "gauges_under_heavy_rain_total": len(rained_on),
+                "view": _view(region=region, layer="rain"),
+                "coverage_note": "RAIN_OBSERVATION: observed rain only; no forecast and no flood attribution.",
+                "limitations": [*rain["limitations"], RAIN_CAVEAT]}
     raise KeyError(name)
 
 
@@ -311,6 +339,10 @@ def _fmt_station(row: dict[str, Any]) -> str:
         bits.append(f"계획홍수위까지 {row['minutes_to_planned_flood']}분")
     if row.get("facilities"):
         bits.append("연결 시설 " + "·".join(f["name"] for f in row["facilities"][:3]))
+    rain = row.get("rain_nearby") or {}
+    if (rain.get("intensity_mm_h") or 0) > 0:
+        amount = f"10분 {rain['rain_10m_mm']} mm" if rain.get("rain_10m_mm") is not None else f"1시간 {rain.get('rain_1h_mm')} mm"
+        bits.append(f"근처 강우 {rain.get('intensity_label')}({amount}, {rain.get('distance_km')} km)")
     return " · ".join(bits)
 
 
@@ -346,6 +378,10 @@ def summarize(calls: list[dict[str, Any]]) -> tuple[str, list[int]]:
                     text += " 상승: " + "; ".join(f"{u['name']} {nw.STAGE_KO.get(u['from'], u['from'])}→{nw.STAGE_KO.get(u['to'], u['to'])} ({u['delta_m']:+.2f} m)" for u in ups) + "."
         elif name == "get_station_status":
             text = _fmt_station(result) + "."
+            if not result.get("rain_nearby"):
+                text += " 10 km 안에 강우 관측값이 있는 관측소가 없습니다."
+            elif not (result["rain_nearby"].get("intensity_mm_h") or 0):
+                text += f" 근처 강우 관측소({result['rain_nearby'].get('name')})에는 비가 관측되지 않았습니다."
             if result.get("quality") != "fresh":
                 text += f" 관측 품질이 {result.get('quality')}라 현재 판단에 쓰기 어렵습니다."
         elif name == "navigate_board":
@@ -360,14 +396,46 @@ def summarize(calls: list[dict[str, Any]]) -> tuple[str, list[int]]:
             text = (f"{result.get('facility')} 규칙 성적표: 기준 사건 적중 {card.get('hit')}·누락 {card.get('miss')}, 다른 해 권고 구간(오경보 후보) {card.get('false_alarm_candidates')}건, "
                     f"권고 없이 경보 수위에 닿은 해(근접) {len(card.get('close_call_years', []))}개({', '.join(map(str, card.get('close_call_years', []))) or '없음'}), "
                     f"계획홍수위 미도달 권고 {card.get('review_without_planned_flood')}건입니다. 다른 해 권고는 통제 기록과 대조 전이라 오경보로 확정하지 않습니다.")
+        elif name == "get_rain_status":
+            if not result.get("available"):
+                text = "이 시각의 강우 관측 자료가 없습니다."
+            else:
+                text = (f"{(result.get('observed_at') or '')[11:16]} 기준 {result.get('region')} 강우 관측소 {result.get('gauges_reporting')}곳 중 "
+                        f"{result.get('raining')}곳에서 비가 관측됐고, 강한 비(시간당 15 mm 이상) 이상은 {result.get('heavy_or_above')}곳입니다.")
+                wet = result.get("wettest") or []
+                if wet:
+                    text += " 많이 오는 곳: " + "; ".join(
+                        f"{row['name']} {row['intensity_label']}"
+                        + (f"(10분 {row['rain_10m_mm']} mm)" if row.get("rain_10m_mm") is not None else f"(1시간 {row['rain_1h_mm']} mm)")
+                        for row in wet[:5]) + "."
+                under = result.get("gauges_under_heavy_rain") or []
+                text += f" 강한 비 아래 하천 관측소는 {result.get('gauges_under_heavy_rain_total', 0)}곳"
+                text += (": " + "; ".join(_fmt_station(row) for row in under[:3]) + ".") if under else "입니다."
         if text:
             sentences.append(f"{text} [{order}]")
             evidence.append(order)
     return "\n".join(sentences), evidence
 
 
+_STAGE_COUNT = re.compile(r"(계획홍수위|경보|주의보|관심|정상)\s*(?:단계\s*)?(\d+)\s*곳")
+_STAGE_KEY = {"계획홍수위": "planned_flood", "경보": "warning", "주의보": "advisory", "관심": "attention", "정상": "normal"}
+
+
+def _stage_counts_match(answer: str, calls: list[dict[str, Any]]) -> bool:
+    """A model sentence such as "주의보 3곳" must match a stage count a tool returned; models swap 관심 and 주의보."""
+    tallies = [by for call in calls for by in ((call["result"].get("counts") or {}).get("by_stage"), call["result"].get("by_stage")) if isinstance(by, dict)]
+    if not tallies:
+        return True
+    return all(any(by.get(_STAGE_KEY[word]) == int(count) for by in tallies) for word, count in _STAGE_COUNT.findall(answer))
+
+
 def safe_model_answer(answer: str, calls: list[dict[str, Any]]) -> bool:
     if re.search(r"안전합니다|위험이?\s*없|통제(?:를)?\s*(?:실행|승인|완료)|자동\s*차단|침수가?\s*없|피해가?\s*줄|대피\s*성공|침수될\s*것|넘칠\s*것", answer):
+        return False
+    if not _stage_counts_match(answer, calls):
+        return False
+    # Models turn the 10-minute ×6 conversion into "시간당 144 mm" and mix up the intensity bins; rain is always read out by the tool summary.
+    if any(call["tool_name"] == "get_rain_status" for call in calls):
         return False
     for call in calls:
         if call["tool_name"] == "get_station_status" and call["result"].get("quality") not in (None, "fresh"):
