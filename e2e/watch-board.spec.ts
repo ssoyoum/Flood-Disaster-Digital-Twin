@@ -26,11 +26,23 @@ test("the board agent moves the map and answers from the watch tools without a m
   await page.goto("/");
   await page.getByLabel("Agent request").fill("강원도로 가자");
   await page.getByRole("button", { name: "질문" }).click();
-  await expect(page.locator(".dk-agent-answer")).toContainText("강원(으)로 이동했습니다");
+  await expect(page.locator(".dk-agent-answer").last()).toContainText("강원(으)로 이동했습니다");
   await expect(page).toHaveURL(/region=%EA%B0%95%EC%9B%90/);
 
+  // Answers stack in the panel, so each check reads the newest one.
   await page.getByLabel("Agent request").fill("미호강교 지금 몇 단계야?");
   await page.getByRole("button", { name: "질문" }).click();
-  await expect(page.locator(".dk-agent-answer")).toContainText("청주시(미호강교)");
+  await expect(page.locator(".dk-agent-answer").last()).toContainText("청주시(미호강교)");
   await expect(page.locator('[aria-label="선택 관측소"]')).toContainText("청주시(미호강교)");
+  await expect(page.locator(".wb-rainline")).toContainText("근처 강우");
+});
+
+test("rain from the stored hours shows on the side card and answers a rain question", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".wb-rain-toggle")).toContainText(/강우 중 \d+곳/);
+  await expect(page.locator('[aria-label="비 많이 오는 곳"] li').first()).toContainText("1시간");
+  await page.getByLabel("Agent request").fill("지금 비 많이 오는 곳 어디야?");
+  await page.getByRole("button", { name: "질문" }).click();
+  await expect(page.locator(".dk-agent-answer").last()).toContainText("강우 관측소");
+  await expect(page.locator(".dk-agent-answer").last()).toContainText("강우만으로 단계나 침수를 판정하지 않습니다");
 });

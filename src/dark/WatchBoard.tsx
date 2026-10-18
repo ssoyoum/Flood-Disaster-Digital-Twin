@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { type GeoJSONSource, type MapLayerMouseEvent } from "maplibre-gl";
-import { Activity, ArrowRight, Gauge, Radio, RotateCcw, TrendingUp, X } from "lucide-react";
+import { Activity, ArrowRight, CloudRain, Gauge, Radio, RotateCcw, TrendingUp, X } from "lucide-react";
 import * as api from "../api";
-import type { AgentView, WatchChanges, WatchOverview, WatchStage, WatchStation, WatchStationDetail } from "../types";
+import type { AgentView, WatchChanges, WatchOverview, WatchRainIntensity, WatchRainNearby, WatchRainReading, WatchStage, WatchStation, WatchStationDetail } from "../types";
 import { AgentDock } from "./DarkConsole";
 import { FloodOpsLogo } from "./Landing";
 import "./dark.css";
@@ -18,6 +18,8 @@ import "./watch.css";
 const STAGE_COLOR: Record<WatchStage, string> = { unrated: "#3a4a63", normal: "#38bdf8", attention: "#60a5fa", advisory: "#fbbf24", warning: "#f97316", planned_flood: "#f87171" };
 const STAGE_KO: Record<WatchStage, string> = { unrated: "기준 없음", normal: "정상", attention: "관심", advisory: "주의보", warning: "경보", planned_flood: "계획홍수위" };
 const STAGE_ORDER: WatchStage[] = ["unrated", "normal", "attention", "advisory", "warning", "planned_flood"];
+// Rain uses a violet scale so it never reads as a gauge stage colour.
+const RAIN_COLOR: Record<WatchRainIntensity, string> = { none: "#3a4a63", light: "#a5b4fc", moderate: "#818cf8", heavy: "#a855f7", very_heavy: "#e879f9" };
 const REGION_CENTER: Record<string, [number, number]> = {
   서울: [126.98, 37.56], 부산: [129.05, 35.18], 대구: [128.6, 35.87], 인천: [126.7, 37.46], 광주: [126.85, 35.16], 대전: [127.38, 36.35], 울산: [129.31, 35.54],
   세종: [127.29, 36.48], 경기: [127.2, 37.45], 강원: [128.3, 37.6], 충북: [127.7, 36.75], 충남: [126.9, 36.5], 전북: [127.1, 35.75], 전남: [126.9, 34.85],
@@ -51,6 +53,7 @@ export default function WatchBoard() {
   const [detail, setDetail] = useState<WatchStationDetail | null>(null);
   const [changes, setChanges] = useState<WatchChanges | null>(null);
   const [flyTo, setFlyTo] = useState<{ center: [number, number]; zoom: number } | null>(null);
+  const [showRain, setShowRain] = useState(true);
 
   useEffect(() => {
     const onHash = () => { setAt(readParam("at")); setRegion(readParam("region")); setMinStage(readParam("stage") as WatchStage | null); setSelected(readParam("station")); };
@@ -90,18 +93,30 @@ export default function WatchBoard() {
     else if (region && REGION_CENTER[region]) setFlyTo({ center: REGION_CENTER[region], zoom: 8 });
   }, [overview, selected, region]);
 
+  // Every count on the side card is over the chosen region only; the stage filter narrows the list and the map, not the counts.
+  const scoped = useMemo(() => (overview ? overview.stations.filter((row) => !region || row.region === region) : []), [overview, region]);
   const visible = useMemo(() => {
-    if (!overview) return [];
     const floor = minStage ? STAGE_ORDER.indexOf(minStage) : -1;
-    return overview.stations.filter((row) => (!region || row.region === region) && (floor < 0 || (row.stage && STAGE_ORDER.indexOf(row.stage) >= floor)));
-  }, [overview, region, minStage]);
+    return scoped.filter((row) => floor < 0 || (row.stage && STAGE_ORDER.indexOf(row.stage) >= floor));
+  }, [scoped, minStage]);
   const counts = useMemo(() => {
-    const by: Record<WatchStage, number> = { unrated: 0, normal: 0, attention: 0, advisory: 0, warning: 0, planned_flood: 0 };
+    const atLeast: Record<WatchStage, number> = { unrated: 0, normal: 0, attention: 0, advisory: 0, warning: 0, planned_flood: 0 };
     let rising = 0;
     let facilities = 0;
-    visible.forEach((row) => { if (row.stage) by[row.stage] += 1; if ((row.rate_m_per_10min ?? 0) >= 0.02) rising += 1; facilities += row.facilities.length; });
-    return { by, rising, facilities };
-  }, [visible]);
+    let operational = 0;
+    let underHeavyRain = 0;
+    scoped.forEach((row) => {
+      if (row.stage) STAGE_ORDER.forEach((stage, index) => { if (index > 1 && STAGE_ORDER.indexOf(row.stage as WatchStage) >= index) atLeast[stage] += 1; });
+      if ((row.rate_m_per_10min ?? 0) >= 0.02) rising += 1;
+      facilities += row.facilities.length;
+      operational += row.facilities.filter((item) => item.tier === "operational").length;
+      if ((row.rain_nearby?.intensity_mm_h ?? 0) >= 15) underHeavyRain += 1;
+    });
+    return { atLeast, rising, facilities, operational, underHeavyRain };
+  }, [scoped]);
+  const rain = overview?.rain ?? null;
+  const rainScoped = useMemo(() => (rain ? rain.stations.filter((row) => !region || row.region === region) : []), [rain, region]);
+  const heavyRain = rainScoped.filter((row) => (row.intensity_mm_h ?? 0) >= 15).length;
   const priority = useMemo(() => visible.filter((row) => row.stage && row.stage !== "unrated" && row.stage !== "normal").slice(0, 12), [visible]);
 
   const select = useCallback((code: string | null, fly = true) => {
@@ -116,6 +131,7 @@ export default function WatchBoard() {
     setRegion(nextRegion);
     setMinStage(view.min_stage ?? null);
     setSelected(view.station_code ?? null);
+    if (view.layer === "rain") setShowRain(true);
     writeParams({ at, region: nextRegion, stage: view.min_stage ?? null, station: view.station_code ?? null });
     if (view.center) setFlyTo({ center: view.center, zoom: view.zoom ?? 12 });
     else if (view.region && REGION_CENTER[view.region]) setFlyTo({ center: REGION_CENTER[view.region], zoom: 8 });
@@ -161,14 +177,23 @@ export default function WatchBoard() {
             <div className="wb-counts" role="list">
               {(["planned_flood", "warning", "advisory", "attention"] as WatchStage[]).map((stage) => (
                 <button key={stage} type="button" role="listitem" className={minStage === stage ? "active" : ""} style={{ ["--c" as string]: STAGE_COLOR[stage] }} onClick={() => changeStage(minStage === stage ? null : stage)}>
-                  <strong>{counts.by[stage]}</strong><span>{STAGE_KO[stage]} 이상</span>
+                  <strong>{counts.atLeast[stage]}</strong><span>{STAGE_KO[stage]} 이상</span>
                 </button>
               ))}
             </div>
             <div className="wb-meta">
               <span><TrendingUp size={12} /> 상승 중 {counts.rising}곳</span>
-              <span><Gauge size={12} /> 연결 시설 {counts.facilities}곳 · 운영 {overview?.counts.facilities_operational ?? 0}</span>
+              <span><Gauge size={12} /> 연결 시설 {counts.facilities}곳 · 운영 {counts.operational}</span>
             </div>
+            {rain && (
+              <button type="button" className={`wb-rain-toggle${showRain ? " active" : ""}`} aria-pressed={showRain} onClick={() => setShowRain((value) => !value)}
+                title={`${rain.basis} · 지도에 강우 ${showRain ? "숨기기" : "보이기"}`}>
+                <CloudRain size={13} />
+                {!rain.available ? <span>강우 자료 없음</span> : (
+                  <span>강우 중 <b>{rainScoped.length}</b>곳 · 강한 비 이상 <b>{heavyRain}</b>곳 · 강한 비 아래 하천 관측소 <b>{counts.underHeavyRain}</b>곳</span>
+                )}
+              </button>
+            )}
             <div className="wb-filters">
               <label>지역
                 <select value={region ?? ""} onChange={(event) => changeRegion(event.target.value || null)}>
@@ -205,6 +230,24 @@ export default function WatchBoard() {
             </ol>
           </section>
 
+          {rain?.available && (
+            <section className="tw-card wb-changes wb-rain" aria-label="비 많이 오는 곳">
+              <p className="tw-eyebrow">비 많이 오는 곳 · {clock(rain.observed_at)} · {rain.mode === "live" ? "10분 강우" : "1시간 강우"}</p>
+              {!rainScoped.length ? <p className="ub-note">{region ? `${region}에는` : "지금"} 비가 관측된 강우 관측소가 없습니다.</p> : (
+                <ul>
+                  {rainScoped.slice(0, 5).map((row) => (
+                    <li key={row.code}>
+                      <button type="button" onClick={() => { setShowRain(true); setFlyTo({ center: [row.lon, row.lat], zoom: 10 }); }} style={{ ["--c" as string]: RAIN_COLOR[row.intensity] }}>
+                        <i className="wb-rain-dot" /> {row.name} <small>{rainAmount(row)} · {row.intensity_label}</small>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <small className="ub-note">{rain.basis}. 비는 시간차를 두고 하천 수위에 반영되며, 강우만으로 단계를 바꾸지 않습니다.</small>
+            </section>
+          )}
+
           {changes && (
             <section className="tw-card wb-changes" aria-label="최근 변화">
               <p className="tw-eyebrow">최근 {changes.since_min}분 변화{changes.compared_to ? ` · ${clock(changes.compared_to)} 대비` : ""}</p>
@@ -220,7 +263,7 @@ export default function WatchBoard() {
         </aside>
 
         <section className="wb-map-wrap" aria-label="전국 지도">
-          <WatchMap stations={overview?.stations ?? []} visible={visible} selected={selected} onSelect={(code) => select(code, false)} flyTo={flyTo} />
+          <WatchMap stations={overview?.stations ?? []} visible={visible} selected={selected} onSelect={(code) => select(code, false)} flyTo={flyTo} rain={showRain ? rain?.stations ?? [] : []} />
           {selected && (
             <aside className="wb-overlay" aria-label="선택 관측소">
               <button type="button" className="wb-overlay-close" aria-label="닫기" onClick={() => select(null, false)}><X size={14} /></button>
@@ -230,6 +273,7 @@ export default function WatchBoard() {
           <div className="wb-legend">
             {(["planned_flood", "warning", "advisory", "attention", "normal", "unrated"] as WatchStage[]).map((stage) => <span key={stage}><i style={{ background: STAGE_COLOR[stage] }} />{STAGE_KO[stage]}</span>)}
             <span><i className="wb-legend-facility" />연결 시설</span>
+            {rain && <button type="button" className={`wb-legend-rain${showRain ? " active" : ""}`} aria-pressed={showRain} onClick={() => setShowRain((value) => !value)}><i />강우</button>}
           </div>
         </section>
 
@@ -237,7 +281,7 @@ export default function WatchBoard() {
           <div className="wb-agent-head">
             <p className="tw-eyebrow">대응 에이전트 · 보드 운영</p>
             <h2>물어보면 화면이 따라갑니다</h2>
-            <p className="ub-note">"충북 보여줘", "가장 위험한 곳 5곳", "지난 1시간 변화", "상황 보고 초안". 수치는 서버 도구가 계산하고 AI는 설명만 합니다. 지역·관측소·단계는 질문에 쓴 단어만 조건으로 씁니다.</p>
+            <p className="ub-note">"충북 보여줘", "가장 위험한 곳 5곳", "지금 비 많이 오는 곳", "상황 보고 초안". 수치는 서버 도구가 계산하고 AI는 설명만 합니다. 지역·관측소·단계는 질문에 쓴 단어만 조건으로 씁니다.</p>
           </div>
           <AgentDock eventId="osong-2023" board="watch" facilityAt={at} onView={applyView} />
         </aside>
@@ -269,6 +313,7 @@ function StationCard({ detail }: { detail: WatchStationDetail }) {
         {detail.observation && Object.keys(levels).length > 0 && <LevelBar level={detail.observation.water_level_m} levels={levels} />}
         {detail.quality !== "fresh" && <small className="dk-error">관측 품질: {detail.quality === "stale" ? `오래된 자료(${detail.observation?.age_min}분 전)` : detail.quality === "suspect" ? "급변(정합성 확인 필요)" : "관측 없음"}</small>}
         {detail.recent.length > 1 && <Sparkline points={detail.recent} levels={levels} tone={tone} />}
+        <RainLine rain={detail.rain_nearby ?? null} />
       </section>
       <section className="tw-card wb-facilities" aria-label="연결 시설">
         <p className="tw-eyebrow">연결 시설 · 운영 {operational.length} · 감시 {watch.length}</p>
@@ -288,6 +333,24 @@ function StationCard({ detail }: { detail: WatchStationDetail }) {
         <small className="ub-note">감시 등급은 5 km 안 가장 가까운 관측소에 묶은 것이고, 그 관측소가 시설 유입을 대표하는지는 확인하지 않았습니다. 운영 등록은 유입 경로·대표 관측소·현장 계측·검증 사건 네 관문을 거칩니다.</small>
       </section>
     </>
+  );
+}
+
+function rainAmount(row: Pick<WatchRainReading, "rain_10m_mm" | "rain_1h_mm" | "rain_1h_basis">) {
+  const parts = [];
+  if (row.rain_10m_mm !== null) parts.push(`10분 ${row.rain_10m_mm} mm`);
+  // The last whole hour can read 0 mm while it is pouring now, so only a rolling or stored hour is shown.
+  if (row.rain_1h_mm !== null && row.rain_1h_basis !== "last_hour") parts.push(`1시간 ${row.rain_1h_mm} mm`);
+  return parts.join(" · ") || "—";
+}
+
+function RainLine({ rain }: { rain: WatchRainNearby | null }) {
+  if (!rain) return <p className="wb-rainline ub-note"><CloudRain size={13} /> 10 km 안에 강우 관측값이 있는 관측소가 없습니다.</p>;
+  return (
+    <p className="wb-rainline" style={{ ["--c" as string]: RAIN_COLOR[rain.intensity] }}>
+      <CloudRain size={13} />
+      <span><span><b>{rain.intensity_label}</b>{rain.intensity !== "none" ? ` · ${rainAmount(rain)}` : ""}</span><small>근처 강우 {rain.name} · {rain.distance_km} km · {clock(rain.time)}</small></span>
+    </p>
   );
 }
 
@@ -332,7 +395,7 @@ function Sparkline({ points, levels, tone }: { points: Array<{ time: string; wat
   );
 }
 
-function WatchMap({ stations, visible, selected, onSelect, flyTo }: { stations: WatchStation[]; visible: WatchStation[]; selected: string | null; onSelect: (code: string) => void; flyTo: { center: [number, number]; zoom: number } | null }) {
+function WatchMap({ stations, visible, selected, onSelect, flyTo, rain }: { stations: WatchStation[]; visible: WatchStation[]; selected: string | null; onSelect: (code: string) => void; flyTo: { center: [number, number]; zoom: number } | null; rain: WatchRainReading[] }) {
   const elementRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const readyRef = useRef(false);
@@ -364,12 +427,24 @@ function WatchMap({ stations, visible, selected, onSelect, flyTo }: { stations: 
     });
     map.addControl(new maplibregl.AttributionControl({ compact: false, customAttribution: ["관측 © 한강홍수통제소 OpenAPI", "시설 © 국토교통부 · OSM"] }), "bottom-right");
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-left");
+    const rainPopup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10 });
     // Layers go in as soon as the style is ready; waiting for "load" also waits on basemap tiles,
     // and a failed Esri tile can hold it back so the gauges never appear.
     const setup = () => {
       if (readyRef.current || mapRef.current !== map) return;
       map.addSource("stations", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
       map.addSource("facilities", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      map.addSource("rain", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      // Rain sits under the gauges as soft violet halos sized by intensity (mm/h).
+      map.addLayer({ id: "rain", type: "circle", source: "rain", paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, ["interpolate", ["linear"], ["get", "rate"], 0, 3, 15, 7, 60, 12], 11, ["interpolate", ["linear"], ["get", "rate"], 0, 10, 15, 22, 60, 36]],
+        "circle-color": ["get", "color"], "circle-opacity": 0.42, "circle-blur": 0.35,
+      } });
+      map.on("mousemove", "rain", (event: MapLayerMouseEvent) => {
+        const props = event.features?.[0]?.properties;
+        if (props && !map.queryRenderedFeatures(event.point, { layers: ["stations"] }).length) rainPopup.setLngLat(event.lngLat).setHTML(`<strong>${props.name}</strong><br/>${props.label} · ${props.amount}`).addTo(map);
+      });
+      map.on("mouseleave", "rain", () => rainPopup.remove());
       map.addLayer({ id: "facilities", type: "circle", source: "facilities", paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 6, 2, 12, 5], "circle-color": "#0b1220", "circle-stroke-color": ["case", ["==", ["get", "tier"], "operational"], "#34d399", "#9aa9c2"], "circle-stroke-width": 1.5, "circle-opacity": 0.9 } });
       map.addLayer({ id: "stations", type: "circle", source: "stations", paint: {
         "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, ["case", [">=", ["get", "rank"], 3], 5, 3], 12, ["case", [">=", ["get", "rank"], 3], 10, 6]],
@@ -402,7 +477,15 @@ function WatchMap({ stations, visible, selected, onSelect, flyTo }: { stations: 
     const apply = () => {
       const stationSource = map.getSource("stations") as GeoJSONSource | undefined;
       const facilitySource = map.getSource("facilities") as GeoJSONSource | undefined;
-      if (!stationSource || !facilitySource) return;
+      const rainSource = map.getSource("rain") as GeoJSONSource | undefined;
+      if (!stationSource || !facilitySource || !rainSource) return;
+      rainSource.setData({
+        type: "FeatureCollection",
+        features: rain.filter((row) => (row.intensity_mm_h ?? 0) > 0).map((row) => ({
+          type: "Feature" as const, geometry: { type: "Point" as const, coordinates: [row.lon, row.lat] },
+          properties: { name: row.name, rate: row.intensity_mm_h ?? 0, color: RAIN_COLOR[row.intensity], label: row.intensity_label, amount: rainAmount(row) },
+        })),
+      });
       stationSource.setData({
         type: "FeatureCollection",
         features: stations.map((row) => ({
@@ -419,7 +502,7 @@ function WatchMap({ stations, visible, selected, onSelect, flyTo }: { stations: 
     applyRef.current = apply;
     if (readyRef.current) apply();
     return undefined;
-  }, [stations, visible, selected]);
+  }, [stations, visible, selected, rain]);
 
   useEffect(() => {
     if (!flyTo || !mapRef.current) return;

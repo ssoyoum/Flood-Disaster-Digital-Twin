@@ -650,16 +650,28 @@ export type WatchStation = {
   quality: WatchQuality; stage: WatchStage | null; stage_label: string | null;
   rate_m_per_10min: number | null; rate_window_min: number | null; rise_class: string; rise_label: string;
   margin_to_planned_flood_m: number | null; minutes_to_planned_flood: number | null;
+  rain_nearby?: WatchRainNearby | null;
+};
+export type WatchRainIntensity = "none" | "light" | "moderate" | "heavy" | "very_heavy";
+export type WatchRainReading = {
+  code: string; name: string; short_name: string; region: string; lon: number; lat: number; time: string;
+  rain_10m_mm: number | null; rain_1h_mm: number | null; rain_1h_basis: "rolling" | "last_hour" | "hourly" | "none"; rain_1h_end: string | null;
+  intensity_mm_h: number | null; intensity: WatchRainIntensity; intensity_label: string;
+};
+export type WatchRainNearby = Pick<WatchRainReading, "code" | "name" | "short_name" | "rain_10m_mm" | "rain_1h_mm" | "rain_1h_basis" | "intensity_mm_h" | "intensity" | "intensity_label" | "time"> & { distance_km: number };
+export type WatchRain = {
+  available: boolean; mode: "live" | "replay"; observed_at: string | null; basis: string; gauges_total: number; gauges_reporting: number;
+  raining: number; heavy_or_above: number; by_intensity: Record<Exclude<WatchRainIntensity, "none">, number>; stations: WatchRainReading[]; limitations: string[];
 };
 export type WatchStationDetail = WatchStation & { mode: "live" | "replay"; at: string; recent: Array<{ time: string; water_level_m: number }>; error: string | null };
-export type WatchRegion = { region: string; stations: number; max_stage: WatchStage; advisory_or_above: number; facilities: number };
+export type WatchRegion = { region: string; stations: number; max_stage: WatchStage; advisory_or_above: number; facilities: number; raining?: number; heavy_rain?: number };
 export type WatchOverview = {
   mode: "live" | "replay"; at: string; observed_at: string | null; fetched_at: string; interval: string;
   stations_total: number; stations_observed: number; source: string; error: string | null; limitations: string[];
   filter: { region: string | null; min_stage: WatchStage | null };
-  counts: { by_stage: Record<WatchStage, number>; quality: Record<WatchQuality, number>; rising: number; facilities: number; facilities_operational: number };
-  regions: WatchRegion[]; stations: WatchStation[];
+  counts: { by_stage: Record<WatchStage, number>; quality: Record<WatchQuality, number>; rising: number; facilities: number; facilities_operational: number; under_heavy_rain?: number };
+  regions: WatchRegion[]; stations: WatchStation[]; rain?: WatchRain;
 };
 export type WatchChange = { code: string; name: string; region: string; from: WatchStage; to: WatchStage; delta_m: number; rate_m_per_10min: number; facilities: number };
 export type WatchChanges = { mode: "live" | "replay"; at: string; compared_to?: string; since_min: number; available: boolean; note?: string; stage_up: WatchChange[]; stage_down: WatchChange[]; new_rising: WatchChange[] };
-export type AgentView = { region: string | null; min_stage: WatchStage | null; station_code: string | null; facility_id: string | null; center: [number, number] | null; zoom: number | null };
+export type AgentView = { region: string | null; min_stage: WatchStage | null; station_code: string | null; facility_id: string | null; center: [number, number] | null; zoom: number | null; layer?: "rain" | null };
