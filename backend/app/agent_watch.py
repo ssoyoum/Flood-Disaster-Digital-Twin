@@ -12,7 +12,7 @@ from typing import Any
 from . import national_watch as nw
 
 TOOL_NAMES = {"get_watch_overview", "navigate_board", "rank_priority", "summarize_changes", "get_station_status",
-              "draft_situation_report", "rule_scorecard", "get_rain_status", "rank_facilities"}
+              "draft_situation_report", "rule_scorecard", "get_rain_status", "rank_facilities", "get_official_forecasts", "validation_cases"}
 PARAMETERS: dict[str, set[str]] = {
     "get_watch_overview": {"region", "min_stage"},
     "navigate_board": {"region", "station", "facility", "min_stage"},
@@ -23,6 +23,8 @@ PARAMETERS: dict[str, set[str]] = {
     "rule_scorecard": {"facility"},
     "get_rain_status": {"region", "limit"},
     "rank_facilities": {"region", "group", "driver", "limit"},
+    "get_official_forecasts": {"region"},
+    "validation_cases": {"region"},
 }
 EXAMPLES = [
     {"workflow": "watch_overview", "label": "전국 현황", "question": "지금 전국에서 주의보 이상인 관측소가 몇 곳이야?"},
@@ -35,6 +37,8 @@ EXAMPLES = [
     {"workflow": "rain_status", "label": "강우", "question": "지금 비 많이 오는 곳 어디야?"},
     {"workflow": "rank_facilities", "label": "시설 우선순위", "question": "하천변 출입구 중 먼저 볼 곳 5곳 알려줘"},
     {"workflow": "rank_facilities", "label": "내수형 시설", "question": "내수형 중 비 많이 오는 곳 5곳 알려줘"},
+    {"workflow": "get_official_forecasts", "label": "공식 특보", "question": "지금 홍수특보 내려진 곳 있어?"},
+    {"workflow": "validation_cases", "label": "사례 검증", "question": "대전 사례에서 규칙이 실제 통제보다 빨랐어?"},
 ]
 WATCH_CAVEAT = "감시 등급 연결은 5 km 안 가장 가까운 관측소 기준이며 그 관측소가 시설 유입을 대표하는지는 검증하지 않았습니다."
 BASELINE_CAVEAT = "남은 분은 최근 상승 속도를 그대로 늘린 기준선이며 예보가 아닙니다."
@@ -67,6 +71,13 @@ def tools() -> list[dict[str, Any]]:
         ("rank_facilities", "시설을 잠그는 원인에 맞춰 하천형은 연결 수위, 내수형은 시설 근처 강우로 순위를 낸다. 위험한 시설, 먼저 볼 지하차도, 비가 많이 오는 내수형을 물을 때.",
          "region: 사용자가 쓴 시도(없으면 전국). group: 사용자가 '지하차도'라고 쓰면 underpass, '하천변·둔치·출입구·하상도로'라고 쓰면 riverside(쓰지 않으면 생략). driver: '하천형'이면 river, '내수형'이면 pluvial(쓰지 않으면 생략). limit: 사용자가 쓴 개수(기본 5).",
          "시설 이름·종류·지역, 하천형·내수형 분류, 위험 단계, 판단 이유, 하천 관측소와 거리, 계획홍수위까지 남은 분, 주변 1·3시간 강우.", "시설 침수 여부, 통제 실행, 배수·펌프 용량에 따른 실제 침수 판단."),
+        ("get_official_forecasts", "홍수통제소가 낸 공식 홍수주의보·홍수경보 중인 관측소를 센다(실시간, 재생 시각이면 그 시각의 발령 이력). 특보·홍수경보·홍수주의보·발령을 물을 때.",
+         "region: 사용자가 쓴 시도(없으면 전국).",
+         "특보 종류별 관측소 수, 관측소별 발령 시각·발령 시 수위·예상 수위·예상 시각·경과 분.", "특보 문안 밖의 예보, 시설 침수 여부, 통제 실행."),
+        ("validation_cases", "과거 사건(오송 2023, 대전 2020·2023·2024)에서 시설 위험 규칙과 공식 특보가 실제 통제·유입보다 몇 분 먼저였는지 보여준다. 검증·사례·규칙이 실제 통제보다 빨랐는지 물을 때.",
+         "region: 사용자가 쓴 시도(대전·충북, 없으면 전부).",
+         "사례별 기준 시각(통제·유입)과 정밀도, 공식 주의보·경보·시설 주의·경계 첫 시각과 선행 분, 기준 시각에 주의 이상이던 같은 지역 시설 수.",
+         "보도에 없는 분 단위 통제 시각, 기준을 바꾸면 어떻게 되는지(재계산 안 함), 다른 사건 일반화."),
     ]
     return [{"name": name, "description": description, "input_fields": sorted(PARAMETERS[name]),
              "output": "national watch evidence with provenance and limitations", "use_when": description,
@@ -88,6 +99,8 @@ _FACILITY_WORD = re.compile(r"시설|지하차도|하천변|둔치|고수부지|
 _RAIN = re.compile(r"강우|호우|폭우|소나기|빗줄기|비\s*(?:가|는|도)?\s*(?:많이|오|와|내리|온|쏟|퍼붓)")
 _OVERVIEW = re.compile(r"몇\s*곳|현황|전체|전국|몇\s*개")
 _STATUS = re.compile(r"단계|수위|남았|상태|여유|얼마")
+_OFFICIAL = re.compile(r"특보|홍수경보|홍수주의보|발령")
+_VALIDATE = re.compile(r"검증|사례|실제\s*통제|통제\s*(?:시각|보다)|빨랐|늦었")
 
 
 def _written_stage(message: str) -> str | None:
@@ -137,6 +150,10 @@ def hints(message: str) -> list[dict[str, Any]]:
 
     if _SCORE.search(message) and facility and facility["tier"] == "operational":
         add("rule_scorecard", facility=facility["name"])
+    elif _VALIDATE.search(message):
+        add("validation_cases", region=region)
+    elif _OFFICIAL.search(message) and not station and not facility:
+        add("get_official_forecasts", region=region)
     elif driver and not facility and (_RANK.search(message) or _RAIN.search(message) or "먼저" in message):
         add("rank_facilities", region=region, group=_written_group(message), driver=driver, limit=_written_limit(message))
     elif _FACILITY_WORD.search(message) and not facility and (_RANK.search(message) or _OVERVIEW.search(message) or "먼저" in message):
@@ -351,6 +368,25 @@ def run_tool(name: str, request: Any) -> dict[str, Any]:
                 "view": _view(region=region, facility=view_facility, layer="rain" if driver == "pluvial" else None) if view_facility else _view(region=region, layer="rain" if driver == "pluvial" else None),
                 "coverage_note": "FACILITY_RISK: ordered by 0–4 risk level using the facility's flooding driver: river stage or nearby rain.",
                 "limitations": data["limitations"]}
+    if name == "get_official_forecasts":
+        from . import flood_forecast
+        data = flood_forecast.summary(at)
+        catalogue = nw.stations()
+        active = [{**row, "region": catalogue[row["station_code"]].region if row["station_code"] in catalogue else None} for row in data["active"]]
+        if region:
+            active = [row for row in active if row["region"] == region]
+        return {"mode": data["mode"], "at": data["at"], "region": region or "전국", "error": data["error"],
+                "counts": {"warning": sum(1 for row in active if row["level"] == "warning"), "advisory": sum(1 for row in active if row["level"] == "advisory")},
+                "active": active[:10], "active_total": len(active), "source": data["source"], "view": _view(region=region),
+                "coverage_note": "OFFICIAL_FORECAST: HRFCO 홍수예보 발령 as issued; FloodOps does not alter it.",
+                "limitations": data["limitations"]}
+    if name == "validation_cases":
+        from . import case_validation
+        data = case_validation.scorecard()
+        cases = [item for item in data["cases"] if not region or nw.match_region(item["region"]) == region]
+        return {"region": region or "전체", "built_at": data["built_at"], "rule": data["rule"], "cases": cases, "view": _view(region=region),
+                "coverage_note": "VALIDATION_REPLAY: stored replay of facility_risk every 10 minutes against reported control times.",
+                "limitations": data["limitations"]}
     if name == "get_rain_status":
         limit = getattr(request, "limit", None) or 5
         data = nw.overview(at, region, None, limit=2000, rain_mode=rain_mode)
@@ -495,6 +531,29 @@ def summarize(calls: list[dict[str, Any]]) -> tuple[str, list[int]]:
                             bit += f"({rain['name']} {rain.get('distance_km')} km)"
                     parts.append(bit)
                 text += " " + "; ".join(parts) + "."
+        elif name == "get_official_forecasts":
+            counts = result.get("counts", {})
+            if result.get("error") and not result.get("active_total"):
+                text = "공식 홍수특보 피드를 읽지 못했습니다."
+            else:
+                text = (f"{(result.get('at') or '')[:16].replace('T', ' ')} 기준 {result.get('region')} 공식 홍수경보 {counts.get('warning', 0)}곳, "
+                        f"홍수주의보 {counts.get('advisory', 0)}곳입니다.")
+                rows = result.get("active") or []
+                if rows:
+                    text += " " + "; ".join(
+                        f"{row['station_name']} {row['level_ko']}(발령 {row['issued_at'][5:16].replace('T', ' ')}"
+                        + (f", 예상 {row['forecast_time'][11:16]} {row['forecast_level_m']:.2f} m" if row.get("forecast_time") and row.get("forecast_level_m") is not None else "")
+                        + ")" for row in rows[:5]) + "."
+        elif name == "validation_cases":
+            parts = []
+            for item in result.get("cases", []):
+                ref = item["reference"]
+                picks = [s for s in item["signals"] if s["signal"] in ("공식 홍수주의보", "공식 홍수경보") or s["signal"].endswith("첫 주의 이상")]
+                region_now = item.get("region_at_reference") or {}
+                parts.append(f"{item['title']}: 기준 {ref['label']} — "
+                             + ", ".join(f"{s['signal']} {s['at'][11:16] if s['at'] else '없음'}({s['verdict']})" for s in picks)
+                             + f"; 기준 시각에 {item['region']} 시설 {region_now.get('total', 0)}곳 중 주의 이상 {region_now.get('advisory_or_above', 0)}곳")
+            text = " / ".join(parts) + ". 통제 시각은 보도 기준입니다." if parts else "이 지역의 검증 사례가 없습니다."
         elif name == "get_rain_status":
             if not result.get("available"):
                 text = "이 시각의 강우 관측 자료가 없습니다."
