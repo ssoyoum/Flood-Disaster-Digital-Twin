@@ -1,0 +1,45 @@
+{
+ "built_at": "2026-10-19T02:18:09",
+ "issuances_compared": 652,
+ "window": "issue −12 h … +24 h, hourly series",
+ "rule": "river_stage_v1 on hourly data (rate = 1-hour change)",
+ "threshold_source": {
+  "notes": 64,
+  "forecast_level": 195,
+  "current": 393
+ },
+ "threshold_changed_since_issue": 195,
+ "경보": {
+  "issuances": 154,
+  "target_crossed": 97,
+  "target_never_crossed": 57,
+  "issued_before_crossing": 93,
+  "issue_lead_over_crossing": {
+   "n": 97,
+   "median_min": 60,
+   "p25_min": 40.0,
+   "p75_min": 80.0
+  },
+  "planned_flood_reached": 24,
+  "rule_fired": 46,
+  "rule_before_issue": 3,
+  "rule_minus_issue": {
+   "n": 46,
+   "median_min": 50.0,
+   "p25_min": 20.0,
+   "p75_min": 62.5
+  }
+ },
+ "주의보": {
+  "issuances": 467,
+  "target_crossed": 310,
+  "target_never_crossed": 157,
+  "issued_before_crossing": 299,
+  "issue_lead_over_crossing": {
+   "n": 310,
+   "median_min": 70.0,
+   "p25_min": 50.0,
+   "p75_min": 110.0
+  }
+ }
+}
