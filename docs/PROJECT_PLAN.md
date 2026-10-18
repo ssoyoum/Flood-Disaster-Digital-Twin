@@ -1,32 +1,39 @@
 # FloodOps Project Plan
 
-Last updated: 2026-09-04
+Last updated: 2026-10-19
 
 ## Definition
 
-FloodOps is a Counterfactual Disaster Digital Twin.
+FloodOps is a facility-centered flood monitoring and control-decision twin for places where rivers meet roads: underpasses and river access points. Low-lying evacuation areas are an expansion target once verified coordinates and evacuation criteria are available.
 
-It reconstructs a real historical disaster with observed and spatial data, then changes intervention conditions under the same event to compare response options.
+The product uses observed river levels and rainfall, official flood forecasts, and facility-specific evidence to screen risk. For facilities that pass operational data gates, it compares the control rule with historical observations and records a human operator's review. Historical event replays are validation and training material; the facility is the unit of operation.
 
-FloodOps is not:
+Facilities have two evidence levels:
 
-- an AI flood prediction model
-- a precise future forecasting system
-- an official flood map replacement
-- a validated hydraulic simulation system
-- a simple news timeline
+- **Watch:** a nearby river gauge or rainfall station supports a provisional risk rank. Gauge representativeness, local drainage, pumps, and the exact inundation path may be unknown. A watch rank is a screening signal, not a control recommendation.
+- **Operational:** the facility has a reviewed inflow path, representative gauge, field measurement, and validation event in the registry. Its own rule can drive a control review, be backtested, and have operator confirmations recorded.
+
+Official river flood forecasts may raise the minimum watch stage for river-driven facilities. Observed-rain thresholds support pluvial screening. Neither input proves that a specific facility is inundated.
+
+FloodOps does not:
+
+- issue an automatic closure or evacuation command
+- claim a precise future flood time from a recent-rate calculation
+- replace official flood maps or agency warnings
+- claim validated depth, velocity, damage, or casualty reduction
+- infer a facility's flood source from proximity alone
 
 Core value:
 
-> Historical Disaster Reconstruction + Counterfactual Intervention + Decision Support
+> National facility screening + evidence-gated facility decisions + historical validation
 
 ## Reference Case
 
-The first reference case is:
+The primary validation case is:
 
 > 2023 Osong Underpass Flood - Miho River and Gungpyeong 2 Underpass
 
-Main analysis flow:
+Its historical evidence flow is:
 
 ```text
 rainfall
@@ -38,56 +45,36 @@ rainfall
 -> response intervention timing
 ```
 
-The key question is not only where water was present. The key question is when the event state became dangerous and whether a different intervention timing could have changed the response window.
+The reference case checks whether a facility rule would have raised a control review before the recorded underpass inflow. Other cases are scored against reported closure times with their source precision preserved. A replay result is not a claim that a different action would have prevented damage.
 
-## Phase 1: FloodOps 1.0
+## Phase 1: Historical evidence and rule validation
 
-Phase 1 is an Observed Event Twin / Historical Reconstruction MVP.
+**Status: complete for the current validation set.** This phase establishes observed data, sourced event milestones, replay, and measurable rule timing.
 
-Included:
+- Osong replay combines observed rainfall and water levels with the sourced incident timeline and provisional spatial layers.
+- Official HRFCO flood forecast issuance is compared with observed stage and facility rules.
+- A deterministic scorecard replays facility risk at 10-minute steps against reported control or inflow times for Osong and three Daejeon cases. Approximate and upper-bound news times retain their source precision.
+- Closure-timing and inflow-delay scenarios compare timestamps only; they do not estimate avoided damage or casualties.
 
-- KMA observed rainfall
-- HRFCO/Flood Control Office observed water level
-- official incident timeline
-- WAMIS river geometry
-- SGIS administrative boundary
-- Copernicus DEM
-- official GIS Building Integrated Information
-- OSM historical snapshot for QA and context
-- Gungpyeong 2 underpass thematic layer
-- Historical Replay
-- baseline scenario
-- one or more rule-based interventions
-- deterministic Agent workflows for situation, closure timing, inflow delay, and exposure inventory
-- optional LLM intent planner with deterministic fallback
-- portfolio response scenario API for building-ID validation and source-backed availability reporting
-- provenance and limitations
-- temporary approximate flood envelope for visual reconstruction
+## Phase 2: National watch and facility decision twin
 
-Not included as validated claims:
+**Status: active.** The first operating view is the national watch board. The current risk API ranks 399 facilities by provisional driver: 144 river-driven and 255 pluvial. Only Gungpyeong 2 Underpass has an operational facility-specific rule; the remaining facilities are watch-level candidates.
 
-- official flood extent
-- measured depth
-- measured velocity
-- final exposure KPIs without valid flood geometry
-- fatality, damage-cost, or official loss-reduction estimates
+- Live HRFCO water levels and rainfall are kept separate from historical replay. Repeated source timestamps do not count as new observations; source quality and age remain visible.
+- River-driven facilities use the linked gauge stage, with an official flood advisory or warning as a minimum stage. Pluvial facilities compare nearby observed rainfall against KMA advisory amounts; KMA weather-warning issuance is still awaiting API access.
+- One-hour rainfall history is cached locally. Twelve-hour rainfall is shown only after 12 consecutive hourly observations exist.
+- The operational facility view supports current status, rule criteria review, historical backtest, and local operator confirmation records. A record captures the server-side observation and rule snapshot and distinguishes live from replay.
+- Watch-level estimates show their connected gauge or rainfall basis and limits. They do not become operational rules by being displayed or ranked.
 
-## Current Implementation Snapshot
+## Phase 3: Evidence, coverage, and release readiness
 
-As of 2026-09-04, the Osong MVP is presentation-ready at the backend and light
-frontend baseline. Historical Replay, HAND-like reconstruction, What-if A/B,
-Agent workflow orchestration, the optional LLM planner, and the portfolio
-scenario availability boundary are connected and covered by automated tests.
+**Status: planned and partly blocked by external data access.** Expand operational coverage only when the evidence gates can be checked for each facility.
 
-The `ui/dark-console` branch contains an in-progress dark console presentation
-layer. It reuses the existing APIs and data, but still requires browser smoke
-testing, MapLibre warning cleanup, provenance/limitation review, and a focused
-commit before it is treated as complete.
-
-Current validation command results:
-
-- backend: `58 passed`
-- frontend: `npm run build` passed; Vite reported only the existing large-chunk warning
+- Obtain entrance low-point elevations, drainage or river inflow paths, field sensors, closure criteria, and time-stamped control histories from the responsible agencies.
+- Add facilities only after registry gates for inflow path, representative gauge, field measurement, and validation event are documented. Keep unresolved sites as watch-level candidates.
+- Apply for KMA weather-warning and AWS products before connecting official rain warnings or live KMA rainfall. Do not substitute an unavailable API with fabricated or stale values.
+- Deploy the updated board only after cloud access and deployment prerequisites are approved; confirm live/replay separation and the memory limit on the target server.
+- Record agency interviews and pilot observations as evidence before changing facility rules or product claims.
 
 ## Current Spatial Reconstruction
 
@@ -121,37 +108,36 @@ Limit:
 - not depth or velocity
 - not final exposure geometry
 
-## Phase 1 What-if Scope
+## Historical Replay and Counterfactual Scope
 
-MVP What-if scenarios should stay small and defensible.
+Historical scenarios stay small and defensible.
 
-Preferred first scenarios:
+Supported comparisons:
 
-- vehicle entry closure at alternative times
-- temporary flood barrier presence or absence
-- levee height or levee condition variation, only if assumptions are explicit
+- facility closure at alternative times against recorded milestones
+- user-specified delay to an observed milestone, with only the later timestamps shifted
+
+Future sensitivity work may compare temporary barriers or levee conditions only when the assumed geometry and effect are explicit. A time shift is not a hydraulic effect.
 
 Allowed outputs:
 
-- response window
-- closure state
-- risk-state transition
-- access allowed / blocked
-- approximate envelope difference if available
-- baseline versus scenario visual comparison
+- lead time to recorded inflow or other milestones
+- whether a closure time is before or after a recorded milestone
+- shifted milestone timestamps under a user-defined delay
+- baseline versus scenario timing comparison
 
 Do not estimate deaths prevented, property damage avoided, or official damage reduction without a validated model and evidence.
 
-## Phase 2: Physics-Enhanced Twin
+## Hydraulic simulation research track
 
-Phase 2 adds calibrated physical simulation to the reconstruction twin.
+This track is separate from the operational watch board. Solver output remains `SIMULATED` until its inputs and results are checked against observed evidence.
 
 Possible engines:
 
 - HEC-RAS 2D
 - LISFLOOD-FP
 
-Phase 2 target:
+Research target:
 
 ```text
 breach location / geometry
@@ -164,25 +150,11 @@ breach location / geometry
 -> React UI
 ```
 
-HEC-RAS is a simulation engine, not the project identity.
-
-## Phase 3: Operational Twin
-
-Phase 3 may connect:
-
-- real-time sensors
-- weather forecasts
-- live river levels
-- facility status
-- risk prediction
-- warning automation
-- operational response comparison
-
-This is outside the current MVP.
+HEC-RAS is a simulation engine, not the project identity. Do not present depth, velocity, or official flood extent until breach geometry, boundary conditions, facility elevations, and independent validation data are available. Automated warning or control commands are outside the current release scope.
 
 ## Future Case Expansion
 
-Candidate cases remain:
+Cases are validation material for facility rules, not the product unit. The current scorecard covers Osong 2023 and Daejeon 2020, 2023, and 2024. Additional cases remain conditional:
 
 - 2022 Seoul Urban Flood
 - 2022 Pohang Typhoon Flood
@@ -202,14 +174,13 @@ Each case must separate:
 
 ## Success Criteria
 
-For the Osong MVP:
+For the current release:
 
-- the historical sequence is replayable
-- map state changes with time
-- observed rainfall and water level are visible
-- Gungpyeong 2 underpass is clearly identified
-- at least one intervention can be compared with baseline
-- provenance and uncertainty are visible
-- approximate flood envelope is clearly labeled as temporary derived approximation
-- exposure KPIs that need official flood geometry remain pending
-- backend tests and frontend build pass
+- live monitoring and historical replay are visibly distinct, with observation time, source quality, and stale-data behavior exposed
+- each facility rank names its river or rain basis and says when that basis does not establish local flooding
+- only a registry-approved facility receives an operational control-rule review
+- official forecast, observed gauge/rainfall, facility rule, and reported control time remain separate evidence rows
+- scorecards preserve the source precision of reported event times and show late, early, or missing signals without hiding adverse results
+- operator confirmation records store the server observation/rule snapshot and label replay records as historical
+- derived spatial layers remain labeled provisional; no unvalidated depth, velocity, exposure-loss, or casualty-reduction claim is shown
+- release tasks include approved API access, target-server memory and mode checks, and a documented deployment endpoint
