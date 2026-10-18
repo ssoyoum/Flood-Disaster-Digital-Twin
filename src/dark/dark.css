@@ -31,6 +31,8 @@
 .dk-view-tabs { display: flex; align-self: stretch; align-items: center; gap: 3px; margin-left: 14px; }
 .dk-view-tabs button { height: 100%; padding: 0 12px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--dk-muted); font-size: 12px; font-weight: 800; }
 .dk-view-tabs button:hover, .dk-view-tabs button.active { border-bottom-color: var(--dk-accent); color: var(--dk-text); }
+.dk-view-tabs .dk-tab-link { display: flex; align-items: center; height: 100%; margin-left: 6px; padding: 0 12px; border-bottom: 2px solid transparent; color: var(--dk-accent); font-size: 12px; font-weight: 800; text-decoration: none; white-space: nowrap; }
+.dk-view-tabs .dk-tab-link:hover { border-bottom-color: var(--dk-accent); color: var(--dk-text); }
 .dk-header-agent { position: relative; display: flex; align-items: center; gap: 12px; flex: 1; min-width: 360px; max-width: 760px; padding: 5px 10px; border: 1px solid var(--dk-accent); border-radius: 8px; background: transparent; }
 .dk-header-agent-title { display: flex; align-items: center; gap: 7px; flex: none; }
 .dk-header-agent-title > span:last-child { display: grid; gap: 1px; }

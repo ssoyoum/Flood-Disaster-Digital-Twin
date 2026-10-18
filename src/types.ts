@@ -635,3 +635,31 @@ export type RiseForecast = {
   reaches_within_6h?: { advisory: boolean; warning: boolean; planned_flood: boolean }; margin_after_rise_m?: number; linear_6h_m?: number; station_in_training?: boolean;
   limitations: string[];
 };
+
+// ---- National watch board ----------------------------------------------------------------------
+export type WatchStage = "unrated" | "normal" | "attention" | "advisory" | "warning" | "planned_flood";
+export type WatchQuality = "fresh" | "stale" | "suspect" | "missing";
+export type WatchFacilityLink = {
+  facility_id: string; name: string; kind: string; tier: "operational" | "watch"; region: string | null; sgg?: string | null;
+  lon: number; lat: number; distance_km: number | null; event_id: string | null;
+};
+export type WatchStation = {
+  code: string; name: string; short_name: string; agency: string; address: string; region: string; lon: number; lat: number;
+  flood_forecast: boolean; levels_m: Record<string, number>; facilities: WatchFacilityLink[]; tiers: { operational: number; watch: number };
+  observation: { time: string; water_level_m: number; interval: string; age_min: number } | null;
+  quality: WatchQuality; stage: WatchStage | null; stage_label: string | null;
+  rate_m_per_10min: number | null; rate_window_min: number | null; rise_class: string; rise_label: string;
+  margin_to_planned_flood_m: number | null; minutes_to_planned_flood: number | null;
+};
+export type WatchStationDetail = WatchStation & { mode: "live" | "replay"; at: string; recent: Array<{ time: string; water_level_m: number }>; error: string | null };
+export type WatchRegion = { region: string; stations: number; max_stage: WatchStage; advisory_or_above: number; facilities: number };
+export type WatchOverview = {
+  mode: "live" | "replay"; at: string; observed_at: string | null; fetched_at: string; interval: string;
+  stations_total: number; stations_observed: number; source: string; error: string | null; limitations: string[];
+  filter: { region: string | null; min_stage: WatchStage | null };
+  counts: { by_stage: Record<WatchStage, number>; quality: Record<WatchQuality, number>; rising: number; facilities: number; facilities_operational: number };
+  regions: WatchRegion[]; stations: WatchStation[];
+};
+export type WatchChange = { code: string; name: string; region: string; from: WatchStage; to: WatchStage; delta_m: number; rate_m_per_10min: number; facilities: number };
+export type WatchChanges = { mode: "live" | "replay"; at: string; compared_to?: string; since_min: number; available: boolean; note?: string; stage_up: WatchChange[]; stage_down: WatchChange[]; new_rising: WatchChange[] };
+export type AgentView = { region: string | null; min_stage: WatchStage | null; station_code: string | null; facility_id: string | null; center: [number, number] | null; zoom: number | null };

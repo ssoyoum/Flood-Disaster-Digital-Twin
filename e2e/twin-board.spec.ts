@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 // The Playwright FastAPI server runs with FLOODOPS_TWIN_MODE=replay, so the board reads the stored 2023 series.
 test("the twin board shows the 2023 replay status, presets and backtest for the Osong underpass", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: /지하차도 통제 판단 보드/ }).click();
+  await page.getByRole("navigation", { name: "FloodOps 화면" }).getByRole("link", { name: "운영 시설" }).click();
   await expect(page).toHaveURL(/#twin$/);
   await expect(page.locator("h1")).toContainText("지하차도 통제 판단 트윈");
   await expect(page.locator('[aria-label="시설"]')).toContainText("궁평2지하차도");

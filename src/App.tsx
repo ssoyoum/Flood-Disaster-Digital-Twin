@@ -6,23 +6,25 @@ import UrbanConsole from "./dark/UrbanConsole";
 import TimelineConsole from "./dark/TimelineConsole";
 import CaseComparePage from "./dark/CaseCompare";
 import TwinBoard from "./dark/TwinBoard";
+import WatchBoard from "./dark/WatchBoard";
 import { ConsentBanner, PrivacyPage } from "./dark/Consent";
 import { loadAnalytics, trackPageView } from "./analytics";
 import { CaseSelectPage, IntroPage } from "./dark/Landing";
 import { localizeEvent, localizeReconstruction } from "./dark/ko";
 import type { DataStatusResponse, ExposureMetrics, FloodEvent, LayersResponse, ReconstructionResponse } from "./types";
 
-// Hash routes keep the browser back button working: "" intro, "#cases", "#event/<id>".
-type Route = { page: "intro" } | { page: "cases" } | { page: "compare" } | { page: "privacy" } | { page: "twin" } | { page: "event"; id: string };
+// Hash routes keep the browser back button working: "" watch board, "#intro", "#cases", "#event/<id>".
+type Route = { page: "watch" } | { page: "intro" } | { page: "cases" } | { page: "compare" } | { page: "privacy" } | { page: "twin" } | { page: "event"; id: string };
 
 function readRoute(): Route {
   const hash = window.location.hash.replace(/^#\/?/, "");
+  if (hash === "intro") return { page: "intro" };
   if (hash === "cases") return { page: "cases" };
   if (hash === "compare") return { page: "compare" };
   if (hash === "twin" || hash.startsWith("twin?")) return { page: "twin" };
   if (hash === "privacy") return { page: "privacy" };
   if (hash.startsWith("event/")) return { page: "event", id: decodeURIComponent(hash.slice(6)) };
-  return { page: "intro" };
+  return { page: "watch" };
 }
 
 // The layer payload is large; a slow or restarting server deserves a couple more tries before an error.
@@ -72,17 +74,19 @@ function Screens() {
   }, [route]);
 
   useEffect(() => {
-    if (route.page === "intro") document.title = "FloodOps | 지하차도 통제 판단 트윈";
-    if (route.page === "cases") document.title = "사례 선택 | FloodOps";
-    if (route.page === "twin") document.title = "지하차도 통제 판단 트윈 | FloodOps";
+    if (route.page === "watch") document.title = "FloodOps | 하천 접점 시설 감시 보드";
+    if (route.page === "intro") document.title = "소개 | FloodOps";
+    if (route.page === "cases") document.title = "검증 사례 | FloodOps";
+    if (route.page === "twin") document.title = "통제 판단 보드 | FloodOps";
   }, [route]);
 
-  if (route.page === "intro") return <IntroPage onStart={() => go("cases")} onTwin={() => go("twin")} />;
-  if (route.page === "twin") return <TwinBoard onBack={() => go("cases")} />;
+  if (route.page === "watch") return <WatchBoard />;
+  if (route.page === "intro") return <IntroPage onStart={() => go("cases")} onTwin={() => go("twin")} onWatch={() => go("watch")} />;
+  if (route.page === "twin") return <TwinBoard onBack={() => go("watch")} />;
   if (route.page === "cases") {
     if (eventsError) return <ErrorState message="사례 목록을 불러오지 못했습니다. 백엔드 API 연결을 확인하세요." />;
     if (!events) return <LoadingState label="사례 목록을 불러오는 중" />;
-    return <CaseSelectPage events={events} onSelect={(id) => go(`event/${encodeURIComponent(id)}`)} onBack={() => go("")} onCompare={() => go("compare")} />;
+    return <CaseSelectPage events={events} onSelect={(id) => go(`event/${encodeURIComponent(id)}`)} onBack={() => go("watch")} onCompare={() => go("compare")} onTwin={() => go("twin")} />;
   }
   if (route.page === "privacy") return <PrivacyPage onBack={() => window.history.length > 1 ? window.history.back() : go("")} />;
   if (route.page === "compare") return <CaseComparePage onBack={() => go("cases")} onOpen={(id) => go(`event/${encodeURIComponent(id)}`)} />;

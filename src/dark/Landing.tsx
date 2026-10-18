@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Gauge, GitCompare, History, Lock, Scale } from "lucide-react";
+import { getTwinFacilities } from "../api";
 import type { FloodEvent } from "../types";
 import "./landing.css";
 
@@ -106,37 +107,59 @@ function ServiceSchematic() {
   );
 }
 
-export function IntroPage({ onStart, onTwin }: { onStart: () => void; onTwin?: () => void }) {
+export function IntroPage({ onStart, onTwin, onWatch }: { onStart: () => void; onTwin?: () => void; onWatch?: () => void }) {
+  const [operational, setOperational] = useState<string[] | null>(null);
+  useEffect(() => {
+    let live = true;
+    getTwinFacilities().then((items) => { if (live) setOperational(items.map((item) => item.name)); }).catch(() => { if (live) setOperational([]); });
+    return () => { live = false; };
+  }, []);
   const features = [
-    { icon: Gauge, title: "지금 상태", text: "지하차도에 연결된 하천 수위로 단계·상승 속도·계획홍수위까지 남은 분을 보고, 통제 검토 권고를 받습니다." },
-    { icon: Scale, title: "통제 기준 검토", text: "기준을 바꾸면 2023년 오송에서 몇 분 먼저 알렸을지와 2019~2026년 다른 시기에 몇 번 권고했을지를 함께 봅니다." },
-    { icon: History, title: "사건으로 검증", text: "과거 사건을 관측 단계별로 재생하고 통제 시각을 바꿔 유입까지 남는 시간을 비교합니다. 에이전트 질의도 같은 도구를 씁니다." },
+    { icon: Gauge, title: "전국 감시 보드", href: "#watch", text: "홍수통제소 관측소 1,400여 곳을 각 관측소의 공식 기준 수위로 판정하고, 연결된 시설과 함께 지도에 올립니다. 에이전트에게 \"충북 보여줘\"라고 말하면 이동합니다." },
+    { icon: Scale, title: "운영 시설 · 통제 기준 검토", href: "#twin?tab=criteria", text: "검증된 시설은 시설별 규칙으로 통제 검토를 권고하고, 기준을 바꾸면 과거 사건에서 몇 분 먼저 알렸을지와 다른 해 권고 횟수를 함께 봅니다." },
+    { icon: History, title: "사건으로 검증", href: "#cases", text: "과거 사건을 관측 단계별로 재생하고 통제·대피 시각을 바꿔 남는 시간을 비교합니다. 규칙과 에이전트의 검증용입니다." },
+  ];
+  const scope = [
+    { title: "지하차도", state: "운영 1 · 감시 228", tone: "live", href: "#watch", detail: operational?.length ? `${operational.join("·")} 운영 등록` : "궁평2지하차도 운영 등록" },
+    { title: "하천변 출입구", state: "다음 확장", tone: "next", href: null, detail: "산책로·둔치주차장·하상도로" },
+    { title: "저지대 마을 대피", state: "사례 검증", tone: "case", href: "#event/andong-uiseong-2026", detail: "2026 안동·의성 대피 시각" },
   ];
   return (
     <main className="fo-landing fo-intro">
       <Brand />
       <section className="fo-hero">
         <div className="fo-hero-copy">
-          <p className="fo-eyebrow">지하차도 통제 판단 디지털 트윈</p>
+          <p className="fo-eyebrow">하천 접점 시설 통제·대피 판단 트윈</p>
           <h1>
-            이 지하차도,
+            강물이 넘치기 전에,
             <br />
-            지금 막아야 할까
+            어디를 언제 막을까
           </h1>
           <p className="fo-lead">
-            FloodOps는 지하차도마다 연결된 하천 수위로 지금 단계와 통제 검토까지 남은 시간을 보여주고,
+            FloodOps는 하천 수위를 지하차도·하천변 출입구·저지대 마을의 단계와 통제까지 남은 시간으로 바꿔 보여주고,
             <br />
             그 기준이 과거 홍수에서 몇 분 먼저 알렸을지, 평소에는 얼마나 자주 울렸을지
             <br />
             담당자가 직접 검증해 보는 판단 보조 도구입니다.
           </p>
+          <ul className="fo-scope" aria-label="적용 시설">
+            {scope.map((item) => {
+              const body = <><span className={`fo-scope-state ${item.tone}`}>{item.state}</span><strong>{item.title}</strong><small>{item.detail}</small></>;
+              return <li key={item.title}>{item.href ? <a href={item.href}>{body}</a> : <div aria-disabled="true">{body}</div>}</li>;
+            })}
+          </ul>
           <div className="fo-intro-actions">
-            {onTwin && (
-              <button className="fo-primary" type="button" onClick={onTwin}>
-                지하차도 통제 판단 보드 <ArrowRight size={18} />
+            {onWatch && (
+              <button className="fo-primary" type="button" onClick={onWatch}>
+                전국 감시 보드 <ArrowRight size={18} />
               </button>
             )}
-            <button className={onTwin ? "fo-ghost" : "fo-primary"} type="button" onClick={onStart}>
+            {onTwin && (
+              <button className="fo-ghost" type="button" onClick={onTwin}>
+                운영 시설 통제 판단 <ArrowRight size={16} />
+              </button>
+            )}
+            <button className="fo-ghost" type="button" onClick={onStart}>
               과거 사건 재생 <ArrowRight size={16} />
             </button>
           </div>
@@ -144,12 +167,12 @@ export function IntroPage({ onStart, onTwin }: { onStart: () => void; onTwin?: (
         <ServiceSchematic />
       </section>
       <section className="fo-features">
-        {features.map(({ icon: Icon, title, text }, index) => (
-          <article key={title} style={{ animationDelay: `${index * -2}s` }}>
+        {features.map(({ icon: Icon, title, text, href }, index) => (
+          <a key={title} className="fo-feature" href={href} style={{ animationDelay: `${index * -2}s` }}>
             <Icon size={20} />
-            <strong>{title}</strong>
+            <strong>{title} <ArrowRight size={14} /></strong>
             <p>{text}</p>
-          </article>
+          </a>
         ))}
       </section>
       <p className="fo-footnote">권고는 하천 수위로 본 선행 지표이며, 통제 결정은 담당자 판단과 현장 기준(침수심)이 우선합니다. 침수 범위는 관측·지형 기반 근사 재구성이며 공식 침수범위가 아닙니다.</p>
@@ -157,7 +180,7 @@ export function IntroPage({ onStart, onTwin }: { onStart: () => void; onTwin?: (
   );
 }
 
-export function CaseSelectPage({ events, onSelect, onBack, onCompare }: { events: FloodEvent[]; onSelect: (id: string) => void; onBack: () => void; onCompare?: () => void }) {
+export function CaseSelectPage({ events, onSelect, onBack, onCompare, onTwin }: { events: FloodEvent[]; onSelect: (id: string) => void; onBack: () => void; onCompare?: () => void; onTwin?: () => void }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const activeIndex = events.length ? selectedIndex % events.length : 0;
@@ -197,7 +220,10 @@ export function CaseSelectPage({ events, onSelect, onBack, onCompare }: { events
           <p className="fo-eyebrow">CASE LIBRARY</p>
           <h2>분석할 홍수 사례를 선택하세요</h2>
         </div>
-        {onCompare && <button className="fo-ghost fo-cases-compare" type="button" onClick={onCompare}><GitCompare size={16} /> 사례 간 비교</button>}
+        <div className="fo-cases-tools">
+          {onTwin && <button className="fo-ghost" type="button" onClick={onTwin}><Gauge size={16} /> 통제 판단 보드</button>}
+          {onCompare && <button className="fo-ghost" type="button" onClick={onCompare}><GitCompare size={16} /> 사례 간 비교</button>}
+        </div>
       </header>
       <section className="fo-case-library" aria-label="홍수 사례 목록">
         <div

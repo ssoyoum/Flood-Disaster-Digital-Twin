@@ -5,6 +5,7 @@ import CrossSection from "./CrossSection";
 import type {
   AgentExampleQuestion,
   AgentAskResult,
+  AgentView,
   AgentWorkflowName,
   DataStatusResponse,
   ExposureMetrics,
@@ -430,6 +431,7 @@ export default function DarkConsole({
           <button type="button" className={view === "compare" ? "active" : ""} onClick={() => { if (view !== "compare" && time === 0 && stages.length > 4) setTime(4); setView("compare"); }}>시나리오 비교</button>
           <button type="button" className={view === "insights" ? "active" : ""} onClick={() => setView("insights")}>인사이트</button>
           <button type="button" className={view === "provenance" ? "active" : ""} onClick={() => setView("provenance")}>출처·한계</button>
+          <TwinBoardLink eventId={eventData.id} />
         </nav>
         <div className="dk-header-agent">
           <div className="dk-header-agent-title"><span><strong>대응 에이전트</strong><small>근거 기반 조치 질의</small></span></div>
@@ -1123,12 +1125,28 @@ function HandScenarioView({
 /* Agent — 질문 → 도구 선택 → 관찰 → 추가 도구 또는 근거 답변.                   */
 /* ------------------------------------------------------------------ */
 
-export function AgentDock({ eventId, compact = false }: { eventId: string; compact?: boolean }) {
-  const [facilityMode, setFacilityMode] = useState(false);
+// Shown only when this event validates a registered facility, so other cases keep their tabs unchanged.
+function TwinBoardLink({ eventId }: { eventId: string }) {
+  const [name, setName] = useState<string | null>(null);
+  useEffect(() => {
+    let live = true;
+    api.getAgentFacilities().then((items) => { if (live) setName(items.find((item) => item.event_id === eventId)?.name ?? null); }).catch(() => {});
+    return () => { live = false; };
+  }, [eventId]);
+  if (!name) return null;
+  return <a className="dk-tab-link" href="#twin" title={`${name} 통제 판단 보드로 이동`}>통제 판단 보드 ↗</a>;
+}
+
+// initialFacility opens the dock in facility mode (the twin board); facilityAt follows the board's replay time.
+// board="watch" switches to the national board tools; a tool result carrying `view` is handed to onView.
+export function AgentDock({ eventId, compact = false, initialFacility, facilityAt, board, onView }: {
+  eventId: string; compact?: boolean; initialFacility?: string; facilityAt?: string | null; board?: "watch"; onView?: (view: AgentView) => void;
+}) {
+  const [facilityMode, setFacilityMode] = useState(Boolean(initialFacility));
   const [facilities, setFacilities] = useState<api.AgentFacility[]>([]);
   const [selectedFacility, setSelectedFacility] = useState("");
-  const [observationAt, setObservationAt] = useState("");
-  const facilityId = facilityMode && facilities.some((item) => item.id === selectedFacility && item.event_id === eventId) ? selectedFacility : null;
+  const [observationAt, setObservationAt] = useState(facilityAt?.slice(0, 16) ?? "");
+  const facilityId = !board && facilityMode && facilities.some((item) => item.id === selectedFacility && item.event_id === eventId) ? selectedFacility : null;
   const [message, setMessage] = useState("");
   const [turns, setTurns] = useState<Array<{ question: string; response: AgentAskResult }>>([]);
   const [busy, setBusy] = useState(false);
@@ -1140,14 +1158,17 @@ export function AgentDock({ eventId, compact = false }: { eventId: string; compa
 
   useEffect(() => {
     let live = true;
-    setFacilityMode(false); setFacilities([]); setSelectedFacility(""); setObservationAt("");
+    setFacilityMode(Boolean(initialFacility)); setFacilities([]); setSelectedFacility("");
+    if (board) return () => { live = false; };
     api.getAgentFacilities().then((items) => {
       if (!live) return;
       const choices = items.filter((item) => item.event_id === eventId);
-      setFacilities(choices); setSelectedFacility(choices[0]?.id ?? "");
+      setFacilities(choices); setSelectedFacility(choices.find((item) => item.id === initialFacility)?.id ?? choices[0]?.id ?? "");
     }).catch(() => {});
     return () => { live = false; };
-  }, [eventId]);
+  }, [eventId, initialFacility, board]);
+
+  useEffect(() => { setObservationAt(facilityAt?.slice(0, 16) ?? ""); }, [facilityAt]);
 
   useEffect(() => {
     setTurns([]); setMessage(""); setError(null); setBusy(false);
@@ -1159,12 +1180,12 @@ export function AgentDock({ eventId, compact = false }: { eventId: string; compa
 
   useEffect(() => {
     let live = true;
-    setExamples(facilityId ? [] : eventId === "osong-2023" ? FALLBACK_EXAMPLES : []);
-    api.getAgentExamples(eventId, facilityId)
+    setExamples(facilityId || board ? [] : eventId === "osong-2023" ? FALLBACK_EXAMPLES : []);
+    api.getAgentExamples(eventId, facilityId, board)
       .then((items) => { if (live && items.length) setExamples(items); })
       .catch(() => { /* keep the offline fallback chips */ });
     return () => { live = false; };
-  }, [eventId, facilityId]);
+  }, [eventId, facilityId, board]);
 
   const ask = async (question: string) => {
     const text = question.trim();
@@ -1183,11 +1204,13 @@ export function AgentDock({ eventId, compact = false }: { eventId: string; compa
         { role: "assistant", content: turn.response.answer },
       ]).slice(-6);
       const response = await api.askAgent(eventId, text, history, controller.signal,
-        facilityId ? { facility_id: facilityId, observation_at: observationAt || null } : undefined);
+        board ? { board, observation_at: observationAt || null } : facilityId ? { facility_id: facilityId, observation_at: observationAt || null } : undefined);
       if (pendingRequest.current !== controller || controller.signal.aborted) return;
       if (response.event_id !== eventId || (response.facility_id ?? null) !== facilityId) throw new Error("Agent event mismatch");
       setTurns((previous) => [...previous, { question: text, response }]);
       setMessage(response.status === "UNAVAILABLE" ? text : "");
+      const view = response.tool_calls.map((call) => call.result?.view as AgentView | undefined).find((item) => item && (item.center || item.region || item.min_stage));
+      if (view && onView) onView(view);
     } catch (cause) {
       if (pendingRequest.current !== controller || controller.signal.aborted) return;
       setMessage(text);
@@ -1210,12 +1233,15 @@ export function AgentDock({ eventId, compact = false }: { eventId: string; compa
     }
   };
 
-  const idleHint = facilityId ? "시설 상태·통제 기준·과거 백테스트를 물어보세요." : isOsong ? "예: HAND 임계를 1.5m 낮추면 붉은 셀이 어떻게 바뀌나요?" : examples[0] ? `예: ${examples[0].question}` : "사건과 대응 조건을 물어보세요.";
+  const idleHint = board ? "지역·관측소 이동, 우선순위, 변화 요약, 상황 보고를 물어보세요." : facilityId ? "시설 상태·통제 기준·과거 백테스트를 물어보세요." : isOsong ? "예: HAND 임계를 1.5m 낮추면 붉은 셀이 어떻게 바뀌나요?" : examples[0] ? `예: ${examples[0].question}` : "사건과 대응 조건을 물어보세요.";
   const status = busy ? "자료를 확인하고 다음 도구를 판단하는 중…" : turns.length ? "다른 조건이나 후속 질문을 이어서 물어보세요." : idleHint;
 
   return (
     <div className={`dk-agent${compact ? " dk-agent-compact" : ""}`}>
-      <div className="dk-agent-head"><p>FloodOps 에이전트</p><span className="dk-agent-badge llm">{facilityId ? "시설 판단 근거" : "Gemini + 분석 도구"}</span></div>
+      <div className="dk-agent-head"><p>FloodOps 에이전트</p><span className="dk-agent-badge llm">{board ? "보드 운영 도구" : facilityId ? "시설 판단 근거" : "Gemini + 분석 도구"}</span></div>
+      {board && compact && examples.length > 0 && <div className="dk-agent-suggestions dk-agent-suggestions-inline" aria-label="추천 질문">
+        {examples.slice(0, 4).map((item) => <button key={item.label} type="button" title={item.question} disabled={busy} onClick={() => void ask(item.question)}>{item.label}</button>)}
+      </div>}
       {facilities.length > 0 && <details className="dk-agent-scope-picker" ref={scopePicker}>
         <summary>분석 범위 · {facilityId ? "시설 판단" : "과거 사건"}</summary>
         <div className="dk-agent-scope" aria-label="Agent 분석 범위">
@@ -1231,14 +1257,14 @@ export function AgentDock({ eventId, compact = false }: { eventId: string; compa
         </>}
         </div>
       </details>}
-      {!compact && <div className="dk-agent-intro">질문에 따라 등록된 분석 도구를 차례로 호출하고 결과를 읽어 답합니다. 질문·대화 기록·도구 결과는 Gemini에 전송됩니다. 도구로 확인할 수 없는 피해 효과는 추정하지 않습니다.</div>}
+      {!compact && !board && <div className="dk-agent-intro">질문에 따라 등록된 분석 도구를 차례로 호출하고 결과를 읽어 답합니다. 질문·대화 기록·도구 결과는 Gemini에 전송됩니다. 도구로 확인할 수 없는 피해 효과는 추정하지 않습니다.</div>}
       {!compact && <div className="dk-agent-suggestions" aria-label="추천 질문">
-        {isOsong && !facilityId && <button type="button" disabled={busy} onClick={() => void ask("HAND 선택 임계를 1.5m 낮추면 붉은 셀이 단계별로 어떻게 바뀌나요?")}>HAND 붉은 셀 변화</button>}
-        {isOsong && !facilityId && <button type="button" disabled={busy} onClick={() => void ask("08:25 통제와 유입 10분 지연을 함께 비교하면 무엇이 다르고, 무엇은 알 수 없나요?")}>통제 + 유입 지연 함께</button>}
+        {isOsong && !facilityId && !board && <button type="button" disabled={busy} onClick={() => void ask("HAND 선택 임계를 1.5m 낮추면 붉은 셀이 단계별로 어떻게 바뀌나요?")}>HAND 붉은 셀 변화</button>}
+        {isOsong && !facilityId && !board && <button type="button" disabled={busy} onClick={() => void ask("08:25 통제와 유입 10분 지연을 함께 비교하면 무엇이 다르고, 무엇은 알 수 없나요?")}>통제 + 유입 지연 함께</button>}
         {examples.map((item) => <button key={item.label} type="button" title={item.question} disabled={busy} onClick={() => void ask(item.question)}>{item.label}</button>)}
       </div>}
       <form className="dk-agent-bar" onSubmit={(event) => { event.preventDefault(); void ask(message); }}>
-        <input aria-label="Agent request" value={message} maxLength={1000} disabled={busy} onChange={(event) => setMessage(event.target.value)} placeholder="사건과 개입 조건을 자유롭게 물어보세요" />
+        <input aria-label="Agent request" value={message} maxLength={1000} disabled={busy} onChange={(event) => setMessage(event.target.value)} placeholder={board ? "예: 충북 보여줘 · 가장 위험한 곳 5곳 · 상황 보고 초안" : facilityId ? "시설 단계·남은 시간·통제 기준을 물어보세요" : "사건과 개입 조건을 자유롭게 물어보세요"} />
         <button type="submit" disabled={busy || !message.trim()}>질문</button>
       </form>
       <small className="dk-agent-status" aria-live="polite">{status}</small>

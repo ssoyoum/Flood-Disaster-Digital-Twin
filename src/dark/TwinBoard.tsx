@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Activity, AlertTriangle, ArrowLeft, ArrowRight, Gauge, Radio, RotateCcw, TrendingUp } from "lucide-react";
 import * as api from "../api";
 import type { RiseForecast, TwinBacktest, TwinFacility, TwinGateId, TwinGateStatus, TwinStatus, WaterLevelReadiness } from "../types";
+import { AgentDock } from "./DarkConsole";
 import { FloodOpsLogo } from "./Landing";
 import TwinCriteria from "./TwinCriteria";
 import TwinSpatial from "./TwinSpatial";
@@ -58,6 +59,11 @@ function readAt(): string | null {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+function readTab(): BoardTab {
+  const match = window.location.hash.match(/[?&]tab=([^&]+)/);
+  return TABS.find((item) => item.id === match?.[1])?.id ?? "now";
+}
+
 export default function TwinBoard({ onBack }: { onBack: () => void }) {
   const [facilities, setFacilities] = useState<TwinFacility[] | null>(null);
   const [facilityId, setFacilityId] = useState<string | null>(null);
@@ -70,7 +76,7 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
   const [waterInputError, setWaterInputError] = useState<string | null>(null);
   const [rise, setRise] = useState<RiseForecast | null>(null);
   const [riseError, setRiseError] = useState<string | null>(null);
-  const [tab, setTab] = useState<BoardTab>("now");
+  const [tab, setTab] = useState<BoardTab>(readTab);
 
   // 6시간 최대 상승 예측(연구 카드). 권고와 같은 시각을 보되 권고 계산에는 들어가지 않는다.
   useEffect(() => {
@@ -150,7 +156,7 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
     <div className="dk-root tw-root" style={{ ["--tone" as string]: tone }}>
       <header className="dk-topbar">
         <div className="dk-brand">
-          <a className="dk-brand-mark" href="#" title="소개로 돌아가기" aria-label="소개로 돌아가기"><FloodOpsLogo size={30} /></a>
+          <a className="dk-brand-mark" href="#watch" title="감시 보드로 돌아가기" aria-label="감시 보드로 돌아가기"><FloodOpsLogo size={30} /></a>
           <div>
             <h1>지하차도 통제 판단 트윈</h1>
             <p>FloodOps · 관측 수위로 지금 단계와 남은 시간을 보여주고, 과거 사건으로 규칙을 검증합니다</p>
@@ -161,13 +167,17 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
             <button key={item.id} type="button" className={tab === item.id ? "active" : ""} aria-pressed={tab === item.id} onClick={() => setTab(item.id)}>{item.label}</button>
           ))}
         </nav>
+        <div className="dk-header-agent">
+          <div className="dk-header-agent-title"><span><strong>대응 에이전트</strong><small>시설 판단 근거 질의</small></span></div>
+          <AgentDock eventId={facility.event_id} compact initialFacility={facility.id} facilityAt={at} />
+        </div>
         <div className="dk-status">
           <span className="dk-chip tw-mode" data-mode={viewingReplay ? "replay" : "live"}>
             {viewingReplay ? <RotateCcw size={12} /> : <Radio size={12} />}
             {viewingReplay ? "2023년 사건 재생" : "실시간 관측"}
             <small>{status?.mode === "live" ? "홍수통제소 OpenAPI" : "저장된 10분 수위"}</small>
           </span>
-          <button type="button" className="fo-ghost tw-back" onClick={onBack}><ArrowLeft size={14} /> 사례 선택</button>
+          <button type="button" className="fo-ghost tw-back" onClick={onBack}><ArrowLeft size={14} /> 감시 보드</button>
         </div>
       </header>
 

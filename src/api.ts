@@ -1,6 +1,6 @@
 import type { CriteriaFloor, RiseForecast, TwinBacktest, TwinCriteriaReview, TwinFacility, TwinMode, TwinStatus, CaseLeadTimes, ResponseTimingResult, TimelineReconstructionResponse, AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
 import { boundedAgentHistory, type ConversationMessage } from "./agentConversation";
-import type { WaterLevelReadiness } from "./types";
+import type { WaterLevelReadiness, WatchChanges, WatchFacilityLink, WatchOverview, WatchStage, WatchStationDetail } from "./types";
 
 const configuredApiBase = import.meta.env.VITE_API_BASE;
 const API_BASE = configuredApiBase === "same-origin" ? "" : configuredApiBase ?? (import.meta.env.PROD ? "" : "http://localhost:8033");
@@ -67,10 +67,10 @@ export const testSafetyDataApi = (serviceKey: string) =>
 export const getExposureInventory = (eventId: string, radii: number[] = [300, 500, 1000, 2000]) =>
   request<ExposureInventory>(`/api/events/${eventId}/exposure-inventory?${radii.map((radius) => `radii_m=${radius}`).join("&")}`);
 
-export const getAgentExamples = (eventId = "osong-2023", facilityId?: string | null) => request<AgentExampleQuestion[]>(`/api/agent/examples?event_id=${encodeURIComponent(eventId)}${facilityId ? `&facility_id=${encodeURIComponent(facilityId)}` : ""}`);
+export const getAgentExamples = (eventId = "osong-2023", facilityId?: string | null, board?: "watch" | null) => request<AgentExampleQuestion[]>(`/api/agent/examples?event_id=${encodeURIComponent(eventId)}${facilityId ? `&facility_id=${encodeURIComponent(facilityId)}` : ""}${board ? `&board=${board}` : ""}`);
 
 export type AgentFacility = { id: string; name: string; event_id: string; mode: "live" | "replay" };
-export type AgentFacilityScope = { facility_id: string; observation_at?: string | null };
+export type AgentFacilityScope = { facility_id?: string; observation_at?: string | null; board?: "watch" };
 export const getAgentFacilities = () => request<AgentFacility[]>("/api/twin/facilities");
 
 export const askAgent = (eventId: string, message: string, history: ConversationMessage[] = [], signal?: AbortSignal, scope?: AgentFacilityScope) =>
@@ -150,3 +150,18 @@ export const getWaterLevelReadiness = (facilityId: string, at?: string, signal?:
   request<WaterLevelReadiness>(`/api/twin/facilities/${encodeURIComponent(facilityId)}/forecast-readiness${at ? `?at=${encodeURIComponent(at)}` : ""}`, { signal });
 export const getRiseForecast = (facilityId: string, at?: string, signal?: AbortSignal) =>
   request<RiseForecast>(`/api/twin/facilities/${encodeURIComponent(facilityId)}/rise-forecast${at ? `?at=${encodeURIComponent(at)}` : ""}`, { signal });
+
+// National watch board
+const watchQuery = (params: Record<string, string | number | null | undefined>) => {
+  const search = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => { if (value !== null && value !== undefined && value !== "") search.set(key, String(value)); });
+  const text = search.toString();
+  return text ? `?${text}` : "";
+};
+export const getWatchOverview = (options: { at?: string | null; region?: string | null; min_stage?: WatchStage | null; limit?: number } = {}, signal?: AbortSignal) =>
+  request<WatchOverview>(`/api/watch/overview${watchQuery(options)}`, { signal });
+export const getWatchStation = (code: string, at?: string | null, signal?: AbortSignal) =>
+  request<WatchStationDetail>(`/api/watch/stations/${encodeURIComponent(code)}${watchQuery({ at })}`, { signal });
+export const getWatchChanges = (options: { at?: string | null; since_min?: number; region?: string | null } = {}, signal?: AbortSignal) =>
+  request<WatchChanges>(`/api/watch/changes${watchQuery(options)}`, { signal });
+export const getWatchFacilities = () => request<Array<WatchFacilityLink & { station_code: string }>>("/api/watch/facilities");
