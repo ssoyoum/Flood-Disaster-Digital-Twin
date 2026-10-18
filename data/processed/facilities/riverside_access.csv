@@ -1,0 +1,126 @@
+facility_id,name,kind,kind_ko,sido,lon,lat,river_name,river_class,distance_to_river_m,access,source,osm_id
+osm:way/891507267,동강 둔치야구장,riverside_park,하천 둔치 공원,강원,128.466674,37.175978,한강,local,0,,OpenStreetMap (ODbL),way/891507267
+osm:way/1187795601,동강둔치공원,riverside_park,하천 둔치 공원,강원,128.469866,37.179517,한강,local,0,,OpenStreetMap (ODbL),way/1187795601
+osm:way/768795390,둔치공원,riverside_park,하천 둔치 공원,강원,129.037201,37.609651,주수천,local,0,,OpenStreetMap (ODbL),way/768795390
+osm:way/1474744767,방산수변공원,riverside_park,하천 둔치 공원,강원,127.949369,38.208489,수입천,local,118,,OpenStreetMap (ODbL),way/1474744767
+osm:way/1365136871,춘천수변공원,riverside_park,하천 둔치 공원,강원,127.698929,37.872601,북한강,national,29,,OpenStreetMap (ODbL),way/1365136871
+osm:way/1208463516,7호 수변공원,riverside_park,하천 둔치 공원,경기,126.991486,37.259109,서호천,local,11,,OpenStreetMap (ODbL),way/1208463516
+osm:way/469641116,강변공원,riverside_park,하천 둔치 공원,경기,127.049799,37.884591,신천,national,100,,OpenStreetMap (ODbL),way/469641116
+osm:way/471550855,구리한강시민공원,riverside_park,하천 둔치 공원,경기,127.142318,37.57508,한강,national,21,,OpenStreetMap (ODbL),way/471550855
+osm:way/474183720,난지한강공원,riverside_park,하천 둔치 공원,경기,126.877994,37.5666,한강,national,0,,OpenStreetMap (ODbL),way/474183720
+osm:relation/14662928,남양주 한강시민공원 삼패지구,riverside_park,하천 둔치 공원,경기,127.197538,37.589715,한강,national,0,,OpenStreetMap (ODbL),relation/14662928
+osm:way/1348453136,너울수변공원,riverside_park,하천 둔치 공원,경기,127.102167,37.009782,통복천,local,0,,OpenStreetMap (ODbL),way/1348453136
+osm:relation/14614251,다산수변공원,riverside_park,하천 둔치 공원,경기,127.145294,37.623962,왕숙천,local,162,,OpenStreetMap (ODbL),relation/14614251
+osm:way/470168688,덕풍수변공원-1,riverside_park,하천 둔치 공원,경기,127.216119,37.544697,덕풍천,local,52,,OpenStreetMap (ODbL),way/470168688
+osm:way/557518509,덕풍수변공원-2,riverside_park,하천 둔치 공원,경기,127.217609,37.544543,덕풍천,local,62,,OpenStreetMap (ODbL),way/557518509
+osm:way/380063860,병목안시민공원,riverside_park,하천 둔치 공원,경기,126.909066,37.384912,수암천,local,111,,OpenStreetMap (ODbL),way/380063860
+osm:way/909230153,복하천수변공원,riverside_park,하천 둔치 공원,경기,127.459961,37.2682,복하천,national,123,,OpenStreetMap (ODbL),way/909230153
+osm:way/470125458,삼송창릉천수변공원,riverside_park,하천 둔치 공원,경기,126.888908,37.646381,창릉천,local,206,,OpenStreetMap (ODbL),way/470125458
+osm:relation/11357820,상서재1호 수변공원,riverside_park,하천 둔치 공원,경기,127.104255,37.014683,통복천,local,0,,OpenStreetMap (ODbL),relation/11357820
+osm:way/831232401,상서재2호 수변공원,riverside_park,하천 둔치 공원,경기,127.106575,37.017001,통복천,local,1,,OpenStreetMap (ODbL),way/831232401
+osm:way/1453572444,송산1호수변공원,riverside_park,하천 둔치 공원,경기,127.085131,37.744727,부용천,local,0,,OpenStreetMap (ODbL),way/1453572444
+osm:way/679177791,수변공원,riverside_park,하천 둔치 공원,경기,127.123622,37.639642,갈매천,local,25,,OpenStreetMap (ODbL),way/679177791
+osm:way/724520856,수변공원10호,riverside_park,하천 둔치 공원,경기,127.181759,37.568816,망월천,local,38,,OpenStreetMap (ODbL),way/724520856
+osm:way/718086155,수변공원12호,riverside_park,하천 둔치 공원,경기,127.048463,37.046103,서정리천,local,4,,OpenStreetMap (ODbL),way/718086155
+osm:relation/14666595,수석한강공원,riverside_park,하천 둔치 공원,경기,127.168889,37.584919,한강,national,46,,OpenStreetMap (ODbL),relation/14666595
+osm:way/736928827,시민공원,riverside_park,하천 둔치 공원,경기,127.05256,37.746637,중랑천,local,0,,OpenStreetMap (ODbL),way/736928827
+osm:way/468964745,신동수변공원,riverside_park,하천 둔치 공원,경기,127.041209,37.247964,원천리천,local,0,,OpenStreetMap (ODbL),way/468964745
+osm:way/1494946889,의왕고천수변공원,riverside_park,하천 둔치 공원,경기,126.97178,37.347859,안양천,local,46,,OpenStreetMap (ODbL),way/1494946889
+osm:way/1203520117,제 5호 수변공원,riverside_park,하천 둔치 공원,경기,126.990263,37.262208,서호천,local,22,,OpenStreetMap (ODbL),way/1203520117
+osm:way/1203505829,제 6호 수변공원,riverside_park,하천 둔치 공원,경기,126.990579,37.261093,서호천,local,18,,OpenStreetMap (ODbL),way/1203505829
+osm:way/472362202,팔당팔화 수변공원,riverside_park,하천 둔치 공원,경기,127.226064,37.54934,한강,national,28,,OpenStreetMap (ODbL),way/472362202
+osm:way/558708449,팔당팔화 수변공원,riverside_park,하천 둔치 공원,경기,127.21681,37.556056,한강,national,254,,OpenStreetMap (ODbL),way/558708449
+osm:way/1189311571,포천운동장 수변공원,riverside_park,하천 둔치 공원,경기,127.200094,37.889075,포천천,local,40,,OpenStreetMap (ODbL),way/1189311571
+osm:way/772820377,학의천 시민공원,riverside_park,하천 둔치 공원,경기,126.987065,37.38997,학의천,local,17,,OpenStreetMap (ODbL),way/772820377
+osm:way/1083316473,다산수변공원 주차장,riverside_parking,둔치·하천변 주차장,경기,127.145559,37.620609,왕숙천,local,97,,OpenStreetMap (ODbL),way/1083316473
+osm:node/9976376095,왕숙천 둔치 주차장,riverside_parking,둔치·하천변 주차장,경기,127.147096,37.611599,왕숙천,local,39,,OpenStreetMap (ODbL),node/9976376095
+osm:way/743460192,가리새수변공원,riverside_park,하천 둔치 공원,경남,128.888555,35.142961,서낙동강,national,0,,OpenStreetMap (ODbL),way/743460192
+osm:way/1410842496,가산수변공원,riverside_park,하천 둔치 공원,경남,129.017785,35.295677,양산천,national,108,,OpenStreetMap (ODbL),way/1410842496
+osm:way/1511380705,가야수변공원,riverside_park,하천 둔치 공원,경남,128.13761,35.763115,가야천,local,48,,OpenStreetMap (ODbL),way/1511380705
+osm:way/472258439,강변공원,riverside_park,하천 둔치 공원,경남,129.195256,35.320231,좌광천,local,115,,OpenStreetMap (ODbL),way/472258439
+osm:way/783836630,수변공원,riverside_park,하천 둔치 공원,경남,128.801892,35.189491,대청천,local,16,,OpenStreetMap (ODbL),way/783836630
+osm:way/1007289994,수변공원,riverside_park,하천 둔치 공원,경남,128.101352,35.126188,화개천,local,39,,OpenStreetMap (ODbL),way/1007289994
+osm:way/519780820,신안동강변공원,riverside_park,하천 둔치 공원,경남,128.070984,35.17915,남강,national,160,,OpenStreetMap (ODbL),way/519780820
+osm:way/1104434292,영전수변공원,riverside_park,하천 둔치 공원,경남,128.211338,35.573862,황강,national,45,,OpenStreetMap (ODbL),way/1104434292
+osm:way/521149738,판문동 강변공원,riverside_park,하천 둔치 공원,경남,128.049438,35.165367,판문천,local,151,,OpenStreetMap (ODbL),way/521149738
+osm:way/1187215472,강변공원,riverside_park,하천 둔치 공원,경북,128.090868,36.128865,직지사천,local,43,,OpenStreetMap (ODbL),way/1187215472
+osm:way/961879813,개운저수지수변공원,riverside_park,하천 둔치 공원,경북,128.143803,36.398644,개운천,local,0,,OpenStreetMap (ODbL),way/961879813
+osm:way/639666517,냉천수변공원,riverside_park,하천 둔치 공원,경북,129.408944,35.961143,냉천,local,32,,OpenStreetMap (ODbL),way/639666517
+osm:way/554928063,북천시민공원,riverside_park,하천 둔치 공원,경북,128.155067,36.427041,북천,local,11,,OpenStreetMap (ODbL),way/554928063
+osm:way/548869984,송평천 수변공원,riverside_park,하천 둔치 공원,경북,128.468485,36.574809,송평천,local,0,,OpenStreetMap (ODbL),way/548869984
+osm:way/468978972,영천 강변공원 3,riverside_park,하천 둔치 공원,경북,128.943906,35.968251,금호강,national,22,,OpenStreetMap (ODbL),way/468978972
+osm:way/468985542,영천 강변공원4,riverside_park,하천 둔치 공원,경북,128.935835,35.966086,금호강,national,42,,OpenStreetMap (ODbL),way/468985542
+osm:way/468978971,영천강변공원,riverside_park,하천 둔치 공원,경북,128.94131,35.969964,금호강,national,6,,OpenStreetMap (ODbL),way/468978971
+osm:way/1185467219,임고강변공원,riverside_park,하천 둔치 공원,경북,128.991804,36.046422,자호천,local,52,,OpenStreetMap (ODbL),way/1185467219
+osm:way/1485334144,청도천변공원,riverside_park,하천 둔치 공원,경북,128.74957,35.637923,청도천,local,26,,OpenStreetMap (ODbL),way/1485334144
+osm:way/476644842,강변 체육공원 주차장3,riverside_parking,둔치·하천변 주차장,경북,129.372175,36.012625,형산강,national,33,,OpenStreetMap (ODbL),way/476644842
+osm:node/4634111809,강변주차장,riverside_parking,둔치·하천변 주차장,경북,128.943221,35.97033,금호강,national,30,,OpenStreetMap (ODbL),node/4634111809
+osm:way/476644841,강변체육공원 주차장4,riverside_parking,둔치·하천변 주차장,경북,129.37423,36.016356,형산강,national,46,,OpenStreetMap (ODbL),way/476644841
+osm:way/821873210,신천 강변공원,riverside_park,하천 둔치 공원,대구,128.601654,35.883133,신천,local,0,,OpenStreetMap (ODbL),way/821873210
+osm:way/821871716,신천 강변공원,riverside_park,하천 둔치 공원,대구,128.599902,35.887727,신천,local,49,,OpenStreetMap (ODbL),way/821871716
+osm:way/846900833,신천 둔치공원,riverside_park,하천 둔치 공원,대구,128.595522,35.890767,신천,local,0,,OpenStreetMap (ODbL),way/846900833
+osm:way/1208648826,대청호자연수변공원,riverside_park,하천 둔치 공원,대전,127.474176,36.372693,금강,national,147,,OpenStreetMap (ODbL),way/1208648826
+osm:way/498890132,용소수변공원,riverside_park,하천 둔치 공원,대전,127.352489,36.312201,갑천,national,130,,OpenStreetMap (ODbL),way/498890132
+osm:way/499267103,작은내 수변공원,riverside_park,하천 둔치 공원,대전,127.341769,36.342285,진잠천,local,0,,OpenStreetMap (ODbL),way/499267103
+osm:way/779008380,중촌시민공원,riverside_park,하천 둔치 공원,대전,127.403722,36.339079,유등천,national,99,,OpenStreetMap (ODbL),way/779008380
+osm:relation/9775285,거제 온천천시민공원,riverside_park,하천 둔치 공원,부산,129.080729,35.205376,온천천,local,189,,OpenStreetMap (ODbL),relation/9775285
+osm:relation/6995019,구서 온천천 시민공원,riverside_park,하천 둔치 공원,부산,129.091297,35.251844,온천천,local,52,,OpenStreetMap (ODbL),relation/6995019
+osm:way/475846958,금정 수영강변공원,riverside_park,하천 둔치 공원,부산,129.121286,35.226479,수영강,national,0,,OpenStreetMap (ODbL),way/475846958
+osm:relation/9774981,기장 수영강변공원,riverside_park,하천 둔치 공원,부산,129.121832,35.226672,수영강,national,0,,OpenStreetMap (ODbL),relation/9774981
+osm:relation/9788236,동래 수영강변공원,riverside_park,하천 둔치 공원,부산,129.116701,35.205714,수영강,national,207,,OpenStreetMap (ODbL),relation/9788236
+osm:relation/9775286,명륜 온천천시민공원,riverside_park,하천 둔치 공원,부산,129.081099,35.205434,온천천,local,222,,OpenStreetMap (ODbL),relation/9775286
+osm:relation/9788237,반송 수영강변공원,riverside_park,하천 둔치 공원,부산,129.117923,35.205742,수영강,national,121,,OpenStreetMap (ODbL),relation/9788237
+osm:way/475891886,부곡 온천천시민공원,riverside_park,하천 둔치 공원,부산,129.084743,35.219034,온천천,local,72,,OpenStreetMap (ODbL),way/475891886
+osm:way/399660588,부산시민공원,riverside_park,하천 둔치 공원,부산,129.057664,35.168916,전포천,local,128,,OpenStreetMap (ODbL),way/399660588
+osm:way/471672358,수변공원,riverside_park,하천 둔치 공원,부산,129.039927,35.188224,부전천,local,17,,OpenStreetMap (ODbL),way/471672358
+osm:relation/9788251,수영 수영강변공원,riverside_park,하천 둔치 공원,부산,129.127493,35.165235,수영강,national,0,,OpenStreetMap (ODbL),relation/9788251
+osm:relation/9775115,안락 온천천시민공원,riverside_park,하천 둔치 공원,부산,129.09875,35.192977,온천천,local,87,,OpenStreetMap (ODbL),relation/9775115
+osm:relation/9775148,연산 온천천시민공원,riverside_park,하천 둔치 공원,부산,129.096977,35.192539,온천천,local,0,,OpenStreetMap (ODbL),relation/9775148
+osm:relation/9788239,연제 수영강변공원,riverside_park,하천 둔치 공원,부산,129.117101,35.184234,수영강,national,0,,OpenStreetMap (ODbL),relation/9788239
+osm:relation/9788331,장전 온천천시민공원,riverside_park,하천 둔치 공원,부산,129.089081,35.231054,온천천,local,2,,OpenStreetMap (ODbL),relation/9788331
+osm:relation/9788238,해운대 수영강변공원,riverside_park,하천 둔치 공원,부산,129.117897,35.184383,수영강,national,0,,OpenStreetMap (ODbL),relation/9788238
+osm:way/954120866,광나루한강공원,riverside_park,하천 둔치 공원,서울,127.112166,37.539678,한강,national,0,,OpenStreetMap (ODbL),way/954120866
+osm:way/172203046,뚝섬한강공원,riverside_park,하천 둔치 공원,서울,127.06869,37.529995,한강,national,152,,OpenStreetMap (ODbL),way/172203046
+osm:way/330666503,망원한강공원,riverside_park,하천 둔치 공원,서울,126.901774,37.550377,한강,national,0,,OpenStreetMap (ODbL),way/330666503
+osm:way/418249072,반포한강공원,riverside_park,하천 둔치 공원,서울,126.992186,37.509123,한강,national,0,,OpenStreetMap (ODbL),way/418249072
+osm:way/769712608,반포한강공원,riverside_park,하천 둔치 공원,서울,127.000114,37.512342,한강,national,0,,OpenStreetMap (ODbL),way/769712608
+osm:way/299177417,양화한강공원,riverside_park,하천 둔치 공원,서울,126.899902,37.540231,한강,national,68,,OpenStreetMap (ODbL),way/299177417
+osm:way/254615442,오목수변공원,riverside_park,하천 둔치 공원,서울,126.87744,37.52456,안양천,national,62,,OpenStreetMap (ODbL),way/254615442
+osm:way/815751336,이촌한강공원,riverside_park,하천 둔치 공원,서울,126.978561,37.515706,한강,national,123,,OpenStreetMap (ODbL),way/815751336
+osm:way/445157984,국회 둔치 주차장,riverside_parking,둔치·하천변 주차장,서울,126.914271,37.534377,한강,national,100,,OpenStreetMap (ODbL),way/445157984
+osm:way/693846463,물빛찬수변공원,riverside_park,하천 둔치 공원,세종,127.266707,36.478899,금강,national,0,,OpenStreetMap (ODbL),way/693846463
+osm:relation/9734468,방축천수변공원,riverside_park,하천 둔치 공원,세종,127.259111,36.507727,방축천,local,30,,OpenStreetMap (ODbL),relation/9734468
+osm:way/693846461,붓꽃수변공원,riverside_park,하천 둔치 공원,세종,127.257766,36.471735,금강,national,7,,OpenStreetMap (ODbL),way/693846461
+osm:way/695631639,빛가람수변공원,riverside_park,하천 둔치 공원,세종,127.259549,36.49375,제천,local,0,,OpenStreetMap (ODbL),way/695631639
+osm:way/693846464,여울목수변공원,riverside_park,하천 둔치 공원,세종,127.261736,36.47701,금강,national,0,,OpenStreetMap (ODbL),way/693846464
+osm:way/696817447,굴화 강변공원,riverside_park,하천 둔치 공원,울산,129.256465,35.560097,굴화천,local,99,,OpenStreetMap (ODbL),way/696817447
+osm:way/689056761,굴화강변공원,riverside_park,하천 둔치 공원,울산,129.266197,35.555222,태화강,local,56,,OpenStreetMap (ODbL),way/689056761
+osm:way/475717572,동천강변공원,riverside_park,하천 둔치 공원,울산,129.349765,35.554057,동천,local,0,,OpenStreetMap (ODbL),way/475717572
+osm:way/180233795,강변공영주차장,riverside_parking,둔치·하천변 주차장,울산,129.31867,35.55249,태화강,national,43,,OpenStreetMap (ODbL),way/180233795
+osm:way/473311465,남천변 주차장,riverside_parking,둔치·하천변 주차장,울산,129.124099,35.562792,태화강,local,20,,OpenStreetMap (ODbL),way/473311465
+osm:way/486103374,강청수변공원,riverside_park,하천 둔치 공원,전남,127.500039,34.987671,순천동천,local,4,,OpenStreetMap (ODbL),way/486103374
+osm:way/468991057,구례 둔치 공원,riverside_park,하천 둔치 공원,전남,127.469737,35.214542,서시천,local,0,,OpenStreetMap (ODbL),way/468991057
+osm:way/481499095,동천천변공원,riverside_park,하천 둔치 공원,전남,127.489222,34.963886,순천동천,local,53,,OpenStreetMap (ODbL),way/481499095
+osm:way/624701188,불갑수변공원,riverside_park,하천 둔치 공원,전남,126.51541,35.222234,불갑천,local,24,,OpenStreetMap (ODbL),way/624701188
+osm:way/479024188,탐진강둔치공원,riverside_park,하천 둔치 공원,전남,126.904945,34.676408,탐진강,national,3,,OpenStreetMap (ODbL),way/479024188
+osm:way/1022623660,풍영천변공원,riverside_park,하천 둔치 공원,전남,126.814045,35.182569,풍영정천,local,0,,OpenStreetMap (ODbL),way/1022623660
+osm:way/624701187,불갑수변공원 주차장,riverside_parking,둔치·하천변 주차장,전남,126.513211,35.221095,불갑천,local,18,,OpenStreetMap (ODbL),way/624701187
+osm:way/1442163492,섬진강변길1쉼터,riverside_parking,둔치·하천변 주차장,전남,127.644069,35.168199,섬진강,national,23,,OpenStreetMap (ODbL),way/1442163492
+osm:way/620531223,천변3지구공영주차장,riverside_parking,둔치·하천변 주차장,전남,126.980858,35.31794,영산강,national,183,yes,OpenStreetMap (ODbL),way/620531223
+osm:way/670224291,기지제 수변공원,riverside_park,하천 둔치 공원,전북,127.066359,35.843313,조촌천,local,0,,OpenStreetMap (ODbL),way/670224291
+osm:way/202067005,금강시민공원,riverside_park,하천 둔치 공원,충남,126.75745,36.01168,금강,national,213,,OpenStreetMap (ODbL),way/202067005
+osm:way/1150732088,대실천변공원,riverside_park,하천 둔치 공원,충남,127.25722,36.264245,농소천,local,102,,OpenStreetMap (ODbL),way/1150732088
+osm:way/890755418,버들수변공원,riverside_park,하천 둔치 공원,충남,126.641798,36.885199,당진천,local,20,,OpenStreetMap (ODbL),way/890755418
+osm:way/890755417,어름수변공원,riverside_park,하천 둔치 공원,충남,126.64135,36.884764,당진천,local,14,,OpenStreetMap (ODbL),way/890755417
+osm:way/1311664431,합덕제수변공원,riverside_park,하천 둔치 공원,충남,126.780782,36.792565,석우천,local,107,,OpenStreetMap (ODbL),way/1311664431
+osm:way/1564846010,광천천하상2공구공영주차장,riverside_parking,둔치·하천변 주차장,충남,126.626538,36.500344,광천천,local,16,,OpenStreetMap (ODbL),way/1564846010
+osm:way/1246212865,천변주차장,riverside_parking,둔치·하천변 주차장,충남,126.59452,36.345664,대천천,local,15,,OpenStreetMap (ODbL),way/1246212865
+osm:way/451563167,하상도로,riverbed_road,하상도로,충북,127.477584,36.652115,무심천,national,0,,OpenStreetMap (ODbL),way/451563167
+osm:way/451563166,하상도로,riverbed_road,하상도로,충북,127.472195,36.659553,율량천,local,0,,OpenStreetMap (ODbL),way/451563166
+osm:way/1152892733,단양수변공원,riverside_park,하천 둔치 공원,충북,128.370423,36.980783,한강,national,95,,OpenStreetMap (ODbL),way/1152892733
+osm:way/503476764,동화울수변공원,riverside_park,하천 둔치 공원,충북,127.395143,36.424671,관평천,local,0,,OpenStreetMap (ODbL),way/503476764
+osm:way/461361395,수변공원5,riverside_park,하천 둔치 공원,충북,127.492319,36.617663,무심천,national,48,,OpenStreetMap (ODbL),way/461361395
+osm:way/1188029603,유채꽃 수변공원,riverside_park,하천 둔치 공원,충북,127.646169,36.279543,금강,national,0,,OpenStreetMap (ODbL),way/1188029603
+osm:way/775587704,천변공원,riverside_park,하천 둔치 공원,충북,127.580705,36.789039,보강천,local,149,,OpenStreetMap (ODbL),way/775587704
+osm:way/1550807959,팽나무수변공원,riverside_park,하천 둔치 공원,충북,127.471616,36.270719,대전천,local,241,,OpenStreetMap (ODbL),way/1550807959
+osm:way/333513568,하상주차장,riverside_parking,둔치·하천변 주차장,충북,127.718869,36.481202,항건천,local,0,,OpenStreetMap (ODbL),way/333513568
