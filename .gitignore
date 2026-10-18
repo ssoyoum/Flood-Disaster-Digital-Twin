@@ -10,6 +10,7 @@ __pycache__/
 *.tsbuildinfo
 .logs/
 data/interim/
+data/local/
 # Local source downloads are preserved outside Git; provenance lives in manifests.
 data/raw/
 data/raw/seoul_flood_footprints_2022/

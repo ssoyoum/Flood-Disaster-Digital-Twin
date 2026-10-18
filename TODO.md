@@ -1,6 +1,6 @@
 # FloodOps TODO
 
-Last Updated: 2026-10-18 KST
+Last Updated: 2026-10-19 KST
 
 - Current identity: **하천 접점 시설(지하차도·하천변 출입구·저지대 마을) 통제·대피 판단 트윈**. 2026-10-16에 지하차도 PoC에서 범위를 넓혔다(근거: [docs/DIRECTION_RESEARCH.md](docs/DIRECTION_RESEARCH.md)).
 - 2026-10-18 구조: **감시 등급**(전국 관측소 1,408곳을 각 관측소의 공식 기준 수위로 판정, 5 km 안 시설 229곳 연결, 대표성 미검증) + **운영 등급**(관문 통과 시설의 고유 규칙·백테스트, 지금 궁평2 1곳). 첫 화면은 감시 보드(`#watch`), 에이전트는 보드 운영 도구 7개(이동·우선순위·변화·보고·성적표 등). 과거 사건은 «검증» 탭.
@@ -451,3 +451,4 @@ Phase 3 운영 트윈 (PROJECT_PLAN Phase 3, 앞당겨 진행):
 - [x] portfolio response scenario API와 Swagger contract 연결
 - [x] data-quality issue tracking 문서 추가
 - [x] README, Project Plan, Development Guide, Decision Records를 Counterfactual Disaster Digital Twin 정의에 맞춰 정리
+- [x] 운영 시설 임박 알림·담당자 확인 기록 연결(2026-10-19, 실시간/재생 구분 및 로컬 JSONL 저장)

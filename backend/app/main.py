@@ -38,6 +38,8 @@ from .case_comparison import get_case_lead_times
 from .twin import FACILITIES as TWIN_FACILITIES, backtest as twin_backtest, criteria_review as twin_criteria_review, facility_status as twin_facility_status, list_facilities as twin_list_facilities, twin_mode
 from . import agent_facility, agent_watch, national_watch
 from . import facility_registry
+from . import decision_log
+from .decision_log import DecisionRecordCreate
 from .water_level_bridge import readiness as water_level_readiness
 from .rise_model import forecast as rise_forecast
 from .layer_payload import slim_layers
@@ -554,6 +556,34 @@ def twin_status(facility_id: str, at: str | None = Query(default=None, descripti
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:  # live source failure must not hide the facility
         raise HTTPException(status_code=503, detail=f"Observation source unavailable: {exc}") from exc
+
+
+@app.get("/api/twin/facilities/{facility_id}/decisions", tags=["twin"])
+def twin_decision_records(facility_id: str, limit: int = Query(default=20, ge=1, le=100)):
+    """Recent local operator confirmations for one registered operational facility."""
+
+    _require_operational_facility(facility_id, f"Unknown facility: {facility_id}")
+    return {"facility_id": facility_id, "records": decision_log.list_records(facility_id, limit)}
+
+
+@app.post("/api/twin/facilities/{facility_id}/decisions", tags=["twin"])
+def twin_record_decision(
+    facility_id: str,
+    request: DecisionRecordCreate,
+    at: str | None = Query(default=None, description="Optional observation time for an explicitly labelled replay record"),
+):
+    """Save a human confirmation together with a server-generated observation and criteria snapshot."""
+
+    _require_operational_facility(facility_id, f"Unknown facility: {facility_id}")
+    try:
+        status = twin_facility_status(facility_id, at)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Observation source unavailable: {exc}") from exc
+    if not status.get("observation"):
+        raise HTTPException(status_code=409, detail="No gauge observation is available; confirmation was not recorded")
+    return decision_log.append_record(TWIN_FACILITIES[facility_id], status, request)
 
 
 @app.get("/api/twin/facilities/{facility_id}/backtest", tags=["twin"])

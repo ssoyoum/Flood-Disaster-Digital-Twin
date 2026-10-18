@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>통제 판단 트윈 · 지금 상태 C안 (통합용)</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+
+
+
+
+
+<style id="twc-document-style">html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #05080f; } .demo-stage { height: 100%; }</style>
+<style id="twc-style">
+/* ===== 루트: 이 안에서만 스타일이 적용된다 ===== */
+.twc { position: relative; width: 100%; height: 100%; min-height: 640px; overflow: hidden; isolation: isolate;
+  background: var(--twc-bg); color: var(--twc-text); font-family: "Noto Sans KR", system-ui, sans-serif; font-size: 15px; line-height: 1.45; word-break: keep-all; }
+
+.twc {
+  --twc-bg: #05080f; --twc-glass: rgba(11, 17, 29, .86); --twc-glass-2: rgba(23, 33, 52, .72); --twc-line: rgba(148, 163, 184, .16);
+  --twc-text: #e8eef7; --twc-muted: #95a4ba; --twc-dim: #6b7a90;
+  --twc-red: #f87171; --twc-orange: #fb923c; --twc-amber: #fbbf24; --twc-blue: #38bdf8; --twc-green: #34d399;
+  --twc-tone: var(--twc-red);
+}
+.twc, .twc * { box-sizing: border-box; }
+/* :where()로 우선순위를 0으로 둬서 twc- 클래스 규칙이 항상 이긴다 */
+:where(.twc) button { font: inherit; color: inherit; }
+/* 앱 전역 요소 규칙(styles.css의 h2 등)이 새어 들어오지 않게 컴포넌트 안에서 다시 고정 */
+.twc h2 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: normal; }
+.twc p { letter-spacing: normal; }
+
+/* ---------- map ---------- */
+#twc-map { position: absolute; inset: 0 30% 0 0; opacity: 0; transition: opacity 1.6s ease; }
+#twc-map.twc-in { opacity: 1; }
+.twc-vignette { position: absolute; inset: 0 30% 0 0; pointer-events: none; z-index: 1;
+  background: radial-gradient(ellipse at 52% 45%, transparent 45%, rgba(5,8,15,.55) 100%); }
+.twc .maplibregl-ctrl-attrib { background: rgba(5,8,15,.6) !important; color: var(--twc-dim) !important; font-size: 11px; }
+.twc .maplibregl-ctrl-attrib a { color: var(--twc-muted) !important; }
+
+/* ---------- glass panels ---------- */
+.twc-panel { background: var(--twc-glass); border: 1px solid var(--twc-line); border-radius: 14px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+.twc-eyebrow { margin: 0 0 8px; color: var(--twc-muted); font-size: 13px; font-weight: 700; }
+.twc-reveal { opacity: 0; transform: translateY(10px); }
+.twc-go .twc-reveal { animation: twc-rise .55s cubic-bezier(.2,.7,.2,1) forwards; animation-delay: calc(var(--twc-d, 0) * 1ms); }
+@keyframes twc-rise { to { opacity: 1; transform: none; } }
+
+/* left: decision panel — 바깥 상자 없이 유리 카드만 띄운다 */
+.twc-left { opacity: 0; transition: opacity .5s ease; }
+.twc-go .twc-left { opacity: 1; }
+.twc-left { position: absolute; z-index: 10; top: 16px; left: 16px; width: 330px; display: flex; flex-direction: column; gap: 10px; }
+.twc-gcard { position: relative; padding: 16px 18px; border-radius: 16px; border: 1px solid rgba(255,255,255,.09);
+  background: linear-gradient(145deg, rgba(40,52,72,.55), rgba(14,20,32,.5)); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 12px 30px rgba(0,0,0,.35); }
+/* 시설 카드: 이름 + 상태 말풍선 + 이유 */
+.twc-fac-card { border-color: color-mix(in srgb, var(--twc-tone) 55%, transparent); transition: border-color .5s, box-shadow .5s; }
+.twc-fac-card::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(120% 80% at 0% 0%, color-mix(in srgb, var(--twc-tone) 22%, transparent), transparent 60%); transition: background .5s; }
+.twc-fac-head { display: flex; align-items: center; gap: 10px; padding-right: 30px; }
+.twc-fac-head h2 { margin: 0; font-size: 20px; white-space: nowrap; }
+.twc-state-bubble { position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px 4px 9px; border-radius: 10px; background: var(--twc-tone); color: #0b1220;
+  font-size: 15px; font-weight: 900; white-space: nowrap; transition: background .5s; box-shadow: 0 0 18px color-mix(in srgb, var(--twc-tone) 55%, transparent); }
+.twc-state-bubble::before { content: ""; position: absolute; right: 100%; top: 50%; transform: translateY(-50%); border: 6px solid transparent; border-right-color: var(--twc-tone); transition: border-color .5s; }
+.twc-state-bubble i { width: 8px; height: 8px; border-radius: 50%; background: #0b1220; animation: twc-blink 1.6s infinite; }
+@keyframes twc-ping { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--twc-tone) 70%, transparent); } 70%, 100% { box-shadow: 0 0 0 10px transparent; } }
+@keyframes twc-blink { 50% { opacity: .25; } }
+.twc-fac-sub { margin: 4px 0 10px; color: var(--twc-muted); font-size: 13px; }
+.twc-why { margin: 0; font-size: 16px; font-weight: 700; line-height: 1.4; }
+.twc-at { display: block; margin-top: 2px; color: var(--twc-muted); font-size: 13px; }
+.twc-flash { animation: twc-flash .9s ease; }
+@keyframes twc-flash { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--twc-tone) 80%, transparent), 0 12px 30px rgba(0,0,0,.35); } 100% { box-shadow: 0 0 0 18px transparent, 0 12px 30px rgba(0,0,0,.35); } }
+/* 판단 기준 안내: 마우스를 올리면 보이고, 누르면 고정, X로 닫기 */
+.twc-info { position: absolute; top: 12px; right: 12px; z-index: 2; }
+.twc-info-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.06); color: #cbd5e1; font-size: 14px; font-weight: 900; cursor: pointer; }
+.twc-info-btn:hover, .twc-info.twc-pinned .twc-info-btn { background: var(--twc-blue); color: #04101f; border-color: var(--twc-blue); }
+.twc-info-pop { position: absolute; left: calc(100% + 12px); top: -6px; width: 300px; padding: 14px 36px 14px 14px; border-radius: 12px; background: rgba(8,12,21,.97); border: 1px solid rgba(56,189,248,.45);
+  font-size: 14px; color: #dbe5f2; box-shadow: 0 12px 30px rgba(0,0,0,.5); opacity: 0; transform: translateX(-6px); pointer-events: none; transition: opacity .2s, transform .2s; }
+.twc-info-pop::before { content: ""; position: absolute; right: 100%; top: 14px; border: 7px solid transparent; border-right-color: rgba(56,189,248,.45); }
+.twc-info:hover .twc-info-pop, .twc-info.twc-pinned .twc-info-pop { opacity: 1; transform: none; pointer-events: auto; }
+.twc-info.twc-closed:not(.twc-pinned) .twc-info-pop { opacity: 0; pointer-events: none; }
+.twc-info-pop b { display: block; margin-bottom: 4px; color: var(--twc-blue); }
+.twc-info-pop p { margin: 0 0 8px; }
+.twc-info-pop small { display: block; color: var(--twc-muted); font-size: 13px; }
+.twc-info-x { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 6px; border: 0; background: rgba(255,255,255,.08); color: #cbd5e1; cursor: pointer; font-size: 14px; }
+.twc-info-x:hover { background: rgba(255,255,255,.18); }
+.twc-gates { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.twc-gate { padding: 2px 9px; border-radius: 999px; border: 1px solid var(--twc-line); font-size: 12px; font-weight: 700; }
+.twc-gate.twc-ok { color: var(--twc-green); border-color: rgba(52,211,153,.6); } .twc-gate.twc-miss { color: var(--twc-red); border-color: rgba(248,113,113,.6); }
+/* 숫자 먼저: 굵은 숫자 + 작은 단위 + 같은 크기의 설명 */
+.twc-metrics { padding: 6px 18px; }
+.twc-m { display: flex; align-items: baseline; gap: 4px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.07); }
+.twc-m:last-child { border-bottom: 0; }
+.twc-m strong { font-size: 26px; font-weight: 900; letter-spacing: -.01em; font-variant-numeric: tabular-nums; line-height: 1.1; white-space: nowrap; min-width: 0; }
+.twc-m strong small { font-size: 13px; font-weight: 700; color: var(--twc-muted); margin-left: 3px; letter-spacing: 0; }
+.twc-m .twc-lbl { margin-left: 8px; font-size: 13px; font-weight: 500; color: var(--twc-muted); letter-spacing: 0; }
+.twc-m.twc-hot strong { color: var(--twc-red); } .twc-m.twc-replay strong { color: var(--twc-amber); }
+
+/* right: context column */
+.twc-right { position: absolute; z-index: 10; top: 0; right: 0; width: 30%; bottom: 0; display: flex; flex-direction: column; gap: 12px; overflow: auto; padding: 16px; background: #080d17; border-left: 1px solid var(--twc-line); }
+.twc-right .twc-panel { background: #101827; backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none; }
+
+.twc-card { padding: 14px 16px; }
+.twc-eyebrow-row { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; }
+.twc-eyebrow-row .twc-eyebrow { margin: 0; }
+.twc-tip-wrap { position: relative; }
+.twc-tip-i { width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(255,255,255,.2); background: transparent; color: var(--twc-muted); font-size: 11px; font-weight: 900; cursor: pointer; line-height: 1; }
+.twc-autotip { position: absolute; left: calc(100% + 10px); top: 50%; transform: translate(-4px, -50%); width: max-content; max-width: 240px; padding: 6px 10px; border-radius: 8px;
+  background: #fbbf24; color: #1a1203; font-size: 12px; font-weight: 700; line-height: 1.35; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; z-index: 3; }
+.twc-autotip::before { content: ""; position: absolute; right: 100%; top: 50%; transform: translateY(-50%); border: 6px solid transparent; border-right-color: #fbbf24; }
+.twc-autotip.twc-show { opacity: 1; transform: translate(0, -50%); }
+/* 지금 단계 → 다음 단계까지: 한 줄로 붙이고 색으로 대비 */
+.twc-flow { display: grid; grid-template-columns: 1fr auto; align-items: stretch; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,.08); }
+.twc-flow-now { padding: 12px 14px; background: rgba(255,255,255,.04); }
+.twc-flow-now .twc-t { display: block; font-size: 26px; font-weight: 900; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--twc-tone); transition: color .5s; }
+.twc-flow-now b { display: block; margin-top: 2px; font-size: 16px; }
+.twc-flow-now span { color: var(--twc-muted); font-size: 13px; }
+.twc-flow-next { position: relative; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; min-width: 118px; padding: 12px 14px 12px 22px; background: #fbbf24; color: #1a1203; }
+.twc-flow-next::before { content: ""; position: absolute; left: -1px; top: 0; bottom: 0; width: 14px; background: rgba(255,255,255,.04); clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.twc-flow-next strong { font-size: 30px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+.twc-flow-next strong small { font-size: 14px; font-weight: 800; margin-left: 2px; }
+.twc-flow-next span { margin-top: 4px; font-size: 13px; font-weight: 700; text-align: right; }
+.twc-flow-next.twc-end { background: rgba(255,255,255,.08); color: var(--twc-muted); }
+.twc-chart { position: relative; padding-top: 48px; }
+.twc-chart-bubble { position: absolute; left: 16px; top: 12px; z-index: 2; padding: 5px 10px; border-radius: 9px; background: rgba(8,12,21,.92); border: 1px solid rgba(255,255,255,.14); font-size: 13px; font-weight: 700; color: #dbe5f2; }
+.twc-chart-bubble::after { content: ""; position: absolute; left: 18px; top: 100%; border: 6px solid transparent; border-top-color: rgba(8,12,21,.92); }
+.twc-tag { display: inline-block; padding: 1px 7px; border-radius: 6px; background: rgba(148,163,184,.14); color: #b6c3d6; font-size: 12px; font-weight: 700; }
+.twc-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.twc-chart .twc-ln { fill: none; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.twc-chart .twc-area { opacity: 0; }
+.twc-go .twc-chart .twc-ln { animation: twc-draw 1.4s ease forwards; animation-delay: 1.5s; }
+.twc-go .twc-chart .twc-area { animation: twc-fade 1s ease forwards; animation-delay: 2.2s; }
+.twc-chart .twc-ln.twc-redraw, .twc-go .twc-chart .twc-ln.twc-redraw { animation: twc-draw .7s ease forwards; animation-delay: 0s; }
+.twc-chart .twc-area.twc-redraw, .twc-go .twc-chart .twc-area.twc-redraw { animation: twc-fade .6s ease forwards; animation-delay: .35s; }
+.twc-chart .twc-ln.twc-static, .twc-go .twc-chart .twc-ln.twc-static { animation: none; stroke-dashoffset: 0; }
+.twc-chart .twc-area.twc-static, .twc-go .twc-chart .twc-area.twc-static { animation: none; opacity: 1; }
+@keyframes twc-fade { to { opacity: 1; } }
+.twc-chart .twc-now-ring { transform-box: fill-box; transform-origin: center; animation: twc-ring 2s ease-out infinite; }
+@keyframes twc-ring { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(2.6); opacity: 0; } }
+.twc-chart-legend { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--twc-muted); }
+.twc-chart-legend .twc-bar { flex: 1; height: 6px; margin: 6px 10px 0; border-radius: 3px; background: linear-gradient(90deg, #22d3ee, #38bdf8, #34d399, #fbbf24, #fb923c, #f87171, #e879f9); }
+@keyframes twc-draw { to { stroke-dashoffset: 0; } }
+.twc-ref { border-style: dashed; }
+.twc-ref summary { cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-height: 30px; font-size: 14px; font-weight: 700; color: #c5d1e2; list-style: none; }
+.twc-ref summary::-webkit-details-marker { display: none; }
+.twc-ref summary::before { content: "▸"; color: var(--twc-muted); }
+.twc-ref[open] summary::before { content: "▾"; }
+.twc-ref summary .twc-tag { order: 3; flex-basis: 100%; width: max-content; flex-grow: 0; margin-left: 18px; }
+.twc-ref summary em { margin-left: auto; font-style: normal; font-variant-numeric: tabular-nums; }
+.twc-kv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+.twc-kv div { padding: 8px; border-radius: 8px; background: var(--twc-glass-2); }
+.twc-kv strong { display: block; font-size: 15px; font-variant-numeric: tabular-nums; }
+.twc-kv span { color: var(--twc-muted); font-size: 12px; }
+
+/* bottom: timeline (상자 없음 · 프리미어식 재생헤드) */
+.twc-dock { position: absolute; z-index: 10; left: 0; right: 30%; bottom: 0; padding: 40px 22px 14px; pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(5,8,15,.72) 38%, rgba(5,8,15,.92)); }
+.twc-dock > * { pointer-events: auto; }
+.twc-tl { position: relative; padding-left: 76px; }
+.twc-play-wrap { position: absolute; left: 0; top: 14px; }
+.twc-play { width: 56px; height: 56px; border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center; font-size: 20px; color: #06101f;
+  background: radial-gradient(circle at 35% 30%, #fff, #cfe3ff); box-shadow: 0 0 0 4px rgba(77,163,255,.25), 0 8px 24px rgba(0,0,0,.5); transition: transform .15s, box-shadow .2s; }
+.twc-play:hover { transform: scale(1.06); box-shadow: 0 0 0 6px rgba(77,163,255,.35), 0 8px 24px rgba(0,0,0,.5); }
+.twc-play.twc-on { background: radial-gradient(circle at 35% 30%, #ffd9d9, #f87171); }
+.twc-bubble { position: absolute; left: -4px; bottom: calc(100% + 14px); width: 320px; padding: 12px 14px; border-radius: 12px; background: rgba(8,12,21,.96); border: 1px solid rgba(148,163,184,.25);
+  font-size: 14px; color: #dbe5f2; box-shadow: 0 10px 30px rgba(0,0,0,.5); opacity: 0; transform: translateY(6px); pointer-events: none; transition: opacity .25s, transform .25s; }
+.twc-bubble::after { content: ""; position: absolute; left: 26px; top: 100%; border: 8px solid transparent; border-top-color: rgba(8,12,21,.96); }
+.twc-bubble.twc-show { opacity: 1; transform: none; }
+.twc-bubble b { display: block; margin-bottom: 4px; }
+.twc-bubble .twc-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; font-size: 13px; color: var(--twc-muted); }
+.twc-bubble .twc-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+.twc-tl-body { position: relative; cursor: pointer; touch-action: none; user-select: none; }
+.twc-ruler { position: relative; height: 30px; }
+.twc-ruler i { position: absolute; bottom: 0; width: 1px; height: 5px; background: rgba(203,213,225,.35); }
+.twc-ruler i.twc-major { height: 9px; background: rgba(226,232,240,.7); }
+.twc-ruler span { position: absolute; top: 0; transform: translateX(-50%); font-size: 12px; font-weight: 700; color: #aab6c8; text-shadow: 0 1px 3px #000; font-variant-numeric: tabular-nums; }
+.twc-lane { position: relative; margin-top: 4px; }
+.twc-track { position: relative; height: 20px; border-radius: 6px; overflow: hidden; display: flex; background: #1e293b; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 4px 14px rgba(0,0,0,.4); }
+.twc-track span { height: 100%; }
+.twc-marks { position: relative; height: 60px; margin-top: 8px; }
+.twc-mk.twc-r1 { top: 29px; }
+.twc-mk { position: absolute; z-index: 4; transform: translateX(-50%); padding: 3px 8px; border-radius: 7px; border: 1px solid rgba(148,163,184,.25); background: rgba(10,16,28,.92); font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; line-height: 1.3; }
+.twc-mk small { color: var(--twc-muted); font-weight: 500; margin-left: 3px; }
+.twc-mk.twc-bt { border-color: rgba(248,113,113,.7); }
+.twc-mk.twc-on { border-color: #4da3ff; background: #4da3ff; color: #04101f; } .twc-mk.twc-on small { color: #0b2545; }
+.twc-mk:hover { border-color: #94a3b8; }
+/* 재생헤드: 눈금자 위 머리 + 트랙·표식까지 내려오는 선 */
+.twc-playhead { position: absolute; top: -26px; bottom: 0; width: 0; z-index: 3; transition: left .45s cubic-bezier(.2,.7,.2,1); pointer-events: none; }
+.twc-dragging .twc-playhead { transition: none; }
+.twc-ph-head { position: absolute; left: 0; top: 0; transform: translateX(-50%); padding: 4px 10px 5px; border-radius: 7px; background: #4da3ff; color: #04101f;
+  font-size: 16px; font-weight: 900; font-variant-numeric: tabular-nums; white-space: nowrap; box-shadow: 0 0 0 2px rgba(255,255,255,.85), 0 6px 18px rgba(77,163,255,.55); }
+.twc-ph-head::after { content: ""; position: absolute; left: 50%; top: 100%; transform: translateX(-50%); border: 7px solid transparent; border-top-color: #4da3ff; }
+.twc-ph-line { position: absolute; left: -1.5px; top: 34px; bottom: 0; width: 3px; background: #4da3ff; box-shadow: 0 0 12px rgba(77,163,255,.9); border-radius: 2px; }
+
+/* facility marker */
+.twc-fmk { display: flex; align-items: center; gap: 8px; pointer-events: none; }
+.twc-fmk .twc-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--twc-tone); border: 2px solid #fff; box-shadow: 0 0 0 0 var(--twc-tone); animation: twc-ping 1.8s infinite; }
+.twc-fmk .twc-tip { padding: 7px 10px; border-radius: 10px; background: rgba(8,12,21,.92); border: 1px solid var(--twc-line); font-size: 13px; line-height: 1.35; white-space: nowrap; box-shadow: 0 6px 20px rgba(0,0,0,.4); }
+.twc-fmk .twc-tip b { display: block; font-size: 14px; }
+.twc-fmk .twc-tip span { color: var(--twc-muted); }
+.twc-fmk .twc-tip em { font-style: normal; font-weight: 900; color: var(--twc-tone); }
+
+.twc-toast { position: absolute; z-index: 30; top: 14px; left: 50%; transform: translateX(-50%); padding: 8px 14px; border-radius: 10px; background: rgba(8,12,21,.92); border: 1px solid var(--twc-line); font-size: 13px; color: var(--twc-muted); }
+.twc-alert { margin-top: 10px; padding: 10px 12px; border: 1px solid rgba(251,191,36,.45); border-radius: 10px; background: rgba(120,82,10,.22); color: #fde68a; font-size: 13px; }
+.twc-alert[hidden] { display: none; }
+.twc-alert[data-level="urgent"], .twc-alert[data-level="stale"] { border-color: rgba(248,113,113,.55); background: rgba(127,29,29,.28); color: #fecaca; }
+.twc-alert strong { display: block; margin-bottom: 3px; font-size: 14px; }
+.twc-alert span { display: block; color: #e2e8f0; }
+.twc-log-form { display: grid; gap: 8px; }
+.twc-log-form label { display: grid; gap: 4px; color: #c5d1e2; font-size: 12px; font-weight: 700; }
+.twc-log-form input, .twc-log-form select, .twc-log-form textarea { width: 100%; min-width: 0; padding: 8px 9px; border: 1px solid rgba(148,163,184,.25); border-radius: 7px; background: #0b1220; color: #e8eef7; font: inherit; font-size: 13px; }
+.twc-log-form textarea { min-height: 54px; resize: vertical; }
+.twc-log-form .twc-log-confirm { display: flex; grid-template-columns: auto 1fr; align-items: start; gap: 7px; font-weight: 500; line-height: 1.4; }
+.twc-log-form .twc-log-confirm input { width: auto; margin: 2px 0 0; }
+.twc-log-submit { min-height: 36px; border: 1px solid rgba(56,189,248,.5); border-radius: 8px; background: rgba(14,116,144,.28); color: #bae6fd; font-weight: 800; cursor: pointer; }
+.twc-log-submit:disabled { opacity: .55; cursor: wait; }
+.twc-log-state { min-height: 18px; margin: 0; color: var(--twc-muted); font-size: 12px; }
+.twc-log-list { display: grid; gap: 7px; margin: 10px 0 0; padding: 0; list-style: none; }
+.twc-log-item { padding: 8px 9px; border: 1px solid rgba(148,163,184,.14); border-radius: 8px; background: rgba(255,255,255,.025); font-size: 12px; }
+.twc-log-item strong, .twc-log-item span { display: block; }
+.twc-log-item span { margin-top: 2px; color: var(--twc-muted); }
+.twc-log-note { margin: 8px 0 0; color: var(--twc-dim); font-size: 11px; line-height: 1.45; }
+
+@media (prefers-reduced-motion: reduce) {
+  #twc-map { transition: none; } .twc-reveal { opacity: 1; transform: none; } .twc-go .twc-reveal, .twc-go .twc-chart .twc-ln, .twc-go .twc-chart .twc-area { animation: none; }
+  .twc-chart .twc-ln { stroke-dashoffset: 0; } .twc-chart .twc-area { opacity: 1; } .twc-chart .twc-now-ring { animation: none; } .twc-badge::before, .twc-fmk .twc-dot { animation: none; } .twc-playhead { transition: none; }
+}
+</style>
+</head>
+<body>
+
+
+<main class="demo-stage">
+
+<div class="twc" id="twc-root" data-api="http://127.0.0.1:8033" data-facility="gungpyeong2-underpass">
+  <div id="twc-map" aria-label="지하차도 주변 지도"></div>
+  <div class="twc-vignette"></div>
+  <div class="twc-toast" id="twc-toast">지도 레이어를 불러오는 중…</div>
+
+
+  <aside class="twc-left" aria-label="통제 판단">
+    <div class="twc-gcard twc-fac-card twc-reveal" style="--twc-d:0" id="twc-fac">
+      <div class="twc-info" id="twc-info">
+        <button class="twc-info-btn" type="button" id="twc-info-btn" aria-label="판단 기준 안내" aria-expanded="false">i</button>
+        <div class="twc-info-pop" role="dialog" aria-label="판단 기준">
+          <button class="twc-info-x" type="button" id="twc-info-x" aria-label="안내 닫기">✕</button>
+          <b>판단은 담당자·현장 확인이 우선</b>
+          <p>이 트윈은 침수심을 재지 않고 하천 수위(선행 지표)만 봅니다. 통제 여부는 현장에서 결정합니다.</p>
+          <small>규칙 river_stage_v1 — 계획홍수위 도달, 또는 경보 이상 + 현재 속도로 60분 안 도달이면 «통제 검토»</small>
+          <div class="twc-gates" id="twc-gates"></div>
+        </div>
+      </div>
+      <div class="twc-fac-head"><h2 id="twc-fname">궁평2지하차도</h2><span class="twc-state-bubble" id="twc-badge-wrap"><i></i><span id="twc-badge">—</span></span></div>
+      <p class="twc-fac-sub" id="twc-fsub">지방도 508호선 · 청주시(미호강교) 연결</p>
+      <p class="twc-why" id="twc-why">관측을 불러오는 중</p>
+      <span class="twc-at" id="twc-at">—</span>
+      <div class="twc-alert" id="twc-alert" role="alert" hidden><strong id="twc-alert-title"></strong><span id="twc-alert-detail"></span></div>
+    </div>
+    <div class="twc-gcard twc-metrics twc-reveal" style="--twc-d:160">
+      <div class="twc-m" id="twc-r-level"><strong><span class="twc-cnt" id="twc-k-level">—</span><small>m</small></strong><span class="twc-lbl">현재 수위</span></div>
+      <div class="twc-m" id="twc-r-margin"><strong id="twc-k-margin">—</strong><span class="twc-lbl" id="twc-k-margin-l">계획홍수위까지 여유</span></div>
+      <div class="twc-m" id="twc-r-rate"><strong id="twc-k-rate">—</strong><span class="twc-lbl">최근 30분 속도</span></div>
+      <div class="twc-m" id="twc-r-eta"><strong id="twc-k-eta">—</strong><span class="twc-lbl" id="twc-k-eta-l">현재 속도로 계획홍수위까지</span></div>
+    </div>
+  </aside>
+
+
+  <section class="twc-right" aria-label="시각별 맥락">
+    <article class="twc-panel twc-card twc-reveal" style="--twc-d:760" id="twc-ops-card">
+      <p class="twc-eyebrow">운영 알림 · 담당자 확인</p>
+      <p class="twc-log-state" id="twc-log-mode">관측 기준 확인 중</p>
+      <form class="twc-log-form" id="twc-log-form">
+        <label>확인자 이름 또는 역할<input name="checked_by" autocomplete="name" maxlength="80" required placeholder="예: 당직 담당자" /></label>
+        <label>확인 결과<select name="confirmation" required><option value="CONFIRMED">관측값·등록 기준 확인</option><option value="NO_ACTION">확인 후 현재 조치 불필요</option><option value="ESCALATE">현장 확인 요청</option></select></label>
+        <label>메모<textarea name="note" maxlength="500" placeholder="현장 확인 사항 (선택)"></textarea></label>
+        <label class="twc-log-confirm"><input name="acknowledged" type="checkbox" required /><span>화면의 관측 시각·수위·운영 기준을 확인했습니다.</span></label>
+        <button class="twc-log-submit" id="twc-log-submit" type="submit">확인 기록 저장</button>
+        <p class="twc-log-state" id="twc-log-feedback" role="status"></p>
+      </form>
+      <ul class="twc-log-list" id="twc-log-list" aria-label="최근 확인 기록"></ul>
+      <p class="twc-log-note">이름은 직접 입력되며 계정 인증은 아닙니다. 기록에는 관측 자료 모드가 함께 저장됩니다. 알림은 통제 명령이 아니며 현장 담당자의 확인이 우선합니다.</p>
+    </article>
+    <article class="twc-panel twc-card twc-reveal" style="--twc-d:900" id="twc-stage-card">
+      <div class="twc-eyebrow-row"><p class="twc-eyebrow">이 시각의 사건 단계</p>
+        <span class="twc-tip-wrap"><button class="twc-tip-i" type="button" id="twc-src-i" aria-label="출처 안내">i</button><span class="twc-autotip" id="twc-src-tip" role="status">원문 확인 필요 · 사건 시각은 공식 발표·보도 기준이며 원문 페이지 확인이 남아 있어요</span></span></div>
+      <div class="twc-flow">
+        <div class="twc-flow-now"><span class="twc-t" id="twc-s-time">—</span><b id="twc-s-label">—</b><span id="twc-s-desc"></span></div>
+        <div class="twc-flow-next" id="twc-s-next"><strong>—</strong><span>다음 단계</span></div>
+      </div>
+    </article>
+    <article class="twc-panel twc-card twc-chart twc-reveal" style="--twc-d:1040">
+      <span class="twc-chart-bubble">24시간 수위 · 기준선</span>
+      <svg id="twc-chart" viewBox="0 0 320 196" role="img" aria-label="24시간 수위 그래프"></svg>
+      <div class="twc-chart-legend"><span>낮음</span><span class="twc-bar"></span><span>계획홍수위 이상</span></div>
+    </article>
+    <details class="twc-panel twc-card twc-ref twc-reveal" style="--twc-d:1180" id="twc-rise" open>
+      <summary><span class="twc-tag">참고 · 권고에 반영 안 됨</span> 6시간 상승 예측 <em id="twc-rise-v">—</em></summary>
+      <div class="twc-kv"><div><strong id="twc-rise-q">—</strong><span>상한(90%)</span></div><div><strong id="twc-rise-lin">—</strong><span>단순 외삽</span></div><div><strong id="twc-rise-rain">—</strong><span>6시간 강우</span></div></div>
+    </details>
+    <article class="twc-panel twc-card twc-reveal" style="--twc-d:1300">
+      <p class="twc-eyebrow">지도 범례</p>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#c5d1e2">
+        <span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:rgba(248,113,113,.45);border:1px solid #f87171;vertical-align:middle;margin-right:6px"></i>침수 추정 범위 (HAND 근사 · 공식 침수범위 아님)</span>
+        <span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#1d4ed8;vertical-align:middle;margin-right:6px"></i>하천 (WAMIS)</span>
+      </div>
+    </article>
+  </section>
+
+
+  <section class="twc-dock twc-reveal" style="--twc-d:1500" id="twc-dock" aria-label="시간축">
+    <div class="twc-tl">
+      <div class="twc-play-wrap">
+        <button class="twc-play" type="button" id="twc-play" aria-label="재생" aria-describedby="twc-bubble">▶</button>
+        <div class="twc-bubble" id="twc-bubble" role="tooltip">
+          <b>2023-07-15 00:00 → 09:00</b>
+          재생하면 10분씩 넘어갑니다. 막대·표식을 누르거나 파란 재생헤드를 끌어서 시각을 옮길 수 있어요.
+          <div class="twc-legend"><span><i style="background:#38bdf8"></i>관심</span><span><i style="background:#fbbf24"></i>주의보</span><span><i style="background:#fb923c"></i>경보</span><span><i style="background:#f87171"></i>계획홍수위</span></div>
+        </div>
+      </div>
+      <div class="twc-tl-body" id="twc-tlbody">
+        <div class="twc-ruler" id="twc-ruler"></div>
+        <div class="twc-lane"><div class="twc-track" id="twc-track"></div></div>
+        <div class="twc-marks" id="twc-marks"></div>
+        <div class="twc-playhead" id="twc-cursor"><div class="twc-ph-head" id="twc-cursor-l">08:00</div><div class="twc-ph-line"></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+</main>
+
+<script>
+(() => {
+  const root = document.getElementById("twc-root");
+  const params = new URLSearchParams(location.search);
+  const API = params.get("api") ?? root.dataset.api ?? "http://127.0.0.1:8033";
+  const FAC = params.get("facility") ?? root.dataset.facility ?? "gungpyeong2-underpass";
+  const DAY = "2023-07-15";
+  const T0 = 0, T1 = 540; // minutes from 00:00 to 09:00
+  const STAGES = [
+    { t: "04:10", label: "홍수경보 발령", desc: "지하차도 침수 전 경보" },
+    { t: "06:40", label: "계획홍수위 도달 (감찰 발표)", desc: "국무조정실이 통제 요건 충족으로 본 시각" },
+    { t: "07:50", label: "임시제방 부근 월류 시작", desc: "제방 붕괴 전 넘침 보고" },
+    { t: "08:09", label: "임시제방 붕괴", desc: "기준 시뮬레이션 사건" },
+    { t: "08:27", label: "지하차도 유입 시작", desc: "CCTV 기반 시각" },
+    { t: "08:35", label: "차량 주행 불능", desc: "통행 불가 상태" },
+    { t: "08:40", label: "지하차도 완전 침수", desc: "기준 사건 마지막 단계" },
+  ];
+  const RECO = { NORMAL: ["정상", "#38bdf8"], MONITOR: ["감시", "#fbbf24"], CLOSURE_REVIEW: ["통제 검토", "#f87171"] };
+  const STAGE_COLOR = { normal: "#1e3a5f", attention: "#38bdf8", advisory: "#fbbf24", warning: "#fb923c", planned_flood: "#f87171" };
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const $ = (id) => root.querySelector(`#${id}`);
+  const toMin = (hhmm) => { const [h, m] = hhmm.split(":").map(Number); return h * 60 + m; };
+  const hhmm = (min) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
+  const pct = (min) => ((min - T0) / (T1 - T0)) * 100;
+  const request = async (path, options = {}) => {
+    const response = await fetch(API + path, { ...options, headers: { ...(options.headers || {}), ...(options.body ? { "Content-Type": "application/json" } : {}) } });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(typeof payload.detail === "string" ? payload.detail : `HTTP ${response.status}`);
+    return payload;
+  };
+  const get = (path) => request(path);
+
+  let prevReco = null, current = toMin("08:00"), map = null, facility = null, marker = null, levels = null, seq = 0, playing = null, sourceMode = "replay", currentStatus = null;
+
+  function renderAlert(status) {
+    const alert = $("twc-alert");
+    const title = $("twc-alert-title"), detail = $("twc-alert-detail");
+    alert.hidden = false;
+    alert.dataset.level = "";
+    if (status.status === "NO_OBSERVATION" || !status.observation) {
+      alert.dataset.level = "stale";
+      title.textContent = "관측값 없음 · 판단 보류";
+      detail.textContent = "기준 도달 여부를 확인할 관측 자료가 없습니다.";
+      return;
+    }
+    if (status.recommendation === "CLOSURE_REVIEW") {
+      alert.dataset.level = "urgent";
+      title.textContent = "운영 기준 도달 임박 · 담당자 확인 필요";
+      detail.textContent = `${status.observation.water_level_m.toFixed(2)} m · 계획홍수위 ${status.levels_m.planned_flood.toFixed(2)} m · ${status.reason}`;
+      return;
+    }
+    if (status.recommendation === "MONITOR") {
+      title.textContent = "등록 기준 접근 · 수위 상승 감시";
+      detail.textContent = `${status.observation.water_level_m.toFixed(2)} m · ${status.stage_label} · ${status.reason}`;
+      return;
+    }
+    alert.hidden = true;
+  }
+
+  const localTime = (value) => value ? new Date(value).toLocaleString("ko-KR", { hour12: false, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "시각 없음";
+  function renderDecisionRecords(records) {
+    const list = $("twc-log-list");
+    list.replaceChildren();
+    if (!records.length) {
+      const empty = document.createElement("li"); empty.className = "twc-log-item"; empty.textContent = "저장된 확인 기록이 없습니다."; list.appendChild(empty); return;
+    }
+    const confirmationLabels = { CONFIRMED: "관측·기준 확인", NO_ACTION: "현재 조치 불필요", ESCALATE: "현장 확인 요청" };
+    records.forEach((record) => {
+      const item = document.createElement("li"); item.className = "twc-log-item";
+      const title = document.createElement("strong"); title.textContent = `${confirmationLabels[record.confirmation] ?? "확인 기록"} · ${record.checked_by}`;
+      const value = record.water_level_m == null ? "수위 미상" : `${Number(record.water_level_m).toFixed(2)} m`;
+      const meta = document.createElement("span"); meta.textContent = `${record.source_mode === "live" ? "실시간" : "재생"} · 관측 ${localTime(record.observation_at)} · ${value} · 기록 ${localTime(record.recorded_at)}`;
+      item.append(title, meta);
+      if (record.note) { const note = document.createElement("span"); note.textContent = record.note; item.appendChild(note); }
+      list.appendChild(item);
+    });
+  }
+
+  async function loadDecisionRecords() {
+    try {
+      const result = await get(`/api/twin/facilities/${encodeURIComponent(FAC)}/decisions?limit=8`);
+      renderDecisionRecords(result.records || []);
+    } catch (error) {
+      $("twc-log-list").textContent = `기록을 불러오지 못했습니다: ${error.message}`;
+    }
+  }
+
+  function renderMode() {
+    const message = sourceMode === "live"
+      ? "실시간 관측 · 5분마다 새로고침"
+      : "2023년 사건 재생 · 입력 기록은 실제 현장 조치가 아닌 재생 확인으로 저장";
+    $("twc-log-mode").textContent = message;
+    $("twc-stage-card").hidden = sourceMode === "live";
+    $("twc-dock").hidden = sourceMode === "live";
+  }
+
+  /* ---- number count-up ---- */
+  function countTo(el, to, digits = 2) {
+    const from = parseFloat(el.dataset.v ?? "0") || 0;
+    el.dataset.v = to;
+    if (reduced) { el.textContent = to.toFixed(digits); return; }
+    const start = performance.now(), dur = 650;
+    const step = (now) => { const k = Math.min(1, (now - start) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = (from + (to - from) * e).toFixed(digits); if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }
+
+  /* ---- timeline ---- */
+  function buildTimeline(transitions, firstReview) {
+    const track = $("twc-track");
+    const pts = transitions.map((r) => ({ min: (new Date(r.time) - new Date(`${DAY}T00:00:00`)) / 60000, stage: r.stage }));
+    for (let i = 0; i < pts.length; i++) {
+      const a = Math.max(T0, pts[i].min), b = Math.min(T1, pts[i + 1]?.min ?? T1);
+      if (b <= T0 || a >= T1 || b <= a) continue;
+      const s = document.createElement("span");
+      s.style.width = `${((b - a) / (T1 - T0)) * 100}%`; s.style.background = STAGE_COLOR[pts[i].stage]; s.title = pts[i].stage;
+      track.appendChild(s);
+    }
+    // 눈금자: 30분 작은 눈금, 1시간 큰 눈금
+    const ruler = $("twc-ruler");
+    for (let m = T0; m <= T1; m += 30) {
+      const i = document.createElement("i"); i.style.left = `${pct(m)}%`; if (m % 60 === 0) i.className = "twc-major"; ruler.appendChild(i);
+      if (m % 60 === 0) { const l = document.createElement("span"); l.textContent = hhmm(m); l.style.left = `${pct(m)}%`; if (m === T0) l.style.transform = "none"; if (m === T1) l.style.transform = "translateX(-100%)"; ruler.appendChild(l); }
+    }
+    // 막대·눈금자를 누르거나 끌면 그 시각으로 (10분 단위)
+    const body = $("twc-tlbody");
+    const minAt = (x) => { const r = track.getBoundingClientRect(); return Math.max(T0, Math.min(T1, Math.round(((x - r.left) / r.width) * (T1 - T0) / 10) * 10)); };
+    let dragTimer = null;
+    body.addEventListener("pointerdown", (ev) => {
+      if (ev.target.closest(".twc-mk")) return;
+      body.setPointerCapture(ev.pointerId); body.classList.add("twc-dragging"); stopPlay();
+      const move = (e) => { const m = minAt(e.clientX); moveHead(m); clearTimeout(dragTimer); dragTimer = setTimeout(() => setTime(m, { chart: "static" }), 120); };
+      const up = (e) => { body.removeEventListener("pointermove", move); body.removeEventListener("pointerup", up); body.classList.remove("twc-dragging"); clearTimeout(dragTimer); setTime(minAt(e.clientX)); };
+      body.addEventListener("pointermove", move); body.addEventListener("pointerup", up); move(ev);
+    });
+    const SHORT = { "04:10": "홍수경보", "06:40": "계획홍수위", "07:50": "월류", "08:09": "제방 붕괴", "08:27": "유입" };
+    const marks = [...STAGES.slice(0, 5).map((s) => ({ t: s.t, label: SHORT[s.t] })), firstReview && { t: firstReview, label: "트윈 첫 권고", bt: true }].filter(Boolean)
+      .sort((x, y) => toMin(x.t) - toMin(y.t));
+    const host = $("twc-marks");
+    marks.forEach((m) => {
+      const b = document.createElement("button"); b.type = "button"; b.className = "twc-mk" + (m.bt ? " twc-bt" : ""); b.dataset.t = m.t;
+      b.innerHTML = `${m.t}<small>${m.label}</small>`; b.style.left = `${pct(toMin(m.t))}%`;
+      b.addEventListener("click", () => setTime(toMin(m.t)));
+      host.appendChild(b);
+    });
+    // 겹치는 표식은 아랫줄로 내린다.
+    requestAnimationFrame(() => {
+      const rowRight = [-1e9, -1e9];
+      [...host.children].forEach((el) => {
+        let r = el.getBoundingClientRect();
+        let row = rowRight.findIndex((right) => r.left > right + 6);
+        if (row < 0) { el.querySelector("small")?.remove(); r = el.getBoundingClientRect(); row = rowRight[0] <= rowRight[1] ? 0 : 1; if (r.left <= rowRight[row] + 6) { el.style.marginLeft = `${rowRight[row] + 6 - r.left}px`; r = el.getBoundingClientRect(); } }
+        if (row === 1) el.classList.add("twc-r1");
+        rowRight[row] = r.right;
+      });
+    });
+  }
+
+  /* ---- chart ---- */
+  function drawChart(water, mode) {
+    const svg = $("twc-chart"); if (!levels) return;
+    const pts = [[-24, water.wl_t_minus_24h], [-12, water.wl_t_minus_12h], [-6, water.wl_t_minus_6h], [-3, water.wl_t_minus_3h], [-1, water.wl_t_minus_1h], [0, water.wl_t]].filter((p) => p[1] != null);
+    const lo = Math.floor(Math.min(levels.attention, ...pts.map((p) => p[1])) - 0.6), hi = Math.max(levels.planned_flood + 1.0, ...pts.map((p) => p[1] + .6));
+    const X0 = 8, X1 = 300, Y0 = 18, Y1 = 168;
+    const x = (h) => X0 + ((h + 24) / 24) * (X1 - X0), y = (v) => Y1 - ((v - lo) / (hi - lo)) * (Y1 - Y0);
+    const P = pts.map(([h, v]) => [x(h), y(v)]);
+    // 부드러운 선 (Catmull-Rom → 베지어)
+    let d = `M${P[0][0]},${P[0][1]}`;
+    for (let i = 0; i < P.length - 1; i++) {
+      const p0 = P[i - 1] ?? P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] ?? p2;
+      d += ` C${p1[0] + (p2[0] - p0[0]) / 6},${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6},${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]},${p2[1]}`;
+    }
+    const area = `${d} L${P[P.length - 1][0]},${Y1} L${P[0][0]},${Y1} Z`;
+    // 높이(수위)에 따라 색이 바뀌는 무지개 그라데이션: 기준선 위치에 색 경계를 맞춘다.
+    const off = (v) => Math.max(0, Math.min(1, (y(v) - Y1) / (Y0 - Y1)));
+    const stops = [[0, "#22d3ee"], [off(levels.attention), "#38bdf8"], [off((levels.attention + levels.advisory) / 2), "#34d399"], [off(levels.advisory), "#fbbf24"],
+      [off(levels.warning), "#fb923c"], [off(levels.planned_flood), "#f87171"], [1, "#e879f9"]]
+      .map(([o, c]) => `<stop offset="${o}" stop-color="${c}"/>`).join("");
+    const refLines = [["attention", "관심", "#38bdf8"], ["advisory", "주의보", "#fbbf24"], ["warning", "경보", "#fb923c"], ["planned_flood", "계획홍수위", "#f87171"]]
+      .map(([k, l, c]) => `<line x1="${X0}" x2="${X1}" y1="${y(levels[k])}" y2="${y(levels[k])}" stroke="${c}" stroke-opacity="${k === "planned_flood" ? .8 : .35}" stroke-dasharray="${k === "planned_flood" ? "0" : "2 4"}"/>`
+        + `<text x="${X0 + 2}" y="${y(levels[k]) - 4}" fill="${c}" font-size="11" font-weight="700" opacity=".9">${l} ${levels[k]}</text>`).join("");
+    const [lx, ly] = P[P.length - 1], last = pts[pts.length - 1][1];
+    const cls = mode === "redraw" ? " redraw" : mode === "static" ? " static" : "";
+    svg.setAttribute("viewBox", "0 0 316 196");
+    svg.innerHTML = `<defs>
+        <linearGradient id="twc-wlGrad" gradientUnits="userSpaceOnUse" x1="0" y1="${Y1}" x2="0" y2="${Y0}">${stops}</linearGradient>
+        <linearGradient id="twc-fadeDown" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <mask id="twc-areaMask"><rect x="0" y="0" width="316" height="196" fill="url(#twc-fadeDown)"/></mask>
+        <filter id="twc-glow" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      ${refLines}
+      <path class="twc-area${cls}" d="${area}" fill="url(#twc-wlGrad)" mask="url(#twc-areaMask)"/>
+      <path class="twc-ln${cls}" d="${d}" pathLength="1" stroke="url(#twc-wlGrad)" filter="url(#twc-glow)"/>
+      <line x1="${lx}" x2="${lx}" y1="${ly + 8}" y2="${Y1}" stroke="#fff" stroke-opacity=".7" stroke-dasharray="3 4"/>
+      <circle class="twc-now-ring" cx="${lx}" cy="${ly}" r="7" fill="none" stroke="url(#twc-wlGrad)" stroke-width="2"/>
+      <circle cx="${lx}" cy="${ly}" r="6" fill="var(--twc-tone)" stroke="#fff" stroke-width="2.4" filter="url(#twc-glow)"/>
+      <text x="${lx - 10}" y="${ly - 10}" text-anchor="end" fill="#fff" font-size="15" font-weight="900">${last.toFixed(2)} m</text>
+      <text x="${X0}" y="190" fill="#6b7a90" font-size="11">24시간 전</text><text x="${X1}" y="190" fill="#6b7a90" font-size="11" text-anchor="end">${hhmm(current)}</text>`;
+  }
+
+  /* ---- state update ---- */
+  const moveHead = (min) => { $("twc-cursor").style.left = `${pct(min)}%`; $("twc-cursor-l").textContent = hhmm(min); };
+  let prevStage;
+  let srcTimer = null;
+  function showSrcTip() { const t = $("twc-src-tip"); t.classList.add("twc-show"); clearTimeout(srcTimer); srcTimer = setTimeout(() => t.classList.remove("twc-show"), 3000); }
+  const setTone = (el, tone) => { el.classList.remove("twc-hot", "twc-ok", "twc-replay"); el.classList.add(`twc-${tone}`); };
+  async function setTime(min, { chart = "redraw" } = {}) {
+    current = min; const my = ++seq; const at = `${DAY}T${hhmm(min)}:00`;
+    if (sourceMode !== "live") {
+      moveHead(min);
+      root.querySelectorAll(".twc-mk").forEach((m) => m.classList.toggle("twc-on", toMin(m.dataset.t) === min));
+    }
+    let st, rise;
+    const query = sourceMode === "live" ? "" : `?at=${encodeURIComponent(at)}`;
+    try { [st, rise] = await Promise.all([get(`/api/twin/facilities/${FAC}/status${query}`), get(`/api/twin/facilities/${FAC}/rise-forecast${query}`).catch(() => null)]); }
+    catch (error) { $("twc-why").textContent = `관측을 불러오지 못했습니다: ${error.message}`; renderAlert({ status: "NO_OBSERVATION" }); return; }
+    if (my !== seq) return;
+    currentStatus = st;
+    renderAlert(st);
+    if (sourceMode === "live" && st.observation?.time) {
+      const clock = st.observation.time.slice(11, 16);
+      if (/^\d{2}:\d{2}$/.test(clock)) current = toMin(clock);
+    }
+    levels = st.levels_m;
+    const [label, tone] = RECO[st.recommendation] ?? ["관측 없음", "#94a3b8"];
+    root.style.setProperty("--twc-tone", tone);
+    $("twc-badge").textContent = label; $("twc-why").textContent = st.reason ?? "—";
+    // 상태가 바뀌면 카드·말풍선·지도 표식이 그 색으로 한 번 번쩍인다 (정상 파랑 → 감시 노랑 → 통제 검토 빨강)
+    if (prevReco && prevReco !== st.recommendation) ["twc-fac", "twc-badge-wrap"].forEach((id) => { const e = $(id); e.classList.remove("twc-flash"); void e.offsetWidth; e.classList.add("twc-flash"); });
+    prevReco = st.recommendation;
+    $("twc-at").textContent = `${sourceMode === "live" ? "실시간" : "2023-07-15 재생"} · ${localTime(st.observation?.time ?? st.at)} 기준 · 단계 ${st.stage_label ?? "관측 없음"}`;
+    if (st.observation) countTo($("twc-k-level"), st.observation.water_level_m);
+    const m = st.margin_to_planned_flood_m;
+    const rm = $("twc-r-margin");
+    if (m != null && m <= 0) { $("twc-k-margin-l").textContent = "계획홍수위 초과"; $("twc-k-margin").innerHTML = `+${Math.abs(m).toFixed(2)}<small>m</small>`; setTone(rm, "hot"); }
+    else { $("twc-k-margin-l").textContent = "계획홍수위까지 여유"; $("twc-k-margin").innerHTML = m == null ? "—" : `${m.toFixed(2)}<small>m</small>`; setTone(rm, "ok"); }
+    const r = st.rate_m_per_10min;
+    $("twc-k-rate").innerHTML = r == null ? "—" : `${r > 0 ? "↑" : r < 0 ? "↓" : "→"} ${Math.abs(r).toFixed(3)}<small>m/10분</small>`;
+    // 도달 전에는 "N분 남음", 도달 뒤(재생)에는 2023년 실제 유입까지 남은 분.
+    const eta = $("twc-r-eta");
+    if (m != null && m > 0) { $("twc-k-eta-l").textContent = "현재 속도로 계획홍수위까지"; $("twc-k-eta").innerHTML = st.minutes_to_planned_flood == null ? "상승 없음" : `${st.minutes_to_planned_flood}<small>분</small>`; setTone(eta, st.minutes_to_planned_flood != null && st.minutes_to_planned_flood <= 60 ? "hot" : "ok"); }
+    else if (st.reference_minutes_to_inflow != null) { $("twc-k-eta-l").textContent = "2023 실제 유입(08:27)까지"; $("twc-k-eta").innerHTML = st.reference_minutes_to_inflow > 0 ? `${st.reference_minutes_to_inflow}<small>분</small>` : "유입 이후"; setTone(eta, "replay"); }
+    else { $("twc-k-eta-l").textContent = "계획홍수위까지"; $("twc-k-eta").textContent = "도달"; setTone(eta, "hot"); }
+
+    // 사건 단계 카드
+    const idx = sourceMode === "live" ? -1 : STAGES.reduce((acc, s, i) => (toMin(s.t) <= min ? i : acc), -1);
+    if (sourceMode !== "live") {
+      if (idx < 0) { $("twc-s-time").textContent = "—"; $("twc-s-label").textContent = "첫 사건 단계(04:10) 전"; $("twc-s-desc").textContent = "지도에 표시할 근사 범위가 없습니다"; }
+      else { $("twc-s-time").textContent = STAGES[idx].t; $("twc-s-label").textContent = STAGES[idx].label; $("twc-s-desc").textContent = STAGES[idx].desc; }
+      const nx = STAGES[idx + 1];
+      const nb = $("twc-s-next"); nb.classList.toggle("twc-end", !nx);
+      nb.innerHTML = nx ? `<strong>${toMin(nx.t) - min}<small>분 뒤</small></strong><span>${nx.label.replace(" (감찰 발표)", "")}</span>` : `<strong>—</strong><span>마지막 단계</span>`;
+      if (idx !== prevStage && prevStage !== undefined) showSrcTip();
+      prevStage = idx;
+    }
+
+    if (rise?.prediction_available) {
+      $("twc-rise-v").textContent = `${rise.maxrise_6h_m > 0 ? "+" : ""}${rise.maxrise_6h_m.toFixed(2)} m`;
+      $("twc-rise-q").textContent = rise.maxrise_6h_q90_m == null ? "—" : `+${rise.maxrise_6h_q90_m.toFixed(2)} m`;
+      $("twc-rise-lin").textContent = rise.linear_6h_m == null ? "—" : `${rise.linear_6h_m.toFixed(2)} m`;
+    } else { $("twc-rise-v").textContent = "예측 없음"; $("twc-rise-q").textContent = $("twc-rise-lin").textContent = "—"; }
+    $("twc-rise-rain").textContent = rise?.inputs?.rain?.sfc_rain_6h == null ? "—" : `${rise.inputs.rain.sfc_rain_6h.toFixed(1)} mm`;
+    if (rise?.inputs?.water) drawChart(rise.inputs.water, chart);
+
+    // 지도
+    if (marker) marker.getElement().querySelector(".twc-tip").innerHTML = `<b>${facility?.name ?? "궁평2지하차도"}</b><span>미호강교 ${st.observation ? st.observation.water_level_m.toFixed(2) : "—"} m · </span><em>${label}</em>`;
+    if (sourceMode !== "live" && map?.getLayer("hand-fill")) {
+      const f = ["all", ["==", ["geometry-type"], "Polygon"], ["==", ["get", "stage_index"], idx]];
+      ["hand-fill", "hand-glow", "hand-line"].forEach((id) => map.setFilter(id, f));
+    }
+  }
+
+  /* ---- map + intro ---- */
+  async function init() {
+    const [facs, layers, bt, mode] = await Promise.all([get("/api/twin/facilities"), get("/api/events/osong-2023/layers"), get(`/api/twin/facilities/${FAC}/backtest`), get("/api/twin/mode")]);
+    facility = facs.find((f) => f.id === FAC);
+    sourceMode = mode.mode === "live" ? "live" : "replay";
+    renderMode();
+    $("twc-fname").textContent = facility.name; $("twc-fsub").textContent = `${facility.road} · ${facility.gauge.name} 연결`;
+    const G = { inflow_path: "유입 경로", representative_gauge: "대표 관측소", site_instrumentation: "현장 계측", validation_event: "검증 사건" };
+    $("twc-gates").innerHTML = Object.entries(G).map(([k, l]) => { const s = facility.gates?.[k]?.status; return `<span class="twc-gate ${s === "CONFIRMED" ? "twc-ok" : "twc-miss"}" title="${facility.gates?.[k]?.note ?? ""}">${l} ${s === "CONFIRMED" ? "✓" : s === "MISSING" ? "없음" : "확인 중"}</span>`; }).join("");
+    if (sourceMode !== "live") buildTimeline(bt.stage_transitions, bt.first_closure_review?.time?.slice(11, 16));
+    await loadDecisionRecords();
+
+    const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas";
+    map = new maplibregl.Map({
+      container: $("twc-map"), attributionControl: false,
+      style: { version: 8, sources: {
+        base: { type: "raster", tiles: [`${ESRI}/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}`], tileSize: 256, maxzoom: 16, attribution: "Tiles © Esri · 하천 WAMIS · 건축물 국토교통부 · 도로 © OpenStreetMap" },
+        refs: { type: "raster", tiles: [`${ESRI}/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}`], tileSize: 256, maxzoom: 16 },
+      }, layers: [{ id: "base", type: "raster", source: "base", paint: { "raster-brightness-max": .75 } }] },
+      center: facility.location, zoom: 11.6, pitch: 0, bearing: 0, maxPitch: 65,
+    });
+    map.addControl(new maplibregl.AttributionControl({ compact: true }), "top-right");
+    map.on("load", () => {
+      const src = (k) => map.addSource(k, { type: "geojson", data: layers[k].data });
+      ["waterways", "roads", "buildings", "hand_reconstruction", "underpass"].forEach(src);
+      map.addLayer({ id: "water", type: "fill", source: "waterways", paint: { "fill-color": "#1d4ed8", "fill-opacity": .55 } });
+      map.addLayer({ id: "roads", type: "line", source: "roads", paint: { "line-color": "#64748b", "line-width": ["interpolate", ["linear"], ["zoom"], 12, .3, 16, 1.6], "line-opacity": .55 } });
+      map.addLayer({ id: "bld", type: "fill", source: "buildings", minzoom: 13, paint: { "fill-color": "#334155", "fill-opacity": .5 } });
+      const f = ["all", ["==", ["geometry-type"], "Polygon"], ["==", ["get", "stage_index"], -1]];
+      map.addLayer({ id: "hand-fill", type: "fill", source: "hand_reconstruction", filter: f, paint: { "fill-color": "#f87171", "fill-opacity": 0, "fill-opacity-transition": { duration: 1400 } } });
+      map.addLayer({ id: "hand-glow", type: "line", source: "hand_reconstruction", filter: f, paint: { "line-color": "#f87171", "line-width": 5, "line-blur": 5, "line-opacity": 0, "line-opacity-transition": { duration: 1400 } } });
+      map.addLayer({ id: "hand-line", type: "line", source: "hand_reconstruction", filter: f, paint: { "line-color": "#fca5a5", "line-width": .8, "line-opacity": 0, "line-opacity-transition": { duration: 1400 } } });
+      if (sourceMode === "live") ["hand-fill", "hand-glow", "hand-line"].forEach((id) => map.setLayoutProperty(id, "visibility", "none"));
+      map.addLayer({ id: "underpass", type: "line", source: "underpass", paint: { "line-color": "#fff", "line-width": 4, "line-opacity": .9 } });
+      map.addLayer({ id: "refs", type: "raster", source: "refs", paint: { "raster-opacity": .55 } });
+      const el = document.createElement("div"); el.className = "twc-fmk"; el.innerHTML = `<span class="twc-dot"></span><span class="twc-tip"></span>`;
+      marker = new maplibregl.Marker({ element: el, anchor: "left", offset: [-7, 0] }).setLngLat(facility.location).addTo(map);
+      $("twc-toast").remove();
+      setTime(current, { chart: "intro" }).then(() => { if (sourceMode !== "live") intro(); else { root.classList.add("twc-go"); map.easeTo({ center: facility.location, zoom: 13.8, pitch: 35, bearing: -18, padding: padding(), duration: reduced ? 0 : 1800 }); } });
+      if (sourceMode === "live") window.setInterval(() => setTime(current, { chart: "static" }), 5 * 60_000);
+    });
+  }
+
+  function padding() { return { top: 60, left: 340, right: 20, bottom: 200 }; }
+
+  /* 영상 참고: 검은 화면 → 지도 서서히 → 카메라가 기울며 다가감 → 좌측 패널 → 우측 카드 → 하단 → 범위가 번짐 */
+  function intro() {
+    root.classList.remove("twc-go"); void root.offsetWidth;
+    $("twc-map").classList.remove("twc-in");
+    if (sourceMode !== "live") ["hand-fill", "hand-glow", "hand-line"].forEach((id) => map.setPaintProperty(id, id === "hand-fill" ? "fill-opacity" : "line-opacity", 0));
+    map.jumpTo({ center: facility.location, zoom: 11.6, pitch: 0, bearing: 0, padding: padding() });
+    requestAnimationFrame(() => {
+      $("twc-map").classList.add("twc-in");
+      map.easeTo({ center: facility.location, zoom: 14.3, pitch: 52, bearing: -22, padding: padding(), duration: reduced ? 0 : 4200, easing: (t) => 1 - Math.pow(1 - t, 3) });
+      setTimeout(showSrcTip, reduced ? 0 : 2000);
+      setTimeout(() => { root.classList.add("twc-go"); ["twc-k-level"].forEach((id) => { const e = $(id); const v = parseFloat(e.dataset.v); e.dataset.v = 0; if (!isNaN(v)) countTo(e, v); }); }, reduced ? 0 : 700);
+      if (sourceMode !== "live") setTimeout(() => {
+        map.setPaintProperty("hand-fill", "fill-opacity", .3); map.setPaintProperty("hand-glow", "line-opacity", .45); map.setPaintProperty("hand-line", "line-opacity", .85);
+      }, reduced ? 0 : 2600);
+    });
+  }
+
+  function stopPlay() { if (playing) { clearInterval(playing); playing = null; } $("twc-play").textContent = "▶"; $("twc-play").classList.remove("twc-on"); $("twc-play").setAttribute("aria-label", "재생"); }
+  $("twc-log-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!currentStatus?.observation) { $("twc-log-feedback").textContent = "관측값이 없어 확인 기록을 저장할 수 없습니다."; return; }
+    const form = event.currentTarget, button = $("twc-log-submit"), values = new FormData(form);
+    button.disabled = true; $("twc-log-feedback").textContent = "관측·기준을 묶어 기록하는 중…";
+    try {
+      const query = sourceMode === "live" ? "" : `?at=${encodeURIComponent(currentStatus.at)}`;
+      await request(`/api/twin/facilities/${encodeURIComponent(FAC)}/decisions${query}`, {
+        method: "POST",
+        body: JSON.stringify({ checked_by: values.get("checked_by"), confirmation: values.get("confirmation"), acknowledged: values.get("acknowledged") === "on", note: values.get("note") }),
+      });
+      form.elements.acknowledged.checked = false;
+      $("twc-log-feedback").textContent = sourceMode === "live" ? "실시간 관측 확인을 저장했습니다." : "재생 시각 확인을 저장했습니다.";
+      await loadDecisionRecords();
+    } catch (error) {
+      $("twc-log-feedback").textContent = `저장 실패: ${error.message}`;
+    } finally { button.disabled = false; }
+  });
+  $("twc-play").addEventListener("click", () => {
+    if (playing) { stopPlay(); return; }
+    if (current >= toMin("08:40")) current = toMin("04:00");
+    $("twc-play").textContent = "❚❚"; $("twc-play").classList.add("twc-on"); $("twc-play").setAttribute("aria-label", "일시정지");
+    playing = setInterval(() => { const n = current + 10; if (n > toMin("08:40")) { stopPlay(); return; } setTime(n, { chart: "static" }); }, 900);
+  });
+  // 재생 버튼에 마우스를 올리면 안내 말풍선, 3초 뒤 사라짐
+  let bubbleTimer = null;
+  const showBubble = () => { $("twc-bubble").classList.add("twc-show"); clearTimeout(bubbleTimer); bubbleTimer = setTimeout(() => $("twc-bubble").classList.remove("twc-show"), 3000); };
+  $("twc-play").addEventListener("mouseenter", showBubble);
+  $("twc-play").addEventListener("focus", showBubble);
+  // 판단 기준 안내: 올리면 보이고, 누르면 고정/해제, ✕로 닫기
+  (() => {
+    const box = $("twc-info"), btn = $("twc-info-btn");
+    btn.addEventListener("click", () => { const on = !box.classList.contains("twc-pinned"); box.classList.toggle("twc-pinned", on); box.classList.remove("twc-closed"); btn.setAttribute("aria-expanded", String(on)); });
+    $("twc-info-x").addEventListener("click", (e) => { e.stopPropagation(); box.classList.remove("twc-pinned"); box.classList.add("twc-closed"); btn.setAttribute("aria-expanded", "false"); });
+    box.addEventListener("mouseleave", () => box.classList.remove("twc-closed"));
+    $("twc-src-i").addEventListener("mouseenter", showSrcTip); $("twc-src-i").addEventListener("focus", showSrcTip);
+  })();
+  init().catch((e) => { $("twc-toast").textContent = `불러오지 못했습니다: ${e.message} · 백엔드(8033)가 켜져 있는지 확인하세요`; });
+  // 바깥에서 쓸 수 있게 최소 API만 노출: 인트로 다시 보기, 시각 이동
+  root.twc = { intro: () => map && intro(), setTime: (hhmmStr) => setTime(toMin(hhmmStr)) };
+})();
+</script>
+</body>
+</html>
