@@ -870,6 +870,32 @@ def watch_flood_forecasts(
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
+@app.get("/api/watch/validation-cases", tags=["watch"])
+def watch_validation_cases():
+    """Each validation case: when the facility rule and the official forecast spoke against the real control."""
+
+    from . import case_validation
+
+    try:
+        return case_validation.scorecard()
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.get("/api/watch/validation-cases/{case_id}", tags=["watch"])
+def watch_validation_case(case_id: str):
+    """One validation case with its 10-minute timeline."""
+
+    from . import case_validation
+
+    try:
+        return case_validation.scorecard(case_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
 @app.get("/api/agent/planner-status", tags=["agent"])
 def agent_planner_status():
     """Report whether the LLM planner can run, without calling the API."""

@@ -1,0 +1,2812 @@
+{
+ "built_at": "2026-10-19T03:33:25",
+ "step_min": 10,
+ "rule": "facility_risk: 하천형 = 연결 관측소 단계 + 공식 특보 하한, 내수형 = 10 km 안 강우 1·3·12시간 누적(기상청 호우특보 기준량)",
+ "cases": [
+  {
+   "id": "osong-2023",
+   "title": "오송 궁평2지하차도 2023-07-15",
+   "region": "충북",
+   "gauge": "3011665",
+   "window": {
+    "start": "2023-07-14T12:00",
+    "end": "2023-07-15T08:40",
+    "step_min": 10
+   },
+   "reference": {
+    "at": "2023-07-15T08:27",
+    "precision": "minute",
+    "kind": "inflow",
+    "label": "통제 없이 지하차도 유입 시작(08:40 완전 침수)",
+    "source": "국무조정실 감찰 결과 시각(osong_repository, 원문 쪽수 미연결)",
+    "precision_ko": "분 단위 기록"
+   },
+   "signals": [
+    {
+     "signal": "공식 홍수주의보",
+     "at": "2023-07-14T17:20",
+     "lead_min": 907,
+     "lead_is_lower_bound": false,
+     "verdict": "유입보다 907분 먼저",
+     "source": "HRFCO fldfct 이력"
+    },
+    {
+     "signal": "공식 홍수경보",
+     "at": "2023-07-15T04:10",
+     "lead_min": 257,
+     "lead_is_lower_bound": false,
+     "verdict": "유입보다 257분 먼저",
+     "source": "HRFCO fldfct 이력"
+    },
+    {
+     "signal": "궁평2지하차도 주의 이상",
+     "at": "2023-07-14T17:20",
+     "lead_min": 907,
+     "lead_is_lower_bound": false,
+     "verdict": "유입보다 907분 먼저",
+     "facility_id": "gungpyeong2-underpass",
+     "why": "공식 홍수주의보 중(발령 17:20 · 예상 18:50 7.00 m) · 관심 · 계획홍수위까지 526분",
+     "driver": "river"
+    },
+    {
+     "signal": "궁평2지하차도 경계 이상",
+     "at": "2023-07-15T04:10",
+     "lead_min": 257,
+     "lead_is_lower_bound": false,
+     "verdict": "유입보다 257분 먼저",
+     "facility_id": "gungpyeong2-underpass",
+     "why": "공식 홍수경보 중(발령 04:10 · 예상 05:00 8.00 m) · 주의보 · 계획홍수위까지 197분",
+     "driver": "river"
+    },
+    {
+     "signal": "충북 시설 중 첫 주의 이상",
+     "at": "2023-07-14T15:00",
+     "lead_min": 1047,
+     "lead_is_lower_bound": false,
+     "verdict": "유입보다 1047분 먼저",
+     "first_facility": "무심천 하상도로",
+     "why": "공식 홍수주의보 중(발령 15:00 · 예상 16:20 4.00 m) · 관심 · 계획홍수위까지 461분"
+    },
+    {
+     "signal": "충북 시설 중 첫 경계 이상",
+     "at": "2023-07-15T03:00",
+     "lead_min": 327,
+     "lead_is_lower_bound": false,
+     "verdict": "유입보다 327분 먼저",
+     "first_facility": "무심천 하상도로",
+     "why": "공식 홍수경보 중(발령 03:00 · 예상 03:30 5.00 m) · 주의보 · 계획홍수위까지 123분"
+    }
+   ],
+   "region_at_reference": {
+    "at": "2023-07-15T08:30",
+    "advisory_or_above": 8,
+    "warning_or_above": 4,
+    "total": 15
+   },
+   "timeline": [
+    {
+     "at": "2023-07-14T12:00",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T12:10",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T12:20",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T12:30",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T12:40",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T12:50",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T13:00",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T13:10",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T13:20",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T13:30",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T13:40",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T13:50",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T14:00",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T14:10",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T14:20",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T14:30",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T14:40",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T14:50",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T15:00",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T15:10",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T15:20",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T15:30",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T15:40",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T15:50",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T16:00",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T16:10",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T16:20",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T16:30",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T16:40",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T16:50",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T17:00",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T17:10",
+     "levels": {
+      "gungpyeong2-underpass": 1
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T17:20",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T17:30",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T17:40",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T17:50",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T18:00",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T18:10",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T18:20",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T18:30",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T18:40",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T18:50",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T19:00",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T19:10",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T19:20",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T19:30",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T19:40",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T19:50",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T20:00",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T20:10",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T20:20",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T20:30",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T20:40",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T20:50",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T21:00",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T21:10",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T21:20",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T21:30",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T21:40",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T21:50",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T22:00",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T22:10",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T22:20",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T22:30",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T22:40",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T22:50",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 4
+    },
+    {
+     "at": "2023-07-14T23:00",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-14T23:10",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-14T23:20",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-14T23:30",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-14T23:40",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-14T23:50",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-15T00:00",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-15T00:10",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-15T00:20",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-15T00:30",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-15T00:40",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-15T00:50",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-15T01:00",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-15T01:10",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-15T01:20",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-15T01:30",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-15T01:40",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-15T01:50",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 5
+    },
+    {
+     "at": "2023-07-15T02:00",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 6
+    },
+    {
+     "at": "2023-07-15T02:10",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 6
+    },
+    {
+     "at": "2023-07-15T02:20",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 6
+    },
+    {
+     "at": "2023-07-15T02:30",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 6
+    },
+    {
+     "at": "2023-07-15T02:40",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 6
+    },
+    {
+     "at": "2023-07-15T02:50",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 6
+    },
+    {
+     "at": "2023-07-15T03:00",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T03:10",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T03:20",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T03:30",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T03:40",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T03:50",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T04:00",
+     "levels": {
+      "gungpyeong2-underpass": 2
+     },
+     "region_advisory_or_above": 6
+    },
+    {
+     "at": "2023-07-15T04:10",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 6
+    },
+    {
+     "at": "2023-07-15T04:20",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 6
+    },
+    {
+     "at": "2023-07-15T04:30",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 6
+    },
+    {
+     "at": "2023-07-15T04:40",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 6
+    },
+    {
+     "at": "2023-07-15T04:50",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 6
+    },
+    {
+     "at": "2023-07-15T05:00",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T05:10",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T05:20",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T05:30",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T05:40",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T05:50",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T06:00",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T06:10",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T06:20",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T06:30",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T06:40",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T06:50",
+     "levels": {
+      "gungpyeong2-underpass": 3
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T07:00",
+     "levels": {
+      "gungpyeong2-underpass": 4
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T07:10",
+     "levels": {
+      "gungpyeong2-underpass": 4
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T07:20",
+     "levels": {
+      "gungpyeong2-underpass": 4
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T07:30",
+     "levels": {
+      "gungpyeong2-underpass": 4
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T07:40",
+     "levels": {
+      "gungpyeong2-underpass": 4
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T07:50",
+     "levels": {
+      "gungpyeong2-underpass": 4
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T08:00",
+     "levels": {
+      "gungpyeong2-underpass": 4
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T08:10",
+     "levels": {
+      "gungpyeong2-underpass": 4
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T08:20",
+     "levels": {
+      "gungpyeong2-underpass": 4
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T08:30",
+     "levels": {
+      "gungpyeong2-underpass": 4
+     },
+     "region_advisory_or_above": 8
+    },
+    {
+     "at": "2023-07-15T08:40",
+     "levels": {
+      "gungpyeong2-underpass": 4
+     },
+     "region_advisory_or_above": 8
+    }
+   ]
+  },
+  {
+   "id": "daejeon-2020-07-30",
+   "title": "대전 만년지하차도 2020-07-30",
+   "region": "대전",
+   "gauge": "3009670",
+   "window": {
+    "start": "2020-07-30T00:00",
+    "end": "2020-07-30T09:00",
+    "step_min": 10
+   },
+   "reference": {
+    "at": "2020-07-30T06:01",
+    "precision": "upper_bound",
+    "kind": "control",
+    "label": "만년·태평 지하차도 통제(새벽부터, 06:01 보도 시점에 통제 중)",
+    "source": "https://www.ytn.co.kr/_ln/0115_202007300601136499",
+    "precision_ko": "보도 시각(그 전에 이미 통제)"
+   },
+   "signals": [
+    {
+     "signal": "공식 홍수주의보",
+     "at": "2020-07-30T04:50",
+     "lead_min": 71,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제 보도 시각보다 71분 먼저",
+     "source": "HRFCO fldfct 이력"
+    },
+    {
+     "signal": "공식 홍수경보",
+     "at": "2020-07-30T07:40",
+     "lead_min": -99,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제 보도 시각보다 99분 늦음, 그 전에 이미 통제 중",
+     "source": "HRFCO fldfct 이력"
+    },
+    {
+     "signal": "만년지하차도 주의 이상",
+     "at": "2020-07-30T04:50",
+     "lead_min": 71,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제 보도 시각보다 71분 먼저",
+     "facility_id": "underpass_coordinates:321",
+     "why": "공식 홍수주의보 중(발령 04:50 · 예상 05:50 3.50 m) · 정상 · 계획홍수위까지 712분",
+     "driver": "river"
+    },
+    {
+     "signal": "만년지하차도 경계 이상",
+     "at": "2020-07-30T07:40",
+     "lead_min": -99,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제 보도 시각보다 99분 늦음, 그 전에 이미 통제 중",
+     "facility_id": "underpass_coordinates:321",
+     "why": "공식 홍수경보 중(발령 07:40 · 예상 08:30 4.50 m) · 주의보 · 계획홍수위까지 1046분",
+     "driver": "river"
+    },
+    {
+     "signal": "대전 시설 중 첫 주의 이상",
+     "at": "2020-07-30T04:50",
+     "lead_min": 71,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제 보도 시각보다 71분 먼저",
+     "first_facility": "만년지하차도",
+     "why": "공식 홍수주의보 중(발령 04:50 · 예상 05:50 3.50 m) · 정상 · 계획홍수위까지 712분"
+    },
+    {
+     "signal": "대전 시설 중 첫 경계 이상",
+     "at": "2020-07-30T05:00",
+     "lead_min": 61,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제 보도 시각보다 61분 먼저",
+     "first_facility": "대청호자연수변공원",
+     "why": "하천 관측소 없음 · 3시간 100.0 mm · 호우경보 기준량(90 mm) 이상"
+    }
+   ],
+   "region_at_reference": {
+    "at": "2020-07-30T06:10",
+    "advisory_or_above": 19,
+    "warning_or_above": 17,
+    "total": 26
+   },
+   "timeline": [
+    {
+     "at": "2020-07-30T00:00",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T00:10",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T00:20",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T00:30",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T00:40",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T00:50",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T01:00",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T01:10",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T01:20",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T01:30",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T01:40",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T01:50",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T02:00",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T02:10",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T02:20",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T02:30",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T02:40",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T02:50",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T03:00",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T03:10",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T03:20",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T03:30",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T03:40",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T03:50",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T04:00",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T04:10",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T04:20",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T04:30",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T04:40",
+     "levels": {
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2020-07-30T04:50",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2020-07-30T05:00",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T05:10",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T05:20",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T05:30",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T05:40",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T05:50",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T06:00",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T06:10",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T06:20",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T06:30",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T06:40",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T06:50",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T07:00",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T07:10",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T07:20",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T07:30",
+     "levels": {
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T07:40",
+     "levels": {
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T07:50",
+     "levels": {
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2020-07-30T08:00",
+     "levels": {
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2020-07-30T08:10",
+     "levels": {
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2020-07-30T08:20",
+     "levels": {
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2020-07-30T08:30",
+     "levels": {
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2020-07-30T08:40",
+     "levels": {
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2020-07-30T08:50",
+     "levels": {
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2020-07-30T09:00",
+     "levels": {
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 20
+    }
+   ]
+  },
+  {
+   "id": "daejeon-2023-07-14",
+   "title": "대전 하상도로·하상주차장 2023-07-14",
+   "region": "대전",
+   "gauge": "3009670",
+   "window": {
+    "start": "2023-07-14T00:00",
+    "end": "2023-07-14T15:00",
+    "step_min": 10
+   },
+   "reference": {
+    "at": "2023-07-14T05:30",
+    "precision": "approximate",
+    "kind": "control",
+    "label": "하상도로·하상주차장 16곳 출입 제한(05:30경)",
+    "source": "https://www.ccnnews.co.kr/news/articleView.html?idxno=301544",
+    "precision_ko": "보도의 «경» 시각"
+   },
+   "signals": [
+    {
+     "signal": "공식 홍수주의보",
+     "at": "2023-07-14T08:50",
+     "lead_min": -200,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 200분 늦음",
+     "source": "HRFCO fldfct 이력"
+    },
+    {
+     "signal": "공식 홍수경보",
+     "at": "2023-07-14T14:20",
+     "lead_min": -530,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 530분 늦음",
+     "source": "HRFCO fldfct 이력"
+    },
+    {
+     "signal": "만년지하차도 주의 이상",
+     "at": "2023-07-14T08:50",
+     "lead_min": -200,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 200분 늦음",
+     "facility_id": "underpass_coordinates:321",
+     "why": "공식 홍수주의보 중(발령 08:50 · 예상 09:30 3.50 m) · 관심 · 계획홍수위까지 2712분",
+     "driver": "river"
+    },
+    {
+     "signal": "만년지하차도 경계 이상",
+     "at": "2023-07-14T14:20",
+     "lead_min": -530,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 530분 늦음",
+     "facility_id": "underpass_coordinates:321",
+     "why": "공식 홍수경보 중(발령 14:20 · 예상 15:10 4.50 m) · 주의보 · 계획홍수위까지 200분",
+     "driver": "river"
+    },
+    {
+     "signal": "진터지하차도 주의 이상",
+     "at": "2023-07-14T08:50",
+     "lead_min": -200,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 200분 늦음",
+     "facility_id": "underpass_coordinates:335",
+     "why": "공식 홍수주의보 중(발령 08:50 · 예상 09:30 3.50 m) · 관심 · 계획홍수위까지 2712분",
+     "driver": "river"
+    },
+    {
+     "signal": "진터지하차도 경계 이상",
+     "at": "2023-07-14T14:20",
+     "lead_min": -530,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 530분 늦음",
+     "facility_id": "underpass_coordinates:335",
+     "why": "공식 홍수경보 중(발령 14:20 · 예상 15:10 4.50 m) · 주의보 · 계획홍수위까지 200분",
+     "driver": "river"
+    },
+    {
+     "signal": "대전 시설 중 첫 주의 이상",
+     "at": "2023-07-14T06:00",
+     "lead_min": -30,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 30분 늦음",
+     "first_facility": "갈마지하차도",
+     "why": "3시간 64.0 mm · 호우주의보 기준량(60 mm) 이상"
+    },
+    {
+     "signal": "대전 시설 중 첫 경계 이상",
+     "at": "2023-07-14T14:20",
+     "lead_min": -530,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 530분 늦음",
+     "first_facility": "만년지하차도",
+     "why": "공식 홍수경보 중(발령 14:20 · 예상 15:10 4.50 m) · 주의보 · 계획홍수위까지 200분"
+    }
+   ],
+   "region_at_reference": {
+    "at": "2023-07-14T05:30",
+    "advisory_or_above": 0,
+    "warning_or_above": 0,
+    "total": 26
+   },
+   "timeline": [
+    {
+     "at": "2023-07-14T00:00",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T00:10",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T00:20",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T00:30",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T00:40",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T00:50",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T01:00",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T01:10",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T01:20",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T01:30",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T01:40",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T01:50",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T02:00",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T02:10",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T02:20",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T02:30",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T02:40",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T02:50",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T03:00",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T03:10",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T03:20",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T03:30",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T03:40",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T03:50",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T04:00",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T04:10",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T04:20",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T04:30",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T04:40",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T04:50",
+     "levels": {
+      "underpass_coordinates:321": 0,
+      "underpass_coordinates:335": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T05:00",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T05:10",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T05:20",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T05:30",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T05:40",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T05:50",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T06:00",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 10
+    },
+    {
+     "at": "2023-07-14T06:10",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 10
+    },
+    {
+     "at": "2023-07-14T06:20",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 10
+    },
+    {
+     "at": "2023-07-14T06:30",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 10
+    },
+    {
+     "at": "2023-07-14T06:40",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 10
+    },
+    {
+     "at": "2023-07-14T06:50",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 10
+    },
+    {
+     "at": "2023-07-14T07:00",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T07:10",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T07:20",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T07:30",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T07:40",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T07:50",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T08:00",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T08:10",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T08:20",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T08:30",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T08:40",
+     "levels": {
+      "underpass_coordinates:321": 1,
+      "underpass_coordinates:335": 1
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2023-07-14T08:50",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T09:00",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T09:10",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T09:20",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T09:30",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T09:40",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T09:50",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T10:00",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T10:10",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T10:20",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T10:30",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T10:40",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T10:50",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T11:00",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T11:10",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T11:20",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T11:30",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T11:40",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T11:50",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 2
+    },
+    {
+     "at": "2023-07-14T12:00",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 12
+    },
+    {
+     "at": "2023-07-14T12:10",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 12
+    },
+    {
+     "at": "2023-07-14T12:20",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 12
+    },
+    {
+     "at": "2023-07-14T12:30",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 12
+    },
+    {
+     "at": "2023-07-14T12:40",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 12
+    },
+    {
+     "at": "2023-07-14T12:50",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 12
+    },
+    {
+     "at": "2023-07-14T13:00",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2023-07-14T13:10",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2023-07-14T13:20",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2023-07-14T13:30",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2023-07-14T13:40",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2023-07-14T13:50",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 19
+    },
+    {
+     "at": "2023-07-14T14:00",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2023-07-14T14:10",
+     "levels": {
+      "underpass_coordinates:321": 2,
+      "underpass_coordinates:335": 2
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2023-07-14T14:20",
+     "levels": {
+      "underpass_coordinates:321": 3,
+      "underpass_coordinates:335": 3
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2023-07-14T14:30",
+     "levels": {
+      "underpass_coordinates:321": 3,
+      "underpass_coordinates:335": 3
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2023-07-14T14:40",
+     "levels": {
+      "underpass_coordinates:321": 3,
+      "underpass_coordinates:335": 3
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2023-07-14T14:50",
+     "levels": {
+      "underpass_coordinates:321": 3,
+      "underpass_coordinates:335": 3
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2023-07-14T15:00",
+     "levels": {
+      "underpass_coordinates:321": 3,
+      "underpass_coordinates:335": 3
+     },
+     "region_advisory_or_above": 20
+    }
+   ]
+  },
+  {
+   "id": "daejeon-2024-07-10",
+   "title": "대전 갑천 교량·오량지하차도 2024-07-10",
+   "region": "대전",
+   "gauge": "3009670",
+   "window": {
+    "start": "2024-07-10T00:00",
+    "end": "2024-07-10T09:00",
+    "step_min": 10
+   },
+   "reference": {
+    "at": "2024-07-10T06:00",
+    "precision": "approximate",
+    "kind": "control",
+    "label": "교량 8곳·오량지하차도 양방향 통제(6시께부터)",
+    "source": "https://m.joongdo.co.kr/view.php?key=20240710010003018",
+    "precision_ko": "보도의 «경» 시각"
+   },
+   "signals": [
+    {
+     "signal": "공식 홍수주의보",
+     "at": "2024-07-10T04:00",
+     "lead_min": 120,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 120분 먼저",
+     "source": "HRFCO fldfct 이력"
+    },
+    {
+     "signal": "공식 홍수경보",
+     "at": "2024-07-10T05:20",
+     "lead_min": 40,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 40분 먼저",
+     "source": "HRFCO fldfct 이력"
+    },
+    {
+     "signal": "오량지하차도 주의 이상",
+     "at": "2024-07-10T04:00",
+     "lead_min": 120,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 120분 먼저",
+     "facility_id": "underpass_coordinates:324",
+     "why": "3시간 67.0 mm · 호우주의보 기준량(60 mm) 이상",
+     "driver": "pluvial"
+    },
+    {
+     "signal": "오량지하차도 경계 이상",
+     "at": null,
+     "lead_min": null,
+     "lead_is_lower_bound": false,
+     "verdict": "구간 안에서 울리지 않음(실제 통제까지)",
+     "facility_id": "underpass_coordinates:324",
+     "why": null,
+     "driver": null
+    },
+    {
+     "signal": "만년지하차도 주의 이상",
+     "at": "2024-07-10T04:00",
+     "lead_min": 120,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 120분 먼저",
+     "facility_id": "underpass_coordinates:321",
+     "why": "공식 홍수주의보 중(발령 04:00) · 관심 · 계획홍수위까지 129분",
+     "driver": "river"
+    },
+    {
+     "signal": "만년지하차도 경계 이상",
+     "at": "2024-07-10T05:20",
+     "lead_min": 40,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 40분 먼저",
+     "facility_id": "underpass_coordinates:321",
+     "why": "공식 홍수경보 중(발령 05:20) · 주의보 · 계획홍수위까지 97분",
+     "driver": "river"
+    },
+    {
+     "signal": "대전 시설 중 첫 주의 이상",
+     "at": "2024-07-10T03:30",
+     "lead_min": 150,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 150분 먼저",
+     "first_facility": "도마지하차도",
+     "why": "공식 홍수주의보 중(발령 03:30) · 관심 · 계획홍수위까지 378분"
+    },
+    {
+     "signal": "대전 시설 중 첫 경계 이상",
+     "at": "2024-07-10T04:00",
+     "lead_min": 120,
+     "lead_is_lower_bound": false,
+     "verdict": "실제 통제보다 약 120분 먼저",
+     "first_facility": "도마지하차도",
+     "why": "공식 홍수경보 중(발령 04:00) · 주의보 · 계획홍수위까지 53분"
+    }
+   ],
+   "region_at_reference": {
+    "at": "2024-07-10T06:00",
+    "advisory_or_above": 3,
+    "warning_or_above": 3,
+    "total": 26
+   },
+   "timeline": [
+    {
+     "at": "2024-07-10T00:00",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T00:10",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T00:20",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T00:30",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T00:40",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T00:50",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T01:00",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T01:10",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T01:20",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T01:30",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T01:40",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T01:50",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T02:00",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T02:10",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T02:20",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T02:30",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T02:40",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T02:50",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T03:00",
+     "levels": {
+      "underpass_coordinates:324": 1,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T03:10",
+     "levels": {
+      "underpass_coordinates:324": 1,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T03:20",
+     "levels": {
+      "underpass_coordinates:324": 1,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 0
+    },
+    {
+     "at": "2024-07-10T03:30",
+     "levels": {
+      "underpass_coordinates:324": 1,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 1
+    },
+    {
+     "at": "2024-07-10T03:40",
+     "levels": {
+      "underpass_coordinates:324": 1,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 1
+    },
+    {
+     "at": "2024-07-10T03:50",
+     "levels": {
+      "underpass_coordinates:324": 1,
+      "underpass_coordinates:321": 0
+     },
+     "region_advisory_or_above": 1
+    },
+    {
+     "at": "2024-07-10T04:00",
+     "levels": {
+      "underpass_coordinates:324": 2,
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2024-07-10T04:10",
+     "levels": {
+      "underpass_coordinates:324": 2,
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2024-07-10T04:20",
+     "levels": {
+      "underpass_coordinates:324": 2,
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2024-07-10T04:30",
+     "levels": {
+      "underpass_coordinates:324": 2,
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2024-07-10T04:40",
+     "levels": {
+      "underpass_coordinates:324": 2,
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2024-07-10T04:50",
+     "levels": {
+      "underpass_coordinates:324": 2,
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 20
+    },
+    {
+     "at": "2024-07-10T05:00",
+     "levels": {
+      "underpass_coordinates:324": 2,
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 18
+    },
+    {
+     "at": "2024-07-10T05:10",
+     "levels": {
+      "underpass_coordinates:324": 2,
+      "underpass_coordinates:321": 2
+     },
+     "region_advisory_or_above": 18
+    },
+    {
+     "at": "2024-07-10T05:20",
+     "levels": {
+      "underpass_coordinates:324": 2,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 18
+    },
+    {
+     "at": "2024-07-10T05:30",
+     "levels": {
+      "underpass_coordinates:324": 2,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 18
+    },
+    {
+     "at": "2024-07-10T05:40",
+     "levels": {
+      "underpass_coordinates:324": 2,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 18
+    },
+    {
+     "at": "2024-07-10T05:50",
+     "levels": {
+      "underpass_coordinates:324": 2,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 18
+    },
+    {
+     "at": "2024-07-10T06:00",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T06:10",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T06:20",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T06:30",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T06:40",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T06:50",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T07:00",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T07:10",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T07:20",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T07:30",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T07:40",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T07:50",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T08:00",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T08:10",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T08:20",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T08:30",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T08:40",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T08:50",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    },
+    {
+     "at": "2024-07-10T09:00",
+     "levels": {
+      "underpass_coordinates:324": 0,
+      "underpass_coordinates:321": 3
+     },
+     "region_advisory_or_above": 3
+    }
+   ]
+  }
+ ],
+ "limitations": [
+  "통제 시각은 보도 기준이다. 분 단위 기록은 오송(감찰 결과)뿐이고, 대전은 «경»·보도 시각 상한이다.",
+  "재생 수위·강우는 저장 1시간 자료다(오송 미호천교만 10분). 10분 간격 재생이어도 값은 시간 단위로 바뀐다.",
+  "통제를 앞선 신호라도 그 시각에 같은 지역의 다른 시설도 함께 올라갔다면 선별력은 낮다. region_at_reference를 함께 본다."
+ ]
+}
