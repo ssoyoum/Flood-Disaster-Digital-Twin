@@ -47,3 +47,17 @@ def test_replay_ranks_river_and_pluvial_facilities_together():
     assert all((r["rain"].get("rain_3h_mm") or 0) >= fr.RAIN_3H_ADVISORY_MM or (r["rain"].get("rain_12h_mm") or 0) >= fr.RAIN_12H_ADVISORY_MM
                for r in pluvial)
     assert fr.facility_risk(AT, driver="pluvial", limit=5)["filter"]["driver"] == "pluvial"
+
+
+def test_official_warning_lifts_river_type_facilities_and_is_shown():
+    data = fr.facility_risk(AT, limit=2000)
+    gungpyeong = next(r for r in data["facilities"] if r["facility_id"] == "gungpyeong2-underpass")
+    assert gungpyeong["official"]["level"] == "warning" and gungpyeong["official"]["issued_at"] == "2023-07-15T04:10"
+    assert gungpyeong["why"].startswith("공식 홍수경보 중(발령 04:10")
+    lifted = [r for r in data["facilities"] if r["official"]]
+    assert lifted and all(r["driver"] == "river" and r["level"] >= fr.OFFICIAL_LEVEL[r["official"]["level"]] for r in lifted)
+    assert data["counts"]["under_official"] == len(lifted) and data["counts"]["official_gauges"]["warning"] >= 2
+    mannyeon = next(r for r in lifted if r["official"]["issued_at"] == "2023-07-14T14:20")
+    assert "발령 7.14 14:20" in mannyeon["why"]  # a day-old issuance carries its date
+    assert not any(r["official"] for r in fr.facility_risk("2023-07-14T12:00:00", limit=2000)["facilities"]
+                   if r["facility_id"] == "gungpyeong2-underpass")

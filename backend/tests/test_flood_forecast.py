@@ -32,3 +32,14 @@ def test_replay_summary_lists_warnings_first():
     assert data["mode"] == "replay" and data["counts"]["warning"] >= 2
     levels = [row["level"] for row in data["active"]]
     assert levels == sorted(levels, key=lambda level: level != "warning")
+
+
+def test_route_replays_and_rejects_a_bad_time():
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    client = TestClient(app)
+    body = client.get("/api/watch/flood-forecasts", params={"at": "2023-07-15T06:00:00"}).json()
+    assert body["mode"] == "replay" and any(row["station_code"] == "3011665" for row in body["active"])
+    assert client.get("/api/watch/flood-forecasts", params={"at": "not-a-time"}).status_code == 422

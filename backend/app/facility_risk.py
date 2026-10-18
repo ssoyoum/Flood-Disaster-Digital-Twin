@@ -21,6 +21,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from . import flood_forecast as ff
 from . import national_watch as nw
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -37,6 +38,7 @@ ELEVATION_HINT_MIN_M = -3.0
 
 LEVELS = {0: "평상", 1: "관심", 2: "주의", 3: "경계", 4: "심각"}
 RIVER_LEVEL = {"attention": 1, "advisory": 2, "warning": 3, "planned_flood": 4}
+OFFICIAL_LEVEL = {"advisory": 2, "warning": 3}  # 홍수주의보 → 주의, 홍수경보 → 경계 (floor, never lowers)
 LIMITATIONS = [
     "하천형은 같은 하천 1.5 km 안 관측소의 과거 최고 수위가 지면 근처까지 온 시설(조사 B등급 이상)과 하천변 출입구다. 나머지 지하차도는 내수형으로 추정한다.",
     "내수형은 시설 10 km 안 강우 관측소의 1·3·12시간 누적을 기상청 호우특보 기준량(3시간 60·90 mm, 12시간 110·180 mm)과 비교한다. 특보 기준은 예보용이며, 시설이 실제로 잠기는지는 배수·펌프 용량이 정한다.",
@@ -212,6 +214,13 @@ def _pluvial_level(rain: dict[str, Any] | None) -> tuple[int, str]:
     return 0, "강우 없음"
 
 
+def _short_time(stamp: str, at: str | None) -> str:
+    """'04:10' on the assessed day, '7.14 14:20' otherwise, so a day-old issuance does not read as today's."""
+    if at and stamp[:10] == str(at)[:10]:
+        return stamp[11:16]
+    return f"{int(stamp[5:7])}.{int(stamp[8:10])} {stamp[11:16]}"
+
+
 # ---- assessment ---------------------------------------------------------------------------------------
 def facility_risk(at: str | None = None, region: str | None = None, driver: str | None = None, limit: int = 300,
                   rain_mode: str | None = None) -> dict[str, Any]:
@@ -225,6 +234,9 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
     else:
         rain_at, totals = _live_totals()
         basis = "실시간 10분·시간별 강우 누적(시간별 자료는 로컬 캐시에 저장)"
+    # The official forecast leads the observed crossing by about an hour (docs/PLATFORM_DATA.md §3-1), so a gauge
+    # under 홍수주의보·경보 lifts its river-type facilities even before the stage gets there.
+    official = ff.active_at(status["at"]) if at or status["mode"] == "replay" else ff.active_now()
     codes = set(totals)
     rows = []
     for item in status["facilities"]:
@@ -246,6 +258,12 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
                 why = "하천 관측소 없음 · " + why
         else:
             level, why = _pluvial_level(rain)
+        issued = official.get(item.get("station_code") or "") if kind == "river" else None
+        if issued:
+            level = max(level, OFFICIAL_LEVEL[issued["level"]])
+            forecast = (f" · 예상 {_short_time(issued['forecast_time'], status['at'])} {issued['forecast_level_m']:.2f} m"
+                        if issued.get("forecast_time") and issued.get("forecast_level_m") is not None else "")
+            why = f"공식 {issued['level_ko']} 중(발령 {_short_time(issued['issued_at'], status['at'])}{forecast}) · {why}"
         rows.append({
             "facility_id": item["facility_id"], "name": item["name"], "kind_ko": item["kind_ko"], "group": item["group"], "tier": item["tier"],
             "region": item["region"], "lon": item["lon"], "lat": item["lat"], "driver": kind, "driver_reason": reason,
@@ -254,6 +272,7 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
             # A gauge's minutes say nothing about an underpass that floods from local rain.
             "minutes_to_planned_flood": item.get("minutes_to_planned_flood") if kind == "river" else None,
             "rain": rain,
+            "official": {k: issued[k] for k in ("level", "level_ko", "issued_at", "forecast_level_m", "forecast_time", "minutes_since_issue")} if issued else None,
         })
 
     def order(row: dict[str, Any]) -> tuple:
@@ -264,7 +283,10 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
 
     rows.sort(key=order)
     counts = {"total": len(rows), "by_driver": {k: sum(1 for r in rows if r["driver"] == k) for k in ("river", "pluvial")},
-              "by_level": {LEVELS[k]: sum(1 for r in rows if r["level"] == k) for k in LEVELS}}
+              "by_level": {LEVELS[k]: sum(1 for r in rows if r["level"] == k) for k in LEVELS},
+              "under_official": sum(1 for r in rows if r["official"]),
+              "official_gauges": {"warning": sum(1 for a in official.values() if a["level"] == "warning"),
+                                  "advisory": sum(1 for a in official.values() if a["level"] == "advisory")}}
     rain_rows = []
     gauges = nw.rain_gauges()
     for code, values in sorted(totals.items()):

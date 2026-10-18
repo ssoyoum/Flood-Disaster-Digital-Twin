@@ -856,6 +856,20 @@ def watch_facility_risk(
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
+@app.get("/api/watch/flood-forecasts", tags=["watch"])
+def watch_flood_forecasts(
+    at: str | None = Query(default=None, description="ISO time to replay from the collected issuance history; omit for live"),
+):
+    """Gauges under an official 홍수주의보·홍수경보, live from HRFCO or replayed from the collected history."""
+
+    from . import flood_forecast
+
+    try:
+        return flood_forecast.summary(at)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
 @app.get("/api/agent/planner-status", tags=["agent"])
 def agent_planner_status():
     """Report whether the LLM planner can run, without calling the API."""
