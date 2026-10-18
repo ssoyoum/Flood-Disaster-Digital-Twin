@@ -170,6 +170,7 @@ body { display: flex; flex-direction: column; }
 .wx-badge { padding: 0 5px; border-radius: 4px; font-size: 11px; font-weight: 800; }
 .wx-badge.wx-up { background: rgba(248,113,113,.16); color: var(--wx-red); }
 .wx-badge.wx-fast { background: rgba(255,255,255,.08); color: var(--wx-ui); }
+.wx-badge.wx-official { flex: none; background: color-mix(in srgb, var(--wx-c) 18%, transparent); color: var(--wx-c); }
 .wx-q { color: var(--wx-amber); font-size: 11px; font-weight: 700; }
 .wx-lv { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; line-height: 1.25; }
 .wx-lv b { display: block; font-size: 14px; font-weight: 700; }
@@ -921,11 +922,13 @@ body { display: flex; flex-direction: column; }
     const river = rows.filter((r) => r.driver === "river").length, pluvial = rows.length - river;
     const rainy = rows.filter((r) => (r.risk.rain?.rain_3h_mm ?? r.risk.rain?.rain_1h_mm ?? 0) > 0).length;
     const rainTime = st.overview?.rain_at ? clock(st.overview.rain_at) : "자료 없음";
+    const official = { warning: 0, advisory: 0, ...(st.overview?.counts?.official_gauges ?? {}) };
     const kpi = (label, value, unit, color, hot) => `<div class="wx-kpi${hot ? " wx-hotk" : ""}" style="--wx-c:${color}"><span>${label}</span><strong>${value}<small>${unit}</small></strong></div>`;
     $("wx-kpidot").classList.toggle("wx-alert", serious > 0);
     $("wx-kpis").innerHTML = kpi(`전국 시설 · ${esc(st.region || "전국")}`, rows.length, "곳", "#71717a")
       + kpi("경계 이상", serious, "곳", COLOR.warning, serious > 0)
       + kpi("주의 이상", atLeast("advisory"), "곳", COLOR.advisory, atLeast("advisory") > 0)
+      + kpi("공식 홍수특보 관측소", official.warning + official.advisory, `곳 · 경보 ${official.warning}`, COLOR.warning, official.warning > 0)
       + kpi("하천형", river, "곳", "#38bdf8") + kpi("내수형", pluvial, "곳", "#0ea5e9")
       + kpi("강우 자료 연결", rainy, "곳", "#38bdf8")
       + kpi("강우 관측 기준", rainTime, "KST", "#71717a")
@@ -934,13 +937,14 @@ body { display: flex; flex-direction: column; }
   function rowHtml(r, i) {
     const f = r.risk, stage = r.stage ?? "unrated", isRiver = f.driver === "river";
     const driver = isRiver ? "하천형" : "내수형", driverTag = `<span class="wx-driver" data-driver="${f.driver}">${driver}</span>`;
+    const officialTag = f.official ? `<span class="wx-badge wx-official" style="--wx-c:${COLOR[f.official.level]}" title="${esc(`${f.official.level_ko} 발령 ${f.official.issued_at.replace("T", " ")} · ${f.official.minutes_since_issue}분 경과`)}">${esc(f.official.level_ko)}</span>` : "";
     const rain = f.rain, rainAmounts = rain ? [["12시간", rain.rain_12h_mm], ["3시간", rain.rain_3h_mm], ["1시간", rain.rain_1h_mm]].filter(([, amount]) => amount !== null && amount !== undefined).map(([window, amount]) => `${window} ${Number(amount).toFixed(1)} mm`) : [];
     const rainText = rain ? (rainAmounts.join(" · ") || "강우 자료 대기") : "강우 관측 없음";
     const value = isRiver ? f.minutes_to_planned_flood : (rain?.rain_12h_mm ?? rain?.rain_3h_mm ?? rain?.rain_1h_mm ?? rain?.rain_10m_mm);
     const unit = isRiver ? "분" : "mm";
     const urgency = isRiver ? (value !== null && value !== undefined && value <= 60) : f.level >= 2;
     return `<button type="button" role="listitem" class="wx-row${r.code === st.selected ? " wx-sel" : ""}" data-code="${esc(r.code)}" style="--wx-c:${COLOR[stage]};animation-delay:${Math.min(i, 20) * 12}ms">
-      <span class="wx-rk">${i + 1}</span><span class="wx-nm"><span class="wx-nmtop"><b>${esc(f.name)}</b>${driverTag}<span class="wx-fac">${esc(f.kind_ko)}</span></span>
+      <span class="wx-rk">${i + 1}</span><span class="wx-nm"><span class="wx-nmtop"><b>${esc(f.name)}</b>${driverTag}${officialTag}<span class="wx-fac">${esc(f.kind_ko)}</span></span>
       ${riskTrack(f.level)}<span class="wx-gline"><b>${esc(f.level_label)}</b><span>${esc(f.why)}</span></span></span>
       <span class="wx-eta${urgency ? " wx-soon" : ""}"><strong>${value === null || value === undefined ? "—" : isRiver ? value : Number(value).toFixed(1)}</strong><small>${unit}</small><span class="wx-why">${rainText}</span></span></button>`;
   }
