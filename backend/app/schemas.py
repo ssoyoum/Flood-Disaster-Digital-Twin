@@ -291,6 +291,7 @@ class AgentToolCallRequest(FacilityAgentScope):
     action_times: list[str] | None = None
     # National watch board tools
     region: str | None = Field(default=None, max_length=20)
+    case_id: str | None = Field(default=None, max_length=60)
     station: str | None = Field(default=None, max_length=60)
     facility: str | None = Field(default=None, max_length=100)
     min_stage: Literal["attention", "advisory", "warning", "planned_flood"] | None = None

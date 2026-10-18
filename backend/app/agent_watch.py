@@ -12,7 +12,7 @@ from typing import Any
 from . import national_watch as nw
 
 TOOL_NAMES = {"get_watch_overview", "navigate_board", "rank_priority", "summarize_changes", "get_station_status",
-              "draft_situation_report", "rule_scorecard", "get_rain_status", "rank_facilities", "get_official_forecasts", "validation_cases"}
+              "draft_situation_report", "rule_scorecard", "get_rain_status", "rank_facilities", "get_official_forecasts", "validation_cases", "post_event_review"}
 PARAMETERS: dict[str, set[str]] = {
     "get_watch_overview": {"region", "min_stage"},
     "navigate_board": {"region", "station", "facility", "min_stage"},
@@ -25,6 +25,7 @@ PARAMETERS: dict[str, set[str]] = {
     "rank_facilities": {"region", "group", "driver", "limit"},
     "get_official_forecasts": {"region"},
     "validation_cases": {"region"},
+    "post_event_review": {"region", "case_id"},
 }
 EXAMPLES = [
     {"workflow": "watch_overview", "label": "전국 현황", "question": "지금 전국에서 주의보 이상인 관측소가 몇 곳이야?"},
@@ -39,6 +40,7 @@ EXAMPLES = [
     {"workflow": "rank_facilities", "label": "내수형 시설", "question": "내수형 중 비 많이 오는 곳 5곳 알려줘"},
     {"workflow": "get_official_forecasts", "label": "공식 특보", "question": "지금 홍수특보 내려진 곳 있어?"},
     {"workflow": "validation_cases", "label": "사례 검증", "question": "대전 사례에서 규칙이 실제 통제보다 빨랐어?"},
+    {"workflow": "post_event_review", "label": "사후 검토", "question": "오송 사건 사후 검토 보고서 작성해줘"},
 ]
 WATCH_CAVEAT = "감시 등급 연결은 5 km 안 가장 가까운 관측소 기준이며 그 관측소가 시설 유입을 대표하는지는 검증하지 않았습니다."
 BASELINE_CAVEAT = "남은 분은 최근 상승 속도를 그대로 늘린 기준선이며 예보가 아닙니다."
@@ -78,6 +80,10 @@ def tools() -> list[dict[str, Any]]:
          "region: 사용자가 쓴 시도(대전·충북, 없으면 전부).",
          "사례별 기준 시각(통제·유입)과 정밀도, 공식 주의보·경보·시설 주의·경계 첫 시각과 선행 분, 기준 시각에 주의 이상이던 같은 지역 시설 수.",
          "보도에 없는 분 단위 통제 시각, 기준을 바꾸면 어떻게 되는지(재계산 안 함), 다른 사건 일반화."),
+        ("post_event_review", "저장된 오송·대전 사례의 사건 기준, 공식 특보, 시설 위험 재생 신호를 한데 묶어 사후 검토 초안을 만든다. PERC에서 영감을 받은 증거 제한형 데스크 검토이며 사후 검토·복기·PERC 보고서를 요청할 때.",
+         "case_id: 사용자가 오송·궁평2 또는 대전 사건 연도·시설을 명시하면 해당 저장 사례. region: 사용자가 쓴 시도(사건을 특정하지 않으면 해당 시도, 없으면 전체 사례).",
+         "사례별 출처가 있는 통제·유입 기준, 시각 정밀도, 공식 특보·시설 규칙 신호, 같은 지역 신호 수, 검토에 필요한 추가 증거.",
+         "완전한 PERC, 통제 원인·대응 성패·피해·복구·취약성 평가, 저장 자료 밖의 사실."),
     ]
     return [{"name": name, "description": description, "input_fields": sorted(PARAMETERS[name]),
              "output": "national watch evidence with provenance and limitations", "use_when": description,
@@ -95,12 +101,19 @@ _SCORE = re.compile(r"성적|적중|오경보|근접|채점|믿을")
 _GROUP_WORDS = [("지하차도", "underpass"), ("하천변", "riverside"), ("둔치", "riverside"), ("고수부지", "riverside"), ("하상도로", "riverside"),
                 ("출입구", "riverside"), ("천변", "riverside")]
 _DRIVER_WORDS = [("내수형", "pluvial"), ("하천형", "river")]
+_POST_EVENT_CASE_ALIASES = {
+    "osong-2023": ("오송", "궁평2"),
+    "daejeon-2020-07-30": ("대전 2020", "대전2020", "2020-07-30", "만년지하차도"),
+    "daejeon-2023-07-14": ("대전 2023", "대전2023", "2023-07-14", "하상도로", "하상주차장"),
+    "daejeon-2024-07-10": ("대전 2024", "대전2024", "2024-07-10", "오량", "갑천"),
+}
 _FACILITY_WORD = re.compile(r"시설|지하차도|하천변|둔치|고수부지|하상도로|출입구|천변")
 _RAIN = re.compile(r"강우|호우|폭우|소나기|빗줄기|비\s*(?:가|는|도)?\s*(?:많이|오|와|내리|온|쏟|퍼붓)")
 _OVERVIEW = re.compile(r"몇\s*곳|현황|전체|전국|몇\s*개")
 _STATUS = re.compile(r"단계|수위|남았|상태|여유|얼마")
 _OFFICIAL = re.compile(r"특보|홍수경보|홍수주의보|발령")
 _VALIDATE = re.compile(r"검증|사례|실제\s*통제|통제\s*(?:시각|보다)|빨랐|늦었")
+_POST_EVENT_REVIEW = re.compile(r"사후\s*(?:검토|분석|보고서|평가|리뷰)|사건\s*(?:복기|사후\s*검토)|재난\s*(?:복기|사후\s*분석)|PERC", re.IGNORECASE)
 
 
 def _written_stage(message: str) -> str | None:
@@ -132,6 +145,12 @@ def _written_driver(message: str) -> str | None:
     return None
 
 
+def _written_review_case_id(message: str) -> str | None:
+    matches = [case_id for case_id, aliases in _POST_EVENT_CASE_ALIASES.items()
+               if case_id in message or any(alias in message for alias in aliases)]
+    return matches[0] if len(matches) == 1 else None
+
+
 def _written_limit(message: str) -> int | None:
     match = re.search(r"(\d{1,2})\s*(?:곳|개|군데|위)", message)
     return int(match.group(1)) if match else None
@@ -143,12 +162,15 @@ def hints(message: str) -> list[dict[str, Any]]:
     facility = nw.find_facility(message)
     stage = _written_stage(message)
     driver = _written_driver(message)
+    review_case_id = _written_review_case_id(message)
     out: list[dict[str, Any]] = []
 
     def add(name: str, **params: Any) -> None:
         out.append({"tool_name": name, "parameters": {k: v for k, v in params.items() if v is not None}})
 
-    if _SCORE.search(message) and facility and facility["tier"] == "operational":
+    if _POST_EVENT_REVIEW.search(message):
+        add("post_event_review", case_id=review_case_id, region=region if not review_case_id else None)
+    elif _SCORE.search(message) and facility and facility["tier"] == "operational":
         add("rule_scorecard", facility=facility["name"])
     elif _VALIDATE.search(message):
         add("validation_cases", region=region)
@@ -224,6 +246,12 @@ def validate(name: str, params: dict[str, Any], supplied: str) -> dict[str, Any]
         if minutes is None or minutes != _written_minutes(supplied) or not 10 <= minutes <= 1440:
             raise ValueError("The time span must appear in the user's question (10–1440 minutes).")
         clean["since_min"] = minutes
+    if params.get("case_id") is not None:
+        case_id = str(params["case_id"])
+        aliases = _POST_EVENT_CASE_ALIASES.get(case_id)
+        if aliases is None or (case_id not in supplied and not any(alias in supplied for alias in aliases)):
+            raise ValueError("The case must be one the user named (Osong 2023 or a named Daejeon case).")
+        clean["case_id"] = case_id
     if name == "navigate_board" and not any(key in clean for key in ("region", "station", "facility", "min_stage")):
         raise ValueError("navigate_board needs a region, station, facility or stage the user named.")
     if name == "get_station_status" and "station" not in clean:
@@ -243,6 +271,33 @@ def _station_brief(row: dict[str, Any]) -> dict[str, Any]:
     brief["facilities"] = [{"facility_id": f["facility_id"], "name": f["name"], "tier": f["tier"], "distance_km": f.get("distance_km")} for f in row.get("facilities", [])]
     brief["rain_nearby"] = row.get("rain_nearby")
     return brief
+
+
+def _review_signal(signal: dict[str, Any], precision: str) -> dict[str, Any]:
+    at = signal.get("at")
+    lead = signal.get("lead_min")
+    if at is None:
+        comparison = "저장된 재생 구간에서 이 신호가 확인되지 않음"
+    elif signal.get("lead_is_lower_bound"):
+        comparison = "재생 시작 전부터 신호가 있어 선행 분은 하한"
+    elif precision == "upper_bound":
+        if lead is not None and lead >= 0:
+            comparison = f"보도 시각보다 {lead}분 먼저 관측됐으나 실제 통제와의 간격은 확인 불가"
+        else:
+            comparison = f"보도 시각보다 {abs(lead or 0)}분 뒤 관측; 보도 시점에는 이미 통제 중이어서 실제 통제 대비 지연은 확정할 수 없음"
+    elif precision == "approximate":
+        if lead is None:
+            comparison = "근사 기준 시각과 비교할 수 없음"
+        else:
+            comparison = f"보도의 근사 시각 기준 약 {abs(lead)}분 {'전' if lead >= 0 else '후'}"
+    elif lead is None:
+        comparison = "기준 시각과 비교할 수 없음"
+    else:
+        comparison = f"분 단위 기준 시각보다 {abs(lead)}분 {'전' if lead >= 0 else '후'}"
+    reviewed = {key: signal.get(key) for key in ("signal", "at", "lead_min", "lead_is_lower_bound", "source", "facility_id", "first_facility", "driver", "why")}
+    reviewed["source_basis"] = signal.get("source") or "저장된 facility_risk 재생 (상단 rule 참조)"
+    reviewed["comparison"] = comparison
+    return reviewed
 
 
 def _view(region: str | None = None, station: dict[str, Any] | None = None, facility: dict[str, Any] | None = None, min_stage: str | None = None,
@@ -387,6 +442,48 @@ def run_tool(name: str, request: Any) -> dict[str, Any]:
         return {"region": region or "전체", "built_at": data["built_at"], "rule": data["rule"], "cases": cases, "view": _view(region=region),
                 "coverage_note": "VALIDATION_REPLAY: stored replay of facility_risk every 10 minutes against reported control times.",
                 "limitations": data["limitations"]}
+    if name == "post_event_review":
+        from . import case_validation
+        data = case_validation.scorecard()
+        case_id = getattr(request, "case_id", None)
+        cases = [item for item in data["cases"]
+                 if (not case_id or item["id"] == case_id) and (not region or nw.match_region(item["region"]) == region)]
+        reviewed = []
+        for item in cases:
+            reference = item["reference"]
+            regional = item.get("region_at_reference") or {}
+            reviewed.append({
+                "id": item["id"], "title": item["title"], "region": item["region"],
+                "reference": reference,
+                "signals": [_review_signal(signal, reference["precision"]) for signal in item["signals"]],
+                "regional_context_at_reference": regional,
+                "regional_context_note": (f"재생 기준 시각 주변 {regional.get('at')}에 같은 지역 시설 "
+                                          f"{regional.get('total', 0)}곳 중 주의 이상 {regional.get('advisory_or_above', 0)}곳, "
+                                          f"경계 이상 {regional.get('warning_or_above', 0)}곳이었다. 이 수치는 신호의 원인이나 선별력을 입증하지 않는다."),
+            })
+        return {
+            "document_type": "PERC-inspired evidence-limited desk review",
+            "region": region or (reviewed[0]["region"] if case_id and reviewed else "전체 사례"), "case_id": case_id,
+            "scorecard_built_at": data["built_at"],
+            "replay_step_min": data["step_min"], "rule": data["rule"], "cases": reviewed,
+            "review_lenses": {
+                "event_reference": "사건별 통제 또는 유입 기준과 출처·시각 정밀도를 기록한다.",
+                "warning_and_facility_signals": "저장된 공식 홍수특보 이력과 시설 위험 규칙 재생 시각을 비교한다.",
+                "regional_context": "기준 시각 주변의 같은 지역 시설 신호 수를 함께 본다.",
+                "response_recovery_and_causality": "자료가 없어 평가하지 않는다.",
+            },
+            "evidence_to_collect": [
+                "시설별 실제 통제·해제 시각, 결정자, 판단 근거와 전달 기록",
+                "현장 강우·수위 원자료와 시설별 배수·유입 경로 및 점검 기록",
+                "경보 수신·전파·대응 기록과 관계기관 조정 기록",
+                "피해·대피·구조·복구 기록, 현장 관계자 면담과 취약성 정보",
+            ],
+            "view": _view(region=region),
+            "coverage_note": "PERC-inspired desk review of stored event scorecards; this is not a full PERC and makes no causal finding.",
+            "limitations": [*data["limitations"],
+                            "현재 자료는 사건 기준·공식 특보·시설 위험 규칙 재생에 한정된다. 인터뷰, 취약성, 대응 과정, 피해·복구 자료가 없어 전체 재난관리 성과를 평가하지 않는다.",
+                            "기준 시각이 보도상 근사 또는 상한이면 표시된 선행·지연은 실제 통제 시각과 같지 않을 수 있다."],
+        }
     if name == "get_rain_status":
         limit = getattr(request, "limit", None) or 5
         data = nw.overview(at, region, None, limit=2000, rain_mode=rain_mode)
@@ -544,6 +641,23 @@ def summarize(calls: list[dict[str, Any]]) -> tuple[str, list[int]]:
                         f"{row['station_name']} {row['level_ko']}(발령 {row['issued_at'][5:16].replace('T', ' ')}"
                         + (f", 예상 {row['forecast_time'][11:16]} {row['forecast_level_m']:.2f} m" if row.get("forecast_time") and row.get("forecast_level_m") is not None else "")
                         + ")" for row in rows[:5]) + "."
+        elif name == "post_event_review":
+            parts = []
+            for item in result.get("cases", []):
+                ref = item["reference"]
+                signals = item.get("signals", [])
+                selected = [signal for signal in signals if signal.get("signal", "").startswith("공식 홍수")
+                            or "시설 중 첫" in signal.get("signal", "")]
+                timing = "; ".join(
+                    f"{signal['signal']} {signal['at'][11:16] if signal.get('at') else '없음'} ({signal['comparison']})"
+                    for signal in selected
+                )
+                regional = item.get("regional_context_at_reference") or {}
+                parts.append(f"{item['title']}: 기준 {ref['label']} [{ref['precision_ko']}]; {timing}; "
+                             f"기준 시각 주변 같은 지역 시설 {regional.get('total', 0)}곳 중 주의 이상 "
+                             f"{regional.get('advisory_or_above', 0)}곳, 경계 이상 {regional.get('warning_or_above', 0)}곳")
+            text = ("저장 사례 기반 PERC 참고형 사후 검토 초안입니다. " + " / ".join(parts)
+                    + ". 통제 사유·대응 성패·피해·복구는 현재 자료로 평가하지 않았습니다.") if parts else "선택 지역의 저장 사후 검토 사례가 없습니다."
         elif name == "validation_cases":
             parts = []
             for item in result.get("cases", []):
