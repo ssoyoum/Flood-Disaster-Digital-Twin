@@ -552,6 +552,23 @@ export type TwinFacility = {
   status: "OPERATIONAL" | "CANDIDATE"; gates: TwinGates;
 };
 
+export type TwinRegistryFacility = {
+  id: string; name: string; kind: string; driver: string; status: "OPERATIONAL" | "CANDIDATE";
+  region: string | null; location: [number, number] | null; road?: string | null; managing_agency?: string | null; event_id?: string | null;
+  gauge?: { station_id: string; name: string } | null; gates: TwinGates; unmet_gates?: TwinGateId[];
+  driver_hypothesis?: "river" | "pluvial"; driver_hypothesis_note?: string;
+  source?: { dataset_id?: string; source_record_id?: string; source_url?: string; molit_no?: string; osm_way_ids?: string | null };
+  nearby_gauges?: Array<{ station_id: string; name: string; distance_km: number; flood_forecast_station?: boolean }>;
+  nearby_rain_gauges?: Array<{ station_id: string; name: string; agency?: string | null; distance_km: number }>;
+  control_rule?: Record<string, unknown> | null; reference_event?: Record<string, unknown> | null;
+};
+
+export type TwinRegistry = {
+  gates: Array<{ id: TwinGateId; label: string; question: string }>;
+  operational: TwinRegistryFacility[]; candidates: TwinRegistryFacility[];
+  counts: { operational: number; candidate: number };
+};
+
 export type CriteriaFloor = "advisory" | "warning";
 
 export type TwinCriteriaReview = {

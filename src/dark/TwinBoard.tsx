@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Activity, AlertTriangle, ArrowLeft, ArrowRight, Radio, RotateCcw } from "lucide-react";
 import * as api from "../api";
-import type { TwinBacktest, TwinFacility, TwinStatus } from "../types";
+import type { TwinBacktest, TwinFacility, TwinGateId, TwinRegistry, TwinRegistryFacility, TwinStatus } from "../types";
 import { AgentDock } from "./DarkConsole";
 import { FloodOpsLogo } from "./Landing";
 import { AppNavigation } from "./Navigation";
@@ -10,12 +10,22 @@ import "./dark.css";
 import "./navigation.css";
 import "./twin.css";
 
-type BoardTab = "now" | "criteria" | "backtest";
+type BoardTab = "now" | "criteria" | "backtest" | "registry";
 const TABS: Array<{ id: BoardTab; label: string }> = [
   { id: "now", label: "지금 상태" },
   { id: "criteria", label: "통제 기준 검토" },
   { id: "backtest", label: "백테스트" },
+  { id: "registry", label: "시설 등록" },
 ];
+
+const GATE_IDS: TwinGateId[] = ["inflow_path", "representative_gauge", "site_instrumentation", "validation_event"];
+const GATE_LABELS: Record<TwinGateId, string> = {
+  inflow_path: "유입 경로", representative_gauge: "대표 관측소", site_instrumentation: "현장 계측", validation_event: "검증 사건",
+};
+const GATE_STATUS_LABELS: Record<string, string> = {
+  CONFIRMED: "확인", PENDING: "확인 대기", MISSING: "자료 없음", UNKNOWN: "미확인",
+};
+const DRIVER_LABELS: Record<string, string> = { river: "하천형", pluvial: "내수형" };
 
 /*
  * 지하차도 통제 판단 보드.
@@ -47,6 +57,8 @@ function readTab(): BoardTab {
 
 export default function TwinBoard({ onBack }: { onBack: () => void }) {
   const [facilities, setFacilities] = useState<TwinFacility[] | null>(null);
+  const [registry, setRegistry] = useState<TwinRegistry | null>(null);
+  const [registryError, setRegistryError] = useState<string | null>(null);
   const [facilityId, setFacilityId] = useState<string | null>(null);
   const [at, setAt] = useState<string | null>(readAt);
   const [status, setStatus] = useState<TwinStatus | null>(null);
@@ -56,6 +68,7 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
 
   useEffect(() => {
     api.getTwinFacilities().then((list) => { setFacilities(list); setFacilityId((current) => current ?? list[0]?.id ?? null); }).catch((reason: Error) => setError(reason.message));
+    api.getTwinRegistry().then(setRegistry).catch((reason: Error) => setRegistryError(reason.message));
     // 뒤로가기나 주소 직접 수정으로 ?at= 가 바뀌면 같은 컴포넌트에서 다시 읽는다.
     const onHash = () => setAt(readAt());
     window.addEventListener("hashchange", onHash);
@@ -127,6 +140,51 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
       </main>}
 
       {tab === "criteria" && <TwinCriteria facilityId={facility.id} />}
+
+      {tab === "registry" && <main className="tw-main tw-registry-page" aria-label="시설 등록 현황">
+        <header className="tw-registry-summary">
+          <div>
+            <p className="tw-eyebrow">시설 유형 · 등록 게이트</p>
+            <h2 className="tw-section-title">운영 시설과 확장 후보</h2>
+            <p className="tw-section-lead">하천형 운영 시설과 내수형 가설 후보를 같은 등록 항목으로 보여줍니다. 후보 가설은 운영 규칙으로 사용하지 않습니다.</p>
+          </div>
+          {registry && <strong>{registry.counts.operational} 운영 · {registry.counts.candidate} 후보</strong>}
+        </header>
+        {registry ? <div className="tw-registry-list">
+          {[...registry.operational, ...registry.candidates].map((row: TwinRegistryFacility) => {
+            const rainGauge = row.nearby_rain_gauges?.[0];
+            const stageGauge = row.nearby_gauges?.[0];
+            const gateCount = row.unmet_gates?.length ?? GATE_IDS.filter((id) => row.gates[id].status !== "CONFIRMED").length;
+            return <article className="tw-card tw-registry-item" key={row.id}>
+              <div className="tw-registry-item-head">
+                <div>
+                  <span className="tw-registry-status" data-status={row.status}>{row.status === "OPERATIONAL" ? "운영" : "후보"}</span>
+                  {row.driver_hypothesis && <span className="tw-registry-hypothesis">가설 · {row.driver_hypothesis}</span>}
+                  <h3>{row.name}</h3>
+                  <p>{row.region ?? "지역 미등록"}</p>
+                </div>
+                <small>{gateCount === 0 ? "등록 게이트 완료" : `미확인 게이트 ${gateCount}`}</small>
+              </div>
+              <dl className="tw-registry-details">
+                <div><dt>분류</dt><dd>{row.driver_hypothesis ? `${DRIVER_LABELS[row.driver_hypothesis]} 가설 · 미검증` : DRIVER_LABELS[row.driver] ?? row.driver}</dd></div>
+                <div><dt>위치</dt><dd>{row.location ? `${row.location[1].toFixed(6)}, ${row.location[0].toFixed(6)}` : "좌표 없음"}</dd></div>
+                <div><dt>수위계</dt><dd>{row.gauge?.name ?? (stageGauge ? `${stageGauge.name} · ${stageGauge.distance_km.toFixed(2)} km` : "미연결")}</dd></div>
+                <div><dt>강우계</dt><dd>{rainGauge ? `${rainGauge.name} · ${rainGauge.distance_km.toFixed(2)} km` : "미연결"}</dd></div>
+                <div><dt>운영 판정</dt><dd>{row.status === "OPERATIONAL" ? "운영 기준 적용" : "운영 기준 미등록"}</dd></div>
+                <div><dt>출처</dt><dd>{row.source?.source_record_id ?? row.event_id ?? "시설 레지스트리"}</dd></div>
+              </dl>
+              <div className="tw-gates tw-registry-gates">
+                {GATE_IDS.map((id) => <span className="tw-gate" data-status={row.gates[id].status} title={row.gates[id].note} key={id}>{GATE_LABELS[id]} · {GATE_STATUS_LABELS[row.gates[id].status]}</span>)}
+              </div>
+              {row.driver_hypothesis_note && <p className="tw-registry-note">{row.driver_hypothesis_note}</p>}
+              {row.status === "CANDIDATE" && <p className="tw-registry-candidate-note">후보 자료이며 시설별 운영 기준과 검증 사건은 등록되지 않았습니다.</p>}
+            </article>;
+          })}
+        </div> : <div className="tw-card tw-registry-empty">
+          <strong>{registryError ? "시설 등록 정보를 불러오지 못했습니다." : "시설 등록 정보를 불러오는 중입니다."}</strong>
+          {registryError && <small>{registryError}</small>}
+        </div>}
+      </main>}
 
       {tab === "backtest" && <main className="tw-main">
         <section className="tw-col">

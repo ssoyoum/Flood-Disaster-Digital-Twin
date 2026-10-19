@@ -1,4 +1,4 @@
-import type { CriteriaFloor, RiseForecast, TwinBacktest, TwinCriteriaReview, TwinFacility, TwinMode, TwinStatus, CaseLeadTimes, ResponseTimingResult, TimelineReconstructionResponse, AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
+import type { CriteriaFloor, RiseForecast, TwinBacktest, TwinCriteriaReview, TwinFacility, TwinMode, TwinRegistry, TwinStatus, CaseLeadTimes, ResponseTimingResult, TimelineReconstructionResponse, AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
 import { boundedAgentHistory, type ConversationMessage } from "./agentConversation";
 import type { WaterLevelReadiness, WatchChanges, WatchFacilityLink, WatchFacilityStatus, WatchOverview, WatchStage, WatchStationDetail, SeoulRiverStageFeed } from "./types";
 
@@ -142,6 +142,7 @@ export const getCaseLeadTimes = () => request<CaseLeadTimes>("/api/cases/lead-ti
 // Underpass control-decision twin
 export const getTwinMode = () => request<TwinMode>("/api/twin/mode");
 export const getTwinFacilities = () => request<TwinFacility[]>("/api/twin/facilities");
+export const getTwinRegistry = () => request<TwinRegistry>("/api/twin/registry");
 export const getTwinStatus = (facilityId: string, at?: string) => request<TwinStatus>(`/api/twin/facilities/${encodeURIComponent(facilityId)}/status${at ? `?at=${encodeURIComponent(at)}` : ""}`);
 export const getTwinBacktest = (facilityId: string) => request<TwinBacktest>(`/api/twin/facilities/${encodeURIComponent(facilityId)}/backtest`);
 export const getTwinCriteriaReview = (facilityId: string, stageFloor: CriteriaFloor, leadThresholdMin: number, signal?: AbortSignal) =>
