@@ -190,6 +190,17 @@ button { font: inherit; color: inherit; }
 .op-map-legend { position: absolute; left: 12px; bottom: 12px; display: flex; gap: 12px; padding: 6px 10px; border-radius: 8px; background: rgba(9,9,11,.85); font-size: 11.5px; color: var(--muted); }
 .op-map-legend i { display: inline-block; width: 10px; height: 10px; margin-right: 5px; border-radius: 2px; vertical-align: -1px; }
 .op-map-wait { position: absolute; inset: 0; display: grid; place-items: center; color: var(--dim); font-size: 13px; }
+/* 사건 재생 막대(예전 사건 콘솔과 같은 구성) */
+.op-replay { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.op-replay-label { display: flex; flex-direction: column; min-width: 190px; }
+.op-replay-label span { color: var(--dim); font-size: 11px; font-weight: 700; }
+.op-replay-label strong { font-size: 14px; font-variant-numeric: tabular-nums; }
+.op-replay button { min-width: 34px; height: 34px; padding: 0 10px; border: 1px solid var(--line-2); border-radius: 8px; background: rgba(255,255,255,.04); font-size: 15px; font-weight: 700; cursor: pointer; }
+.op-replay button.primary { min-width: 104px; font-size: 13px; background: var(--ui); color: var(--bg); border-color: var(--ui); }
+.op-replay button:disabled { opacity: .35; cursor: default; }
+.op-replay-track { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding-left: 6px; }
+.op-replay-track input { width: 100%; accent-color: var(--red); }
+.op-replay-ticks { display: flex; justify-content: space-between; color: var(--dim); font-size: 11px; font-variant-numeric: tabular-nums; }
 .op-lead-chart svg { display: block; width: 100%; height: auto; }
 
 @media (max-width: 1200px) {
@@ -200,6 +211,7 @@ button { font: inherit; color: inherit; }
   .op-tabs a small { display: none; }
 }
 @media (max-width: 760px) {
+  .op-replay { flex-wrap: wrap; } .op-replay-label { min-width: 0; width: 100%; } .op-replay-ticks { display: none; }
   .op-top { gap: 10px; }
   .op-brand span, .op-status { display: none; }
   .op-tabs { overflow-x: auto; }

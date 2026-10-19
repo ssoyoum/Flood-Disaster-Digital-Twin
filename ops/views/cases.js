@@ -104,9 +104,19 @@ async function detailView(view, id) {
       <div><dt><b>2</b>실제 대응</dt><dd>${lead.actual?.lead_min != null ? `<strong class="${lead.actual.lead_min >= 0 ? "op-early" : "op-late"}">${lead.actual.lead_min >= 0 ? "+" : "−"}${Math.abs(lead.actual.lead_min)}분</strong>` : '<strong class="op-late">없음</strong>'}<small>${esc(lead.actual?.time ?? "")} ${esc(lead.actual?.label ?? "")}</small></dd></div>
       <div><dt><b>3</b>기준대로 했다면</dt><dd>${lead.counterfactual?.lead_min != null ? `<strong class="op-early">+${lead.counterfactual.lead_min}분</strong>` : "—"}<small>${esc(lead.counterfactual?.time ?? "")} ${esc(lead.counterfactual?.label ?? "")} · ${esc(lead.evidence ?? "")}</small></dd></div>
     </dl>` : ""}
+    <div class="op-replay" role="group" aria-label="사건 재생">
+      <div class="op-replay-label"><span>사건 재생</span><strong id="op-replay-now">—</strong></div>
+      <button type="button" id="op-prev" aria-label="이전 단계" title="이전 단계">‹</button>
+      <button type="button" id="op-play" class="primary">▶ 재생</button>
+      <button type="button" id="op-next" aria-label="다음 단계" title="다음 단계">›</button>
+      <div class="op-replay-track">
+        <input type="range" id="op-range" min="0" max="${Math.max(0, steps.length - 1)}" value="0" aria-label="재구성 단계">
+        <div class="op-replay-ticks">${steps.map((s) => `<span>${hhmm(s.time)}</span>`).join("")}</div>
+      </div>
+    </div>
     <div class="op-case-layout">
       <div class="op-card">
-        <div class="op-card-head"><h3>재구성 단계 ${steps.length}개</h3>${isOsong ? '<button type="button" class="op-go" id="op-play">재생</button>' : ""}</div>
+        <div class="op-card-head"><h3>재구성 단계 ${steps.length}개</h3></div>
         <ol class="op-steps" id="op-steps">${steps.map((s, i) => `<li data-i="${i}"><time>${hhmm(s.time)}</time><i></i><span><b>${esc(STEP_KO[s.state] ?? s.label)}</b><small>${esc(CONF_KO[s.confidence] ?? s.confidence ?? "")}</small></span></li>`).join("")}</ol>
       </div>
       ${isOsong
@@ -122,6 +132,10 @@ async function detailView(view, id) {
     current = i;
     view.querySelectorAll("#op-steps li").forEach((li) => { const k = Number(li.dataset.i); li.classList.toggle("on", k === i); li.classList.toggle("past", k < i); });
     const step = steps[i];
+    view.querySelector("#op-replay-now").textContent = step ? `${hhmm(step.time)} · ${STEP_KO[step.state] ?? step.label}` : "재구성 단계 없음";
+    view.querySelector("#op-range").value = String(i);
+    view.querySelector("#op-prev").disabled = i <= 0;
+    view.querySelector("#op-next").disabled = i >= steps.length - 1;
     if (!isOsong) {
       view.querySelector("#op-step-title").textContent = `${hhmm(step.time)} ${STEP_KO[step.state] ?? step.label}`;
       view.querySelector("#op-step-body").textContent = `출처: ${step.source ?? "—"} · 확인 수준: ${CONF_KO[step.confidence] ?? step.confidence ?? "—"}`;
@@ -134,7 +148,21 @@ async function detailView(view, id) {
       if (el) el.textContent = `이 단계 추정 셀 ${cells.length}개`;
     }
   };
-  view.querySelectorAll("#op-steps li").forEach((li) => li.addEventListener("click", () => select(Number(li.dataset.i))));
+  // 예전 사건 콘솔과 같은 재생 막대: ‹ ▶ › 와 시간 막대. 손으로 움직이면 재생을 멈춘다.
+  const playButton = view.querySelector("#op-play");
+  const stop = () => { if (timer) window.clearInterval(timer); timer = null; playButton.textContent = "▶ 재생"; };
+  const manual = (i) => { stop(); select(Math.max(0, Math.min(steps.length - 1, i))); };
+  view.querySelectorAll("#op-steps li").forEach((li) => li.addEventListener("click", () => manual(Number(li.dataset.i))));
+  view.querySelector("#op-prev").addEventListener("click", () => manual(current - 1));
+  view.querySelector("#op-next").addEventListener("click", () => manual(current + 1));
+  view.querySelector("#op-range").addEventListener("input", (e) => manual(Number(e.target.value)));
+  playButton.disabled = !steps.length;
+  playButton.addEventListener("click", () => {
+    if (timer) { stop(); return; }
+    if (current >= steps.length - 1) select(0);
+    playButton.textContent = "❚❚ 일시정지";
+    timer = window.setInterval(() => { if (current + 1 >= steps.length) { stop(); return; } select(current + 1); }, 1200);
+  });
   select(0);
 
   if (isOsong) {
@@ -142,11 +170,6 @@ async function detailView(view, id) {
     if (!document.getElementById("op-map")) return;  // 그사이 다른 화면으로 옮겼다
     handFeatures = layers.hand_reconstruction?.data?.features ?? [];
     mountHandMap(document.getElementById("op-map"), layers, steps, () => { document.getElementById("op-map-wait")?.remove(); select(current); });
-    document.getElementById("op-play").addEventListener("click", () => {
-      if (timer) { window.clearInterval(timer); timer = null; return; }
-      select(0);
-      timer = window.setInterval(() => { if (current + 1 >= steps.length) { window.clearInterval(timer); timer = null; return; } select(current + 1); }, 1200);
-    });
   }
 }
 
