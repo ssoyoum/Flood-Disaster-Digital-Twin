@@ -607,11 +607,11 @@ def twin_record_decision(
 
 
 @app.get("/api/twin/facilities/{facility_id}/backtest", tags=["twin"])
-def twin_backtest_route(facility_id: str):
+def twin_backtest_route(facility_id: str, points: bool = Query(default=False, description="Include the 10-minute water levels the rule read")):
     """Apply the facility's control rule to the stored 2023 series and report when it would have fired."""
 
     _require_operational_facility(facility_id, f"Unknown facility: {facility_id}")
-    return twin_backtest(facility_id)
+    return twin_backtest(facility_id, include_points=points)
 
 
 @app.get("/api/twin/facilities/{facility_id}/criteria-review", tags=["twin"])

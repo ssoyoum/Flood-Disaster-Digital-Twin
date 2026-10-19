@@ -234,7 +234,7 @@ def facility_status(facility_id: str, at: str | None = None) -> dict[str, Any]:
     return result
 
 
-def backtest(facility_id: str) -> dict[str, Any]:
+def backtest(facility_id: str, include_points: bool = False) -> dict[str, Any]:
     """Replay the rule over the stored event series and report when it would have fired."""
 
     facility = FACILITIES[facility_id]
@@ -257,7 +257,7 @@ def backtest(facility_id: str) -> dict[str, Any]:
     lead = None
     if first_review:
         lead = {key: int((datetime.fromisoformat(reference[key]) - datetime.fromisoformat(first_review["time"])).total_seconds() // 60) for key in ("levee_failure", "underpass_inflow", "full_inundation")}
-    return {
+    result = {
         "facility_id": facility_id,
         "event_id": facility["event_id"],
         "rule": facility["control_rule"],
@@ -268,6 +268,11 @@ def backtest(facility_id: str) -> dict[str, Any]:
         "reference_event": reference,
         "note": "백테스트는 저장된 2023년 10분 수위에 같은 규칙을 적용한 결과다. 06:40은 국무조정실이 통제 요건 충족 시각으로 본 시각이고, 보관된 10분 자료로는 06:50에 계획홍수위에 닿는다(DQ-009).",
     }
+    if include_points:
+        # The hydrograph the rule read, so a screen can draw the thresholds it crossed instead of only the lead.
+        # Opt-in: the agent tool shares this function and should not carry 400+ rows into the model.
+        result["points"] = [[row["time"].isoformat(timespec="minutes"), row["water_level_m"]] for row in series]
+    return result
 
 
 # ---- closure-criteria review -------------------------------------------------------------------

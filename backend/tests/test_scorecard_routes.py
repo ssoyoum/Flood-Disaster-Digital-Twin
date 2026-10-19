@@ -24,3 +24,11 @@ def test_flood_forecast_history_route_serves_both_summaries():
     body = response.json()
     assert body["issuances"]["issuances"] == sum(body["issuances"]["by_year"].values())
     assert body["official_vs_observed"]["경보"]["issue_lead_over_crossing"]["median_min"] is not None
+
+
+def test_backtest_points_are_opt_in():
+    plain = client.get("/api/twin/facilities/gungpyeong2-underpass/backtest").json()
+    assert "points" not in plain
+    with_points = client.get("/api/twin/facilities/gungpyeong2-underpass/backtest?points=true").json()
+    assert len(with_points["points"]) == with_points["series"]["records"]
+    assert with_points["first_closure_review"] == plain["first_closure_review"]
