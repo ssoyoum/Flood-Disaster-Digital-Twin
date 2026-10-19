@@ -817,6 +817,15 @@ def watch_overview(
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
+@app.get("/api/watch/seoul-river-stages", tags=["watch"])
+def watch_seoul_river_stages():
+    """Seoul's current river gauge levels alongside its published control levels."""
+
+    from . import seoul_river_stage
+
+    return seoul_river_stage.summary()
+
+
 @app.get("/api/watch/stations/{code}", tags=["watch"])
 def watch_station(code: str, at: str | None = None, rain_mode: Literal["live", "replay"] | None = None):
     try:

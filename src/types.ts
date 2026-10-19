@@ -685,6 +685,18 @@ export type WatchOverview = {
   counts: { by_stage: Record<WatchStage, number>; quality: Record<WatchQuality, number>; rising: number; facilities: number; facilities_operational: number; under_heavy_rain?: number };
   regions: WatchRegion[]; stations: WatchStation[]; rain?: WatchRain;
 };
+export type SeoulRiverStage = {
+  gauge_code: string; gauge_name: string; river: string; district: string;
+  embankment_m: number | null; planned_flood_m: number | null; riverbed_m: number | null;
+  control_level_m: number | null; level_m: number | null; collected_at: string | null; age_minutes: number | null;
+  freshness: "fresh" | "stale" | "unknown";
+  control_status: "no_control_level" | "no_reading" | "at_or_above" | "below"; mode: "live" | "snapshot";
+};
+export type SeoulRiverStageFeed = {
+  available: boolean; mode: "live" | "snapshot"; fetched_at: string; source: string; source_url: string;
+  update_interval_minutes: number; stations_total: number; stations_with_control_level: number; at_or_above_control: number;
+  error: string | null; stations: SeoulRiverStage[]; limitations: string[];
+};
 export type WatchChange = { code: string; name: string; region: string; from: WatchStage; to: WatchStage; delta_m: number; rate_m_per_10min: number; facilities: number };
 export type WatchChanges = { mode: "live" | "replay"; at: string; compared_to?: string; since_min: number; available: boolean; note?: string; stage_up: WatchChange[]; stage_down: WatchChange[]; new_rising: WatchChange[] };
 export type AgentView = { region: string | null; min_stage: WatchStage | null; station_code: string | null; facility_id: string | null; center: [number, number] | null; zoom: number | null; layer?: "rain" | null };
