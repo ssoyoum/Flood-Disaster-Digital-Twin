@@ -6,6 +6,9 @@ Most underpasses flood from local rain (내수), not from the river, so one indi
            ground (research grade B or better), or it is a riverside entrance. Judged by the gauge stage.
 - pluvial: every other underpass. Judged by nearby 1-, 3- and 12-hour rain against the KMA heavy-rain
            advisory/warning amounts (호우주의보 3 h 60 mm / 12 h 110 mm, 호우경보 3 h 90 mm / 12 h 180 mm).
+- live only: KMA heavy-rain alerts floor pluvial and riverside entrance levels when the alert-zone name
+             matches the facility's province and municipality. Historical replay uses collected HRFCO
+             flood forecasts only; the KMA alert-history API is not approved yet.
 
 The rain thresholds are the national forecast-advisory amounts applied to observed rain. They say "rain at the
 level the KMA warns about", not that a given underpass floods: pump capacity, sump and catchment decide that,
@@ -24,6 +27,7 @@ from typing import Any
 
 from . import flood_forecast as ff
 from . import kma_aws
+from . import kma_weather_warning as kww
 from . import national_watch as nw
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -45,6 +49,7 @@ LIMITATIONS = [
     "하천형은 같은 하천 1.5 km 안 관측소의 과거 최고 수위가 지면 근처까지 온 시설(조사 B등급 이상)과 하천변 출입구다. 나머지 지하차도는 내수형으로 추정한다.",
     "내수형은 시설 10 km 안 강우 관측소의 1·3·12시간 누적을 기상청 호우특보 기준량(3시간 60·90 mm, 12시간 110·180 mm)과 비교한다. 특보 기준은 예보용이며, 시설이 실제로 잠기는지는 배수·펌프 용량이 정한다.",
     "실시간 3시간 누적은 10분 자료가 충분하지 않으면 시간별 자료로 계산한다. 12시간 누적은 12개의 연속된 시간별 자료가 있어야 하며 로컬 캐시에 저장한다.",
+    "기상청 호우특보는 시군구 이름이 직접 맞는 내수형·하천변 출입구에만 실시간 단계 하한으로 쓴다. 복합 특보구역 이름은 미매칭으로 남고, 과거 재생에는 현재 특보를 적용하지 않는다.",
 ]
 
 _LOCK = threading.Lock()
@@ -247,6 +252,7 @@ def _short_time(stamp: str, at: str | None) -> str:
 # ---- assessment ---------------------------------------------------------------------------------------
 def facility_risk(at: str | None = None, region: str | None = None, driver: str | None = None, limit: int = 300,
                   rain_mode: str | None = None) -> dict[str, Any]:
+    """Rank facilities by the linked flood driver and apply only time-valid official warning floors."""
     status = nw.facility_status(at, region, None, 2000, rain_mode)
     if rain_mode == "live":
         rain_at, totals = _live_totals()
@@ -260,6 +266,13 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
     # The official forecast leads the observed crossing by about an hour (docs/PLATFORM_DATA.md §3-1), so a gauge
     # under 홍수주의보·경보 lifts its river-type facilities even before the stage gets there.
     official = ff.active_at(status["at"]) if at or status["mode"] == "replay" else ff.active_now()
+    if at or status["mode"] == "replay":
+        warning_feed = {"available": False, "fetched_at": None, "active": [], "error": None}
+        warning_mode = "replay-unavailable"
+    else:
+        warning_feed = kww.current()
+        warning_mode = "live"
+    weather_alerts = warning_feed.get("active", []) if warning_feed.get("available") else []
     codes = set(totals)
     rows = []
     for item in status["facilities"]:
@@ -287,6 +300,14 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
             forecast = (f" · 예상 {_short_time(issued['forecast_time'], status['at'])} {issued['forecast_level_m']:.2f} m"
                         if issued.get("forecast_time") and issued.get("forecast_level_m") is not None else "")
             why = f"공식 {issued['level_ko']} 중(발령 {_short_time(issued['issued_at'], status['at'])}{forecast}) · {why}"
+        weather_warning = None
+        if kind == "pluvial" or item["group"] == "riverside":
+            weather_warning = kww.for_facility(weather_alerts, item)
+            if weather_warning:
+                weather_floor = OFFICIAL_LEVEL[weather_warning["level"]]
+                level = max(level, weather_floor)
+                timing = f"발효 {_short_time(weather_warning['effective_at'], status['at'])}" if weather_warning.get("effective_at") else "현재 발효"
+                why = f"기상청 {weather_warning['level_ko']} · {weather_warning['area']} {timing} · {why}"
         rows.append({
             "facility_id": item["facility_id"], "name": item["name"], "kind_ko": item["kind_ko"], "group": item["group"], "tier": item["tier"],
             "region": item["region"], "lon": item["lon"], "lat": item["lat"], "driver": kind, "driver_reason": reason,
@@ -296,6 +317,7 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
             "minutes_to_planned_flood": item.get("minutes_to_planned_flood") if kind == "river" else None,
             "rain": rain,
             "official": {k: issued[k] for k in ("level", "level_ko", "issued_at", "forecast_level_m", "forecast_time", "minutes_since_issue")} if issued else None,
+            "weather_warning": {k: weather_warning[k] for k in ("region_code", "province", "area", "level", "level_ko", "issued_at", "effective_at")} if weather_warning else None,
         })
 
     def order(row: dict[str, Any]) -> tuple:
@@ -308,6 +330,7 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
     counts = {"total": len(rows), "by_driver": {k: sum(1 for r in rows if r["driver"] == k) for k in ("river", "pluvial")},
               "by_level": {LEVELS[k]: sum(1 for r in rows if r["level"] == k) for k in LEVELS},
               "under_official": sum(1 for r in rows if r["official"]),
+              "under_weather_warning": sum(1 for r in rows if r["weather_warning"]),
               "official_gauges": {"warning": sum(1 for a in official.values() if a["level"] == "warning"),
                                   "advisory": sum(1 for a in official.values() if a["level"] == "advisory")}}
     rain_rows = []
@@ -318,6 +341,10 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
         rain_rows.append({"code": code, "name": gauge.name, "region": gauge.region, "lon": gauge.lon, "lat": gauge.lat, **values})
     return {"mode": status["mode"], "at": status["at"], "observed_at": status.get("observed_at"),
             "rain_at": rain_at.isoformat() if rain_at else None, "rain_basis": basis,
+            "weather_warning_feed": {"mode": warning_mode, "available": bool(warning_feed.get("available")),
+                                     "fetched_at": warning_feed["fetched_at"].isoformat(timespec="minutes") if warning_feed.get("fetched_at") else None,
+                                     "active_areas": len(weather_alerts), "error": warning_feed.get("error"),
+                                     "source": "기상청 API Hub wrn_now_data.php"},
             "filter": {"region": region, "driver": driver}, "counts": counts, "facilities": rows[:limit], "rain_gauges": rain_rows,
             "thresholds": {"rain_3h_advisory_mm": RAIN_3H_ADVISORY_MM, "rain_3h_warning_mm": RAIN_3H_WARNING_MM,
                            "rain_12h_advisory_mm": RAIN_12H_ADVISORY_MM, "rain_12h_warning_mm": RAIN_12H_WARNING_MM,
