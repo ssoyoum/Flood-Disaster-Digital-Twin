@@ -50,6 +50,7 @@ LIMITATIONS = [
     "하천형은 같은 하천 1.5 km 안 관측소의 과거 최고 수위가 지면 근처까지 온 시설(조사 B등급 이상)과 하천변 출입구다. 나머지 지하차도는 내수형으로 추정한다.",
     "내수형은 시설 10 km 안 강우 관측소의 1·3·12시간 누적을 기상청 호우특보 기준량(3시간 60·90 mm, 12시간 110·180 mm)과 비교한다. 특보 기준은 예보용이며, 시설이 실제로 잠기는지는 배수·펌프 용량이 정한다.",
     "실시간 3시간 누적은 10분 자료가 충분하지 않으면 시간별 자료로 계산한다. 12시간 누적은 12개의 연속된 시간별 자료가 있어야 하며 로컬 캐시에 저장한다.",
+    "기상청 AWS의 RN-15m은 원래 15분 누적으로 보존한다. 강한 비 보조 신호에만 시간당 환산값(×4)을 쓰며, 10분 강우나 호우특보 누적 기준으로 간주하지 않는다.",
     "기상청 호우특보는 시군구 이름이 직접 맞는 내수형·하천변 출입구에만 실시간 단계 하한으로 쓴다. 복합 특보구역 이름은 미매칭으로 남고, 과거 재생에는 현재 특보를 적용하지 않는다.",
 ]
 
@@ -138,7 +139,8 @@ def _with_kma(rain_at: datetime | None, totals: dict[str, dict[str, float | None
     if not kma["rows"]:
         return rain_at, totals, basis
     merged = {**totals, **{code: values for code, values in kma["rows"].items() if _gauge(code) is not None}}
-    return rain_at or kma["observed_at"], merged, basis + " + 기상청 AWS 매분(1시간 RN-60m · 3시간 = 1시간 3회 합 · 12시간 RN-12H)"
+    observed_at = max((stamp for stamp in (rain_at, kma["observed_at"]) if stamp is not None), default=None)
+    return observed_at, merged, basis + " + 기상청 AWS 매분(RN-15m · RN-60m · RN-12H; 3시간 = RN-60m 3회 합)"
 
 
 def _nearest_rain_codes(lon: float, lat: float, codes: set[str]) -> list[tuple[str, float]]:
@@ -225,7 +227,8 @@ def _live_totals() -> tuple[datetime | None, dict[str, dict[str, float | None]]]
 def _pluvial_level(rain: dict[str, Any] | None) -> tuple[int, str]:
     if not rain:
         return 0, "10 km 안 강우 관측 없음"
-    three, one, ten = rain.get("rain_3h_mm"), rain.get("rain_1h_mm"), rain.get("rain_10m_mm")
+    three, one = rain.get("rain_3h_mm"), rain.get("rain_1h_mm")
+    ten, fifteen = rain.get("rain_10m_mm"), rain.get("rain_15m_mm")
     twelve = rain.get("rain_12h_mm")
     if twelve is not None and twelve >= RAIN_12H_WARNING_MM:
         return 3, f"12시간 {twelve} mm · 호우경보 기준량(180 mm) 이상"
@@ -238,6 +241,9 @@ def _pluvial_level(rain: dict[str, Any] | None) -> tuple[int, str]:
     if (one or 0) >= RAIN_1H_STRONG_MM or (ten or 0) * 6 >= RAIN_1H_STRONG_MM * 2:
         detail = f"1시간 {one} mm" if one is not None else f"10분 {ten} mm"
         return 1, f"{detail} · 강한 비"
+    if fifteen is not None and fifteen * 4 >= RAIN_1H_STRONG_MM:
+        equivalent = round(fifteen * 4, 1)
+        return 1, f"15분 {fifteen} mm · 시간당 환산 {equivalent} mm/h · 강한 비"
     if (one or 0) > 0 or (ten or 0) > 0:
         return 0, "비 · 기준 미만"
     return 0, "강우 없음"
@@ -342,7 +348,7 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
         rain = row["rain"] or {}
         minutes = row["minutes_to_planned_flood"] if row["level"] > 0 else None  # thousands of minutes at 평상 rank nothing
         return (-row["level"], minutes if minutes is not None else 10**9, -(rain.get("rain_12h_mm") or 0), -(rain.get("rain_3h_mm") or 0), -(rain.get("rain_1h_mm") or 0),
-                -(rain.get("rain_10m_mm") or 0), row["name"])
+                -(rain.get("rain_10m_mm") or 0), -(rain.get("rain_15m_mm") or 0), row["name"])
 
     rows.sort(key=order)
     counts = {"total": len(rows), "by_driver": {k: sum(1 for r in rows if r["driver"] == k) for k in ("river", "pluvial")},
@@ -367,6 +373,8 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
             "thresholds": {"rain_3h_advisory_mm": RAIN_3H_ADVISORY_MM, "rain_3h_warning_mm": RAIN_3H_WARNING_MM,
                            "rain_12h_advisory_mm": RAIN_12H_ADVISORY_MM, "rain_12h_warning_mm": RAIN_12H_WARNING_MM,
                            "rain_1h_strong_mm": RAIN_1H_STRONG_MM,
+                           "rain_15m_strong_equivalent_mm_h": RAIN_1H_STRONG_MM,
+                           "rain_15m_signal_level": 1,
                            "rain_1h_case_reference_mm_h": RAIN_1H_CASE_REFERENCE_MM_H,
                            "rain_1h_case_reference_effect": "reference_only; does not change facility risk level"},
             "limitations": LIMITATIONS + status.get("limitations", [])[:2]}

@@ -529,3 +529,8 @@ Phase 3 운영 트윈 (PROJECT_PLAN Phase 3, 앞당겨 진행):
 - [x] data-quality issue tracking 문서 추가
 - [x] README, Project Plan, Development Guide, Decision Records를 Counterfactual Disaster Digital Twin 정의에 맞춰 정리
 - [x] 운영 시설 임박 알림·담당자 확인 기록 연결(2026-10-19, 실시간/재생 구분 및 로컬 JSONL 저장)
+
+## 2026-10-19 KMA AWS 강우 신호
+
+- [x] 시설 위험 응답에서 KMA AWS `RN-15m`을 원래 15분 누적으로 유지하고, 시간당 환산값(×4)은 강한 비 보조 단계(1) 신호에만 적용한다. 3·12시간 호우특보 누적 기준과 정확한 10분 자료를 대체하지 않는다.
+- [ ] 정확한 KMA 10분 누적 자료는 현재 승인된 AWS 매분 응답 필드에 없어 미완료로 유지한다. 별도 제품 승인 또는 10분 원자료 연결 뒤 처리.
