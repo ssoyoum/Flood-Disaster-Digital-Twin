@@ -19,9 +19,11 @@ import threading
 from datetime import datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 from . import flood_forecast as ff
+from . import kma_aws
 from . import national_watch as nw
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -111,11 +113,32 @@ def driver_of(facility: dict[str, Any]) -> tuple[str, str]:
 
 
 # ---- rain totals --------------------------------------------------------------------------------------
+def _gauge(code: str) -> Any:
+    """An HRFCO rain gauge, or a KMA AWS station for `kma:{stn}` codes (name, region, lon, lat)."""
+    if code.startswith("kma:"):
+        station = kma_aws.stations().get(code[4:])
+        if station is None:
+            return None
+        return SimpleNamespace(name=f"{station['name']}(기상청 AWS)", region=nw.region_of(station["address"]), lon=station["lon"], lat=station["lat"])
+    return nw.rain_gauges().get(code)
+
+
+def _with_kma(rain_at: datetime | None, totals: dict[str, dict[str, float | None]], basis: str) -> tuple[datetime | None, dict[str, dict[str, float | None]], str]:
+    """Live only: add KMA AWS stations (denser in cities) to the HRFCO gauges; an outage leaves HRFCO alone."""
+    try:
+        kma = kma_aws.rain_totals()
+    except Exception:
+        return rain_at, totals, basis
+    if not kma["rows"]:
+        return rain_at, totals, basis
+    merged = {**totals, **{code: values for code, values in kma["rows"].items() if _gauge(code) is not None}}
+    return rain_at or kma["observed_at"], merged, basis + " + 기상청 AWS 매분(1시간 RN-60m · 3시간 = 1시간 3회 합 · 12시간 RN-12H)"
+
+
 def _nearest_rain_codes(lon: float, lat: float, codes: set[str]) -> list[tuple[str, float]]:
-    gauges = nw.rain_gauges()
     near = []
     for code in codes:
-        gauge = gauges.get(code)
+        gauge = _gauge(code)
         if gauge is None or abs(gauge.lat - lat) > 0.1 or abs(gauge.lon - lon) > 0.13:
             continue
         distance = nw._km(lon, lat, gauge.lon, gauge.lat)
@@ -227,13 +250,13 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
     status = nw.facility_status(at, region, None, 2000, rain_mode)
     if rain_mode == "live":
         rain_at, totals = _live_totals()
-        basis = "실시간 10분·시간별 강우 누적(시간별 자료는 로컬 캐시에 저장)"
+        rain_at, totals, basis = _with_kma(rain_at, totals, "실시간 10분·시간별 강우 누적(시간별 자료는 로컬 캐시에 저장)")
     elif at or status["mode"] == "replay":
         rain_at, totals = _replay_totals(at or nw.DEFAULT_REPLAY_AT)
         basis = "저장 1시간 강우(3시간·12시간 누적 = 최근 관측 합)"
     else:
         rain_at, totals = _live_totals()
-        basis = "실시간 10분·시간별 강우 누적(시간별 자료는 로컬 캐시에 저장)"
+        rain_at, totals, basis = _with_kma(rain_at, totals, "실시간 10분·시간별 강우 누적(시간별 자료는 로컬 캐시에 저장)")
     # The official forecast leads the observed crossing by about an hour (docs/PLATFORM_DATA.md §3-1), so a gauge
     # under 홍수주의보·경보 lifts its river-type facilities even before the stage gets there.
     official = ff.active_at(status["at"]) if at or status["mode"] == "replay" else ff.active_now()
@@ -247,8 +270,8 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
         rain = None
         if near:
             code, distance = near[0]
-            gauge = nw.rain_gauges()[code]
-            rain = {"code": code, "name": gauge.name, "distance_km": distance, **totals[code]}
+            gauge = _gauge(code)
+            rain = {"code": code, "name": gauge.name, "distance_km": distance, "source": "KMA AWS" if code.startswith("kma:") else "HRFCO", **totals[code]}
         if kind == "river":
             level = RIVER_LEVEL.get(item.get("stage") or "", 0)
             minutes = item.get("minutes_to_planned_flood")
@@ -288,9 +311,8 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
               "official_gauges": {"warning": sum(1 for a in official.values() if a["level"] == "warning"),
                                   "advisory": sum(1 for a in official.values() if a["level"] == "advisory")}}
     rain_rows = []
-    gauges = nw.rain_gauges()
     for code, values in sorted(totals.items()):
-        gauge = gauges.get(code)
+        gauge = _gauge(code)
         if gauge is None:
             continue
         rain_rows.append({"code": code, "name": gauge.name, "region": gauge.region, "lon": gauge.lon, "lat": gauge.lat, **values})
