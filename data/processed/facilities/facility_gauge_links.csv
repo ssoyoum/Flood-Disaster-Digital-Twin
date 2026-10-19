@@ -11,12 +11,42 @@ underpass_coordinates:1,원당지하차도,underpass_coordinates.csv,,,126.83486
 underpass_coordinates:1,원당지하차도,underpass_coordinates.csv,,,126.834868,37.655094,rainfall,1,10194030,아라김포TM,한국수자원공사,6.89,False,,,,
 underpass_coordinates:1,원당지하차도,underpass_coordinates.csv,,,126.834868,37.655094,rainfall,2,10194020,귤현보,한국수자원공사,11.26,False,,,,
 underpass_coordinates:1,원당지하차도,underpass_coordinates.csv,,,126.834868,37.655094,rainfall,3,10194010,김포시(김포시청),기후에너지환경부,11.4,False,,,,
+underpass_coordinates:2,남태령지하차도,underpass_coordinates.csv,,,126.995796,37.446187,waterlevel,1,1018692,서울시(신림5교),기후에너지환경부,4.86,True,N,5.4,4.8,3.8
+underpass_coordinates:2,남태령지하차도,underpass_coordinates.csv,,,126.995796,37.446187,waterlevel,2,1018681,서울시(반포2교),기후에너지환경부,5.91,False,N,,,
+underpass_coordinates:2,남태령지하차도,underpass_coordinates.csv,,,126.995796,37.446187,waterlevel,3,1018680,서울시(잠수교),기후에너지환경부,7.9,False,N,15.6,6.2,5.5
+underpass_coordinates:2,남태령지하차도,underpass_coordinates.csv,,,126.995796,37.446187,rainfall,1,10184150,과천시(한국수자원공사),기후에너지환경부,2.62,True,,,,
+underpass_coordinates:2,남태령지하차도,underpass_coordinates.csv,,,126.995796,37.446187,rainfall,2,10184210,의왕시(포일동),기후에너지환경부,6.41,False,,,,
+underpass_coordinates:2,남태령지하차도,underpass_coordinates.csv,,,126.995796,37.446187,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,7.67,False,,,,
 underpass_coordinates:3,복합물류지하차도(군포),underpass_coordinates.csv,,,126.949239,37.33054,waterlevel,1,1202630,반월2,기후에너지환경부,6.85,False,N,,,
 underpass_coordinates:3,복합물류지하차도(군포),underpass_coordinates.csv,,,126.949239,37.33054,waterlevel,2,1202660,반월1,기후에너지환경부,8.21,False,N,,,
 underpass_coordinates:3,복합물류지하차도(군포),underpass_coordinates.csv,,,126.949239,37.33054,waterlevel,3,1101601,수원시(매세교),기후에너지환경부,9.11,False,N,4.7,4.1,3.5
 underpass_coordinates:3,복합물류지하차도(군포),underpass_coordinates.csv,,,126.949239,37.33054,rainfall,1,10184030,남면,기후에너지환경부,1.64,True,,,,
 underpass_coordinates:3,복합물류지하차도(군포),underpass_coordinates.csv,,,126.949239,37.33054,rainfall,2,10184170,군포시(군포1동주민센터),기후에너지환경부,2.62,True,,,,
 underpass_coordinates:3,복합물류지하차도(군포),underpass_coordinates.csv,,,126.949239,37.33054,rainfall,3,12024020,안산시(장상동),기후에너지환경부,6.47,False,,,,
+underpass_coordinates:4,운양지하차도,underpass_coordinates.csv,,,126.690675,37.655211,waterlevel,1,1019661,김포시(사우교),기후에너지환경부,4.65,True,N,3.2,2.4,1.6
+underpass_coordinates:4,운양지하차도,underpass_coordinates.csv,,,126.690675,37.655211,waterlevel,2,1019675,김포시(전류리),기후에너지환경부,5.07,False,N,8.2,6.8,5.5
+underpass_coordinates:4,운양지하차도,underpass_coordinates.csv,,,126.690675,37.655211,waterlevel,3,1019648,계양대교,한국수자원공사,10.34,False,N,,,
+underpass_coordinates:4,운양지하차도,underpass_coordinates.csv,,,126.690675,37.655211,rainfall,1,10194010,김포시(김포시청),기후에너지환경부,4.95,True,,,,
+underpass_coordinates:4,운양지하차도,underpass_coordinates.csv,,,126.690675,37.655211,rainfall,2,10194030,아라김포TM,한국수자원공사,11.36,False,,,,
+underpass_coordinates:4,운양지하차도,underpass_coordinates.csv,,,126.690675,37.655211,rainfall,3,10194020,귤현보,한국수자원공사,11.7,False,,,,
+underpass_coordinates:7,송내지하차도,underpass_coordinates.csv,,,126.753352,37.486661,waterlevel,1,1019612,인천시(굴포1교),기후에너지환경부,3.66,True,N,7.2,6.1,5.0
+underpass_coordinates:7,송내지하차도,underpass_coordinates.csv,,,126.753352,37.486661,waterlevel,2,1019640,굴포천(내),한국수자원공사,4.09,True,N,,,
+underpass_coordinates:7,송내지하차도,underpass_coordinates.csv,,,126.753352,37.486661,waterlevel,3,1019620,부천시(도두리2교),기후에너지환경부,5.11,False,N,4.6,3.4,2.7
+underpass_coordinates:7,송내지하차도,underpass_coordinates.csv,,,126.753352,37.486661,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,5.2,False,,,,
+underpass_coordinates:7,송내지하차도,underpass_coordinates.csv,,,126.753352,37.486661,rainfall,2,10194020,귤현보,한국수자원공사,9.26,False,,,,
+underpass_coordinates:7,송내지하차도,underpass_coordinates.csv,,,126.753352,37.486661,rainfall,3,10184080,서울시(구로구청),기후에너지환경부,11.77,False,,,,
+underpass_coordinates:8,광장지하차도,underpass_coordinates.csv,,,127.112865,37.39574,waterlevel,1,1018650,성남시(궁내교),기후에너지환경부,2.89,True,N,5.1,4.2,3.3
+underpass_coordinates:8,광장지하차도,underpass_coordinates.csv,,,127.112865,37.39574,waterlevel,2,1018653,성남시(둔전교),기후에너지환경부,3.61,True,N,8.1,6.9,6.1
+underpass_coordinates:8,광장지하차도,underpass_coordinates.csv,,,127.112865,37.39574,waterlevel,3,1018655,서울시(대곡교),기후에너지환경부,8.18,False,Y,8.5,7.1,5.8
+underpass_coordinates:8,광장지하차도,underpass_coordinates.csv,,,127.112865,37.39574,rainfall,1,10184040,성남시(한국학중앙연구원),기후에너지환경부,5.49,False,,,,
+underpass_coordinates:8,광장지하차도,underpass_coordinates.csv,,,127.112865,37.39574,rainfall,2,10184130,성남시(대장동),기후에너지환경부,5.51,False,,,,
+underpass_coordinates:8,광장지하차도,underpass_coordinates.csv,,,127.112865,37.39574,rainfall,3,10184230,성남시(구미초교),기후에너지환경부,6.46,False,,,,
+underpass_coordinates:9,백현지하차도,underpass_coordinates.csv,,,127.106718,37.375426,waterlevel,1,1018650,성남시(궁내교),기후에너지환경부,0.62,True,N,5.1,4.2,3.3
+underpass_coordinates:9,백현지하차도,underpass_coordinates.csv,,,127.106718,37.375426,waterlevel,2,1018653,성남시(둔전교),기후에너지환경부,5.93,False,N,8.1,6.9,6.1
+underpass_coordinates:9,백현지하차도,underpass_coordinates.csv,,,127.106718,37.375426,waterlevel,3,1016606,광주시(동림3교),기후에너지환경부,8.93,False,N,5.5,4.8,4.1
+underpass_coordinates:9,백현지하차도,underpass_coordinates.csv,,,127.106718,37.375426,rainfall,1,10184130,성남시(대장동),기후에너지환경부,3.69,True,,,,
+underpass_coordinates:9,백현지하차도,underpass_coordinates.csv,,,127.106718,37.375426,rainfall,2,10184230,성남시(구미초교),기후에너지환경부,4.3,True,,,,
+underpass_coordinates:9,백현지하차도,underpass_coordinates.csv,,,127.106718,37.375426,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,5.3,False,,,,
 underpass_coordinates:10,화랑지하차도,underpass_coordinates.csv,,,127.105168,37.398354,waterlevel,1,1018650,성남시(궁내교),기후에너지환경부,3.17,True,N,5.1,4.2,3.3
 underpass_coordinates:10,화랑지하차도,underpass_coordinates.csv,,,127.105168,37.398354,waterlevel,2,1018653,성남시(둔전교),기후에너지환경부,3.47,True,N,8.1,6.9,6.1
 underpass_coordinates:10,화랑지하차도,underpass_coordinates.csv,,,127.105168,37.398354,waterlevel,3,1018655,서울시(대곡교),기후에너지환경부,7.99,False,Y,8.5,7.1,5.8
@@ -53,6 +83,12 @@ underpass_coordinates:18,상현지하차도,underpass_coordinates.csv,,,127.0718
 underpass_coordinates:18,상현지하차도,underpass_coordinates.csv,,,127.071804,37.30191,rainfall,1,10184230,성남시(구미초교),기후에너지환경부,5.7,False,,,,
 underpass_coordinates:18,상현지하차도,underpass_coordinates.csv,,,127.071804,37.30191,rainfall,2,10184130,성남시(대장동),기후에너지환경부,6.46,False,,,,
 underpass_coordinates:18,상현지하차도,underpass_coordinates.csv,,,127.071804,37.30191,rainfall,3,11014090,용인시(신갈저수지),기후에너지환경부,8.65,False,,,,
+underpass_coordinates:19,신대지하차도,underpass_coordinates.csv,,,127.068449,37.286278,waterlevel,1,1101604,수원시(백년교),기후에너지환경부,4.56,True,N,6.4,5.5,4.7
+underpass_coordinates:19,신대지하차도,underpass_coordinates.csv,,,127.068449,37.286278,waterlevel,2,1101601,수원시(매세교),기후에너지환경부,5.08,False,N,4.7,4.1,3.5
+underpass_coordinates:19,신대지하차도,underpass_coordinates.csv,,,127.068449,37.286278,waterlevel,3,1101605,화성시(화산교),기후에너지환경부,8.73,False,N,8.3,6.6,5.3
+underpass_coordinates:19,신대지하차도,underpass_coordinates.csv,,,127.068449,37.286278,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,7.06,False,,,,
+underpass_coordinates:19,신대지하차도,underpass_coordinates.csv,,,127.068449,37.286278,rainfall,2,10184230,성남시(구미초교),기후에너지환경부,7.2,False,,,,
+underpass_coordinates:19,신대지하차도,underpass_coordinates.csv,,,127.068449,37.286278,rainfall,3,10184130,성남시(대장동),기후에너지환경부,8.2,False,,,,
 underpass_coordinates:20,죽전지하차도,underpass_coordinates.csv,,,127.108918,37.324362,waterlevel,1,1018650,성남시(궁내교),기후에너지환경부,5.07,False,N,5.1,4.2,3.3
 underpass_coordinates:20,죽전지하차도,underpass_coordinates.csv,,,127.108918,37.324362,waterlevel,2,1016606,광주시(동림3교),기후에너지환경부,8.17,False,N,5.5,4.8,4.1
 underpass_coordinates:20,죽전지하차도,underpass_coordinates.csv,,,127.108918,37.324362,waterlevel,3,1101604,수원시(백년교),기후에너지환경부,10.07,False,N,6.4,5.5,4.7
@@ -65,6 +101,30 @@ underpass_coordinates:21,복합물류지하차도(의왕),underpass_coordinates.
 underpass_coordinates:21,복합물류지하차도(의왕),underpass_coordinates.csv,,,126.949239,37.33054,rainfall,1,10184030,남면,기후에너지환경부,1.64,True,,,,
 underpass_coordinates:21,복합물류지하차도(의왕),underpass_coordinates.csv,,,126.949239,37.33054,rainfall,2,10184170,군포시(군포1동주민센터),기후에너지환경부,2.62,True,,,,
 underpass_coordinates:21,복합물류지하차도(의왕),underpass_coordinates.csv,,,126.949239,37.33054,rainfall,3,12024020,안산시(장상동),기후에너지환경부,6.47,False,,,,
+underpass_coordinates:22,장암지하차도,underpass_coordinates.csv,,,127.052643,37.703817,waterlevel,1,1018665,의정부시(신곡교),기후에너지환경부,3.5,True,Y,7.0,6.0,5.1
+underpass_coordinates:22,장암지하차도,underpass_coordinates.csv,,,127.052643,37.703817,waterlevel,2,1018666,의정부시(금신교),기후에너지환경부,4.86,True,N,7.6,6.5,5.4
+underpass_coordinates:22,장암지하차도,underpass_coordinates.csv,,,127.052643,37.703817,waterlevel,3,1018669,서울시(창동교),기후에너지환경부,5.68,False,N,7.9,6.5,5.1
+underpass_coordinates:22,장암지하차도,underpass_coordinates.csv,,,127.052643,37.703817,rainfall,1,10184125,의정부시(도봉차량기지),기후에너지환경부,0.16,True,,,,
+underpass_coordinates:22,장암지하차도,underpass_coordinates.csv,,,127.052643,37.703817,rainfall,2,10184190,서울시(동막골주차장),기후에너지환경부,4.36,True,,,,
+underpass_coordinates:22,장암지하차도,underpass_coordinates.csv,,,127.052643,37.703817,rainfall,3,10184010,의정부시(중앙초교),기후에너지환경부,4.58,True,,,,
+underpass_coordinates:24,중앙지하차도,underpass_coordinates.csv,,,126.976852,37.574305,waterlevel,1,1018686,서울시(홍남교),기후에너지환경부,4.45,True,N,5.3,4.6,3.9
+underpass_coordinates:24,중앙지하차도,underpass_coordinates.csv,,,126.976852,37.574305,waterlevel,2,1018680,서울시(잠수교),기후에너지환경부,6.55,False,N,15.6,6.2,5.5
+underpass_coordinates:24,중앙지하차도,underpass_coordinates.csv,,,126.976852,37.574305,waterlevel,3,1018685,구용산,기후에너지환경부,6.83,False,N,,,
+underpass_coordinates:24,중앙지하차도,underpass_coordinates.csv,,,126.976852,37.574305,rainfall,1,10184070,서울,기후에너지환경부,4.64,True,,,,
+underpass_coordinates:24,중앙지하차도,underpass_coordinates.csv,,,126.976852,37.574305,rainfall,2,10184140,서울시(송정동),기후에너지환경부,7.36,False,,,,
+underpass_coordinates:24,중앙지하차도,underpass_coordinates.csv,,,126.976852,37.574305,rainfall,3,10184200,서울시(월계2교),기후에너지환경부,8.5,False,,,,
+underpass_coordinates:25,금곡지하차도,underpass_coordinates.csv,,,126.949523,37.267131,waterlevel,1,1101601,수원시(매세교),기후에너지환경부,5.87,False,N,4.7,4.1,3.5
+underpass_coordinates:25,금곡지하차도,underpass_coordinates.csv,,,126.949523,37.267131,waterlevel,2,1101605,화성시(화산교),기후에너지환경부,8.33,False,N,8.3,6.6,5.3
+underpass_coordinates:25,금곡지하차도,underpass_coordinates.csv,,,126.949523,37.267131,waterlevel,3,1101604,수원시(백년교),기후에너지환경부,8.43,False,N,6.4,5.5,4.7
+underpass_coordinates:25,금곡지하차도,underpass_coordinates.csv,,,126.949523,37.267131,rainfall,1,11014060,화성시(수원대학교),기후에너지환경부,6.74,False,,,,
+underpass_coordinates:25,금곡지하차도,underpass_coordinates.csv,,,126.949523,37.267131,rainfall,2,10184030,남면,기후에너지환경부,8.64,False,,,,
+underpass_coordinates:25,금곡지하차도,underpass_coordinates.csv,,,126.949523,37.267131,rainfall,3,12024010,안산시(안산호동초교),기후에너지환경부,9.04,False,,,,
+underpass_coordinates:27,동부대로3(보들)지하차도,underpass_coordinates.csv,,,127.088169,37.197907,waterlevel,1,1101641,화성시(느티교),기후에너지환경부,0.37,True,N,,,
+underpass_coordinates:27,동부대로3(보들)지하차도,underpass_coordinates.csv,,,127.088169,37.197907,waterlevel,2,1101605,화성시(화산교),기후에너지환경부,6.41,False,N,8.3,6.6,5.3
+underpass_coordinates:27,동부대로3(보들)지하차도,underpass_coordinates.csv,,,127.088169,37.197907,waterlevel,3,1101604,수원시(백년교),기후에너지환경부,7.14,False,N,6.4,5.5,4.7
+underpass_coordinates:27,동부대로3(보들)지하차도,underpass_coordinates.csv,,,127.088169,37.197907,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,3.18,True,,,,
+underpass_coordinates:27,동부대로3(보들)지하차도,underpass_coordinates.csv,,,127.088169,37.197907,rainfall,2,10164070,용인시(역삼동주민센터),기후에너지환경부,9.76,False,,,,
+underpass_coordinates:27,동부대로3(보들)지하차도,underpass_coordinates.csv,,,127.088169,37.197907,rainfall,3,11014060,화성시(수원대학교),기후에너지환경부,10.11,False,,,,
 underpass_coordinates:28,동부대로4(신리)지하차도,underpass_coordinates.csv,,,127.088217,37.184576,waterlevel,1,1101641,화성시(느티교),기후에너지환경부,1.63,True,N,,,
 underpass_coordinates:28,동부대로4(신리)지하차도,underpass_coordinates.csv,,,127.088217,37.184576,waterlevel,2,1101645,오산시(탑동대교),기후에너지환경부,6.24,False,Y,4.2,5.2,4.5
 underpass_coordinates:28,동부대로4(신리)지하차도,underpass_coordinates.csv,,,127.088217,37.184576,waterlevel,3,1101605,화성시(화산교),기후에너지환경부,7.06,False,N,8.3,6.6,5.3
@@ -83,6 +143,12 @@ underpass_coordinates:33,화산2(용주2)지하차도,underpass_coordinates.csv,
 underpass_coordinates:33,화산2(용주2)지하차도,underpass_coordinates.csv,,,127.009125,37.206227,rainfall,1,11014060,화성시(수원대학교),기후에너지환경부,3.05,True,,,,
 underpass_coordinates:33,화산2(용주2)지하차도,underpass_coordinates.csv,,,127.009125,37.206227,rainfall,2,11014090,용인시(신갈저수지),기후에너지환경부,7.82,False,,,,
 underpass_coordinates:33,화산2(용주2)지하차도,underpass_coordinates.csv,,,127.009125,37.206227,rainfall,3,11014070,평택시(회화리),기후에너지환경부,12.37,False,,,,
+underpass_coordinates:34,혁신지하차도1,underpass_coordinates.csv,,,128.183802,36.121591,waterlevel,1,2010654,김천시(앞들교),기후에너지환경부,0.52,True,N,5.2,4.5,3.7
+underpass_coordinates:34,혁신지하차도1,underpass_coordinates.csv,,,128.183802,36.121591,waterlevel,2,2010660,김천시(대동교),기후에너지환경부,4.75,True,N,6.16,5.1,4.0
+underpass_coordinates:34,혁신지하차도1,underpass_coordinates.csv,,,128.183802,36.121591,waterlevel,3,2010645,김천시(신룡교),기후에너지환경부,4.78,True,N,5.66,4.8,4.0
+underpass_coordinates:34,혁신지하차도1,underpass_coordinates.csv,,,128.183802,36.121591,rainfall,1,20104010,김천시(부곡동),기후에너지환경부,6.73,False,,,,
+underpass_coordinates:34,혁신지하차도1,underpass_coordinates.csv,,,128.183802,36.121591,rainfall,2,20104050,구미시(선주교),기후에너지환경부,16.29,False,,,,
+underpass_coordinates:34,혁신지하차도1,underpass_coordinates.csv,,,128.183802,36.121591,rainfall,3,20114040,구미시(구미대교),기후에너지환경부,19.16,False,,,,
 underpass_coordinates:37,서변지하차도,underpass_coordinates.csv,,,128.599418,35.918399,waterlevel,1,2012665,대구시(동화교),기후에너지환경부,0.24,True,N,5.88,4.9,3.9
 underpass_coordinates:37,서변지하차도,underpass_coordinates.csv,,,128.599418,35.918399,waterlevel,2,2012670,대구시(산격대교),기후에너지환경부,1.0,True,N,7.83,6.7,5.5
 underpass_coordinates:37,서변지하차도,underpass_coordinates.csv,,,128.599418,35.918399,waterlevel,3,2012690,대구시(성북교),기후에너지환경부,2.88,True,Y,5.03,4.0,3.0
@@ -95,6 +161,12 @@ underpass_coordinates:40,감천지하차도,underpass_coordinates.csv,,,128.9978
 underpass_coordinates:40,감천지하차도,underpass_coordinates.csv,,,128.997861,35.086377,rainfall,1,25044010,부산시(을숙도),기후에너지환경부,5.22,False,,,,
 underpass_coordinates:40,감천지하차도,underpass_coordinates.csv,,,128.997861,35.086377,rainfall,2,20224060,부산시(구포대교),기후에너지환경부,13.04,False,,,,
 underpass_coordinates:40,감천지하차도,underpass_coordinates.csv,,,128.997861,35.086377,rainfall,3,20224030,김해시(전하동),기후에너지환경부,17.63,False,,,,
+underpass_coordinates:42,위례터널,underpass_coordinates.csv,,,127.12699,37.466822,waterlevel,1,1018655,서울시(대곡교),기후에너지환경부,0.46,True,Y,8.5,7.1,5.8
+underpass_coordinates:42,위례터널,underpass_coordinates.csv,,,127.12699,37.466822,waterlevel,2,1018653,성남시(둔전교),기후에너지환경부,4.4,True,N,8.1,6.9,6.1
+underpass_coordinates:42,위례터널,underpass_coordinates.csv,,,127.12699,37.466822,waterlevel,3,1018658,서울시(대치교),기후에너지환경부,5.81,False,N,13.5,11.1,8.7
+underpass_coordinates:42,위례터널,underpass_coordinates.csv,,,127.12699,37.466822,rainfall,1,10184100,서울시(대곡교),기후에너지환경부,0.46,True,,,,
+underpass_coordinates:42,위례터널,underpass_coordinates.csv,,,127.12699,37.466822,rainfall,2,10184180,성남시(성남북초교),기후에너지환경부,2.73,True,,,,
+underpass_coordinates:42,위례터널,underpass_coordinates.csv,,,127.12699,37.466822,rainfall,3,10164020,광주시(남한산초교),기후에너지환경부,5.32,False,,,,
 underpass_coordinates:43,외발산지하차도,underpass_coordinates.csv,,,126.817889,37.550435,waterlevel,1,1019657,인천시(상야교),기후에너지환경부,4.89,True,N,5.0,4.1,3.2
 underpass_coordinates:43,외발산지하차도,underpass_coordinates.csv,,,126.817889,37.550435,waterlevel,2,1019647,박촌1교,한국수자원공사,5.08,False,N,,,
 underpass_coordinates:43,외발산지하차도,underpass_coordinates.csv,,,126.817889,37.550435,waterlevel,3,1019660,굴포천(한강),한국수자원공사,5.35,False,N,,,
@@ -107,6 +179,12 @@ underpass_coordinates:44,금하지하차도,underpass_coordinates.csv,,,126.8935
 underpass_coordinates:44,금하지하차도,underpass_coordinates.csv,,,126.893556,37.451007,rainfall,1,10184080,서울시(구로구청),기후에너지환경부,4.93,True,,,,
 underpass_coordinates:44,금하지하차도,underpass_coordinates.csv,,,126.893556,37.451007,rainfall,2,10184090,안양시(충훈1교),기후에너지환경부,5.21,False,,,,
 underpass_coordinates:44,금하지하차도,underpass_coordinates.csv,,,126.893556,37.451007,rainfall,3,10184160,부천시(부안초교),기후에너지환경부,7.91,False,,,,
+underpass_coordinates:45,도봉지하차도,underpass_coordinates.csv,,,127.052931,37.65439,waterlevel,1,1018669,서울시(창동교),기후에너지환경부,0.21,True,N,7.9,6.5,5.1
+underpass_coordinates:45,도봉지하차도,underpass_coordinates.csv,,,127.052931,37.65439,waterlevel,2,1018670,서울시(월계2교),기후에너지환경부,3.37,True,N,6.2,5.1,3.9
+underpass_coordinates:45,도봉지하차도,underpass_coordinates.csv,,,127.052931,37.65439,waterlevel,3,1018675,서울시(중랑교),기후에너지환경부,7.05,False,Y,7.9,6.5,5.0
+underpass_coordinates:45,도봉지하차도,underpass_coordinates.csv,,,127.052931,37.65439,rainfall,1,10184200,서울시(월계2교),기후에너지환경부,3.37,True,,,,
+underpass_coordinates:45,도봉지하차도,underpass_coordinates.csv,,,127.052931,37.65439,rainfall,2,10184190,서울시(동막골주차장),기후에너지환경부,3.67,True,,,,
+underpass_coordinates:45,도봉지하차도,underpass_coordinates.csv,,,127.052931,37.65439,rainfall,3,10184125,의정부시(도봉차량기지),기후에너지환경부,5.35,False,,,,
 underpass_coordinates:49,미래지하차도(BRT지하차도),underpass_coordinates.csv,,,127.276094,36.47224,waterlevel,1,3012606,세종보(상),기타,0.75,True,N,,,
 underpass_coordinates:49,미래지하차도(BRT지하차도),underpass_coordinates.csv,,,127.276094,36.47224,waterlevel,2,3012605,세종시(금남교),기후에너지환경부,0.77,True,N,13.85,11.0,8.3
 underpass_coordinates:49,미래지하차도(BRT지하차도),underpass_coordinates.csv,,,127.276094,36.47224,waterlevel,3,3012604,나성,한국수자원공사,0.88,True,N,,,
@@ -125,6 +203,30 @@ underpass_coordinates:51,주추지하차도,underpass_coordinates.csv,,,127.2417
 underpass_coordinates:51,주추지하차도,underpass_coordinates.csv,,,127.241746,36.509383,rainfall,1,30124110,세종시(문성교),기후에너지환경부,4.12,True,,,,
 underpass_coordinates:51,주추지하차도,underpass_coordinates.csv,,,127.241746,36.509383,rainfall,2,30114070,세종시(농정원),기후에너지환경부,10.29,False,,,,
 underpass_coordinates:51,주추지하차도,underpass_coordinates.csv,,,127.241746,36.509383,rainfall,3,30104040,세종시(명학리),기후에너지환경부,10.41,False,,,,
+underpass_coordinates:53,루원지하차도,underpass_coordinates.csv,,,126.676091,37.524691,waterlevel,1,1019612,인천시(굴포1교),기후에너지환경부,4.48,True,N,7.2,6.1,5.0
+underpass_coordinates:53,루원지하차도,underpass_coordinates.csv,,,126.676091,37.524691,waterlevel,2,1019640,굴포천(내),한국수자원공사,7.38,False,N,,,
+underpass_coordinates:53,루원지하차도,underpass_coordinates.csv,,,126.676091,37.524691,waterlevel,3,1019620,부천시(도두리2교),기후에너지환경부,7.5,False,N,4.6,3.4,2.7
+underpass_coordinates:53,루원지하차도,underpass_coordinates.csv,,,126.676091,37.524691,rainfall,1,12014010,아라인천TM,한국수자원공사,6.7,False,,,,
+underpass_coordinates:53,루원지하차도,underpass_coordinates.csv,,,126.676091,37.524691,rainfall,2,10194020,귤현보,한국수자원공사,9.43,False,,,,
+underpass_coordinates:53,루원지하차도,underpass_coordinates.csv,,,126.676091,37.524691,rainfall,3,10194010,김포시(김포시청),기후에너지환경부,10.66,False,,,,
+underpass_coordinates:54,중봉지하차도,underpass_coordinates.csv,,,126.649773,37.536842,waterlevel,1,1201651,아라서해갑문(내),한국수자원공사,4.84,True,N,,,
+underpass_coordinates:54,중봉지하차도,underpass_coordinates.csv,,,126.649773,37.536842,waterlevel,2,1201652,아라서해갑실(남),한국수자원공사,4.89,True,N,,,
+underpass_coordinates:54,중봉지하차도,underpass_coordinates.csv,,,126.649773,37.536842,waterlevel,3,1201654,아라서해갑실(북),한국수자원공사,4.94,True,N,,,
+underpass_coordinates:54,중봉지하차도,underpass_coordinates.csv,,,126.649773,37.536842,rainfall,1,12014010,아라인천TM,한국수자원공사,4.09,True,,,,
+underpass_coordinates:54,중봉지하차도,underpass_coordinates.csv,,,126.649773,37.536842,rainfall,2,10194010,김포시(김포시청),기후에너지환경부,10.47,False,,,,
+underpass_coordinates:54,중봉지하차도,underpass_coordinates.csv,,,126.649773,37.536842,rainfall,3,10194020,귤현보,한국수자원공사,10.96,False,,,,
+underpass_coordinates:55,청라국제지하차도,underpass_coordinates.csv,,,126.619578,37.531199,waterlevel,1,1201652,아라서해갑실(남),한국수자원공사,3.57,True,N,,,
+underpass_coordinates:55,청라국제지하차도,underpass_coordinates.csv,,,126.619578,37.531199,waterlevel,2,1201651,아라서해갑문(내),한국수자원공사,3.59,True,N,,,
+underpass_coordinates:55,청라국제지하차도,underpass_coordinates.csv,,,126.619578,37.531199,waterlevel,3,1201653,아라서해갑문(외),한국수자원공사,3.61,True,N,,,
+underpass_coordinates:55,청라국제지하차도,underpass_coordinates.csv,,,126.619578,37.531199,rainfall,1,12014010,아라인천TM,한국수자원공사,3.64,True,,,,
+underpass_coordinates:55,청라국제지하차도,underpass_coordinates.csv,,,126.619578,37.531199,rainfall,2,10194010,김포시(김포시청),기후에너지환경부,12.61,False,,,,
+underpass_coordinates:55,청라국제지하차도,underpass_coordinates.csv,,,126.619578,37.531199,rainfall,3,10194020,귤현보,한국수자원공사,13.68,False,,,,
+underpass_coordinates:56,두빛나래 지하차도,underpass_coordinates.csv,,,126.523484,37.47986,waterlevel,1,1201653,아라서해갑문(외),한국수자원공사,11.28,False,N,,,
+underpass_coordinates:56,두빛나래 지하차도,underpass_coordinates.csv,,,126.523484,37.47986,waterlevel,2,1201652,아라서해갑실(남),한국수자원공사,11.39,False,N,,,
+underpass_coordinates:56,두빛나래 지하차도,underpass_coordinates.csv,,,126.523484,37.47986,waterlevel,3,1201654,아라서해갑실(북),한국수자원공사,11.42,False,N,,,
+underpass_coordinates:56,두빛나래 지하차도,underpass_coordinates.csv,,,126.523484,37.47986,rainfall,1,12014010,아라인천TM,한국수자원공사,12.54,False,,,,
+underpass_coordinates:56,두빛나래 지하차도,underpass_coordinates.csv,,,126.523484,37.47986,rainfall,2,10194010,김포시(김포시청),기후에너지환경부,22.66,False,,,,
+underpass_coordinates:56,두빛나래 지하차도,underpass_coordinates.csv,,,126.523484,37.47986,rainfall,3,10194020,귤현보,한국수자원공사,23.68,False,,,,
 underpass_coordinates:57,서천도월지하차도,underpass_coordinates.csv,,,127.59498,34.958755,waterlevel,1,4105630,광양시(서산교),기후에너지환경부,1.69,True,Y,3.99,3.4,2.8
 underpass_coordinates:57,서천도월지하차도,underpass_coordinates.csv,,,127.59498,34.958755,waterlevel,2,4105640,광양시(용강교),기후에너지환경부,1.89,True,Y,4.19,3.6,3.1
 underpass_coordinates:57,서천도월지하차도,underpass_coordinates.csv,,,127.59498,34.958755,waterlevel,3,4105625,광양시(성황4교),기후에너지환경부,8.2,False,N,3.51,2.9,2.2
@@ -155,6 +257,12 @@ underpass_coordinates:62,단계지하차도,underpass_coordinates.csv,,,127.9332
 underpass_coordinates:62,단계지하차도,underpass_coordinates.csv,,,127.933298,37.34371,rainfall,1,10064010,원주,기후에너지환경부,1.63,True,,,,
 underpass_coordinates:62,단계지하차도,underpass_coordinates.csv,,,127.933298,37.34371,rainfall,2,10064070,원주시(서곡초교),기후에너지환경부,5.07,False,,,,
 underpass_coordinates:62,단계지하차도,underpass_coordinates.csv,,,127.933298,37.34371,rainfall,3,10064075,원주시(신촌리),,6.2,False,,,,
+underpass_coordinates:65,강매지하차도,underpass_coordinates.csv,,,126.845244,37.611666,waterlevel,1,1019630,서울시(행주대교),기후에너지환경부,2.85,True,N,10.9,9.0,7.2
+underpass_coordinates:65,강매지하차도,underpass_coordinates.csv,,,126.845244,37.611666,waterlevel,2,1018628,행주(등록문화재),기후에너지환경부,3.38,True,N,,,
+underpass_coordinates:65,강매지하차도,underpass_coordinates.csv,,,126.845244,37.611666,waterlevel,3,1019635,아라한강갑문(내),한국수자원공사,4.69,True,N,,,
+underpass_coordinates:65,강매지하차도,underpass_coordinates.csv,,,126.845244,37.611666,rainfall,1,10194030,아라김포TM,한국수자원공사,4.26,True,,,,
+underpass_coordinates:65,강매지하차도,underpass_coordinates.csv,,,126.845244,37.611666,rainfall,2,10194020,귤현보,한국수자원공사,8.34,False,,,,
+underpass_coordinates:65,강매지하차도,underpass_coordinates.csv,,,126.845244,37.611666,rainfall,3,10194010,김포시(김포시청),기후에너지환경부,11.43,False,,,,
 underpass_coordinates:66,강촌로지하차도,underpass_coordinates.csv,,,126.796103,37.655201,waterlevel,1,1019635,아라한강갑문(내),한국수자원공사,5.9,False,N,,,
 underpass_coordinates:66,강촌로지하차도,underpass_coordinates.csv,,,126.796103,37.655201,waterlevel,2,1019636,아라한강갑실,한국수자원공사,5.9,False,N,,,
 underpass_coordinates:66,강촌로지하차도,underpass_coordinates.csv,,,126.796103,37.655201,waterlevel,3,1019637,아라한강갑문(외),한국수자원공사,5.9,False,N,,,
@@ -179,12 +287,36 @@ underpass_coordinates:69,백마지하차도,underpass_coordinates.csv,,,126.7921
 underpass_coordinates:69,백마지하차도,underpass_coordinates.csv,,,126.792172,37.660658,rainfall,1,10194030,아라김포TM,한국수자원공사,6.77,False,,,,
 underpass_coordinates:69,백마지하차도,underpass_coordinates.csv,,,126.792172,37.660658,rainfall,2,10194010,김포시(김포시청),기후에너지환경부,8.42,False,,,,
 underpass_coordinates:69,백마지하차도,underpass_coordinates.csv,,,126.792172,37.660658,rainfall,3,10194020,귤현보,한국수자원공사,10.41,False,,,,
+underpass_coordinates:70,법곳지하차도,underpass_coordinates.csv,,,126.725737,37.663507,waterlevel,1,1019661,김포시(사우교),기후에너지환경부,4.28,True,N,3.2,2.4,1.6
+underpass_coordinates:70,법곳지하차도,underpass_coordinates.csv,,,126.725737,37.663507,waterlevel,2,1019675,김포시(전류리),기후에너지환경부,6.48,False,N,8.2,6.8,5.5
+underpass_coordinates:70,법곳지하차도,underpass_coordinates.csv,,,126.725737,37.663507,waterlevel,3,1019635,아라한강갑문(내),한국수자원공사,9.05,False,N,,,
+underpass_coordinates:70,법곳지하차도,underpass_coordinates.csv,,,126.725737,37.663507,rainfall,1,10194010,김포시(김포시청),기후에너지환경부,5.44,False,,,,
+underpass_coordinates:70,법곳지하차도,underpass_coordinates.csv,,,126.725737,37.663507,rainfall,2,10194030,아라김포TM,한국수자원공사,9.57,False,,,,
+underpass_coordinates:70,법곳지하차도,underpass_coordinates.csv,,,126.725737,37.663507,rainfall,3,10194020,귤현보,한국수자원공사,11.11,False,,,,
+underpass_coordinates:71,벽제지하차도(문산),underpass_coordinates.csv,,,126.885878,37.673997,waterlevel,1,1019667,고양시(원당교),기후에너지환경부,2.15,True,Y,3.7,3.0,2.5
+underpass_coordinates:71,벽제지하차도(문산),underpass_coordinates.csv,,,126.885878,37.673997,waterlevel,2,1019663,양주시(제궁교),기후에너지환경부,4.22,True,N,6.5,5.5,4.7
+underpass_coordinates:71,벽제지하차도(문산),underpass_coordinates.csv,,,126.885878,37.673997,waterlevel,3,1019606,고양시(은덕교),기후에너지환경부,4.42,True,N,6.0,5.0,4.1
+underpass_coordinates:71,벽제지하차도(문산),underpass_coordinates.csv,,,126.885878,37.673997,rainfall,1,10194030,아라김포TM,한국수자원공사,11.22,False,,,,
+underpass_coordinates:71,벽제지하차도(문산),underpass_coordinates.csv,,,126.885878,37.673997,rainfall,2,10234030,파주시(신산초교),기후에너지환경부,12.22,False,,,,
+underpass_coordinates:71,벽제지하차도(문산),underpass_coordinates.csv,,,126.885878,37.673997,rainfall,3,10184125,의정부시(도봉차량기지),기후에너지환경부,14.95,False,,,,
+underpass_coordinates:72,벽제지하차도(서울),underpass_coordinates.csv,,,126.885878,37.673997,waterlevel,1,1019667,고양시(원당교),기후에너지환경부,2.15,True,Y,3.7,3.0,2.5
+underpass_coordinates:72,벽제지하차도(서울),underpass_coordinates.csv,,,126.885878,37.673997,waterlevel,2,1019663,양주시(제궁교),기후에너지환경부,4.22,True,N,6.5,5.5,4.7
+underpass_coordinates:72,벽제지하차도(서울),underpass_coordinates.csv,,,126.885878,37.673997,waterlevel,3,1019606,고양시(은덕교),기후에너지환경부,4.42,True,N,6.0,5.0,4.1
+underpass_coordinates:72,벽제지하차도(서울),underpass_coordinates.csv,,,126.885878,37.673997,rainfall,1,10194030,아라김포TM,한국수자원공사,11.22,False,,,,
+underpass_coordinates:72,벽제지하차도(서울),underpass_coordinates.csv,,,126.885878,37.673997,rainfall,2,10234030,파주시(신산초교),기후에너지환경부,12.22,False,,,,
+underpass_coordinates:72,벽제지하차도(서울),underpass_coordinates.csv,,,126.885878,37.673997,rainfall,3,10184125,의정부시(도봉차량기지),기후에너지환경부,14.95,False,,,,
 underpass_coordinates:74,신원지하차도,underpass_coordinates.csv,,,127.044736,37.458434,waterlevel,1,1018658,서울시(대치교),기후에너지환경부,5.15,False,N,13.5,11.1,8.7
 underpass_coordinates:74,신원지하차도,underpass_coordinates.csv,,,127.044736,37.458434,waterlevel,2,1018681,서울시(반포2교),기후에너지환경부,6.6,False,N,,,
 underpass_coordinates:74,신원지하차도,underpass_coordinates.csv,,,127.044736,37.458434,waterlevel,3,1018655,서울시(대곡교),기후에너지환경부,6.96,False,Y,8.5,7.1,5.8
 underpass_coordinates:74,신원지하차도,underpass_coordinates.csv,,,127.044736,37.458434,rainfall,1,10184150,과천시(한국수자원공사),기후에너지환경부,6.39,False,,,,
 underpass_coordinates:74,신원지하차도,underpass_coordinates.csv,,,127.044736,37.458434,rainfall,2,10184100,서울시(대곡교),기후에너지환경부,6.96,False,,,,
 underpass_coordinates:74,신원지하차도,underpass_coordinates.csv,,,127.044736,37.458434,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,7.32,False,,,,
+underpass_coordinates:75,신평IC지하차도,underpass_coordinates.csv,,,126.781462,37.629627,waterlevel,1,1019635,아라한강갑문(내),한국수자원공사,3.22,True,N,,,
+underpass_coordinates:75,신평IC지하차도,underpass_coordinates.csv,,,126.781462,37.629627,waterlevel,2,1019636,아라한강갑실,한국수자원공사,3.22,True,N,,,
+underpass_coordinates:75,신평IC지하차도,underpass_coordinates.csv,,,126.781462,37.629627,waterlevel,3,1019637,아라한강갑문(외),한국수자원공사,3.22,True,N,,,
+underpass_coordinates:75,신평IC지하차도,underpass_coordinates.csv,,,126.781462,37.629627,rainfall,1,10194030,아라김포TM,한국수자원공사,3.64,True,,,,
+underpass_coordinates:75,신평IC지하차도,underpass_coordinates.csv,,,126.781462,37.629627,rainfall,2,10194010,김포시(김포시청),기후에너지환경부,6.02,False,,,,
+underpass_coordinates:75,신평IC지하차도,underpass_coordinates.csv,,,126.781462,37.629627,rainfall,3,10194020,귤현보,한국수자원공사,6.84,False,,,,
 underpass_coordinates:76,원흥지하차도,underpass_coordinates.csv,,,126.872212,37.648072,waterlevel,1,1019667,고양시(원당교),기후에너지환경부,4.14,True,Y,3.7,3.0,2.5
 underpass_coordinates:76,원흥지하차도,underpass_coordinates.csv,,,126.872212,37.648072,waterlevel,2,1019606,고양시(은덕교),기후에너지환경부,4.34,True,N,6.0,5.0,4.1
 underpass_coordinates:76,원흥지하차도,underpass_coordinates.csv,,,126.872212,37.648072,waterlevel,3,1019663,양주시(제궁교),기후에너지환경부,6.96,False,N,6.5,5.5,4.7
@@ -227,12 +359,54 @@ underpass_coordinates:82,행신지하차도(시점부),underpass_coordinates.csv
 underpass_coordinates:82,행신지하차도(시점부),underpass_coordinates.csv,,,126.849532,37.616704,rainfall,1,10194030,아라김포TM,한국수자원공사,4.81,True,,,,
 underpass_coordinates:82,행신지하차도(시점부),underpass_coordinates.csv,,,126.849532,37.616704,rainfall,2,10194020,귤현보,한국수자원공사,8.97,False,,,,
 underpass_coordinates:82,행신지하차도(시점부),underpass_coordinates.csv,,,126.849532,37.616704,rainfall,3,10194010,김포시(김포시청),기후에너지환경부,11.8,False,,,,
+underpass_coordinates:83,관문지하차도,underpass_coordinates.csv,,,126.995691,37.446629,waterlevel,1,1018692,서울시(신림5교),기후에너지환경부,4.83,True,N,5.4,4.8,3.8
+underpass_coordinates:83,관문지하차도,underpass_coordinates.csv,,,126.995691,37.446629,waterlevel,2,1018681,서울시(반포2교),기후에너지환경부,5.86,False,N,,,
+underpass_coordinates:83,관문지하차도,underpass_coordinates.csv,,,126.995691,37.446629,waterlevel,3,1018680,서울시(잠수교),기후에너지환경부,7.85,False,N,15.6,6.2,5.5
+underpass_coordinates:83,관문지하차도,underpass_coordinates.csv,,,126.995691,37.446629,rainfall,1,10184150,과천시(한국수자원공사),기후에너지환경부,2.67,True,,,,
+underpass_coordinates:83,관문지하차도,underpass_coordinates.csv,,,126.995691,37.446629,rainfall,2,10184210,의왕시(포일동),기후에너지환경부,6.46,False,,,,
+underpass_coordinates:83,관문지하차도,underpass_coordinates.csv,,,126.995691,37.446629,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,7.72,False,,,,
+underpass_coordinates:84,매헌지하차도,underpass_coordinates.csv,,,127.035191,37.46083,waterlevel,1,1018658,서울시(대치교),기후에너지환경부,5.42,False,N,13.5,11.1,8.7
+underpass_coordinates:84,매헌지하차도,underpass_coordinates.csv,,,127.035191,37.46083,waterlevel,2,1018681,서울시(반포2교),기후에너지환경부,5.82,False,N,,,
+underpass_coordinates:84,매헌지하차도,underpass_coordinates.csv,,,127.035191,37.46083,waterlevel,3,1018660,청담,기후에너지환경부,6.99,False,N,,,
+underpass_coordinates:84,매헌지하차도,underpass_coordinates.csv,,,127.035191,37.46083,rainfall,1,10184150,과천시(한국수자원공사),기후에너지환경부,5.92,False,,,,
+underpass_coordinates:84,매헌지하차도,underpass_coordinates.csv,,,127.035191,37.46083,rainfall,2,10184040,성남시(한국학중앙연구원),기후에너지환경부,7.69,False,,,,
+underpass_coordinates:84,매헌지하차도,underpass_coordinates.csv,,,127.035191,37.46083,rainfall,3,10184100,서울시(대곡교),기후에너지환경부,7.76,False,,,,
+underpass_coordinates:85,상아벌지하차도,underpass_coordinates.csv,,,127.000949,37.437911,waterlevel,1,1018692,서울시(신림5교),기후에너지환경부,5.73,False,N,5.4,4.8,3.8
+underpass_coordinates:85,상아벌지하차도,underpass_coordinates.csv,,,127.000949,37.437911,waterlevel,2,1018681,서울시(반포2교),기후에너지환경부,6.88,False,N,,,
+underpass_coordinates:85,상아벌지하차도,underpass_coordinates.csv,,,127.000949,37.437911,waterlevel,3,1018680,서울시(잠수교),기후에너지환경부,8.83,False,N,15.6,6.2,5.5
+underpass_coordinates:85,상아벌지하차도,underpass_coordinates.csv,,,127.000949,37.437911,rainfall,1,10184150,과천시(한국수자원공사),기후에너지환경부,2.0,True,,,,
+underpass_coordinates:85,상아벌지하차도,underpass_coordinates.csv,,,127.000949,37.437911,rainfall,2,10184210,의왕시(포일동),기후에너지환경부,5.57,False,,,,
+underpass_coordinates:85,상아벌지하차도,underpass_coordinates.csv,,,127.000949,37.437911,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,6.68,False,,,,
+underpass_coordinates:88,광명지하차도,underpass_coordinates.csv,,,126.871086,37.484978,waterlevel,1,1018695,서울시(너부대교),기후에너지환경부,2.35,True,Y,4.9,4.5,3.5
+underpass_coordinates:88,광명지하차도,underpass_coordinates.csv,,,126.871086,37.484978,waterlevel,2,1018697,서울시(오금교),기후에너지환경부,2.61,True,Y,11.0,9.0,7.0
+underpass_coordinates:88,광명지하차도,underpass_coordinates.csv,,,126.871086,37.484978,waterlevel,3,1018698,서울시(신대방1교),기후에너지환경부,3.84,True,Y,4.0,3.2,2.4
+underpass_coordinates:88,광명지하차도,underpass_coordinates.csv,,,126.871086,37.484978,rainfall,1,10184080,서울시(구로구청),기후에너지환경부,1.75,True,,,,
+underpass_coordinates:88,광명지하차도,underpass_coordinates.csv,,,126.871086,37.484978,rainfall,2,10184160,부천시(부안초교),기후에너지환경부,5.27,False,,,,
+underpass_coordinates:88,광명지하차도,underpass_coordinates.csv,,,126.871086,37.484978,rainfall,3,10184090,안양시(충훈1교),기후에너지환경부,9.36,False,,,,
 underpass_coordinates:89,능촌지하차도,underpass_coordinates.csv,,,126.846987,37.441824,waterlevel,1,1018695,서울시(너부대교),기후에너지환경부,4.12,True,Y,4.9,4.5,3.5
 underpass_coordinates:89,능촌지하차도,underpass_coordinates.csv,,,126.846987,37.441824,waterlevel,2,1018693,광명시(시흥대교),기후에너지환경부,4.25,True,N,8.9,6.5,4.7
 underpass_coordinates:89,능촌지하차도,underpass_coordinates.csv,,,126.846987,37.441824,waterlevel,3,1018690,안양시(충훈1교),기후에너지환경부,6.44,False,N,5.2,4.1,3.0
 underpass_coordinates:89,능촌지하차도,underpass_coordinates.csv,,,126.846987,37.441824,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,5.27,False,,,,
 underpass_coordinates:89,능촌지하차도,underpass_coordinates.csv,,,126.846987,37.441824,rainfall,2,10184090,안양시(충훈1교),기후에너지환경부,6.44,False,,,,
 underpass_coordinates:89,능촌지하차도,underpass_coordinates.csv,,,126.846987,37.441824,rainfall,3,10184080,서울시(구로구청),기후에너지환경부,6.86,False,,,,
+underpass_coordinates:90,덕안터널,underpass_coordinates.csv,,,126.885153,37.427092,waterlevel,1,1018693,광명시(시흥대교),기후에너지환경부,2.89,True,N,8.9,6.5,4.7
+underpass_coordinates:90,덕안터널,underpass_coordinates.csv,,,126.885153,37.427092,waterlevel,2,1018690,안양시(충훈1교),기후에너지환경부,2.95,True,N,5.2,4.1,3.0
+underpass_coordinates:90,덕안터널,underpass_coordinates.csv,,,126.885153,37.427092,waterlevel,3,1018695,서울시(너부대교),기후에너지환경부,6.74,False,Y,4.9,4.5,3.5
+underpass_coordinates:90,덕안터널,underpass_coordinates.csv,,,126.885153,37.427092,rainfall,1,10184090,안양시(충훈1교),기후에너지환경부,2.95,True,,,,
+underpass_coordinates:90,덕안터널,underpass_coordinates.csv,,,126.885153,37.427092,rainfall,2,10184080,서울시(구로구청),기후에너지환경부,7.55,False,,,,
+underpass_coordinates:90,덕안터널,underpass_coordinates.csv,,,126.885153,37.427092,rainfall,3,12024020,안산시(장상동),기후에너지환경부,8.46,False,,,,
+underpass_coordinates:91,소하지하차도,underpass_coordinates.csv,,,126.894856,37.438891,waterlevel,1,1018693,광명시(시흥대교),기후에너지환경부,1.49,True,N,8.9,6.5,4.7
+underpass_coordinates:91,소하지하차도,underpass_coordinates.csv,,,126.894856,37.438891,waterlevel,2,1018690,안양시(충훈1교),기후에너지환경부,3.87,True,N,5.2,4.1,3.0
+underpass_coordinates:91,소하지하차도,underpass_coordinates.csv,,,126.894856,37.438891,waterlevel,3,1018692,서울시(신림5교),기후에너지환경부,5.61,False,N,5.4,4.8,3.8
+underpass_coordinates:91,소하지하차도,underpass_coordinates.csv,,,126.894856,37.438891,rainfall,1,10184090,안양시(충훈1교),기후에너지환경부,3.87,True,,,,
+underpass_coordinates:91,소하지하차도,underpass_coordinates.csv,,,126.894856,37.438891,rainfall,2,10184080,서울시(구로구청),기후에너지환경부,6.28,False,,,,
+underpass_coordinates:91,소하지하차도,underpass_coordinates.csv,,,126.894856,37.438891,rainfall,3,10184150,과천시(한국수자원공사),기후에너지환경부,8.33,False,,,,
+underpass_coordinates:92,하안지하차도,underpass_coordinates.csv,,,126.884046,37.464849,waterlevel,1,1018693,광명시(시흥대교),기후에너지환경부,1.63,True,N,8.9,6.5,4.7
+underpass_coordinates:92,하안지하차도,underpass_coordinates.csv,,,126.884046,37.464849,waterlevel,2,1018698,서울시(신대방1교),기후에너지환경부,3.72,True,Y,4.0,3.2,2.4
+underpass_coordinates:92,하안지하차도,underpass_coordinates.csv,,,126.884046,37.464849,waterlevel,3,1018695,서울시(너부대교),기후에너지환경부,3.74,True,Y,4.9,4.5,3.5
+underpass_coordinates:92,하안지하차도,underpass_coordinates.csv,,,126.884046,37.464849,rainfall,1,10184080,서울시(구로구청),기후에너지환경부,3.36,True,,,,
+underpass_coordinates:92,하안지하차도,underpass_coordinates.csv,,,126.884046,37.464849,rainfall,2,10184160,부천시(부안초교),기후에너지환경부,6.61,False,,,,
+underpass_coordinates:92,하안지하차도,underpass_coordinates.csv,,,126.884046,37.464849,rainfall,3,10184090,안양시(충훈1교),기후에너지환경부,6.89,False,,,,
 underpass_coordinates:93,갈매지하차도,underpass_coordinates.csv,,,127.113327,37.62006,waterlevel,1,1018635,남양주시(퇴계원리),기후에너지환경부,3.53,True,N,4.5,3.6,2.8
 underpass_coordinates:93,갈매지하차도,underpass_coordinates.csv,,,127.113327,37.62006,waterlevel,2,1018638,남양주시(왕숙교),기후에너지환경부,3.56,True,Y,9.7,8.0,6.0
 underpass_coordinates:93,갈매지하차도,underpass_coordinates.csv,,,127.113327,37.62006,waterlevel,3,1018630,남양주시(진관교),기후에너지환경부,4.76,True,Y,5.0,4.5,3.9
@@ -245,6 +419,12 @@ underpass_coordinates:94,갈매지하차도,underpass_coordinates.csv,,,127.1133
 underpass_coordinates:94,갈매지하차도,underpass_coordinates.csv,,,127.113327,37.62006,rainfall,1,10184110,남양주시(진관교),기후에너지환경부,4.76,True,,,,
 underpass_coordinates:94,갈매지하차도,underpass_coordinates.csv,,,127.113327,37.62006,rainfall,2,10184200,서울시(월계2교),기후에너지환경부,5.6,False,,,,
 underpass_coordinates:94,갈매지하차도,underpass_coordinates.csv,,,127.113327,37.62006,rainfall,3,10184190,서울시(동막골주차장),기후에너지환경부,6.54,False,,,,
+underpass_coordinates:95,담터지하차도,underpass_coordinates.csv,,,127.111791,37.641431,waterlevel,1,1018635,남양주시(퇴계원리),기후에너지환경부,2.35,True,N,4.5,3.6,2.8
+underpass_coordinates:95,담터지하차도,underpass_coordinates.csv,,,127.111791,37.641431,waterlevel,2,1018630,남양주시(진관교),기후에너지환경부,3.66,True,Y,5.0,4.5,3.9
+underpass_coordinates:95,담터지하차도,underpass_coordinates.csv,,,127.111791,37.641431,waterlevel,3,1018669,서울시(창동교),기후에너지환경부,5.23,False,N,7.9,6.5,5.1
+underpass_coordinates:95,담터지하차도,underpass_coordinates.csv,,,127.111791,37.641431,rainfall,1,10184110,남양주시(진관교),기후에너지환경부,3.66,True,,,,
+underpass_coordinates:95,담터지하차도,underpass_coordinates.csv,,,127.111791,37.641431,rainfall,2,10184190,서울시(동막골주차장),기후에너지환경부,4.35,True,,,,
+underpass_coordinates:95,담터지하차도,underpass_coordinates.csv,,,127.111791,37.641431,rainfall,3,10184200,서울시(월계2교),기후에너지환경부,5.77,False,,,,
 underpass_coordinates:96,당말지하차도,underpass_coordinates.csv,,,126.942969,37.355641,waterlevel,1,1202630,반월2,기후에너지환경부,6.06,False,N,,,
 underpass_coordinates:96,당말지하차도,underpass_coordinates.csv,,,126.942969,37.355641,waterlevel,2,1018690,안양시(충훈1교),기후에너지환경부,6.5,False,N,5.2,4.1,3.0
 underpass_coordinates:96,당말지하차도,underpass_coordinates.csv,,,126.942969,37.355641,waterlevel,3,1202660,반월1,기후에너지환경부,8.44,False,N,,,
@@ -269,6 +449,12 @@ underpass_coordinates:101,마송지하차도,underpass_coordinates.csv,,,126.602
 underpass_coordinates:101,마송지하차도,underpass_coordinates.csv,,,126.602875,37.687384,rainfall,1,10194010,김포시(김포시청),기후에너지환경부,12.76,False,,,,
 underpass_coordinates:101,마송지하차도,underpass_coordinates.csv,,,126.602875,37.687384,rainfall,2,12014010,아라인천TM,한국수자원공사,13.8,False,,,,
 underpass_coordinates:101,마송지하차도,underpass_coordinates.csv,,,126.602875,37.687384,rainfall,3,10194020,귤현보,한국수자원공사,19.55,False,,,,
+underpass_coordinates:102,운양2지하차도,underpass_coordinates.csv,,,126.675958,37.664877,waterlevel,1,1019675,김포시(전류리),기후에너지환경부,3.59,True,N,8.2,6.8,5.5
+underpass_coordinates:102,운양2지하차도,underpass_coordinates.csv,,,126.675958,37.664877,waterlevel,2,1019661,김포시(사우교),기후에너지환경부,6.33,False,N,3.2,2.4,1.6
+underpass_coordinates:102,운양2지하차도,underpass_coordinates.csv,,,126.675958,37.664877,waterlevel,3,1019648,계양대교,한국수자원공사,11.92,False,N,,,
+underpass_coordinates:102,운양2지하차도,underpass_coordinates.csv,,,126.675958,37.664877,rainfall,1,10194010,김포시(김포시청),기후에너지환경부,6.52,False,,,,
+underpass_coordinates:102,운양2지하차도,underpass_coordinates.csv,,,126.675958,37.664877,rainfall,2,12014010,아라인천TM,한국수자원공사,12.32,False,,,,
+underpass_coordinates:102,운양2지하차도,underpass_coordinates.csv,,,126.675958,37.664877,rainfall,3,10194030,아라김포TM,한국수자원공사,13.03,False,,,,
 underpass_coordinates:103,덕송지하차도,underpass_coordinates.csv,,,127.12264,37.662441,waterlevel,1,1018635,남양주시(퇴계원리),기후에너지환경부,2.37,True,N,4.5,3.6,2.8
 underpass_coordinates:103,덕송지하차도,underpass_coordinates.csv,,,127.12264,37.662441,waterlevel,2,1018630,남양주시(진관교),기후에너지환경부,2.93,True,Y,5.0,4.5,3.9
 underpass_coordinates:103,덕송지하차도,underpass_coordinates.csv,,,127.12264,37.662441,waterlevel,3,1018625,남양주시(내곡교),기후에너지환경부,4.93,True,N,6.0,4.0,3.5
@@ -281,6 +467,36 @@ underpass_coordinates:104,돌팍지하차도,underpass_coordinates.csv,,,127.231
 underpass_coordinates:104,돌팍지하차도,underpass_coordinates.csv,,,127.231305,37.638415,rainfall,1,10184060,남양주시(금곡초교),기후에너지환경부,1.78,True,,,,
 underpass_coordinates:104,돌팍지하차도,underpass_coordinates.csv,,,127.231305,37.638415,rainfall,2,10184110,남양주시(진관교),기후에너지환경부,7.11,False,,,,
 underpass_coordinates:104,돌팍지하차도,underpass_coordinates.csv,,,127.231305,37.638415,rainfall,3,10184220,남양주시(진접읍사무소),기후에너지환경부,10.41,False,,,,
+underpass_coordinates:105,동연평지하차도,underpass_coordinates.csv,,,127.175363,37.694421,waterlevel,1,1018625,남양주시(내곡교),기후에너지환경부,0.99,True,N,6.0,4.0,3.5
+underpass_coordinates:105,동연평지하차도,underpass_coordinates.csv,,,127.175363,37.694421,waterlevel,2,1018623,남양주시(연평대교),기후에너지환경부,1.83,True,N,4.2,3.5,2.8
+underpass_coordinates:105,동연평지하차도,underpass_coordinates.csv,,,127.175363,37.694421,waterlevel,3,1018630,남양주시(진관교),기후에너지환경부,5.35,False,Y,5.0,4.5,3.9
+underpass_coordinates:105,동연평지하차도,underpass_coordinates.csv,,,127.175363,37.694421,rainfall,1,10184220,남양주시(진접읍사무소),기후에너지환경부,3.75,True,,,,
+underpass_coordinates:105,동연평지하차도,underpass_coordinates.csv,,,127.175363,37.694421,rainfall,2,10184110,남양주시(진관교),기후에너지환경부,5.35,False,,,,
+underpass_coordinates:105,동연평지하차도,underpass_coordinates.csv,,,127.175363,37.694421,rainfall,3,10184060,남양주시(금곡초교),기후에너지환경부,7.25,False,,,,
+underpass_coordinates:106,별내지하차도,underpass_coordinates.csv,,,127.130381,37.649348,waterlevel,1,1018635,남양주시(퇴계원리),기후에너지환경부,0.83,True,N,4.5,3.6,2.8
+underpass_coordinates:106,별내지하차도,underpass_coordinates.csv,,,127.130381,37.649348,waterlevel,2,1018630,남양주시(진관교),기후에너지환경부,1.9,True,Y,5.0,4.5,3.9
+underpass_coordinates:106,별내지하차도,underpass_coordinates.csv,,,127.130381,37.649348,waterlevel,3,1018638,남양주시(왕숙교),기후에너지환경부,5.32,False,Y,9.7,8.0,6.0
+underpass_coordinates:106,별내지하차도,underpass_coordinates.csv,,,127.130381,37.649348,rainfall,1,10184110,남양주시(진관교),기후에너지환경부,1.9,True,,,,
+underpass_coordinates:106,별내지하차도,underpass_coordinates.csv,,,127.130381,37.649348,rainfall,2,10184190,서울시(동막골주차장),기후에너지환경부,4.83,True,,,,
+underpass_coordinates:106,별내지하차도,underpass_coordinates.csv,,,127.130381,37.649348,rainfall,3,10184060,남양주시(금곡초교),기후에너지환경부,7.29,False,,,,
+underpass_coordinates:107,용신지하차도,underpass_coordinates.csv,,,127.171884,37.661699,waterlevel,1,1018630,남양주시(진관교),기후에너지환경부,2.18,True,Y,5.0,4.5,3.9
+underpass_coordinates:107,용신지하차도,underpass_coordinates.csv,,,127.171884,37.661699,waterlevel,2,1018625,남양주시(내곡교),기후에너지환경부,3.39,True,N,6.0,4.0,3.5
+underpass_coordinates:107,용신지하차도,underpass_coordinates.csv,,,127.171884,37.661699,waterlevel,3,1018635,남양주시(퇴계원리),기후에너지환경부,3.51,True,N,4.5,3.6,2.8
+underpass_coordinates:107,용신지하차도,underpass_coordinates.csv,,,127.171884,37.661699,rainfall,1,10184110,남양주시(진관교),기후에너지환경부,2.18,True,,,,
+underpass_coordinates:107,용신지하차도,underpass_coordinates.csv,,,127.171884,37.661699,rainfall,2,10184060,남양주시(금곡초교),기후에너지환경부,4.51,True,,,,
+underpass_coordinates:107,용신지하차도,underpass_coordinates.csv,,,127.171884,37.661699,rainfall,3,10184220,남양주시(진접읍사무소),기후에너지환경부,7.34,False,,,,
+underpass_coordinates:109,호평지하차도,underpass_coordinates.csv,,,127.253396,37.653534,waterlevel,1,1018623,남양주시(연평대교),기후에너지환경부,8.87,False,N,4.2,3.5,2.8
+underpass_coordinates:109,호평지하차도,underpass_coordinates.csv,,,127.253396,37.653534,waterlevel,2,1018625,남양주시(내곡교),기후에너지환경부,8.88,False,N,6.0,4.0,3.5
+underpass_coordinates:109,호평지하차도,underpass_coordinates.csv,,,127.253396,37.653534,waterlevel,3,1018630,남양주시(진관교),기후에너지환경부,8.94,False,Y,5.0,4.5,3.9
+underpass_coordinates:109,호평지하차도,underpass_coordinates.csv,,,127.253396,37.653534,rainfall,1,10184060,남양주시(금곡초교),기후에너지환경부,4.19,True,,,,
+underpass_coordinates:109,호평지하차도,underpass_coordinates.csv,,,127.253396,37.653534,rainfall,2,10184110,남양주시(진관교),기후에너지환경부,8.94,False,,,,
+underpass_coordinates:109,호평지하차도,underpass_coordinates.csv,,,127.253396,37.653534,rainfall,3,10184220,남양주시(진접읍사무소),기후에너지환경부,9.81,False,,,,
+underpass_coordinates:111,고강지하차도,underpass_coordinates.csv,,,126.816476,37.537916,waterlevel,1,1019647,박촌1교,한국수자원공사,4.87,True,N,,,
+underpass_coordinates:111,고강지하차도,underpass_coordinates.csv,,,126.816476,37.537916,waterlevel,2,1019620,부천시(도두리2교),기후에너지환경부,4.97,True,N,4.6,3.4,2.7
+underpass_coordinates:111,고강지하차도,underpass_coordinates.csv,,,126.816476,37.537916,waterlevel,3,1019640,굴포천(내),한국수자원공사,5.27,False,N,,,
+underpass_coordinates:111,고강지하차도,underpass_coordinates.csv,,,126.816476,37.537916,rainfall,1,10194020,귤현보,한국수자원공사,5.56,False,,,,
+underpass_coordinates:111,고강지하차도,underpass_coordinates.csv,,,126.816476,37.537916,rainfall,2,10184160,부천시(부안초교),기후에너지환경부,6.45,False,,,,
+underpass_coordinates:111,고강지하차도,underpass_coordinates.csv,,,126.816476,37.537916,rainfall,3,10194030,아라김포TM,한국수자원공사,7.07,False,,,,
 underpass_coordinates:114,상동지하차도,underpass_coordinates.csv,,,126.748173,37.506101,waterlevel,1,1019640,굴포천(내),한국수자원공사,2.14,True,N,,,
 underpass_coordinates:114,상동지하차도,underpass_coordinates.csv,,,126.748173,37.506101,waterlevel,2,1019612,인천시(굴포1교),기후에너지환경부,2.26,True,N,7.2,6.1,5.0
 underpass_coordinates:114,상동지하차도,underpass_coordinates.csv,,,126.748173,37.506101,waterlevel,3,1019620,부천시(도두리2교),기후에너지환경부,3.1,True,N,4.6,3.4,2.7
@@ -299,6 +515,12 @@ underpass_coordinates:117,낙원지하차도,underpass_coordinates.csv,,,127.101
 underpass_coordinates:117,낙원지하차도,underpass_coordinates.csv,,,127.101952,37.390942,rainfall,1,10184130,성남시(대장동),기후에너지환경부,4.47,True,,,,
 underpass_coordinates:117,낙원지하차도,underpass_coordinates.csv,,,127.101952,37.390942,rainfall,2,10184040,성남시(한국학중앙연구원),기후에너지환경부,4.52,True,,,,
 underpass_coordinates:117,낙원지하차도,underpass_coordinates.csv,,,127.101952,37.390942,rainfall,3,10184230,성남시(구미초교),기후에너지환경부,6.07,False,,,,
+underpass_coordinates:118,대원지하차도,underpass_coordinates.csv,,,127.148725,37.416393,waterlevel,1,1018653,성남시(둔전교),기후에너지환경부,3.07,True,N,8.1,6.9,6.1
+underpass_coordinates:118,대원지하차도,underpass_coordinates.csv,,,127.148725,37.416393,waterlevel,2,1018650,성남시(궁내교),기후에너지환경부,6.27,False,N,5.1,4.2,3.3
+underpass_coordinates:118,대원지하차도,underpass_coordinates.csv,,,127.148725,37.416393,waterlevel,3,1018655,서울시(대곡교),기후에너지환경부,6.28,False,Y,8.5,7.1,5.8
+underpass_coordinates:118,대원지하차도,underpass_coordinates.csv,,,127.148725,37.416393,rainfall,1,10184180,성남시(성남북초교),기후에너지환경부,3.9,True,,,,
+underpass_coordinates:118,대원지하차도,underpass_coordinates.csv,,,127.148725,37.416393,rainfall,2,10184100,서울시(대곡교),기후에너지환경부,6.28,False,,,,
+underpass_coordinates:118,대원지하차도,underpass_coordinates.csv,,,127.148725,37.416393,rainfall,3,10164020,광주시(남한산초교),기후에너지환경부,7.62,False,,,,
 underpass_coordinates:119,도촌지하차도,underpass_coordinates.csv,,,127.148436,37.417729,waterlevel,1,1018653,성남시(둔전교),기후에너지환경부,2.99,True,N,8.1,6.9,6.1
 underpass_coordinates:119,도촌지하차도,underpass_coordinates.csv,,,127.148436,37.417729,waterlevel,2,1018655,서울시(대곡교),기후에너지환경부,6.13,False,Y,8.5,7.1,5.8
 underpass_coordinates:119,도촌지하차도,underpass_coordinates.csv,,,127.148436,37.417729,waterlevel,3,1018650,성남시(궁내교),기후에너지환경부,6.38,False,N,5.1,4.2,3.3
@@ -311,18 +533,36 @@ underpass_coordinates:120,돌마지하차도,underpass_coordinates.csv,,,127.133
 underpass_coordinates:120,돌마지하차도,underpass_coordinates.csv,,,127.133187,37.377377,rainfall,1,10184230,성남시(구미초교),기후에너지환경부,4.61,True,,,,
 underpass_coordinates:120,돌마지하차도,underpass_coordinates.csv,,,127.133187,37.377377,rainfall,2,10184130,성남시(대장동),기후에너지환경부,5.93,False,,,,
 underpass_coordinates:120,돌마지하차도,underpass_coordinates.csv,,,127.133187,37.377377,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,7.48,False,,,,
+underpass_coordinates:123,매송지하차도,underpass_coordinates.csv,,,127.120201,37.391384,waterlevel,1,1018650,성남시(궁내교),기후에너지환경부,2.6,True,N,5.1,4.2,3.3
+underpass_coordinates:123,매송지하차도,underpass_coordinates.csv,,,127.120201,37.391384,waterlevel,2,1018653,성남시(둔전교),기후에너지환경부,4.09,True,N,8.1,6.9,6.1
+underpass_coordinates:123,매송지하차도,underpass_coordinates.csv,,,127.120201,37.391384,waterlevel,3,1018655,서울시(대곡교),기후에너지환경부,8.62,False,Y,8.5,7.1,5.8
+underpass_coordinates:123,매송지하차도,underpass_coordinates.csv,,,127.120201,37.391384,rainfall,1,10184130,성남시(대장동),기후에너지환경부,5.66,False,,,,
+underpass_coordinates:123,매송지하차도,underpass_coordinates.csv,,,127.120201,37.391384,rainfall,2,10184230,성남시(구미초교),기후에너지환경부,5.96,False,,,,
+underpass_coordinates:123,매송지하차도,underpass_coordinates.csv,,,127.120201,37.391384,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,6.13,False,,,,
 underpass_coordinates:124,백현우회지하차도,underpass_coordinates.csv,,,127.113025,37.383895,waterlevel,1,1018650,성남시(궁내교),기후에너지환경부,1.6,True,N,5.1,4.2,3.3
 underpass_coordinates:124,백현우회지하차도,underpass_coordinates.csv,,,127.113025,37.383895,waterlevel,2,1018653,성남시(둔전교),기후에너지환경부,4.92,True,N,8.1,6.9,6.1
 underpass_coordinates:124,백현우회지하차도,underpass_coordinates.csv,,,127.113025,37.383895,waterlevel,3,1016606,광주시(동림3교),기후에너지환경부,8.89,False,N,5.5,4.8,4.1
 underpass_coordinates:124,백현우회지하차도,underpass_coordinates.csv,,,127.113025,37.383895,rainfall,1,10184130,성남시(대장동),기후에너지환경부,4.66,True,,,,
 underpass_coordinates:124,백현우회지하차도,underpass_coordinates.csv,,,127.113025,37.383895,rainfall,2,10184230,성남시(구미초교),기후에너지환경부,5.15,False,,,,
 underpass_coordinates:124,백현우회지하차도,underpass_coordinates.csv,,,127.113025,37.383895,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,5.58,False,,,,
+underpass_coordinates:125,사송지하차도,underpass_coordinates.csv,,,127.109838,37.407654,waterlevel,1,1018653,성남시(둔전교),기후에너지환경부,2.36,True,N,8.1,6.9,6.1
+underpass_coordinates:125,사송지하차도,underpass_coordinates.csv,,,127.109838,37.407654,waterlevel,2,1018650,성남시(궁내교),기후에너지환경부,4.19,True,N,5.1,4.2,3.3
+underpass_coordinates:125,사송지하차도,underpass_coordinates.csv,,,127.109838,37.407654,waterlevel,3,1018655,서울시(대곡교),기후에너지환경부,6.9,False,Y,8.5,7.1,5.8
+underpass_coordinates:125,사송지하차도,underpass_coordinates.csv,,,127.109838,37.407654,rainfall,1,10184040,성남시(한국학중앙연구원),기후에너지환경부,5.47,False,,,,
+underpass_coordinates:125,사송지하차도,underpass_coordinates.csv,,,127.109838,37.407654,rainfall,2,10184180,성남시(성남북초교),기후에너지환경부,6.08,False,,,,
+underpass_coordinates:125,사송지하차도,underpass_coordinates.csv,,,127.109838,37.407654,rainfall,3,10184130,성남시(대장동),기후에너지환경부,6.38,False,,,,
 underpass_coordinates:127,수내지하차도,underpass_coordinates.csv,,,127.123141,37.370155,waterlevel,1,1018650,성남시(궁내교),기후에너지환경부,1.31,True,N,5.1,4.2,3.3
 underpass_coordinates:127,수내지하차도,underpass_coordinates.csv,,,127.123141,37.370155,waterlevel,2,1018653,성남시(둔전교),기후에너지환경부,6.46,False,N,8.1,6.9,6.1
 underpass_coordinates:127,수내지하차도,underpass_coordinates.csv,,,127.123141,37.370155,waterlevel,3,1016606,광주시(동림3교),기후에너지환경부,7.37,False,N,5.5,4.8,4.1
 underpass_coordinates:127,수내지하차도,underpass_coordinates.csv,,,127.123141,37.370155,rainfall,1,10184230,성남시(구미초교),기후에너지환경부,3.63,True,,,,
 underpass_coordinates:127,수내지하차도,underpass_coordinates.csv,,,127.123141,37.370155,rainfall,2,10184130,성남시(대장동),기후에너지환경부,4.85,True,,,,
 underpass_coordinates:127,수내지하차도,underpass_coordinates.csv,,,127.123141,37.370155,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,6.87,False,,,,
+underpass_coordinates:128,시흥지하차도,underpass_coordinates.csv,,,127.10177,37.422114,waterlevel,1,1018653,성남시(둔전교),기후에너지환경부,1.52,True,N,8.1,6.9,6.1
+underpass_coordinates:128,시흥지하차도,underpass_coordinates.csv,,,127.10177,37.422114,waterlevel,2,1018655,서울시(대곡교),기후에너지환경부,5.51,False,Y,8.5,7.1,5.8
+underpass_coordinates:128,시흥지하차도,underpass_coordinates.csv,,,127.10177,37.422114,waterlevel,3,1018650,성남시(궁내교),기후에너지환경부,5.82,False,N,5.1,4.2,3.3
+underpass_coordinates:128,시흥지하차도,underpass_coordinates.csv,,,127.10177,37.422114,rainfall,1,10184180,성남시(성남북초교),기후에너지환경부,5.44,False,,,,
+underpass_coordinates:128,시흥지하차도,underpass_coordinates.csv,,,127.10177,37.422114,rainfall,2,10184100,서울시(대곡교),기후에너지환경부,5.51,False,,,,
+underpass_coordinates:128,시흥지하차도,underpass_coordinates.csv,,,127.10177,37.422114,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,5.56,False,,,,
 underpass_coordinates:129,여수지하차도,underpass_coordinates.csv,,,127.130217,37.421978,waterlevel,1,1018653,성남시(둔전교),기후에너지환경부,1.33,True,N,8.1,6.9,6.1
 underpass_coordinates:129,여수지하차도,underpass_coordinates.csv,,,127.130217,37.421978,waterlevel,2,1018655,서울시(대곡교),기후에너지환경부,5.26,False,Y,8.5,7.1,5.8
 underpass_coordinates:129,여수지하차도,underpass_coordinates.csv,,,127.130217,37.421978,waterlevel,3,1018650,성남시(궁내교),기후에너지환경부,6.09,False,N,5.1,4.2,3.3
@@ -347,12 +587,30 @@ underpass_coordinates:132,이매지하차도,underpass_coordinates.csv,,,127.126
 underpass_coordinates:132,이매지하차도,underpass_coordinates.csv,,,127.126863,37.386187,rainfall,1,10184230,성남시(구미초교),기후에너지환경부,5.44,False,,,,
 underpass_coordinates:132,이매지하차도,underpass_coordinates.csv,,,127.126863,37.386187,rainfall,2,10184130,성남시(대장동),기후에너지환경부,5.83,False,,,,
 underpass_coordinates:132,이매지하차도,underpass_coordinates.csv,,,127.126863,37.386187,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,6.76,False,,,,
+underpass_coordinates:133,정자지하차도,underpass_coordinates.csv,,,127.104457,37.361701,waterlevel,1,1018650,성남시(궁내교),기후에너지환경부,0.98,True,N,5.1,4.2,3.3
+underpass_coordinates:133,정자지하차도,underpass_coordinates.csv,,,127.104457,37.361701,waterlevel,2,1018653,성남시(둔전교),기후에너지환경부,7.46,False,N,8.1,6.9,6.1
+underpass_coordinates:133,정자지하차도,underpass_coordinates.csv,,,127.104457,37.361701,waterlevel,3,1016606,광주시(동림3교),기후에너지환경부,8.61,False,N,5.5,4.8,4.1
+underpass_coordinates:133,정자지하차도,underpass_coordinates.csv,,,127.104457,37.361701,rainfall,1,10184230,성남시(구미초교),기후에너지환경부,2.91,True,,,,
+underpass_coordinates:133,정자지하차도,underpass_coordinates.csv,,,127.104457,37.361701,rainfall,2,10184130,성남시(대장동),기후에너지환경부,3.08,True,,,,
+underpass_coordinates:133,정자지하차도,underpass_coordinates.csv,,,127.104457,37.361701,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,5.86,False,,,,
+underpass_coordinates:135,하산운지하차도,underpass_coordinates.csv,,,127.090584,37.383398,waterlevel,1,1018650,성남시(궁내교),기후에너지환경부,2.16,True,N,5.1,4.2,3.3
+underpass_coordinates:135,하산운지하차도,underpass_coordinates.csv,,,127.090584,37.383398,waterlevel,2,1018653,성남시(둔전교),기후에너지환경부,5.49,False,N,8.1,6.9,6.1
+underpass_coordinates:135,하산운지하차도,underpass_coordinates.csv,,,127.090584,37.383398,waterlevel,3,1018655,서울시(대곡교),기후에너지환경부,9.92,False,Y,8.5,7.1,5.8
+underpass_coordinates:135,하산운지하차도,underpass_coordinates.csv,,,127.090584,37.383398,rainfall,1,10184130,성남시(대장동),기후에너지환경부,3.19,True,,,,
+underpass_coordinates:135,하산운지하차도,underpass_coordinates.csv,,,127.090584,37.383398,rainfall,2,10184040,성남시(한국학중앙연구원),기후에너지환경부,3.66,True,,,,
+underpass_coordinates:135,하산운지하차도,underpass_coordinates.csv,,,127.090584,37.383398,rainfall,3,10184230,성남시(구미초교),기후에너지환경부,5.61,False,,,,
 underpass_coordinates:136,하탑지하차도,underpass_coordinates.csv,,,127.128666,37.405409,waterlevel,1,1018653,성남시(둔전교),기후에너지환경부,2.71,True,N,8.1,6.9,6.1
 underpass_coordinates:136,하탑지하차도,underpass_coordinates.csv,,,127.128666,37.405409,waterlevel,2,1018650,성남시(궁내교),기후에너지환경부,4.33,True,N,5.1,4.2,3.3
 underpass_coordinates:136,하탑지하차도,underpass_coordinates.csv,,,127.128666,37.405409,waterlevel,3,1018655,서울시(대곡교),기후에너지환경부,7.08,False,Y,8.5,7.1,5.8
 underpass_coordinates:136,하탑지하차도,underpass_coordinates.csv,,,127.128666,37.405409,rainfall,1,10184180,성남시(성남북초교),기후에너지환경부,5.48,False,,,,
 underpass_coordinates:136,하탑지하차도,underpass_coordinates.csv,,,127.128666,37.405409,rainfall,2,10184040,성남시(한국학중앙연구원),기후에너지환경부,7.02,False,,,,
 underpass_coordinates:136,하탑지하차도,underpass_coordinates.csv,,,127.128666,37.405409,rainfall,3,10184100,서울시(대곡교),기후에너지환경부,7.08,False,,,,
+underpass_coordinates:140,동역 지하차도,underpass_coordinates.csv,,,127.064161,37.293,waterlevel,1,1101604,수원시(백년교),기후에너지환경부,5.07,False,N,6.4,5.5,4.7
+underpass_coordinates:140,동역 지하차도,underpass_coordinates.csv,,,127.064161,37.293,waterlevel,2,1101601,수원시(매세교),기후에너지환경부,5.1,False,N,4.7,4.1,3.5
+underpass_coordinates:140,동역 지하차도,underpass_coordinates.csv,,,127.064161,37.293,waterlevel,3,1101605,화성시(화산교),기후에너지환경부,9.22,False,N,8.3,6.6,5.3
+underpass_coordinates:140,동역 지하차도,underpass_coordinates.csv,,,127.064161,37.293,rainfall,1,10184230,성남시(구미초교),기후에너지환경부,6.88,False,,,,
+underpass_coordinates:140,동역 지하차도,underpass_coordinates.csv,,,127.064161,37.293,rainfall,2,10184130,성남시(대장동),기후에너지환경부,7.47,False,,,,
+underpass_coordinates:140,동역 지하차도,underpass_coordinates.csv,,,127.064161,37.293,rainfall,3,11014090,용인시(신갈저수지),기후에너지환경부,7.89,False,,,,
 underpass_coordinates:141,매여울지하차도,underpass_coordinates.csv,,,127.047785,37.258254,waterlevel,1,1101604,수원시(백년교),기후에너지환경부,0.95,True,N,6.4,5.5,4.7
 underpass_coordinates:141,매여울지하차도,underpass_coordinates.csv,,,127.047785,37.258254,waterlevel,2,1101601,수원시(매세교),기후에너지환경부,3.03,True,N,4.7,4.1,3.5
 underpass_coordinates:141,매여울지하차도,underpass_coordinates.csv,,,127.047785,37.258254,waterlevel,3,1101605,화성시(화산교),기후에너지환경부,5.12,False,N,8.3,6.6,5.3
@@ -383,6 +641,18 @@ underpass_coordinates:145,세평지하차도,underpass_coordinates.csv,,,127.002
 underpass_coordinates:145,세평지하차도,underpass_coordinates.csv,,,127.002964,37.261927,rainfall,1,11014060,화성시(수원대학교),기후에너지환경부,6.28,False,,,,
 underpass_coordinates:145,세평지하차도,underpass_coordinates.csv,,,127.002964,37.261927,rainfall,2,11014090,용인시(신갈저수지),기후에너지환경부,8.98,False,,,,
 underpass_coordinates:145,세평지하차도,underpass_coordinates.csv,,,127.002964,37.261927,rainfall,3,10184030,남면,기후에너지환경부,10.57,False,,,,
+underpass_coordinates:146,신대 지하차도,underpass_coordinates.csv,,,127.068449,37.286278,waterlevel,1,1101604,수원시(백년교),기후에너지환경부,4.56,True,N,6.4,5.5,4.7
+underpass_coordinates:146,신대 지하차도,underpass_coordinates.csv,,,127.068449,37.286278,waterlevel,2,1101601,수원시(매세교),기후에너지환경부,5.08,False,N,4.7,4.1,3.5
+underpass_coordinates:146,신대 지하차도,underpass_coordinates.csv,,,127.068449,37.286278,waterlevel,3,1101605,화성시(화산교),기후에너지환경부,8.73,False,N,8.3,6.6,5.3
+underpass_coordinates:146,신대 지하차도,underpass_coordinates.csv,,,127.068449,37.286278,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,7.06,False,,,,
+underpass_coordinates:146,신대 지하차도,underpass_coordinates.csv,,,127.068449,37.286278,rainfall,2,10184230,성남시(구미초교),기후에너지환경부,7.2,False,,,,
+underpass_coordinates:146,신대 지하차도,underpass_coordinates.csv,,,127.068449,37.286278,rainfall,3,10184130,성남시(대장동),기후에너지환경부,8.2,False,,,,
+underpass_coordinates:147,여수내 지하차도,underpass_coordinates.csv,,,127.065869,37.290327,waterlevel,1,1101604,수원시(백년교),기후에너지환경부,4.85,True,N,6.4,5.5,4.7
+underpass_coordinates:147,여수내 지하차도,underpass_coordinates.csv,,,127.065869,37.290327,waterlevel,2,1101601,수원시(매세교),기후에너지환경부,5.07,False,N,4.7,4.1,3.5
+underpass_coordinates:147,여수내 지하차도,underpass_coordinates.csv,,,127.065869,37.290327,waterlevel,3,1101605,화성시(화산교),기후에너지환경부,9.02,False,N,8.3,6.6,5.3
+underpass_coordinates:147,여수내 지하차도,underpass_coordinates.csv,,,127.065869,37.290327,rainfall,1,10184230,성남시(구미초교),기후에너지환경부,6.99,False,,,,
+underpass_coordinates:147,여수내 지하차도,underpass_coordinates.csv,,,127.065869,37.290327,rainfall,2,11014090,용인시(신갈저수지),기후에너지환경부,7.56,False,,,,
+underpass_coordinates:147,여수내 지하차도,underpass_coordinates.csv,,,127.065869,37.290327,rainfall,3,10184130,성남시(대장동),기후에너지환경부,7.75,False,,,,
 underpass_coordinates:149,원천(원천교차로)지하차도,underpass_coordinates.csv,,,127.06214,37.270725,waterlevel,1,1101604,수원시(백년교),기후에너지환경부,2.81,True,N,6.4,5.5,4.7
 underpass_coordinates:149,원천(원천교차로)지하차도,underpass_coordinates.csv,,,127.06214,37.270725,waterlevel,2,1101601,수원시(매세교),기후에너지환경부,4.11,True,N,4.7,4.1,3.5
 underpass_coordinates:149,원천(원천교차로)지하차도,underpass_coordinates.csv,,,127.06214,37.270725,waterlevel,3,1101605,화성시(화산교),기후에너지환경부,6.96,False,N,8.3,6.6,5.3
@@ -413,6 +683,12 @@ underpass_coordinates:153,창룡문 지하차도,underpass_coordinates.csv,,,127
 underpass_coordinates:153,창룡문 지하차도,underpass_coordinates.csv,,,127.025045,37.289194,rainfall,1,10184130,성남시(대장동),기후에너지환경부,8.81,False,,,,
 underpass_coordinates:153,창룡문 지하차도,underpass_coordinates.csv,,,127.025045,37.289194,rainfall,2,11014090,용인시(신갈저수지),기후에너지환경부,9.29,False,,,,
 underpass_coordinates:153,창룡문 지하차도,underpass_coordinates.csv,,,127.025045,37.289194,rainfall,3,10184030,남면,기후에너지환경부,9.45,False,,,,
+underpass_coordinates:154,호곳말통로,underpass_coordinates.csv,,,127.072676,37.294888,waterlevel,1,1101604,수원시(백년교),기후에너지환경부,5.58,False,N,6.4,5.5,4.7
+underpass_coordinates:154,호곳말통로,underpass_coordinates.csv,,,127.072676,37.294888,waterlevel,2,1101601,수원시(매세교),기후에너지환경부,5.85,False,N,4.7,4.1,3.5
+underpass_coordinates:154,호곳말통로,underpass_coordinates.csv,,,127.072676,37.294888,waterlevel,3,1018650,성남시(궁내교),기후에너지환경부,8.93,False,N,5.1,4.2,3.3
+underpass_coordinates:154,호곳말통로,underpass_coordinates.csv,,,127.072676,37.294888,rainfall,1,10184230,성남시(구미초교),기후에너지환경부,6.22,False,,,,
+underpass_coordinates:154,호곳말통로,underpass_coordinates.csv,,,127.072676,37.294888,rainfall,2,10184130,성남시(대장동),기후에너지환경부,7.24,False,,,,
+underpass_coordinates:154,호곳말통로,underpass_coordinates.csv,,,127.072676,37.294888,rainfall,3,11014090,용인시(신갈저수지),기후에너지환경부,7.87,False,,,,
 underpass_coordinates:155,호매실지하차도,underpass_coordinates.csv,,,126.957141,37.261541,waterlevel,1,1101601,수원시(매세교),기후에너지환경부,5.24,False,N,4.7,4.1,3.5
 underpass_coordinates:155,호매실지하차도,underpass_coordinates.csv,,,126.957141,37.261541,waterlevel,2,1101605,화성시(화산교),기후에너지환경부,7.41,False,N,8.3,6.6,5.3
 underpass_coordinates:155,호매실지하차도,underpass_coordinates.csv,,,126.957141,37.261541,waterlevel,3,1101604,수원시(백년교),기후에너지환경부,7.65,False,N,6.4,5.5,4.7
@@ -467,6 +743,12 @@ underpass_coordinates:169,원곡지하차도,underpass_coordinates.csv,,,126.790
 underpass_coordinates:169,원곡지하차도,underpass_coordinates.csv,,,126.790746,37.334909,rainfall,1,12024010,안산시(안산호동초교),기후에너지환경부,7.01,False,,,,
 underpass_coordinates:169,원곡지하차도,underpass_coordinates.csv,,,126.790746,37.334909,rainfall,2,12024020,안산시(장상동),기후에너지환경부,8.17,False,,,,
 underpass_coordinates:169,원곡지하차도,underpass_coordinates.csv,,,126.790746,37.334909,rainfall,3,10184090,안양시(충훈1교),기후에너지환경부,12.6,False,,,,
+underpass_coordinates:170,중앙지하차도,underpass_coordinates.csv,,,126.976852,37.574305,waterlevel,1,1018686,서울시(홍남교),기후에너지환경부,4.45,True,N,5.3,4.6,3.9
+underpass_coordinates:170,중앙지하차도,underpass_coordinates.csv,,,126.976852,37.574305,waterlevel,2,1018680,서울시(잠수교),기후에너지환경부,6.55,False,N,15.6,6.2,5.5
+underpass_coordinates:170,중앙지하차도,underpass_coordinates.csv,,,126.976852,37.574305,waterlevel,3,1018685,구용산,기후에너지환경부,6.83,False,N,,,
+underpass_coordinates:170,중앙지하차도,underpass_coordinates.csv,,,126.976852,37.574305,rainfall,1,10184070,서울,기후에너지환경부,4.64,True,,,,
+underpass_coordinates:170,중앙지하차도,underpass_coordinates.csv,,,126.976852,37.574305,rainfall,2,10184140,서울시(송정동),기후에너지환경부,7.36,False,,,,
+underpass_coordinates:170,중앙지하차도,underpass_coordinates.csv,,,126.976852,37.574305,rainfall,3,10184200,서울시(월계2교),기후에너지환경부,8.5,False,,,,
 underpass_coordinates:171,초지역지하차도,underpass_coordinates.csv,,,126.80877,37.319982,waterlevel,1,1202650,안산시(안산10교),기후에너지환경부,3.04,True,N,6.3,5.4,4.6
 underpass_coordinates:171,초지역지하차도,underpass_coordinates.csv,,,126.80877,37.319982,waterlevel,2,1202660,반월1,기후에너지환경부,4.27,True,N,,,
 underpass_coordinates:171,초지역지하차도,underpass_coordinates.csv,,,126.80877,37.319982,waterlevel,3,1202630,반월2,기후에너지환경부,6.65,False,N,,,
@@ -515,6 +797,12 @@ underpass_coordinates:179,옥정지하차도,underpass_coordinates.csv,,,127.091
 underpass_coordinates:179,옥정지하차도,underpass_coordinates.csv,,,127.091612,37.818157,rainfall,1,10224070,포천시(송우초교),기후에너지환경부,4.75,True,,,,
 underpass_coordinates:179,옥정지하차도,underpass_coordinates.csv,,,127.091612,37.818157,rainfall,2,10184010,의정부시(중앙초교),기후에너지환경부,9.08,False,,,,
 underpass_coordinates:179,옥정지하차도,underpass_coordinates.csv,,,127.091612,37.818157,rainfall,3,10184120,포천시(진목리),기후에너지환경부,10.94,False,,,,
+underpass_coordinates:182,세교지하차도,underpass_coordinates.csv,,,127.047175,37.180773,waterlevel,1,1101641,화성시(느티교),기후에너지환경부,3.85,True,N,,,
+underpass_coordinates:182,세교지하차도,underpass_coordinates.csv,,,127.047175,37.180773,waterlevel,2,1101605,화성시(화산교),기후에너지환경부,4.75,True,N,8.3,6.6,5.3
+underpass_coordinates:182,세교지하차도,underpass_coordinates.csv,,,127.047175,37.180773,waterlevel,3,1101645,오산시(탑동대교),기후에너지환경부,5.3,False,Y,4.2,5.2,4.5
+underpass_coordinates:182,세교지하차도,underpass_coordinates.csv,,,127.047175,37.180773,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,6.52,False,,,,
+underpass_coordinates:182,세교지하차도,underpass_coordinates.csv,,,127.047175,37.180773,rainfall,2,11014060,화성시(수원대학교),기후에너지환경부,7.17,False,,,,
+underpass_coordinates:182,세교지하차도,underpass_coordinates.csv,,,127.047175,37.180773,rainfall,3,11014070,평택시(회화리),기후에너지환경부,9.55,False,,,,
 underpass_coordinates:183,세마지하차도,underpass_coordinates.csv,,,127.04672,37.189733,waterlevel,1,1101641,화성시(느티교),기후에너지환경부,3.47,True,N,,,
 underpass_coordinates:183,세마지하차도,underpass_coordinates.csv,,,127.04672,37.189733,waterlevel,2,1101605,화성시(화산교),기후에너지환경부,3.9,True,N,8.3,6.6,5.3
 underpass_coordinates:183,세마지하차도,underpass_coordinates.csv,,,127.04672,37.189733,waterlevel,3,1101645,오산시(탑동대교),기후에너지환경부,6.29,False,Y,4.2,5.2,4.5
@@ -533,12 +821,24 @@ underpass_coordinates:185,공세지하차도,underpass_coordinates.csv,,,127.117
 underpass_coordinates:185,공세지하차도,underpass_coordinates.csv,,,127.117039,37.239059,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,2.5,True,,,,
 underpass_coordinates:185,공세지하차도,underpass_coordinates.csv,,,127.117039,37.239059,rainfall,2,10164070,용인시(역삼동주민센터),기후에너지환경부,6.33,False,,,,
 underpass_coordinates:185,공세지하차도,underpass_coordinates.csv,,,127.117039,37.239059,rainfall,3,10164030,용인시(포곡초교),기후에너지환경부,10.22,False,,,,
+underpass_coordinates:186,금광 지하차도,underpass_coordinates.csv,,,127.072392,37.281986,waterlevel,1,1101604,수원시(백년교),기후에너지환경부,4.36,True,N,6.4,5.5,4.7
+underpass_coordinates:186,금광 지하차도,underpass_coordinates.csv,,,127.072392,37.281986,waterlevel,2,1101601,수원시(매세교),기후에너지환경부,5.24,False,N,4.7,4.1,3.5
+underpass_coordinates:186,금광 지하차도,underpass_coordinates.csv,,,127.072392,37.281986,waterlevel,3,1101605,화성시(화산교),기후에너지환경부,8.5,False,N,8.3,6.6,5.3
+underpass_coordinates:186,금광 지하차도,underpass_coordinates.csv,,,127.072392,37.281986,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,6.5,False,,,,
+underpass_coordinates:186,금광 지하차도,underpass_coordinates.csv,,,127.072392,37.281986,rainfall,2,10184230,성남시(구미초교),기후에너지환경부,7.39,False,,,,
+underpass_coordinates:186,금광 지하차도,underpass_coordinates.csv,,,127.072392,37.281986,rainfall,3,10184130,성남시(대장동),기후에너지환경부,8.68,False,,,,
 underpass_coordinates:187,동백지하차도(지하차도 #1),underpass_coordinates.csv,,,127.150818,37.285666,waterlevel,1,1016606,광주시(동림3교),기후에너지환경부,7.55,False,N,5.5,4.8,4.1
 underpass_coordinates:187,동백지하차도(지하차도 #1),underpass_coordinates.csv,,,127.150818,37.285666,waterlevel,2,1016607,용인시(월촌교),기후에너지환경부,9.41,False,N,6.7,5.0,3.6
 underpass_coordinates:187,동백지하차도(지하차도 #1),underpass_coordinates.csv,,,127.150818,37.285666,waterlevel,3,1016601,용인시(마전교),기후에너지환경부,9.69,False,N,5.3,4.7,4.2
 underpass_coordinates:187,동백지하차도(지하차도 #1),underpass_coordinates.csv,,,127.150818,37.285666,rainfall,1,10164030,용인시(포곡초교),기후에너지환경부,6.12,False,,,,
 underpass_coordinates:187,동백지하차도(지하차도 #1),underpass_coordinates.csv,,,127.150818,37.285666,rainfall,2,10184230,성남시(구미초교),기후에너지환경부,6.49,False,,,,
 underpass_coordinates:187,동백지하차도(지하차도 #1),underpass_coordinates.csv,,,127.150818,37.285666,rainfall,3,10164070,용인시(역삼동주민센터),기후에너지환경부,6.59,False,,,,
+underpass_coordinates:188,삼막곡 제1지하차도,underpass_coordinates.csv,,,127.103013,37.295684,waterlevel,1,1101604,수원시(백년교),기후에너지환경부,7.32,False,N,6.4,5.5,4.7
+underpass_coordinates:188,삼막곡 제1지하차도,underpass_coordinates.csv,,,127.103013,37.295684,waterlevel,2,1018650,성남시(궁내교),기후에너지환경부,8.28,False,N,5.1,4.2,3.3
+underpass_coordinates:188,삼막곡 제1지하차도,underpass_coordinates.csv,,,127.103013,37.295684,waterlevel,3,1101601,수원시(매세교),기후에너지환경부,8.3,False,N,4.7,4.1,3.5
+underpass_coordinates:188,삼막곡 제1지하차도,underpass_coordinates.csv,,,127.103013,37.295684,rainfall,1,10184230,성남시(구미초교),기후에너지환경부,4.86,True,,,,
+underpass_coordinates:188,삼막곡 제1지하차도,underpass_coordinates.csv,,,127.103013,37.295684,rainfall,2,10184130,성남시(대장동),기후에너지환경부,7.73,False,,,,
+underpass_coordinates:188,삼막곡 제1지하차도,underpass_coordinates.csv,,,127.103013,37.295684,rainfall,3,11014090,용인시(신갈저수지),기후에너지환경부,7.78,False,,,,
 underpass_coordinates:189,서천지하차도,underpass_coordinates.csv,,,127.070594,37.234325,waterlevel,1,1101604,수원시(백년교),기후에너지환경부,3.09,True,N,6.4,5.5,4.7
 underpass_coordinates:189,서천지하차도,underpass_coordinates.csv,,,127.070594,37.234325,waterlevel,2,1101641,화성시(느티교),기후에너지환경부,4.12,True,N,,,
 underpass_coordinates:189,서천지하차도,underpass_coordinates.csv,,,127.070594,37.234325,waterlevel,3,1101605,화성시(화산교),기후에너지환경부,4.82,True,N,8.3,6.6,5.3
@@ -593,6 +893,12 @@ underpass_coordinates:201,금신 지하차도,underpass_coordinates.csv,,,127.05
 underpass_coordinates:201,금신 지하차도,underpass_coordinates.csv,,,127.058006,37.74801,rainfall,1,10184010,의정부시(중앙초교),기후에너지환경부,1.08,True,,,,
 underpass_coordinates:201,금신 지하차도,underpass_coordinates.csv,,,127.058006,37.74801,rainfall,2,10184125,의정부시(도봉차량기지),기후에너지환경부,5.09,False,,,,
 underpass_coordinates:201,금신 지하차도,underpass_coordinates.csv,,,127.058006,37.74801,rainfall,3,10184190,서울시(동막골주차장),기후에너지환경부,8.51,False,,,,
+underpass_coordinates:202,민락지하차도,underpass_coordinates.csv,,,127.109716,37.748722,waterlevel,1,1018666,의정부시(금신교),기후에너지환경부,4.45,True,N,7.6,6.5,5.4
+underpass_coordinates:202,민락지하차도,underpass_coordinates.csv,,,127.109716,37.748722,waterlevel,2,1018665,의정부시(신곡교),기후에너지환경부,5.18,False,Y,7.0,6.0,5.1
+underpass_coordinates:202,민락지하차도,underpass_coordinates.csv,,,127.109716,37.748722,waterlevel,3,1018661,양주시(마전3교),기후에너지환경부,6.32,False,N,6.3,5.4,4.5
+underpass_coordinates:202,민락지하차도,underpass_coordinates.csv,,,127.109716,37.748722,rainfall,1,10184010,의정부시(중앙초교),기후에너지환경부,5.59,False,,,,
+underpass_coordinates:202,민락지하차도,underpass_coordinates.csv,,,127.109716,37.748722,rainfall,2,10184125,의정부시(도봉차량기지),기후에너지환경부,7.23,False,,,,
+underpass_coordinates:202,민락지하차도,underpass_coordinates.csv,,,127.109716,37.748722,rainfall,3,10184220,남양주시(진접읍사무소),기후에너지환경부,7.49,False,,,,
 underpass_coordinates:204,신곡지하차도,underpass_coordinates.csv,,,127.057909,37.736397,waterlevel,1,1018665,의정부시(신곡교),기후에너지환경부,0.42,True,Y,7.0,6.0,5.1
 underpass_coordinates:204,신곡지하차도,underpass_coordinates.csv,,,127.057909,37.736397,waterlevel,2,1018666,의정부시(금신교),기후에너지환경부,1.21,True,N,7.6,6.5,5.4
 underpass_coordinates:204,신곡지하차도,underpass_coordinates.csv,,,127.057909,37.736397,waterlevel,3,1018661,양주시(마전3교),기후에너지환경부,4.76,True,N,6.3,5.4,4.5
@@ -617,6 +923,24 @@ underpass_coordinates:207,의정부역지하차도,underpass_coordinates.csv,,,1
 underpass_coordinates:207,의정부역지하차도,underpass_coordinates.csv,,,127.045755,37.738485,rainfall,1,10184010,의정부시(중앙초교),기후에너지환경부,0.7,True,,,,
 underpass_coordinates:207,의정부역지하차도,underpass_coordinates.csv,,,127.045755,37.738485,rainfall,2,10184125,의정부시(도봉차량기지),기후에너지환경부,4.04,True,,,,
 underpass_coordinates:207,의정부역지하차도,underpass_coordinates.csv,,,127.045755,37.738485,rainfall,3,10184190,서울시(동막골주차장),기후에너지환경부,7.92,False,,,,
+underpass_coordinates:208,자금지하차도(구리),underpass_coordinates.csv,,,127.119302,37.769995,waterlevel,1,1018666,의정부시(금신교),기후에너지환경부,5.86,False,N,7.6,6.5,5.4
+underpass_coordinates:208,자금지하차도(구리),underpass_coordinates.csv,,,127.119302,37.769995,waterlevel,2,1018661,양주시(마전3교),기후에너지환경부,6.29,False,N,6.3,5.4,4.5
+underpass_coordinates:208,자금지하차도(구리),underpass_coordinates.csv,,,127.119302,37.769995,waterlevel,3,1018665,의정부시(신곡교),기후에너지환경부,6.97,False,Y,7.0,6.0,5.1
+underpass_coordinates:208,자금지하차도(구리),underpass_coordinates.csv,,,127.119302,37.769995,rainfall,1,10184010,의정부시(중앙초교),기후에너지환경부,7.0,False,,,,
+underpass_coordinates:208,자금지하차도(구리),underpass_coordinates.csv,,,127.119302,37.769995,rainfall,2,10224070,포천시(송우초교),기후에너지환경부,7.01,False,,,,
+underpass_coordinates:208,자금지하차도(구리),underpass_coordinates.csv,,,127.119302,37.769995,rainfall,3,10184220,남양주시(진접읍사무소),기후에너지환경부,7.9,False,,,,
+underpass_coordinates:209,자금지하차도(포천),underpass_coordinates.csv,,,127.119302,37.769995,waterlevel,1,1018666,의정부시(금신교),기후에너지환경부,5.86,False,N,7.6,6.5,5.4
+underpass_coordinates:209,자금지하차도(포천),underpass_coordinates.csv,,,127.119302,37.769995,waterlevel,2,1018661,양주시(마전3교),기후에너지환경부,6.29,False,N,6.3,5.4,4.5
+underpass_coordinates:209,자금지하차도(포천),underpass_coordinates.csv,,,127.119302,37.769995,waterlevel,3,1018665,의정부시(신곡교),기후에너지환경부,6.97,False,Y,7.0,6.0,5.1
+underpass_coordinates:209,자금지하차도(포천),underpass_coordinates.csv,,,127.119302,37.769995,rainfall,1,10184010,의정부시(중앙초교),기후에너지환경부,7.0,False,,,,
+underpass_coordinates:209,자금지하차도(포천),underpass_coordinates.csv,,,127.119302,37.769995,rainfall,2,10224070,포천시(송우초교),기후에너지환경부,7.01,False,,,,
+underpass_coordinates:209,자금지하차도(포천),underpass_coordinates.csv,,,127.119302,37.769995,rainfall,3,10184220,남양주시(진접읍사무소),기후에너지환경부,7.9,False,,,,
+underpass_coordinates:210,교하지하차도,underpass_coordinates.csv,,,126.717281,37.726494,waterlevel,1,1019680,파주시(교하교),기후에너지환경부,5.4,False,N,7.8,6.5,5.1
+underpass_coordinates:210,교하지하차도,underpass_coordinates.csv,,,126.717281,37.726494,waterlevel,2,1019675,김포시(전류리),기후에너지환경부,5.76,False,N,8.2,6.8,5.5
+underpass_coordinates:210,교하지하차도,underpass_coordinates.csv,,,126.717281,37.726494,waterlevel,3,1019661,김포시(사우교),기후에너지환경부,11.32,False,N,3.2,2.4,1.6
+underpass_coordinates:210,교하지하차도,underpass_coordinates.csv,,,126.717281,37.726494,rainfall,1,10194010,김포시(김포시청),기후에너지환경부,12.37,False,,,,
+underpass_coordinates:210,교하지하차도,underpass_coordinates.csv,,,126.717281,37.726494,rainfall,2,10234030,파주시(신산초교),기후에너지환경부,13.28,False,,,,
+underpass_coordinates:210,교하지하차도,underpass_coordinates.csv,,,126.717281,37.726494,rainfall,3,10194030,아라김포TM,한국수자원공사,15.8,False,,,,
 underpass_coordinates:211,동패지하차도,underpass_coordinates.csv,,,126.71847,37.701583,waterlevel,1,1019675,김포시(전류리),기후에너지환경부,4.8,True,N,8.2,6.8,5.5
 underpass_coordinates:211,동패지하차도,underpass_coordinates.csv,,,126.71847,37.701583,waterlevel,2,1019680,파주시(교하교),기후에너지환경부,7.54,False,N,7.8,6.5,5.1
 underpass_coordinates:211,동패지하차도,underpass_coordinates.csv,,,126.71847,37.701583,waterlevel,3,1019661,김포시(사우교),기후에너지환경부,8.55,False,N,3.2,2.4,1.6
@@ -647,36 +971,84 @@ underpass_coordinates:219,고덕지하차도,underpass_coordinates.csv,,,127.043
 underpass_coordinates:219,고덕지하차도,underpass_coordinates.csv,,,127.043712,37.051819,rainfall,1,11014070,평택시(회화리),기후에너지환경부,5.1,False,,,,
 underpass_coordinates:219,고덕지하차도,underpass_coordinates.csv,,,127.043712,37.051819,rainfall,2,11014010,평택시(진위면사무소),기후에너지환경부,6.78,False,,,,
 underpass_coordinates:219,고덕지하차도,underpass_coordinates.csv,,,127.043712,37.051819,rainfall,3,11014080,평택시(군문교),기후에너지환경부,8.24,False,,,,
+underpass_coordinates:220,세교지하차도,underpass_coordinates.csv,,,127.047175,37.180773,waterlevel,1,1101641,화성시(느티교),기후에너지환경부,3.85,True,N,,,
+underpass_coordinates:220,세교지하차도,underpass_coordinates.csv,,,127.047175,37.180773,waterlevel,2,1101605,화성시(화산교),기후에너지환경부,4.75,True,N,8.3,6.6,5.3
+underpass_coordinates:220,세교지하차도,underpass_coordinates.csv,,,127.047175,37.180773,waterlevel,3,1101645,오산시(탑동대교),기후에너지환경부,5.3,False,Y,4.2,5.2,4.5
+underpass_coordinates:220,세교지하차도,underpass_coordinates.csv,,,127.047175,37.180773,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,6.52,False,,,,
+underpass_coordinates:220,세교지하차도,underpass_coordinates.csv,,,127.047175,37.180773,rainfall,2,11014060,화성시(수원대학교),기후에너지환경부,7.17,False,,,,
+underpass_coordinates:220,세교지하차도,underpass_coordinates.csv,,,127.047175,37.180773,rainfall,3,11014070,평택시(회화리),기후에너지환경부,9.55,False,,,,
 underpass_coordinates:221,이충지하차도,underpass_coordinates.csv,,,127.054638,37.052215,waterlevel,1,1101663,평택시(진위1교),기후에너지환경부,4.76,True,Y,7.0,5.8,4.6
 underpass_coordinates:221,이충지하차도,underpass_coordinates.csv,,,127.054638,37.052215,waterlevel,2,1101670,평택시(동연교),기후에너지환경부,5.07,False,Y,10.1,8.5,7.5
 underpass_coordinates:221,이충지하차도,underpass_coordinates.csv,,,127.054638,37.052215,waterlevel,3,1101675,궁안교,기후에너지환경부,5.19,False,N,,,
 underpass_coordinates:221,이충지하차도,underpass_coordinates.csv,,,127.054638,37.052215,rainfall,1,11014070,평택시(회화리),기후에너지환경부,5.39,False,,,,
 underpass_coordinates:221,이충지하차도,underpass_coordinates.csv,,,127.054638,37.052215,rainfall,2,11014010,평택시(진위면사무소),기후에너지환경부,6.2,False,,,,
 underpass_coordinates:221,이충지하차도,underpass_coordinates.csv,,,127.054638,37.052215,rainfall,3,11014080,평택시(군문교),기후에너지환경부,7.95,False,,,,
+underpass_coordinates:222,이가팔지하차도,underpass_coordinates.csv,,,127.155708,37.8238,waterlevel,1,1022651,포천시(가산교),기후에너지환경부,1.46,True,N,5.0,3.9,2.8
+underpass_coordinates:222,이가팔지하차도,underpass_coordinates.csv,,,127.155708,37.8238,waterlevel,2,1018619,포천시(마명1교),기후에너지환경부,6.53,False,N,6.0,4.8,3.9
+underpass_coordinates:222,이가팔지하차도,underpass_coordinates.csv,,,127.155708,37.8238,waterlevel,3,1022647,포천시(포천대교),기후에너지환경부,8.65,False,Y,8.7,7.4,6.1
+underpass_coordinates:222,이가팔지하차도,underpass_coordinates.csv,,,127.155708,37.8238,rainfall,1,10224070,포천시(송우초교),기후에너지환경부,1.27,True,,,,
+underpass_coordinates:222,이가팔지하차도,underpass_coordinates.csv,,,127.155708,37.8238,rainfall,2,10184120,포천시(진목리),기후에너지환경부,6.09,False,,,,
+underpass_coordinates:222,이가팔지하차도,underpass_coordinates.csv,,,127.155708,37.8238,rainfall,3,10184020,포천시(내촌면사무소),기후에너지환경부,7.63,False,,,,
 underpass_coordinates:225,신풍지하차도,underpass_coordinates.csv,,,127.214678,37.550768,waterlevel,1,1018610,남양주시(팔당대교),기후에너지환경부,2.21,True,N,15.6,12.7,9.5
 underpass_coordinates:225,신풍지하차도,underpass_coordinates.csv,,,127.214678,37.550768,waterlevel,2,1018611,팔당대교,기후에너지환경부,2.46,True,N,,,
 underpass_coordinates:225,신풍지하차도,underpass_coordinates.csv,,,127.214678,37.550768,waterlevel,3,1018605,고안(등록문화재),기후에너지환경부,3.27,True,N,,0.0,0.0
 underpass_coordinates:225,신풍지하차도,underpass_coordinates.csv,,,127.214678,37.550768,rainfall,1,10184050,고안(등록문화재),기후에너지환경부,3.27,True,,,,
 underpass_coordinates:225,신풍지하차도,underpass_coordinates.csv,,,127.214678,37.550768,rainfall,2,10174020,남양주시(팔당댐),기후에너지환경부,6.6,False,,,,
 underpass_coordinates:225,신풍지하차도,underpass_coordinates.csv,,,127.214678,37.550768,rainfall,3,10184232,팔당댐,한국수력원자력,6.6,False,,,,
+underpass_coordinates:229,금곡지하차도,underpass_coordinates.csv,,,126.949523,37.267131,waterlevel,1,1101601,수원시(매세교),기후에너지환경부,5.87,False,N,4.7,4.1,3.5
+underpass_coordinates:229,금곡지하차도,underpass_coordinates.csv,,,126.949523,37.267131,waterlevel,2,1101605,화성시(화산교),기후에너지환경부,8.33,False,N,8.3,6.6,5.3
+underpass_coordinates:229,금곡지하차도,underpass_coordinates.csv,,,126.949523,37.267131,waterlevel,3,1101604,수원시(백년교),기후에너지환경부,8.43,False,N,6.4,5.5,4.7
+underpass_coordinates:229,금곡지하차도,underpass_coordinates.csv,,,126.949523,37.267131,rainfall,1,11014060,화성시(수원대학교),기후에너지환경부,6.74,False,,,,
+underpass_coordinates:229,금곡지하차도,underpass_coordinates.csv,,,126.949523,37.267131,rainfall,2,10184030,남면,기후에너지환경부,8.64,False,,,,
+underpass_coordinates:229,금곡지하차도,underpass_coordinates.csv,,,126.949523,37.267131,rainfall,3,12024010,안산시(안산호동초교),기후에너지환경부,9.04,False,,,,
 underpass_coordinates:230,남양지하차도,underpass_coordinates.csv,,,126.832214,37.216146,waterlevel,1,1202650,안산시(안산10교),기후에너지환경부,11.0,False,N,6.3,5.4,4.6
 underpass_coordinates:230,남양지하차도,underpass_coordinates.csv,,,126.832214,37.216146,waterlevel,2,1202660,반월1,기후에너지환경부,12.06,False,N,,,
 underpass_coordinates:230,남양지하차도,underpass_coordinates.csv,,,126.832214,37.216146,waterlevel,3,1202668,화성시(발안천2교),기후에너지환경부,12.19,False,N,6.0,5.1,4.3
 underpass_coordinates:230,남양지하차도,underpass_coordinates.csv,,,126.832214,37.216146,rainfall,1,12024010,안산시(안산호동초교),기후에너지환경부,11.13,False,,,,
 underpass_coordinates:230,남양지하차도,underpass_coordinates.csv,,,126.832214,37.216146,rainfall,2,11014060,화성시(수원대학교),기후에너지환경부,12.66,False,,,,
 underpass_coordinates:230,남양지하차도,underpass_coordinates.csv,,,126.832214,37.216146,rainfall,3,12024020,안산시(장상동),기후에너지환경부,15.61,False,,,,
+underpass_coordinates:231,동부대로5(동탄산단1)지하차도,underpass_coordinates.csv,,,127.086792,37.17254,waterlevel,1,1101641,화성시(느티교),기후에너지환경부,2.94,True,N,,,
+underpass_coordinates:231,동부대로5(동탄산단1)지하차도,underpass_coordinates.csv,,,127.086792,37.17254,waterlevel,2,1101645,오산시(탑동대교),기후에너지환경부,5.0,True,Y,4.2,5.2,4.5
+underpass_coordinates:231,동부대로5(동탄산단1)지하차도,underpass_coordinates.csv,,,127.086792,37.17254,waterlevel,3,1101605,화성시(화산교),기후에너지환경부,7.75,False,N,8.3,6.6,5.3
+underpass_coordinates:231,동부대로5(동탄산단1)지하차도,underpass_coordinates.csv,,,127.086792,37.17254,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,5.99,False,,,,
+underpass_coordinates:231,동부대로5(동탄산단1)지하차도,underpass_coordinates.csv,,,127.086792,37.17254,rainfall,2,11014010,평택시(진위면사무소),기후에너지환경부,8.07,False,,,,
+underpass_coordinates:231,동부대로5(동탄산단1)지하차도,underpass_coordinates.csv,,,127.086792,37.17254,rainfall,3,11014070,평택시(회화리),기후에너지환경부,9.93,False,,,,
+underpass_coordinates:232,동부대로6(동탄산단2)지하차도,underpass_coordinates.csv,,,127.085166,37.16474,waterlevel,1,1101641,화성시(느티교),기후에너지환경부,3.8,True,N,,,
+underpass_coordinates:232,동부대로6(동탄산단2)지하차도,underpass_coordinates.csv,,,127.085166,37.16474,waterlevel,2,1101645,오산시(탑동대교),기후에너지환경부,4.19,True,Y,4.2,5.2,4.5
+underpass_coordinates:232,동부대로6(동탄산단2)지하차도,underpass_coordinates.csv,,,127.085166,37.16474,waterlevel,3,1101605,화성시(화산교),기후에너지환경부,8.24,False,N,8.3,6.6,5.3
+underpass_coordinates:232,동부대로6(동탄산단2)지하차도,underpass_coordinates.csv,,,127.085166,37.16474,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,6.87,False,,,,
+underpass_coordinates:232,동부대로6(동탄산단2)지하차도,underpass_coordinates.csv,,,127.085166,37.16474,rainfall,2,11014010,평택시(진위면사무소),기후에너지환경부,7.21,False,,,,
+underpass_coordinates:232,동부대로6(동탄산단2)지하차도,underpass_coordinates.csv,,,127.085166,37.16474,rainfall,3,11014070,평택시(회화리),기후에너지환경부,9.12,False,,,,
 underpass_coordinates:234,병점지하차도,underpass_coordinates.csv,,,127.034039,37.209043,waterlevel,1,1101605,화성시(화산교),기후에너지환경부,1.56,True,N,8.3,6.6,5.3
 underpass_coordinates:234,병점지하차도,underpass_coordinates.csv,,,127.034039,37.209043,waterlevel,2,1101641,화성시(느티교),기후에너지환경부,4.58,True,N,,,
 underpass_coordinates:234,병점지하차도,underpass_coordinates.csv,,,127.034039,37.209043,waterlevel,3,1101604,수원시(백년교),기후에너지환경부,4.71,True,N,6.4,5.5,4.7
 underpass_coordinates:234,병점지하차도,underpass_coordinates.csv,,,127.034039,37.209043,rainfall,1,11014060,화성시(수원대학교),기후에너지환경부,5.23,False,,,,
 underpass_coordinates:234,병점지하차도,underpass_coordinates.csv,,,127.034039,37.209043,rainfall,2,11014090,용인시(신갈저수지),기후에너지환경부,5.63,False,,,,
 underpass_coordinates:234,병점지하차도,underpass_coordinates.csv,,,127.034039,37.209043,rainfall,3,11014070,평택시(회화리),기후에너지환경부,12.57,False,,,,
+underpass_coordinates:235,산척지하차도,underpass_coordinates.csv,,,127.123498,37.167379,waterlevel,1,1101641,화성시(느티교),기후에너지환경부,4.94,True,N,,,
+underpass_coordinates:235,산척지하차도,underpass_coordinates.csv,,,127.123498,37.167379,waterlevel,2,1101621,용인시(덕성1교),기후에너지환경부,6.78,False,N,6.6,5.8,5.1
+underpass_coordinates:235,산척지하차도,underpass_coordinates.csv,,,127.123498,37.167379,waterlevel,3,1101656,용인시(전궁교),기후에너지환경부,6.79,False,N,6.3,5.5,4.7
+underpass_coordinates:235,산척지하차도,underpass_coordinates.csv,,,127.123498,37.167379,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,7.04,False,,,,
+underpass_coordinates:235,산척지하차도,underpass_coordinates.csv,,,127.123498,37.167379,rainfall,2,11014100,용인시(이동면사무소),기후에너지환경부,7.07,False,,,,
+underpass_coordinates:235,산척지하차도,underpass_coordinates.csv,,,127.123498,37.167379,rainfall,3,11014010,평택시(진위면사무소),기후에너지환경부,8.04,False,,,,
 underpass_coordinates:239,숙곡지하차도,underpass_coordinates.csv,,,126.900653,37.253165,waterlevel,1,1202650,안산시(안산10교),기후에너지환경부,8.56,False,N,6.3,5.4,4.6
 underpass_coordinates:239,숙곡지하차도,underpass_coordinates.csv,,,126.900653,37.253165,waterlevel,2,1202660,반월1,기후에너지환경부,8.65,False,N,,,
 underpass_coordinates:239,숙곡지하차도,underpass_coordinates.csv,,,126.900653,37.253165,waterlevel,3,1101601,수원시(매세교),기후에너지환경부,10.33,False,N,4.7,4.1,3.5
 underpass_coordinates:239,숙곡지하차도,underpass_coordinates.csv,,,126.900653,37.253165,rainfall,1,12024010,안산시(안산호동초교),기후에너지환경부,7.34,False,,,,
 underpass_coordinates:239,숙곡지하차도,underpass_coordinates.csv,,,126.900653,37.253165,rainfall,2,11014060,화성시(수원대학교),기후에너지환경부,8.15,False,,,,
 underpass_coordinates:239,숙곡지하차도,underpass_coordinates.csv,,,126.900653,37.253165,rainfall,3,10184030,남면,기후에너지환경부,10.88,False,,,,
+underpass_coordinates:240,신리지하차도,underpass_coordinates.csv,,,127.123871,37.170977,waterlevel,1,1101641,화성시(느티교),기후에너지환경부,4.69,True,N,,,
+underpass_coordinates:240,신리지하차도,underpass_coordinates.csv,,,127.123871,37.170977,waterlevel,2,1101621,용인시(덕성1교),기후에너지환경부,6.72,False,N,6.6,5.8,5.1
+underpass_coordinates:240,신리지하차도,underpass_coordinates.csv,,,127.123871,37.170977,waterlevel,3,1101645,오산시(탑동대교),기후에너지환경부,7.14,False,Y,4.2,5.2,4.5
+underpass_coordinates:240,신리지하차도,underpass_coordinates.csv,,,127.123871,37.170977,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,6.68,False,,,,
+underpass_coordinates:240,신리지하차도,underpass_coordinates.csv,,,127.123871,37.170977,rainfall,2,11014100,용인시(이동면사무소),기후에너지환경부,7.21,False,,,,
+underpass_coordinates:240,신리지하차도,underpass_coordinates.csv,,,127.123871,37.170977,rainfall,3,11014010,평택시(진위면사무소),기후에너지환경부,8.43,False,,,,
+underpass_coordinates:243,잎새 지하차도,underpass_coordinates.csv,,,127.070526,37.209809,waterlevel,1,1101641,화성시(느티교),기후에너지환경부,1.71,True,N,,,
+underpass_coordinates:243,잎새 지하차도,underpass_coordinates.csv,,,127.070526,37.209809,waterlevel,2,1101605,화성시(화산교),기후에너지환경부,4.54,True,N,8.3,6.6,5.3
+underpass_coordinates:243,잎새 지하차도,underpass_coordinates.csv,,,127.070526,37.209809,waterlevel,3,1101604,수원시(백년교),기후에너지환경부,5.19,False,N,6.4,5.5,4.7
+underpass_coordinates:243,잎새 지하차도,underpass_coordinates.csv,,,127.070526,37.209809,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,2.75,True,,,,
+underpass_coordinates:243,잎새 지하차도,underpass_coordinates.csv,,,127.070526,37.209809,rainfall,2,11014060,화성시(수원대학교),기후에너지환경부,8.46,False,,,,
+underpass_coordinates:243,잎새 지하차도,underpass_coordinates.csv,,,127.070526,37.209809,rainfall,3,10164070,용인시(역삼동주민센터),기후에너지환경부,10.78,False,,,,
 underpass_coordinates:244,장지교차로지하차도,underpass_coordinates.csv,,,127.121026,37.15351,waterlevel,1,1101656,용인시(전궁교),기후에너지환경부,5.5,False,N,6.3,5.5,4.7
 underpass_coordinates:244,장지교차로지하차도,underpass_coordinates.csv,,,127.121026,37.15351,waterlevel,2,1101645,오산시(탑동대교),기후에너지환경부,5.99,False,Y,4.2,5.2,4.5
 underpass_coordinates:244,장지교차로지하차도,underpass_coordinates.csv,,,127.121026,37.15351,waterlevel,3,1101641,화성시(느티교),기후에너지환경부,6.01,False,N,,,
@@ -689,12 +1061,36 @@ underpass_coordinates:245,장지지하차도,underpass_coordinates.csv,,,127.127
 underpass_coordinates:245,장지지하차도,underpass_coordinates.csv,,,127.127944,37.475567,rainfall,1,10184100,서울시(대곡교),기후에너지환경부,0.88,True,,,,
 underpass_coordinates:245,장지지하차도,underpass_coordinates.csv,,,127.127944,37.475567,rainfall,2,10184180,성남시(성남북초교),기후에너지환경부,3.38,True,,,,
 underpass_coordinates:245,장지지하차도,underpass_coordinates.csv,,,127.127944,37.475567,rainfall,3,10164020,광주시(남한산초교),기후에너지환경부,5.09,False,,,,
+underpass_coordinates:248,진안2지하차도,underpass_coordinates.csv,,,127.029869,37.213188,waterlevel,1,1101605,화성시(화산교),기후에너지환경부,0.99,True,N,8.3,6.6,5.3
+underpass_coordinates:248,진안2지하차도,underpass_coordinates.csv,,,127.029869,37.213188,waterlevel,2,1101604,수원시(백년교),기후에너지환경부,4.33,True,N,6.4,5.5,4.7
+underpass_coordinates:248,진안2지하차도,underpass_coordinates.csv,,,127.029869,37.213188,waterlevel,3,1101641,화성시(느티교),기후에너지환경부,5.06,False,N,,,
+underpass_coordinates:248,진안2지하차도,underpass_coordinates.csv,,,127.029869,37.213188,rainfall,1,11014060,화성시(수원대학교),기후에너지환경부,4.87,True,,,,
+underpass_coordinates:248,진안2지하차도,underpass_coordinates.csv,,,127.029869,37.213188,rainfall,2,11014090,용인시(신갈저수지),기후에너지환경부,5.85,False,,,,
+underpass_coordinates:248,진안2지하차도,underpass_coordinates.csv,,,127.029869,37.213188,rainfall,3,11014070,평택시(회화리),기후에너지환경부,13.02,False,,,,
+underpass_coordinates:249,진안3지하차도,underpass_coordinates.csv,,,127.030846,37.215517,waterlevel,1,1101605,화성시(화산교),기후에너지환경부,0.97,True,N,8.3,6.6,5.3
+underpass_coordinates:249,진안3지하차도,underpass_coordinates.csv,,,127.030846,37.215517,waterlevel,2,1101604,수원시(백년교),기후에너지환경부,4.06,True,N,6.4,5.5,4.7
+underpass_coordinates:249,진안3지하차도,underpass_coordinates.csv,,,127.030846,37.215517,waterlevel,3,1101641,화성시(느티교),기후에너지환경부,5.07,False,N,,,
+underpass_coordinates:249,진안3지하차도,underpass_coordinates.csv,,,127.030846,37.215517,rainfall,1,11014060,화성시(수원대학교),기후에너지환경부,4.98,True,,,,
+underpass_coordinates:249,진안3지하차도,underpass_coordinates.csv,,,127.030846,37.215517,rainfall,2,11014090,용인시(신갈저수지),기후에너지환경부,5.71,False,,,,
+underpass_coordinates:249,진안3지하차도,underpass_coordinates.csv,,,127.030846,37.215517,rainfall,3,11014070,평택시(회화리),기후에너지환경부,13.28,False,,,,
 underpass_coordinates:250,천천지하차도,underpass_coordinates.csv,,,126.941958,37.243651,waterlevel,1,1101601,수원시(매세교),기후에너지환경부,7.08,False,N,4.7,4.1,3.5
 underpass_coordinates:250,천천지하차도,underpass_coordinates.csv,,,126.941958,37.243651,waterlevel,2,1101605,화성시(화산교),기후에너지환경부,7.51,False,N,8.3,6.6,5.3
 underpass_coordinates:250,천천지하차도,underpass_coordinates.csv,,,126.941958,37.243651,waterlevel,3,1101604,수원시(백년교),기후에너지환경부,8.94,False,N,6.4,5.5,4.7
 underpass_coordinates:250,천천지하차도,underpass_coordinates.csv,,,126.941958,37.243651,rainfall,1,11014060,화성시(수원대학교),기후에너지환경부,4.75,True,,,,
 underpass_coordinates:250,천천지하차도,underpass_coordinates.csv,,,126.941958,37.243651,rainfall,2,12024010,안산시(안산호동초교),기후에너지환경부,10.27,False,,,,
 underpass_coordinates:250,천천지하차도,underpass_coordinates.csv,,,126.941958,37.243651,rainfall,3,10184030,남면,기후에너지환경부,11.24,False,,,,
+underpass_coordinates:252,태안(안녕)지하차도,underpass_coordinates.csv,,,127.037773,37.218594,waterlevel,1,1101605,화성시(화산교),기후에너지환경부,1.55,True,N,8.3,6.6,5.3
+underpass_coordinates:252,태안(안녕)지하차도,underpass_coordinates.csv,,,127.037773,37.218594,waterlevel,2,1101604,수원시(백년교),기후에너지환경부,3.61,True,N,6.4,5.5,4.7
+underpass_coordinates:252,태안(안녕)지하차도,underpass_coordinates.csv,,,127.037773,37.218594,waterlevel,3,1101641,화성시(느티교),기후에너지환경부,4.66,True,N,,,
+underpass_coordinates:252,태안(안녕)지하차도,underpass_coordinates.csv,,,127.037773,37.218594,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,5.04,False,,,,
+underpass_coordinates:252,태안(안녕)지하차도,underpass_coordinates.csv,,,127.037773,37.218594,rainfall,2,11014060,화성시(수원대학교),기후에너지환경부,5.64,False,,,,
+underpass_coordinates:252,태안(안녕)지하차도,underpass_coordinates.csv,,,127.037773,37.218594,rainfall,3,10164070,용인시(역삼동주민센터),기후에너지환경부,13.45,False,,,,
+underpass_coordinates:253,태안지하차도,underpass_coordinates.csv,,,127.037773,37.218594,waterlevel,1,1101605,화성시(화산교),기후에너지환경부,1.55,True,N,8.3,6.6,5.3
+underpass_coordinates:253,태안지하차도,underpass_coordinates.csv,,,127.037773,37.218594,waterlevel,2,1101604,수원시(백년교),기후에너지환경부,3.61,True,N,6.4,5.5,4.7
+underpass_coordinates:253,태안지하차도,underpass_coordinates.csv,,,127.037773,37.218594,waterlevel,3,1101641,화성시(느티교),기후에너지환경부,4.66,True,N,,,
+underpass_coordinates:253,태안지하차도,underpass_coordinates.csv,,,127.037773,37.218594,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,5.04,False,,,,
+underpass_coordinates:253,태안지하차도,underpass_coordinates.csv,,,127.037773,37.218594,rainfall,2,11014060,화성시(수원대학교),기후에너지환경부,5.64,False,,,,
+underpass_coordinates:253,태안지하차도,underpass_coordinates.csv,,,127.037773,37.218594,rainfall,3,10164070,용인시(역삼동주민센터),기후에너지환경부,13.45,False,,,,
 underpass_coordinates:258,대청지하차도,underpass_coordinates.csv,,,128.801909,35.193906,waterlevel,1,2022684,김해시(대청천교),기후에너지환경부,1.54,True,N,4.45,3.9,3.4
 underpass_coordinates:258,대청지하차도,underpass_coordinates.csv,,,128.801909,35.193906,waterlevel,2,2022685,김해시(정천교),기후에너지환경부,3.16,True,Y,5.77,4.9,4.0
 underpass_coordinates:258,대청지하차도,underpass_coordinates.csv,,,128.801909,35.193906,waterlevel,3,2022686,김해시(후포2교),기후에너지환경부,3.28,True,N,5.98,5.2,4.5
@@ -713,6 +1109,12 @@ underpass_coordinates:261,불암지하차도,underpass_coordinates.csv,,,128.928
 underpass_coordinates:261,불암지하차도,underpass_coordinates.csv,,,128.928942,35.221302,rainfall,1,20224060,부산시(구포대교),기후에너지환경부,6.2,False,,,,
 underpass_coordinates:261,불암지하차도,underpass_coordinates.csv,,,128.928942,35.221302,rainfall,2,20224030,김해시(전하동),기후에너지환경부,6.43,False,,,,
 underpass_coordinates:261,불암지하차도,underpass_coordinates.csv,,,128.928942,35.221302,rainfall,3,25044010,부산시(을숙도),기후에너지환경부,12.53,False,,,,
+underpass_coordinates:262,남해지하차도,underpass_coordinates.csv,,,127.899196,34.837356,waterlevel,1,2502630,남해군(봉천교),기후에너지환경부,0.69,True,N,4.75,4.1,3.4
+underpass_coordinates:262,남해지하차도,underpass_coordinates.csv,,,127.899196,34.837356,waterlevel,2,2502610,남해군(금서교),기후에너지환경부,5.9,False,N,3.36,3.0,2.5
+underpass_coordinates:262,남해지하차도,underpass_coordinates.csv,,,127.899196,34.837356,waterlevel,3,2502660,남해군(봉화교),기후에너지환경부,12.7,False,N,4.45,3.9,3.3
+underpass_coordinates:262,남해지하차도,underpass_coordinates.csv,,,127.899196,34.837356,rainfall,1,41054030,광양시(수어댐),한국수자원공사,26.86,False,,,,
+underpass_coordinates:262,남해지하차도,underpass_coordinates.csv,,,127.899196,34.837356,rainfall,2,40094090,하동군(읍내리),기후에너지환경부,29.31,False,,,,
+underpass_coordinates:262,남해지하차도,underpass_coordinates.csv,,,127.899196,34.837356,rainfall,3,40094010,하동,기타,29.63,False,,,,
 underpass_coordinates:263,남부지하차도,underpass_coordinates.csv,,,129.035102,35.334153,waterlevel,1,2022660,양산시(양산교),기후에너지환경부,2.6,True,Y,6.31,5.1,3.9
 underpass_coordinates:263,남부지하차도,underpass_coordinates.csv,,,129.035102,35.334153,waterlevel,2,2022662,양산시(어곡1교),기후에너지환경부,4.46,True,N,6.1,5.2,4.2
 underpass_coordinates:263,남부지하차도,underpass_coordinates.csv,,,129.035102,35.334153,waterlevel,3,2022655,양산시(효충교),기후에너지환경부,5.27,False,N,7.04,5.9,4.7
@@ -755,6 +1157,12 @@ underpass_coordinates:269,증산역지하차도,underpass_coordinates.csv,,,129.
 underpass_coordinates:269,증산역지하차도,underpass_coordinates.csv,,,129.00965,35.308433,rainfall,1,20224040,양산시(양산교),기후에너지환경부,5.96,False,,,,
 underpass_coordinates:269,증산역지하차도,underpass_coordinates.csv,,,129.00965,35.308433,rainfall,2,20224060,부산시(구포대교),기후에너지환경부,11.75,False,,,,
 underpass_coordinates:269,증산역지하차도,underpass_coordinates.csv,,,129.00965,35.308433,rainfall,3,20224010,양산시(상북면사무소),기후에너지환경부,13.19,False,,,,
+underpass_coordinates:270,남산지하차도,underpass_coordinates.csv,,,128.66126,35.280002,waterlevel,1,2504660,창원시(창원천제1호교),기후에너지환경부,3.78,True,N,4.22,3.6,2.9
+underpass_coordinates:270,남산지하차도,underpass_coordinates.csv,,,128.66126,35.280002,waterlevel,2,2504665,창원시(퇴촌3호교),기후에너지환경부,4.95,True,N,3.74,3.3,2.8
+underpass_coordinates:270,남산지하차도,underpass_coordinates.csv,,,128.66126,35.280002,waterlevel,3,2020671,김해시(주천교),기후에너지환경부,7.14,False,N,6.97,5.9,4.8
+underpass_coordinates:270,남산지하차도,underpass_coordinates.csv,,,128.66126,35.280002,rainfall,1,20204020,창원시(수산대교),기후에너지환경부,10.63,False,,,,
+underpass_coordinates:270,남산지하차도,underpass_coordinates.csv,,,128.66126,35.280002,rainfall,2,20204030,창녕군(청암리),기후에너지환경부,13.97,False,,,,
+underpass_coordinates:270,남산지하차도,underpass_coordinates.csv,,,128.66126,35.280002,rainfall,3,20224050,밀양시(삼랑진교),기후에너지환경부,18.48,False,,,,
 underpass_coordinates:272,명곡지하차도,underpass_coordinates.csv,,,128.65148,35.24183,waterlevel,1,2504660,창원시(창원천제1호교),기후에너지환경부,1.29,True,N,4.22,3.6,2.9
 underpass_coordinates:272,명곡지하차도,underpass_coordinates.csv,,,128.65148,35.24183,waterlevel,2,2504665,창원시(퇴촌3호교),기후에너지환경부,3.35,True,N,3.74,3.3,2.8
 underpass_coordinates:272,명곡지하차도,underpass_coordinates.csv,,,128.65148,35.24183,waterlevel,3,2504662,창원시(석전3교),기후에너지환경부,7.57,False,N,14.78,12.1,9.5
@@ -779,6 +1187,12 @@ underpass_coordinates:277,토월지하차도,underpass_coordinates.csv,,,128.695
 underpass_coordinates:277,토월지하차도,underpass_coordinates.csv,,,128.695673,35.230111,rainfall,1,20204020,창원시(수산대교),기후에너지환경부,15.12,False,,,,
 underpass_coordinates:277,토월지하차도,underpass_coordinates.csv,,,128.695673,35.230111,rainfall,2,20224030,김해시(전하동),기후에너지환경부,15.56,False,,,,
 underpass_coordinates:277,토월지하차도,underpass_coordinates.csv,,,128.695673,35.230111,rainfall,3,20204030,창녕군(청암리),기후에너지환경부,20.31,False,,,,
+underpass_coordinates:279,혁신지하차도2,underpass_coordinates.csv,,,128.185844,36.127955,waterlevel,1,2010654,김천시(앞들교),기후에너지환경부,1.06,True,N,5.2,4.5,3.7
+underpass_coordinates:279,혁신지하차도2,underpass_coordinates.csv,,,128.185844,36.127955,waterlevel,2,2010660,김천시(대동교),기후에너지환경부,4.02,True,N,6.16,5.1,4.0
+underpass_coordinates:279,혁신지하차도2,underpass_coordinates.csv,,,128.185844,36.127955,waterlevel,3,2010645,김천시(신룡교),기후에너지환경부,4.2,True,N,5.66,4.8,4.0
+underpass_coordinates:279,혁신지하차도2,underpass_coordinates.csv,,,128.185844,36.127955,rainfall,1,20104010,김천시(부곡동),기후에너지환경부,6.96,False,,,,
+underpass_coordinates:279,혁신지하차도2,underpass_coordinates.csv,,,128.185844,36.127955,rainfall,2,20104050,구미시(선주교),기후에너지환경부,15.66,False,,,,
+underpass_coordinates:279,혁신지하차도2,underpass_coordinates.csv,,,128.185844,36.127955,rainfall,3,20114040,구미시(구미대교),기후에너지환경부,19.03,False,,,,
 underpass_coordinates:281,성주지하차도,underpass_coordinates.csv,,,128.304073,35.924624,waterlevel,1,2011670,성주군(성산교),기후에너지환경부,1.17,True,N,6.99,5.9,4.8
 underpass_coordinates:281,성주지하차도,underpass_coordinates.csv,,,128.304073,35.924624,waterlevel,2,2011672,성주군(학산교),기후에너지환경부,1.84,True,N,5.11,4.5,3.9
 underpass_coordinates:281,성주지하차도,underpass_coordinates.csv,,,128.304073,35.924624,waterlevel,3,2011665,성주군(도성교),기후에너지환경부,7.52,False,N,7.31,6.1,4.9
@@ -791,6 +1205,18 @@ underpass_coordinates:282,나무고개지하차도,underpass_coordinates.csv,,,1
 underpass_coordinates:282,나무고개지하차도,underpass_coordinates.csv,,,128.598816,36.830144,rainfall,1,20044010,영주시(서천교),기후에너지환경부,1.34,True,,,,
 underpass_coordinates:282,나무고개지하차도,underpass_coordinates.csv,,,128.598816,36.830144,rainfall,2,20044040,대구,기타,2.21,True,,,,
 underpass_coordinates:282,나무고개지하차도,underpass_coordinates.csv,,,128.598816,36.830144,rainfall,3,20044100,영주시(성내리),기후에너지환경부,8.33,False,,,,
+underpass_coordinates:285,선운지하차도,underpass_coordinates.csv,,,126.780338,35.152051,waterlevel,1,5002690,광주특별시(장록교),기후에너지환경부,2.03,True,Y,9.03,8.5,7.5
+underpass_coordinates:285,선운지하차도,underpass_coordinates.csv,,,126.780338,35.152051,waterlevel,2,5001655,광주특별시(풍영정천2교),기후에너지환경부,3.81,True,Y,5.48,5.0,4.4
+underpass_coordinates:285,선운지하차도,underpass_coordinates.csv,,,126.780338,35.152051,waterlevel,3,5001660,광주특별시(어등대교),기후에너지환경부,3.98,True,N,7.11,5.9,4.7
+underpass_coordinates:285,선운지하차도,underpass_coordinates.csv,,,126.780338,35.152051,rainfall,1,50044030,광주특별시(동곡초교),기후에너지환경부,6.07,False,,,,
+underpass_coordinates:285,선운지하차도,underpass_coordinates.csv,,,126.780338,35.152051,rainfall,2,50034050,광주특별시(양과동),기후에너지환경부,10.72,False,,,,
+underpass_coordinates:285,선운지하차도,underpass_coordinates.csv,,,126.780338,35.152051,rainfall,3,50014020,광주특별시(대성초교),기후에너지환경부,11.35,False,,,,
+underpass_coordinates:290,장수제1 지하차도,underpass_coordinates.csv,,,126.791245,35.18168,waterlevel,1,5001655,광주특별시(풍영정천2교),기후에너지환경부,2.41,True,Y,5.48,5.0,4.4
+underpass_coordinates:290,장수제1 지하차도,underpass_coordinates.csv,,,126.791245,35.18168,waterlevel,2,5001660,광주특별시(어등대교),기후에너지환경부,3.76,True,N,7.11,5.9,4.7
+underpass_coordinates:290,장수제1 지하차도,underpass_coordinates.csv,,,126.791245,35.18168,waterlevel,3,5001632,광주특별시(도촌교),기후에너지환경부,4.49,True,N,5.56,4.5,3.5
+underpass_coordinates:290,장수제1 지하차도,underpass_coordinates.csv,,,126.791245,35.18168,rainfall,1,50044030,광주특별시(동곡초교),기후에너지환경부,9.47,False,,,,
+underpass_coordinates:290,장수제1 지하차도,underpass_coordinates.csv,,,126.791245,35.18168,rainfall,2,50014020,광주특별시(대성초교),기후에너지환경부,11.15,False,,,,
+underpass_coordinates:290,장수제1 지하차도,underpass_coordinates.csv,,,126.791245,35.18168,rainfall,3,50024040,장성군(월평리),기후에너지환경부,12.18,False,,,,
 underpass_coordinates:291,효덕지하차도,underpass_coordinates.csv,,,126.896023,35.112024,waterlevel,1,5001670,광주특별시(설월교),기후에너지환경부,3.46,True,N,4.32,3.5,2.8
 underpass_coordinates:291,효덕지하차도,underpass_coordinates.csv,,,126.896023,35.112024,waterlevel,2,5001673,광주특별시(천교),기후에너지환경부,4.46,True,N,4.34,3.5,2.6
 underpass_coordinates:291,효덕지하차도,underpass_coordinates.csv,,,126.896023,35.112024,waterlevel,3,5001669,광주특별시(우제교),기후에너지환경부,4.74,True,N,4.05,2.7,2.2
@@ -899,6 +1325,12 @@ underpass_coordinates:322,문예지하차도,underpass_coordinates.csv,,,127.379
 underpass_coordinates:322,문예지하차도,underpass_coordinates.csv,,,127.379554,36.371051,rainfall,1,30094020,대전시(원촌교),기후에너지환경부,2.84,True,,,,
 underpass_coordinates:322,문예지하차도,underpass_coordinates.csv,,,127.379554,36.371051,rainfall,2,30094040,대전시(만년교),기후에너지환경부,3.43,True,,,,
 underpass_coordinates:322,문예지하차도,underpass_coordinates.csv,,,127.379554,36.371051,rainfall,3,30094050,대전시(인창교),기후에너지환경부,7.21,False,,,,
+underpass_coordinates:323,삼천지하차도,underpass_coordinates.csv,,,127.401056,36.357336,waterlevel,1,3009673,대전시(한밭대교),기후에너지환경부,0.18,True,N,5.49,4.8,3.8
+underpass_coordinates:323,삼천지하차도,underpass_coordinates.csv,,,127.401056,36.357336,waterlevel,2,3009680,대전시(원촌교),기후에너지환경부,2.47,True,Y,5.73,4.8,4.0
+underpass_coordinates:323,삼천지하차도,underpass_coordinates.csv,,,127.401056,36.357336,waterlevel,3,3009675,대전시(대덕대교),기후에너지환경부,2.61,True,N,4.55,3.6,2.7
+underpass_coordinates:323,삼천지하차도,underpass_coordinates.csv,,,127.401056,36.357336,rainfall,1,30094020,대전시(원촌교),기후에너지환경부,2.47,True,,,,
+underpass_coordinates:323,삼천지하차도,underpass_coordinates.csv,,,127.401056,36.357336,rainfall,2,30094040,대전시(만년교),기후에너지환경부,4.64,True,,,,
+underpass_coordinates:323,삼천지하차도,underpass_coordinates.csv,,,127.401056,36.357336,rainfall,3,30094050,대전시(인창교),기후에너지환경부,4.8,True,,,,
 underpass_coordinates:324,오량지하차도,underpass_coordinates.csv,,,127.383802,36.309462,waterlevel,1,3009630,대전시(복수교),기후에너지환경부,1.15,True,Y,3.92,3.2,2.7
 underpass_coordinates:324,오량지하차도,underpass_coordinates.csv,,,127.383802,36.309462,waterlevel,2,3009665,대전시(가수원교),기후에너지환경부,2.25,True,N,4.44,3.6,3.1
 underpass_coordinates:324,오량지하차도,underpass_coordinates.csv,,,127.383802,36.309462,waterlevel,3,3009640,대전시(인창교),기후에너지환경부,4.8,True,Y,4.6,3.8,3.0
@@ -965,12 +1397,36 @@ underpass_coordinates:340,구서 지하차도,underpass_coordinates.csv,,,129.09
 underpass_coordinates:340,구서 지하차도,underpass_coordinates.csv,,,129.092914,35.246239,rainfall,1,20224060,부산시(구포대교),기후에너지환경부,10.19,False,,,,
 underpass_coordinates:340,구서 지하차도,underpass_coordinates.csv,,,129.092914,35.246239,rainfall,2,20224040,양산시(양산교),기후에너지환경부,13.4,False,,,,
 underpass_coordinates:340,구서 지하차도,underpass_coordinates.csv,,,129.092914,35.246239,rainfall,3,20224010,양산시(상북면사무소),기후에너지환경부,19.31,False,,,,
+underpass_coordinates:346,내성 지하차도,underpass_coordinates.csv,,,129.077987,35.20433,waterlevel,1,2302655,부산시(세병교),기후에너지환경부,0.96,True,N,7.05,6.0,5.0
+underpass_coordinates:346,내성 지하차도,underpass_coordinates.csv,,,129.077987,35.20433,waterlevel,2,2302647,부산시(뉴타운교),기후에너지환경부,2.34,True,N,6.14,5.2,4.3
+underpass_coordinates:346,내성 지하차도,underpass_coordinates.csv,,,129.077987,35.20433,waterlevel,3,2302650,부산시(원동교),기후에너지환경부,3.49,True,Y,6.14,5.3,4.6
+underpass_coordinates:346,내성 지하차도,underpass_coordinates.csv,,,129.077987,35.20433,rainfall,1,20224060,부산시(구포대교),기후에너지환경부,7.67,False,,,,
+underpass_coordinates:346,내성 지하차도,underpass_coordinates.csv,,,129.077987,35.20433,rainfall,2,25044010,부산시(을숙도),기후에너지환경부,15.82,False,,,,
+underpass_coordinates:346,내성 지하차도,underpass_coordinates.csv,,,129.077987,35.20433,rainfall,3,20224040,양산시(양산교),기후에너지환경부,17.45,False,,,,
 underpass_coordinates:347,안락 지하차도,underpass_coordinates.csv,,,129.09698,35.198202,waterlevel,1,2302655,부산시(세병교),기후에너지환경부,1.3,True,N,7.05,6.0,5.0
 underpass_coordinates:347,안락 지하차도,underpass_coordinates.csv,,,129.09698,35.198202,waterlevel,2,2302650,부산시(원동교),기후에너지환경부,1.63,True,Y,6.14,5.3,4.6
 underpass_coordinates:347,안락 지하차도,underpass_coordinates.csv,,,129.09698,35.198202,waterlevel,3,2302640,부산시(동천교),기후에너지환경부,2.89,True,N,8.85,7.6,6.3
 underpass_coordinates:347,안락 지하차도,underpass_coordinates.csv,,,129.09698,35.198202,rainfall,1,20224060,부산시(구포대교),기후에너지환경부,9.41,False,,,,
 underpass_coordinates:347,안락 지하차도,underpass_coordinates.csv,,,129.09698,35.198202,rainfall,2,25044010,부산시(을숙도),기후에너지환경부,16.74,False,,,,
 underpass_coordinates:347,안락 지하차도,underpass_coordinates.csv,,,129.09698,35.198202,rainfall,3,20224040,양산시(양산교),기후에너지환경부,18.55,False,,,,
+underpass_coordinates:348,우장춘 지하차도,underpass_coordinates.csv,,,129.072368,35.215248,waterlevel,1,2302647,부산시(뉴타운교),기후에너지환경부,1.72,True,N,6.14,5.2,4.3
+underpass_coordinates:348,우장춘 지하차도,underpass_coordinates.csv,,,129.072368,35.215248,waterlevel,2,2302655,부산시(세병교),기후에너지환경부,2.27,True,N,7.05,6.0,5.0
+underpass_coordinates:348,우장춘 지하차도,underpass_coordinates.csv,,,129.072368,35.215248,waterlevel,3,2302640,부산시(동천교),기후에너지환경부,4.18,True,N,8.85,7.6,6.3
+underpass_coordinates:348,우장춘 지하차도,underpass_coordinates.csv,,,129.072368,35.215248,rainfall,1,20224060,부산시(구포대교),기후에너지환경부,7.27,False,,,,
+underpass_coordinates:348,우장춘 지하차도,underpass_coordinates.csv,,,129.072368,35.215248,rainfall,2,20224040,양산시(양산교),기후에너지환경부,16.16,False,,,,
+underpass_coordinates:348,우장춘 지하차도,underpass_coordinates.csv,,,129.072368,35.215248,rainfall,3,25044010,부산시(을숙도),기후에너지환경부,16.29,False,,,,
+underpass_coordinates:352,와석지하차도,underpass_coordinates.csv,,,129.019146,35.235371,waterlevel,1,2022678,부산시(대동낙동강교),기후에너지환경부,4.08,True,N,5.43,5.0,4.6
+underpass_coordinates:352,와석지하차도,underpass_coordinates.csv,,,129.019146,35.235371,waterlevel,2,2022680,부산시(구포대교),기후에너지환경부,4.24,True,Y,17.85,15.4,14.4
+underpass_coordinates:352,와석지하차도,underpass_coordinates.csv,,,129.019146,35.235371,waterlevel,3,2022670,양산시(호포대교),기후에너지환경부,6.05,False,N,8.59,7.2,5.8
+underpass_coordinates:352,와석지하차도,underpass_coordinates.csv,,,129.019146,35.235371,rainfall,1,20224060,부산시(구포대교),기후에너지환경부,4.23,True,,,,
+underpass_coordinates:352,와석지하차도,underpass_coordinates.csv,,,129.019146,35.235371,rainfall,2,20224040,양산시(양산교),기후에너지환경부,13.67,False,,,,
+underpass_coordinates:352,와석지하차도,underpass_coordinates.csv,,,129.019146,35.235371,rainfall,3,20224030,김해시(전하동),기후에너지환경부,14.71,False,,,,
+underpass_coordinates:355,우동 지하차도,underpass_coordinates.csv,,,129.164192,35.174373,waterlevel,1,2302661,부산시(좌수영교),기후에너지환경부,3.94,True,N,5.2,4.9,4.5
+underpass_coordinates:355,우동 지하차도,underpass_coordinates.csv,,,129.164192,35.174373,waterlevel,2,2302650,부산시(원동교),기후에너지환경부,5.04,False,Y,6.14,5.3,4.6
+underpass_coordinates:355,우동 지하차도,underpass_coordinates.csv,,,129.164192,35.174373,waterlevel,3,2302640,부산시(동천교),기후에너지환경부,6.35,False,N,8.85,7.6,6.3
+underpass_coordinates:355,우동 지하차도,underpass_coordinates.csv,,,129.164192,35.174373,rainfall,1,20224060,부산시(구포대교),기후에너지환경부,15.84,False,,,,
+underpass_coordinates:355,우동 지하차도,underpass_coordinates.csv,,,129.164192,35.174373,rainfall,2,25044010,부산시(을숙도),기후에너지환경부,20.93,False,,,,
+underpass_coordinates:355,우동 지하차도,underpass_coordinates.csv,,,129.164192,35.174373,rainfall,3,20224040,양산시(양산교),기후에너지환경부,23.45,False,,,,
 underpass_coordinates:358,구룡지하차도,underpass_coordinates.csv,,,127.051436,37.471662,waterlevel,1,1018658,서울시(대치교),기후에너지환경부,3.59,True,N,13.5,11.1,8.7
 underpass_coordinates:358,구룡지하차도,underpass_coordinates.csv,,,127.051436,37.471662,waterlevel,2,1018660,청담,기후에너지환경부,5.43,False,N,,,
 underpass_coordinates:358,구룡지하차도,underpass_coordinates.csv,,,127.051436,37.471662,waterlevel,3,1018662,서울시(청담대교),기후에너지환경부,5.8,False,N,15.5,12.6,10.1
@@ -995,12 +1451,24 @@ underpass_coordinates:371,개봉지하차도,underpass_coordinates.csv,,,126.857
 underpass_coordinates:371,개봉지하차도,underpass_coordinates.csv,,,126.857707,37.4937,rainfall,1,10184080,서울시(구로구청),기후에너지환경부,2.53,True,,,,
 underpass_coordinates:371,개봉지하차도,underpass_coordinates.csv,,,126.857707,37.4937,rainfall,2,10184160,부천시(부안초교),기후에너지환경부,4.34,True,,,,
 underpass_coordinates:371,개봉지하차도,underpass_coordinates.csv,,,126.857707,37.4937,rainfall,3,10184070,서울,기후에너지환경부,10.57,False,,,,
+underpass_coordinates:372,구로지하차도,underpass_coordinates.csv,,,126.879816,37.503015,waterlevel,1,1018697,서울시(오금교),기후에너지환경부,0.77,True,Y,11.0,9.0,7.0
+underpass_coordinates:372,구로지하차도,underpass_coordinates.csv,,,126.879816,37.503015,waterlevel,2,1018698,서울시(신대방1교),기후에너지환경부,3.48,True,Y,4.0,3.2,2.4
+underpass_coordinates:372,구로지하차도,underpass_coordinates.csv,,,126.879816,37.503015,waterlevel,3,1018695,서울시(너부대교),기후에너지환경부,4.04,True,Y,4.9,4.5,3.5
+underpass_coordinates:372,구로지하차도,underpass_coordinates.csv,,,126.879816,37.503015,rainfall,1,10184080,서울시(구로구청),기후에너지환경부,1.06,True,,,,
+underpass_coordinates:372,구로지하차도,underpass_coordinates.csv,,,126.879816,37.503015,rainfall,2,10184160,부천시(부안초교),기후에너지환경부,6.53,False,,,,
+underpass_coordinates:372,구로지하차도,underpass_coordinates.csv,,,126.879816,37.503015,rainfall,3,10184070,서울,기후에너지환경부,8.37,False,,,,
 underpass_coordinates:374,공릉지하차도,underpass_coordinates.csv,,,127.067327,37.63176,waterlevel,1,1018670,서울시(월계2교),기후에너지환경부,1.74,True,N,6.2,5.1,3.9
 underpass_coordinates:374,공릉지하차도,underpass_coordinates.csv,,,127.067327,37.63176,waterlevel,2,1018669,서울시(창동교),기후에너지환경부,2.61,True,N,7.9,6.5,5.1
 underpass_coordinates:374,공릉지하차도,underpass_coordinates.csv,,,127.067327,37.63176,waterlevel,3,1018675,서울시(중랑교),기후에너지환경부,4.37,True,Y,7.9,6.5,5.0
 underpass_coordinates:374,공릉지하차도,underpass_coordinates.csv,,,127.067327,37.63176,rainfall,1,10184200,서울시(월계2교),기후에너지환경부,1.74,True,,,,
 underpass_coordinates:374,공릉지하차도,underpass_coordinates.csv,,,127.067327,37.63176,rainfall,2,10184190,서울시(동막골주차장),기후에너지환경부,5.05,False,,,,
 underpass_coordinates:374,공릉지하차도,underpass_coordinates.csv,,,127.067327,37.63176,rainfall,3,10184110,남양주시(진관교),기후에너지환경부,7.72,False,,,,
+underpass_coordinates:375,초안산 지하차도,underpass_coordinates.csv,,,127.058278,37.636739,waterlevel,1,1018670,서울시(월계2교),기후에너지환경부,1.58,True,N,6.2,5.1,3.9
+underpass_coordinates:375,초안산 지하차도,underpass_coordinates.csv,,,127.058278,37.636739,waterlevel,2,1018669,서울시(창동교),기후에너지환경부,1.82,True,N,7.9,6.5,5.1
+underpass_coordinates:375,초안산 지하차도,underpass_coordinates.csv,,,127.058278,37.636739,waterlevel,3,1018675,서울시(중랑교),기후에너지환경부,5.04,False,Y,7.9,6.5,5.0
+underpass_coordinates:375,초안산 지하차도,underpass_coordinates.csv,,,127.058278,37.636739,rainfall,1,10184200,서울시(월계2교),기후에너지환경부,1.58,True,,,,
+underpass_coordinates:375,초안산 지하차도,underpass_coordinates.csv,,,127.058278,37.636739,rainfall,2,10184190,서울시(동막골주차장),기후에너지환경부,4.87,True,,,,
+underpass_coordinates:375,초안산 지하차도,underpass_coordinates.csv,,,127.058278,37.636739,rainfall,3,10184125,의정부시(도봉차량기지),기후에너지환경부,7.33,False,,,,
 underpass_coordinates:377,가인지하차도,underpass_coordinates.csv,,,127.045064,37.659724,waterlevel,1,1018669,서울시(창동교),기후에너지환경부,1.11,True,N,7.9,6.5,5.1
 underpass_coordinates:377,가인지하차도,underpass_coordinates.csv,,,127.045064,37.659724,waterlevel,2,1018670,서울시(월계2교),기후에너지환경부,3.98,True,N,6.2,5.1,3.9
 underpass_coordinates:377,가인지하차도,underpass_coordinates.csv,,,127.045064,37.659724,waterlevel,3,1018675,서울시(중랑교),기후에너지환경부,7.8,False,Y,7.9,6.5,5.0
@@ -1031,12 +1499,24 @@ underpass_coordinates:381,신답지하차도,underpass_coordinates.csv,,,127.048
 underpass_coordinates:381,신답지하차도,underpass_coordinates.csv,,,127.048352,37.56997,rainfall,1,10184140,서울시(송정동),기후에너지환경부,2.07,True,,,,
 underpass_coordinates:381,신답지하차도,underpass_coordinates.csv,,,127.048352,37.56997,rainfall,2,10184200,서울시(월계2교),기후에너지환경부,6.03,False,,,,
 underpass_coordinates:381,신답지하차도,underpass_coordinates.csv,,,127.048352,37.56997,rainfall,3,10184070,서울,기후에너지환경부,8.27,False,,,,
+underpass_coordinates:383,모래내지하차도,underpass_coordinates.csv,,,126.916206,37.568163,waterlevel,1,1018686,서울시(홍남교),기후에너지환경부,1.2,True,N,5.3,4.6,3.9
+underpass_coordinates:383,모래내지하차도,underpass_coordinates.csv,,,126.916206,37.568163,waterlevel,2,1018685,구용산,기후에너지환경부,6.45,False,N,,,
+underpass_coordinates:383,모래내지하차도,underpass_coordinates.csv,,,126.916206,37.568163,waterlevel,3,1018683,서울시(한강대교),기후에너지환경부,6.96,False,Y,13.3,10.5,8.5
+underpass_coordinates:383,모래내지하차도,underpass_coordinates.csv,,,126.916206,37.568163,rainfall,1,10184070,서울,기후에너지환경부,5.9,False,,,,
+underpass_coordinates:383,모래내지하차도,underpass_coordinates.csv,,,126.916206,37.568163,rainfall,2,10184080,서울시(구로구청),기후에너지환경부,8.55,False,,,,
+underpass_coordinates:383,모래내지하차도,underpass_coordinates.csv,,,126.916206,37.568163,rainfall,3,10194030,아라김포TM,한국수자원공사,10.9,False,,,,
 underpass_coordinates:384,성산지하차도,underpass_coordinates.csv,,,126.892354,37.549836,waterlevel,1,1018686,서울시(홍남교),기후에너지환경부,4.12,True,N,5.3,4.6,3.9
 underpass_coordinates:384,성산지하차도,underpass_coordinates.csv,,,126.892354,37.549836,waterlevel,2,1018697,서울시(오금교),기후에너지환경부,4.89,True,Y,11.0,9.0,7.0
 underpass_coordinates:384,성산지하차도,underpass_coordinates.csv,,,126.892354,37.549836,waterlevel,3,1018685,구용산,기후에너지환경부,6.28,False,N,,,
 underpass_coordinates:384,성산지하차도,underpass_coordinates.csv,,,126.892354,37.549836,rainfall,1,10184080,서울시(구로구청),기후에너지환경부,6.12,False,,,,
 underpass_coordinates:384,성산지하차도,underpass_coordinates.csv,,,126.892354,37.549836,rainfall,2,10184070,서울,기후에너지환경부,6.8,False,,,,
 underpass_coordinates:384,성산지하차도,underpass_coordinates.csv,,,126.892354,37.549836,rainfall,3,10194030,아라김포TM,한국수자원공사,9.93,False,,,,
+underpass_coordinates:385,잠두봉지하차도,underpass_coordinates.csv,,,126.912222,37.544576,waterlevel,1,1018686,서울시(홍남교),기후에너지환경부,3.64,True,N,5.3,4.6,3.9
+underpass_coordinates:385,잠두봉지하차도,underpass_coordinates.csv,,,126.912222,37.544576,waterlevel,2,1018685,구용산,기후에너지환경부,4.55,True,N,,,
+underpass_coordinates:385,잠두봉지하차도,underpass_coordinates.csv,,,126.912222,37.544576,waterlevel,3,1018683,서울시(한강대교),기후에너지환경부,5.16,False,Y,13.3,10.5,8.5
+underpass_coordinates:385,잠두봉지하차도,underpass_coordinates.csv,,,126.912222,37.544576,rainfall,1,10184070,서울,기후에너지환경부,4.96,True,,,,
+underpass_coordinates:385,잠두봉지하차도,underpass_coordinates.csv,,,126.912222,37.544576,rainfall,2,10184080,서울시(구로구청),기후에너지환경부,5.96,False,,,,
+underpass_coordinates:385,잠두봉지하차도,underpass_coordinates.csv,,,126.912222,37.544576,rainfall,3,10184160,부천시(부안초교),기후에너지환경부,11.41,False,,,,
 underpass_coordinates:388,선암지하차도,underpass_coordinates.csv,,,127.02055,37.460142,waterlevel,1,1018681,서울시(반포2교),기후에너지환경부,5.1,False,N,,,
 underpass_coordinates:388,선암지하차도,underpass_coordinates.csv,,,127.02055,37.460142,waterlevel,2,1018658,서울시(대치교),기후에너지환경부,6.38,False,N,13.5,11.1,8.7
 underpass_coordinates:388,선암지하차도,underpass_coordinates.csv,,,127.02055,37.460142,waterlevel,3,1018692,서울시(신림5교),기후에너지환경부,6.5,False,N,5.4,4.8,3.8
@@ -1067,6 +1547,12 @@ underpass_coordinates:402,등촌지하차도,underpass_coordinates.csv,,,126.867
 underpass_coordinates:402,등촌지하차도,underpass_coordinates.csv,,,126.867767,37.517866,rainfall,1,10184080,서울시(구로구청),기후에너지환경부,3.03,True,,,,
 underpass_coordinates:402,등촌지하차도,underpass_coordinates.csv,,,126.867767,37.517866,rainfall,2,10184160,부천시(부안초교),기후에너지환경부,6.5,False,,,,
 underpass_coordinates:402,등촌지하차도,underpass_coordinates.csv,,,126.867767,37.517866,rainfall,3,10184070,서울,기후에너지환경부,8.89,False,,,,
+underpass_coordinates:403,오금지하차도,underpass_coordinates.csv,,,126.872549,37.509652,waterlevel,1,1018697,서울시(오금교),기후에너지환경부,0.2,True,Y,11.0,9.0,7.0
+underpass_coordinates:403,오금지하차도,underpass_coordinates.csv,,,126.872549,37.509652,waterlevel,2,1018695,서울시(너부대교),기후에너지환경부,4.17,True,Y,4.9,4.5,3.5
+underpass_coordinates:403,오금지하차도,underpass_coordinates.csv,,,126.872549,37.509652,waterlevel,3,1018698,서울시(신대방1교),기후에너지환경부,4.41,True,Y,4.0,3.2,2.4
+underpass_coordinates:403,오금지하차도,underpass_coordinates.csv,,,126.872549,37.509652,rainfall,1,10184080,서울시(구로구청),기후에너지환경부,2.04,True,,,,
+underpass_coordinates:403,오금지하차도,underpass_coordinates.csv,,,126.872549,37.509652,rainfall,2,10184160,부천시(부안초교),기후에너지환경부,6.3,False,,,,
+underpass_coordinates:403,오금지하차도,underpass_coordinates.csv,,,126.872549,37.509652,rainfall,3,10184070,서울,기후에너지환경부,8.71,False,,,,
 underpass_coordinates:404,오목지하차도,underpass_coordinates.csv,,,126.870749,37.525194,waterlevel,1,1018697,서울시(오금교),기후에너지환경부,1.9,True,Y,11.0,9.0,7.0
 underpass_coordinates:404,오목지하차도,underpass_coordinates.csv,,,126.870749,37.525194,waterlevel,2,1018695,서울시(너부대교),기후에너지환경부,5.61,False,Y,4.9,4.5,3.5
 underpass_coordinates:404,오목지하차도,underpass_coordinates.csv,,,126.870749,37.525194,waterlevel,3,1018698,서울시(신대방1교),기후에너지환경부,5.65,False,Y,4.0,3.2,2.4
@@ -1085,6 +1571,12 @@ underpass_coordinates:407,신길지하차도,underpass_coordinates.csv,,,126.915
 underpass_coordinates:407,신길지하차도,underpass_coordinates.csv,,,126.915546,37.504527,rainfall,1,10184080,서울시(구로구청),기후에너지환경부,2.78,True,,,,
 underpass_coordinates:407,신길지하차도,underpass_coordinates.csv,,,126.915546,37.504527,rainfall,2,10184070,서울,기후에너지환경부,5.53,False,,,,
 underpass_coordinates:407,신길지하차도,underpass_coordinates.csv,,,126.915546,37.504527,rainfall,3,10184160,부천시(부안초교),기후에너지환경부,9.56,False,,,,
+underpass_coordinates:409,남산2호터널입구지하차도,underpass_coordinates.csv,,,126.9887,37.543053,waterlevel,1,1018680,서울시(잠수교),기후에너지환경부,2.93,True,N,15.6,6.2,5.5
+underpass_coordinates:409,남산2호터널입구지하차도,underpass_coordinates.csv,,,126.9887,37.543053,waterlevel,2,1018683,서울시(한강대교),기후에너지환경부,4.25,True,Y,13.3,10.5,8.5
+underpass_coordinates:409,남산2호터널입구지하차도,underpass_coordinates.csv,,,126.9887,37.543053,waterlevel,3,1018685,구용산,기후에너지환경부,4.5,True,N,,,
+underpass_coordinates:409,남산2호터널입구지하차도,underpass_coordinates.csv,,,126.9887,37.543053,rainfall,1,10184070,서울,기후에너지환경부,2.22,True,,,,
+underpass_coordinates:409,남산2호터널입구지하차도,underpass_coordinates.csv,,,126.9887,37.543053,rainfall,2,10184140,서울시(송정동),기후에너지환경부,5.98,False,,,,
+underpass_coordinates:409,남산2호터널입구지하차도,underpass_coordinates.csv,,,126.9887,37.543053,rainfall,3,10184080,서울시(구로구청),기후에너지환경부,10.49,False,,,,
 underpass_coordinates:410,서빙고지하차도,underpass_coordinates.csv,,,126.989213,37.518284,waterlevel,1,1018680,서울시(잠수교),기후에너지환경부,0.55,True,N,15.6,6.2,5.5
 underpass_coordinates:410,서빙고지하차도,underpass_coordinates.csv,,,126.989213,37.518284,waterlevel,2,1018681,서울시(반포2교),기후에너지환경부,2.13,True,N,,,
 underpass_coordinates:410,서빙고지하차도,underpass_coordinates.csv,,,126.989213,37.518284,waterlevel,3,1018683,서울시(한강대교),기후에너지환경부,2.9,True,Y,13.3,10.5,8.5
@@ -1097,6 +1589,12 @@ underpass_coordinates:411,신용산지하차도,underpass_coordinates.csv,,,126.
 underpass_coordinates:411,신용산지하차도,underpass_coordinates.csv,,,126.966009,37.531258,rainfall,1,10184070,서울,기후에너지환경부,0.24,True,,,,
 underpass_coordinates:411,신용산지하차도,underpass_coordinates.csv,,,126.966009,37.531258,rainfall,2,10184080,서울시(구로구청),기후에너지환경부,8.1,False,,,,
 underpass_coordinates:411,신용산지하차도,underpass_coordinates.csv,,,126.966009,37.531258,rainfall,3,10184140,서울시(송정동),기후에너지환경부,8.23,False,,,,
+underpass_coordinates:413,한강대교동측지하차도,underpass_coordinates.csv,,,126.966924,37.519743,waterlevel,1,1018683,서울시(한강대교),기후에너지환경부,1.08,True,Y,13.3,10.5,8.5
+underpass_coordinates:413,한강대교동측지하차도,underpass_coordinates.csv,,,126.966924,37.519743,waterlevel,2,1018685,구용산,기후에너지환경부,1.53,True,N,,,
+underpass_coordinates:413,한강대교동측지하차도,underpass_coordinates.csv,,,126.966924,37.519743,waterlevel,3,1018680,서울시(잠수교),기후에너지환경부,2.52,True,N,15.6,6.2,5.5
+underpass_coordinates:413,한강대교동측지하차도,underpass_coordinates.csv,,,126.966924,37.519743,rainfall,1,10184070,서울,기후에너지환경부,1.51,True,,,,
+underpass_coordinates:413,한강대교동측지하차도,underpass_coordinates.csv,,,126.966924,37.519743,rainfall,2,10184080,서울시(구로구청),기후에너지환경부,7.62,False,,,,
+underpass_coordinates:413,한강대교동측지하차도,underpass_coordinates.csv,,,126.966924,37.519743,rainfall,3,10184140,서울시(송정동),기후에너지환경부,8.61,False,,,,
 underpass_coordinates:414,신사지하차도,underpass_coordinates.csv,,,126.905717,37.598327,waterlevel,1,1018686,서울시(홍남교),기후에너지환경부,3.14,True,N,5.3,4.6,3.9
 underpass_coordinates:414,신사지하차도,underpass_coordinates.csv,,,126.905717,37.598327,waterlevel,2,1019606,고양시(은덕교),기후에너지환경부,5.46,False,N,6.0,5.0,4.1
 underpass_coordinates:414,신사지하차도,underpass_coordinates.csv,,,126.905717,37.598327,waterlevel,3,1019630,서울시(행주대교),기후에너지환경부,8.03,False,N,10.9,9.0,7.2
@@ -1115,6 +1613,12 @@ underpass_coordinates:418,능산지하차도,underpass_coordinates.csv,,,127.100
 underpass_coordinates:418,능산지하차도,underpass_coordinates.csv,,,127.100676,37.603072,rainfall,1,10184200,서울시(월계2교),기후에너지환경부,5.04,False,,,,
 underpass_coordinates:418,능산지하차도,underpass_coordinates.csv,,,127.100676,37.603072,rainfall,2,10184110,남양주시(진관교),기후에너지환경부,6.9,False,,,,
 underpass_coordinates:418,능산지하차도,underpass_coordinates.csv,,,127.100676,37.603072,rainfall,3,10184140,서울시(송정동),기후에너지환경부,6.91,False,,,,
+underpass_coordinates:419,상봉지하차도,underpass_coordinates.csv,,,127.087902,37.598195,waterlevel,1,1018675,서울시(중랑교),기후에너지환경부,1.65,True,Y,7.9,6.5,5.0
+underpass_coordinates:419,상봉지하차도,underpass_coordinates.csv,,,127.087902,37.598195,waterlevel,2,1018670,서울시(월계2교),기후에너지환경부,4.41,True,N,6.2,5.1,3.9
+underpass_coordinates:419,상봉지하차도,underpass_coordinates.csv,,,127.087902,37.598195,waterlevel,3,1018638,남양주시(왕숙교),기후에너지환경부,5.33,False,Y,9.7,8.0,6.0
+underpass_coordinates:419,상봉지하차도,underpass_coordinates.csv,,,127.087902,37.598195,rainfall,1,10184200,서울시(월계2교),기후에너지환경부,4.41,True,,,,
+underpass_coordinates:419,상봉지하차도,underpass_coordinates.csv,,,127.087902,37.598195,rainfall,2,10184140,서울시(송정동),기후에너지환경부,5.85,False,,,,
+underpass_coordinates:419,상봉지하차도,underpass_coordinates.csv,,,127.087902,37.598195,rainfall,3,10184110,남양주시(진관교),기후에너지환경부,8.06,False,,,,
 underpass_coordinates:423,나릿재지하차도,underpass_coordinates.csv,,,127.259659,36.484078,waterlevel,1,3012605,세종시(금남교),기후에너지환경부,1.22,True,N,13.85,11.0,8.3
 underpass_coordinates:423,나릿재지하차도,underpass_coordinates.csv,,,127.259659,36.484078,waterlevel,2,3012606,세종보(상),기타,1.24,True,N,,,
 underpass_coordinates:423,나릿재지하차도,underpass_coordinates.csv,,,127.259659,36.484078,waterlevel,3,3012604,나성,한국수자원공사,1.37,True,N,,,
@@ -1223,6 +1727,66 @@ underpass_coordinates:451,중구청 지하차도,underpass_coordinates.csv,,,129
 underpass_coordinates:451,중구청 지하차도,underpass_coordinates.csv,,,129.331606,35.569242,rainfall,1,22014080,울산시(태화교),기후에너지환경부,2.73,True,,,,
 underpass_coordinates:451,중구청 지하차도,underpass_coordinates.csv,,,129.331606,35.569242,rainfall,2,23014011,울산시(선암댐),한국수자원공사,5.94,False,,,,
 underpass_coordinates:451,중구청 지하차도,underpass_coordinates.csv,,,129.331606,35.569242,rainfall,3,22014040,척과,기타,6.77,False,,,,
+underpass_coordinates:452,계양지하차도,underpass_coordinates.csv,,,126.734464,37.537968,waterlevel,1,1019620,부천시(도두리2교),기후에너지환경부,2.39,True,N,4.6,3.4,2.7
+underpass_coordinates:452,계양지하차도,underpass_coordinates.csv,,,126.734464,37.537968,waterlevel,2,1019647,박촌1교,한국수자원공사,2.41,True,N,,,
+underpass_coordinates:452,계양지하차도,underpass_coordinates.csv,,,126.734464,37.537968,waterlevel,3,1019640,굴포천(내),한국수자원공사,2.78,True,N,,,
+underpass_coordinates:452,계양지하차도,underpass_coordinates.csv,,,126.734464,37.537968,rainfall,1,10194020,귤현보,한국수자원공사,4.51,True,,,,
+underpass_coordinates:452,계양지하차도,underpass_coordinates.csv,,,126.734464,37.537968,rainfall,2,10194010,김포시(김포시청),기후에너지환경부,8.76,False,,,,
+underpass_coordinates:452,계양지하차도,underpass_coordinates.csv,,,126.734464,37.537968,rainfall,3,10194030,아라김포TM,한국수자원공사,8.95,False,,,,
+underpass_coordinates:453,임학지하차도,underpass_coordinates.csv,,,126.738033,37.542875,waterlevel,1,1019647,박촌1교,한국수자원공사,2.06,True,N,,,
+underpass_coordinates:453,임학지하차도,underpass_coordinates.csv,,,126.738033,37.542875,waterlevel,2,1019620,부천시(도두리2교),기후에너지환경부,2.31,True,N,4.6,3.4,2.7
+underpass_coordinates:453,임학지하차도,underpass_coordinates.csv,,,126.738033,37.542875,waterlevel,3,1019650,굴현교,한국수자원공사,2.87,True,N,,,
+underpass_coordinates:453,임학지하차도,underpass_coordinates.csv,,,126.738033,37.542875,rainfall,1,10194020,귤현보,한국수자원공사,3.89,True,,,,
+underpass_coordinates:453,임학지하차도,underpass_coordinates.csv,,,126.738033,37.542875,rainfall,2,10194010,김포시(김포시청),기후에너지환경부,8.29,False,,,,
+underpass_coordinates:453,임학지하차도,underpass_coordinates.csv,,,126.738033,37.542875,rainfall,3,10194030,아라김포TM,한국수자원공사,8.33,False,,,,
+underpass_coordinates:454,간석지하차도,underpass_coordinates.csv,,,126.70771,37.467024,waterlevel,1,1019612,인천시(굴포1교),기후에너지환경부,4.84,True,N,7.2,6.1,5.0
+underpass_coordinates:454,간석지하차도,underpass_coordinates.csv,,,126.70771,37.467024,waterlevel,2,1201660,인천시(연수교),기후에너지환경부,5.7,False,N,6.7,5.2,4.7
+underpass_coordinates:454,간석지하차도,underpass_coordinates.csv,,,126.70771,37.467024,waterlevel,3,1019640,굴포천(내),한국수자원공사,7.74,False,N,,,
+underpass_coordinates:454,간석지하차도,underpass_coordinates.csv,,,126.70771,37.467024,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,9.29,False,,,,
+underpass_coordinates:454,간석지하차도,underpass_coordinates.csv,,,126.70771,37.467024,rainfall,2,10194020,귤현보,한국수자원공사,12.51,False,,,,
+underpass_coordinates:454,간석지하차도,underpass_coordinates.csv,,,126.70771,37.467024,rainfall,3,12014010,아라인천TM,한국수자원공사,13.35,False,,,,
+underpass_coordinates:455,고잔지하차도,underpass_coordinates.csv,,,126.684934,37.387215,waterlevel,1,1201660,인천시(연수교),기후에너지환경부,3.41,True,N,6.7,5.2,4.7
+underpass_coordinates:455,고잔지하차도,underpass_coordinates.csv,,,126.684934,37.387215,waterlevel,2,1019612,인천시(굴포1교),기후에너지환경부,13.94,False,N,7.2,6.1,5.0
+underpass_coordinates:455,고잔지하차도,underpass_coordinates.csv,,,126.684934,37.387215,waterlevel,3,1202695,서해배수문(외),한국수자원공사,14.4,False,N,,,
+underpass_coordinates:455,고잔지하차도,underpass_coordinates.csv,,,126.684934,37.387215,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,15.22,False,,,,
+underpass_coordinates:455,고잔지하차도,underpass_coordinates.csv,,,126.684934,37.387215,rainfall,2,12024020,안산시(장상동),기후에너지환경부,17.77,False,,,,
+underpass_coordinates:455,고잔지하차도,underpass_coordinates.csv,,,126.684934,37.387215,rainfall,3,12024010,안산시(안산호동초교),기후에너지환경부,17.94,False,,,,
+underpass_coordinates:457,해안지하차도,underpass_coordinates.csv,,,126.697153,37.385163,waterlevel,1,1201660,인천시(연수교),기후에너지환경부,3.51,True,N,6.7,5.2,4.7
+underpass_coordinates:457,해안지하차도,underpass_coordinates.csv,,,126.697153,37.385163,waterlevel,2,1019612,인천시(굴포1교),기후에너지환경부,13.94,False,N,7.2,6.1,5.0
+underpass_coordinates:457,해안지하차도,underpass_coordinates.csv,,,126.697153,37.385163,waterlevel,3,1202695,서해배수문(외),한국수자원공사,14.98,False,N,,,
+underpass_coordinates:457,해안지하차도,underpass_coordinates.csv,,,126.697153,37.385163,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,14.61,False,,,,
+underpass_coordinates:457,해안지하차도,underpass_coordinates.csv,,,126.697153,37.385163,rainfall,2,12024020,안산시(장상동),기후에너지환경부,16.67,False,,,,
+underpass_coordinates:457,해안지하차도,underpass_coordinates.csv,,,126.697153,37.385163,rainfall,3,12024010,안산시(안산호동초교),기후에너지환경부,16.88,False,,,,
+underpass_coordinates:458,고속종점지하차도,underpass_coordinates.csv,,,126.635721,37.457228,waterlevel,1,1201660,인천시(연수교),기후에너지환경부,6.96,False,N,6.7,5.2,4.7
+underpass_coordinates:458,고속종점지하차도,underpass_coordinates.csv,,,126.635721,37.457228,waterlevel,2,1019612,인천시(굴포1교),기후에너지환경부,9.59,False,N,7.2,6.1,5.0
+underpass_coordinates:458,고속종점지하차도,underpass_coordinates.csv,,,126.635721,37.457228,waterlevel,3,1201652,아라서해갑실(남),한국수자원공사,11.85,False,N,,,
+underpass_coordinates:458,고속종점지하차도,underpass_coordinates.csv,,,126.635721,37.457228,rainfall,1,12014010,아라인천TM,한국수자원공사,11.96,False,,,,
+underpass_coordinates:458,고속종점지하차도,underpass_coordinates.csv,,,126.635721,37.457228,rainfall,2,10184160,부천시(부안초교),기후에너지환경부,15.73,False,,,,
+underpass_coordinates:458,고속종점지하차도,underpass_coordinates.csv,,,126.635721,37.457228,rainfall,3,10194020,귤현보,한국수자원공사,17.01,False,,,,
+underpass_coordinates:459,석암지하차도,underpass_coordinates.csv,,,126.689772,37.463628,waterlevel,1,1201660,인천시(연수교),기후에너지환경부,5.25,False,N,6.7,5.2,4.7
+underpass_coordinates:459,석암지하차도,underpass_coordinates.csv,,,126.689772,37.463628,waterlevel,2,1019612,인천시(굴포1교),기후에너지환경부,5.81,False,N,7.2,6.1,5.0
+underpass_coordinates:459,석암지하차도,underpass_coordinates.csv,,,126.689772,37.463628,waterlevel,3,1019640,굴포천(내),한국수자원공사,9.04,False,N,,,
+underpass_coordinates:459,석암지하차도,underpass_coordinates.csv,,,126.689772,37.463628,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,10.91,False,,,,
+underpass_coordinates:459,석암지하차도,underpass_coordinates.csv,,,126.689772,37.463628,rainfall,2,12014010,아라인천TM,한국수자원공사,12.81,False,,,,
+underpass_coordinates:459,석암지하차도,underpass_coordinates.csv,,,126.689772,37.463628,rainfall,3,10194020,귤현보,한국수자원공사,13.58,False,,,,
+underpass_coordinates:460,굴포천역지하차도,underpass_coordinates.csv,,,126.731475,37.507004,waterlevel,1,1019612,인천시(굴포1교),기후에너지환경부,0.8,True,N,7.2,6.1,5.0
+underpass_coordinates:460,굴포천역지하차도,underpass_coordinates.csv,,,126.731475,37.507004,waterlevel,2,1019640,굴포천(내),한국수자원공사,3.06,True,N,,,
+underpass_coordinates:460,굴포천역지하차도,underpass_coordinates.csv,,,126.731475,37.507004,waterlevel,3,1019620,부천시(도두리2교),기후에너지환경부,3.8,True,N,4.6,3.4,2.7
+underpass_coordinates:460,굴포천역지하차도,underpass_coordinates.csv,,,126.731475,37.507004,rainfall,1,10194020,귤현보,한국수자원공사,7.6,False,,,,
+underpass_coordinates:460,굴포천역지하차도,underpass_coordinates.csv,,,126.731475,37.507004,rainfall,2,10184160,부천시(부안초교),기후에너지환경부,7.69,False,,,,
+underpass_coordinates:460,굴포천역지하차도,underpass_coordinates.csv,,,126.731475,37.507004,rainfall,3,12014010,아라인천TM,한국수자원공사,11.81,False,,,,
+underpass_coordinates:462,석남지하차도,underpass_coordinates.csv,,,126.678587,37.506134,waterlevel,1,1019612,인천시(굴포1교),기후에너지환경부,3.91,True,N,7.2,6.1,5.0
+underpass_coordinates:462,석남지하차도,underpass_coordinates.csv,,,126.678587,37.506134,waterlevel,2,1019640,굴포천(내),한국수자원공사,7.4,False,N,,,
+underpass_coordinates:462,석남지하차도,underpass_coordinates.csv,,,126.678587,37.506134,waterlevel,3,1019620,부천시(도두리2교),기후에너지환경부,7.79,False,N,4.6,3.4,2.7
+underpass_coordinates:462,석남지하차도,underpass_coordinates.csv,,,126.678587,37.506134,rainfall,1,12014010,아라인천TM,한국수자원공사,8.33,False,,,,
+underpass_coordinates:462,석남지하차도,underpass_coordinates.csv,,,126.678587,37.506134,rainfall,2,10194020,귤현보,한국수자원공사,10.5,False,,,,
+underpass_coordinates:462,석남지하차도,underpass_coordinates.csv,,,126.678587,37.506134,rainfall,3,10184160,부천시(부안초교),기후에너지환경부,12.1,False,,,,
+underpass_coordinates:463,연희지하차도,underpass_coordinates.csv,,,126.663807,37.552378,waterlevel,1,1201651,아라서해갑문(내),한국수자원공사,5.35,False,N,,,
+underpass_coordinates:463,연희지하차도,underpass_coordinates.csv,,,126.663807,37.552378,waterlevel,2,1201652,아라서해갑실(남),한국수자원공사,5.43,False,N,,,
+underpass_coordinates:463,연희지하차도,underpass_coordinates.csv,,,126.663807,37.552378,waterlevel,3,1201654,아라서해갑실(북),한국수자원공사,5.47,False,N,,,
+underpass_coordinates:463,연희지하차도,underpass_coordinates.csv,,,126.663807,37.552378,rainfall,1,12014010,아라인천TM,한국수자원공사,4.21,True,,,,
+underpass_coordinates:463,연희지하차도,underpass_coordinates.csv,,,126.663807,37.552378,rainfall,2,10194010,김포시(김포시청),기후에너지환경부,8.35,False,,,,
+underpass_coordinates:463,연희지하차도,underpass_coordinates.csv,,,126.663807,37.552378,rainfall,3,10194020,귤현보,한국수자원공사,9.3,False,,,,
 underpass_coordinates:468,동춘지하차도,underpass_coordinates.csv,,,126.655368,37.400944,waterlevel,1,1201660,인천시(연수교),기후에너지환경부,3.98,True,N,6.7,5.2,4.7
 underpass_coordinates:468,동춘지하차도,underpass_coordinates.csv,,,126.655368,37.400944,waterlevel,2,1019612,인천시(굴포1교),기후에너지환경부,13.4,False,N,7.2,6.1,5.0
 underpass_coordinates:468,동춘지하차도,underpass_coordinates.csv,,,126.655368,37.400944,waterlevel,3,1202695,서해배수문(외),한국수자원공사,14.12,False,N,,,
@@ -1235,12 +1799,42 @@ underpass_coordinates:469,선학지하차도,underpass_coordinates.csv,,,126.698
 underpass_coordinates:469,선학지하차도,underpass_coordinates.csv,,,126.698131,37.423249,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,11.84,False,,,,
 underpass_coordinates:469,선학지하차도,underpass_coordinates.csv,,,126.698131,37.423249,rainfall,2,12014010,아라인천TM,한국수자원공사,17.15,False,,,,
 underpass_coordinates:469,선학지하차도,underpass_coordinates.csv,,,126.698131,37.423249,rainfall,3,10194020,귤현보,한국수자원공사,17.33,False,,,,
+underpass_coordinates:470,송도지하차도,underpass_coordinates.csv,,,126.666945,37.392597,waterlevel,1,1201660,인천시(연수교),기후에너지환경부,3.7,True,N,6.7,5.2,4.7
+underpass_coordinates:470,송도지하차도,underpass_coordinates.csv,,,126.666945,37.392597,waterlevel,2,1019612,인천시(굴포1교),기후에너지환경부,13.84,False,N,7.2,6.1,5.0
+underpass_coordinates:470,송도지하차도,underpass_coordinates.csv,,,126.666945,37.392597,waterlevel,3,1202695,서해배수문(외),한국수자원공사,13.88,False,N,,,
+underpass_coordinates:470,송도지하차도,underpass_coordinates.csv,,,126.666945,37.392597,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,16.05,False,,,,
+underpass_coordinates:470,송도지하차도,underpass_coordinates.csv,,,126.666945,37.392597,rainfall,2,12024020,안산시(장상동),기후에너지환경부,19.46,False,,,,
+underpass_coordinates:470,송도지하차도,underpass_coordinates.csv,,,126.666945,37.392597,rainfall,3,12014010,아라인천TM,한국수자원공사,19.52,False,,,,
+underpass_coordinates:472,용담지하차도,underpass_coordinates.csv,,,126.673249,37.421255,waterlevel,1,1201660,인천시(연수교),기후에너지환경부,2.06,True,N,6.7,5.2,4.7
+underpass_coordinates:472,용담지하차도,underpass_coordinates.csv,,,126.673249,37.421255,waterlevel,2,1019612,인천시(굴포1교),기후에너지환경부,10.68,False,N,7.2,6.1,5.0
+underpass_coordinates:472,용담지하차도,underpass_coordinates.csv,,,126.673249,37.421255,waterlevel,3,1019640,굴포천(내),한국수자원공사,13.65,False,N,,,
+underpass_coordinates:472,용담지하차도,underpass_coordinates.csv,,,126.673249,37.421255,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,13.86,False,,,,
+underpass_coordinates:472,용담지하차도,underpass_coordinates.csv,,,126.673249,37.421255,rainfall,2,12014010,아라인천TM,한국수자원공사,16.58,False,,,,
+underpass_coordinates:472,용담지하차도,underpass_coordinates.csv,,,126.673249,37.421255,rainfall,3,10194020,귤현보,한국수자원공사,18.42,False,,,,
+underpass_coordinates:473,청학지하차도,underpass_coordinates.csv,,,126.669202,37.425398,waterlevel,1,1201660,인천시(연수교),기후에너지환경부,2.54,True,N,6.7,5.2,4.7
+underpass_coordinates:473,청학지하차도,underpass_coordinates.csv,,,126.669202,37.425398,waterlevel,2,1019612,인천시(굴포1교),기후에너지환경부,10.42,False,N,7.2,6.1,5.0
+underpass_coordinates:473,청학지하차도,underpass_coordinates.csv,,,126.669202,37.425398,waterlevel,3,1019640,굴포천(내),한국수자원공사,13.48,False,N,,,
+underpass_coordinates:473,청학지하차도,underpass_coordinates.csv,,,126.669202,37.425398,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,13.96,False,,,,
+underpass_coordinates:473,청학지하차도,underpass_coordinates.csv,,,126.669202,37.425398,rainfall,2,12014010,아라인천TM,한국수자원공사,16.04,False,,,,
+underpass_coordinates:473,청학지하차도,underpass_coordinates.csv,,,126.669202,37.425398,rainfall,3,10194020,귤현보,한국수자원공사,18.18,False,,,,
+underpass_coordinates:475,그린나래지하차도,underpass_coordinates.csv,,,126.524291,37.478886,waterlevel,1,1201653,아라서해갑문(외),한국수자원공사,11.32,False,N,,,
+underpass_coordinates:475,그린나래지하차도,underpass_coordinates.csv,,,126.524291,37.478886,waterlevel,2,1201652,아라서해갑실(남),한국수자원공사,11.43,False,N,,,
+underpass_coordinates:475,그린나래지하차도,underpass_coordinates.csv,,,126.524291,37.478886,waterlevel,3,1201654,아라서해갑실(북),한국수자원공사,11.47,False,N,,,
+underpass_coordinates:475,그린나래지하차도,underpass_coordinates.csv,,,126.524291,37.478886,rainfall,1,12014010,아라인천TM,한국수자원공사,12.57,False,,,,
+underpass_coordinates:475,그린나래지하차도,underpass_coordinates.csv,,,126.524291,37.478886,rainfall,2,10194010,김포시(김포시청),기후에너지환경부,22.68,False,,,,
+underpass_coordinates:475,그린나래지하차도,underpass_coordinates.csv,,,126.524291,37.478886,rainfall,3,10194020,귤현보,한국수자원공사,23.66,False,,,,
 underpass_coordinates:477,삼목선착장지하차도,underpass_coordinates.csv,,,126.453944,37.497354,waterlevel,1,1201653,아라서해갑문(외),한국수자원공사,14.77,False,N,,,
 underpass_coordinates:477,삼목선착장지하차도,underpass_coordinates.csv,,,126.453944,37.497354,waterlevel,2,1201652,아라서해갑실(남),한국수자원공사,14.91,False,N,,,
 underpass_coordinates:477,삼목선착장지하차도,underpass_coordinates.csv,,,126.453944,37.497354,waterlevel,3,1201654,아라서해갑실(북),한국수자원공사,14.92,False,N,,,
 underpass_coordinates:477,삼목선착장지하차도,underpass_coordinates.csv,,,126.453944,37.497354,rainfall,1,12014010,아라인천TM,한국수자원공사,16.27,False,,,,
 underpass_coordinates:477,삼목선착장지하차도,underpass_coordinates.csv,,,126.453944,37.497354,rainfall,2,10194010,김포시(김포시청),기후에너지환경부,26.53,False,,,,
 underpass_coordinates:477,삼목선착장지하차도,underpass_coordinates.csv,,,126.453944,37.497354,rainfall,3,10194020,귤현보,한국수자원공사,28.76,False,,,,
+underpass_coordinates:481,해찬나래지하차도,underpass_coordinates.csv,,,126.551418,37.494546,waterlevel,1,1201653,아라서해갑문(외),한국수자원공사,8.53,False,N,,,
+underpass_coordinates:481,해찬나래지하차도,underpass_coordinates.csv,,,126.551418,37.494546,waterlevel,2,1201652,아라서해갑실(남),한국수자원공사,8.64,False,N,,,
+underpass_coordinates:481,해찬나래지하차도,underpass_coordinates.csv,,,126.551418,37.494546,waterlevel,3,1201654,아라서해갑실(북),한국수자원공사,8.68,False,N,,,
+underpass_coordinates:481,해찬나래지하차도,underpass_coordinates.csv,,,126.551418,37.494546,rainfall,1,12014010,아라인천TM,한국수자원공사,9.71,False,,,,
+underpass_coordinates:481,해찬나래지하차도,underpass_coordinates.csv,,,126.551418,37.494546,rainfall,2,10194010,김포시(김포시청),기후에너지환경부,19.74,False,,,,
+underpass_coordinates:481,해찬나래지하차도,underpass_coordinates.csv,,,126.551418,37.494546,rainfall,3,10194020,귤현보,한국수자원공사,20.76,False,,,,
 underpass_coordinates:486,석창지하차도,underpass_coordinates.csv,,,127.662784,34.78421,waterlevel,1,4105694,여수시(연등5교),기후에너지환경부,6.3,False,N,6.11,3.5,2.8
 underpass_coordinates:486,석창지하차도,underpass_coordinates.csv,,,127.662784,34.78421,waterlevel,2,2502610,남해군(금서교),기후에너지환경부,16.76,False,N,3.36,3.0,2.5
 underpass_coordinates:486,석창지하차도,underpass_coordinates.csv,,,127.662784,34.78421,waterlevel,3,4105625,광양시(성황4교),기후에너지환경부,16.97,False,N,3.51,2.9,2.2
@@ -1253,6 +1847,12 @@ underpass_coordinates:487,엑스포지하차도,underpass_coordinates.csv,,,127.
 underpass_coordinates:487,엑스포지하차도,underpass_coordinates.csv,,,127.745466,34.748569,rainfall,1,41044040,순천국토관리사무소,기후에너지환경부,30.88,False,,,,
 underpass_coordinates:487,엑스포지하차도,underpass_coordinates.csv,,,127.745466,34.748569,rainfall,2,41054030,광양시(수어댐),한국수자원공사,31.31,False,,,,
 underpass_coordinates:487,엑스포지하차도,underpass_coordinates.csv,,,127.745466,34.748569,rainfall,3,40094090,하동군(읍내리),기후에너지환경부,35.37,False,,,,
+underpass_coordinates:489,월곡지하차도,underpass_coordinates.csv,,,126.708531,35.443367,waterlevel,1,5301635,고창군(모양교),기후에너지환경부,1.1,True,N,5.51,3.3,2.6
+underpass_coordinates:489,월곡지하차도,underpass_coordinates.csv,,,126.708531,35.443367,waterlevel,2,5301660,고창군(부정교),기후에너지환경부,8.37,False,Y,5.7,4.8,4.0
+underpass_coordinates:489,월곡지하차도,underpass_coordinates.csv,,,126.708531,35.443367,waterlevel,3,5002630,장성군(개천교),기후에너지환경부,10.68,False,N,4.32,3.8,3.2
+underpass_coordinates:489,월곡지하차도,underpass_coordinates.csv,,,126.708531,35.443367,rainfall,1,50024020,장성군(백암저수지),기후에너지환경부,6.06,False,,,,
+underpass_coordinates:489,월곡지하차도,underpass_coordinates.csv,,,126.708531,35.443367,rainfall,2,50024030,장성군(장성댐),기후에너지환경부,14.12,False,,,,
+underpass_coordinates:489,월곡지하차도,underpass_coordinates.csv,,,126.708531,35.443367,rainfall,3,50024050,장성군(수산리),한국수자원공사,15.88,False,,,,
 underpass_coordinates:490,예술의전당 지하차도,underpass_coordinates.csv,,,126.705035,35.960729,waterlevel,1,3203690,군산시(신미장교),기후에너지환경부,1.64,True,N,3.59,3.2,2.8
 underpass_coordinates:490,예술의전당 지하차도,underpass_coordinates.csv,,,126.705035,35.960729,waterlevel,2,3014690,금강하구둑(내),한국농어촌공사,7.22,False,N,,,
 underpass_coordinates:490,예술의전당 지하차도,underpass_coordinates.csv,,,126.705035,35.960729,waterlevel,3,3014695,금강하구둑(외),한국농어촌공사,7.24,False,N,,,
@@ -1283,18 +1883,48 @@ underpass_coordinates:499,안덕원지하차도,underpass_coordinates.csv,,,127.
 underpass_coordinates:499,안덕원지하차도,underpass_coordinates.csv,,,127.168963,35.840122,rainfall,1,33014120,완주군(용진초교),기후에너지환경부,1.99,True,,,,
 underpass_coordinates:499,안덕원지하차도,underpass_coordinates.csv,,,127.168963,35.840122,rainfall,2,33014100,전주시(미산교),기후에너지환경부,7.78,False,,,,
 underpass_coordinates:499,안덕원지하차도,underpass_coordinates.csv,,,127.168963,35.840122,rainfall,3,33014060,대천,기후에너지환경부,10.33,False,,,,
+underpass_coordinates:504,가곡지하차도,underpass_coordinates.csv,,,126.684336,36.978344,waterlevel,1,3201690,당진시(채운교),기후에너지환경부,10.25,False,Y,7.52,6.5,5.0
+underpass_coordinates:504,가곡지하차도,underpass_coordinates.csv,,,126.684336,36.978344,waterlevel,2,1202670,남양(외),한국농어촌공사,10.57,False,N,,,
+underpass_coordinates:504,가곡지하차도,underpass_coordinates.csv,,,126.684336,36.978344,waterlevel,3,3201670,당진시(초대교),기후에너지환경부,11.34,False,N,2.94,2.5,2.2
+underpass_coordinates:504,가곡지하차도,underpass_coordinates.csv,,,126.684336,36.978344,rainfall,1,31014090,당진시(순성초교),기후에너지환경부,15.21,False,,,,
+underpass_coordinates:504,가곡지하차도,underpass_coordinates.csv,,,126.684336,36.978344,rainfall,2,31014040,삽교호,한국농어촌공사,16.36,False,,,,
+underpass_coordinates:504,가곡지하차도,underpass_coordinates.csv,,,126.684336,36.978344,rainfall,3,11014040,화성시(양감면사무소),기후에너지환경부,25.96,False,,,,
+underpass_coordinates:505,고대지하차도,underpass_coordinates.csv,,,126.724358,36.981015,waterlevel,1,1202670,남양(외),한국농어촌공사,7.06,False,N,,,
+underpass_coordinates:505,고대지하차도,underpass_coordinates.csv,,,126.724358,36.981015,waterlevel,2,3201670,당진시(초대교),기후에너지환경부,9.94,False,N,2.94,2.5,2.2
+underpass_coordinates:505,고대지하차도,underpass_coordinates.csv,,,126.724358,36.981015,waterlevel,3,3201686,당진시(소송교),기후에너지환경부,12.84,False,N,3.94,3.2,2.5
+underpass_coordinates:505,고대지하차도,underpass_coordinates.csv,,,126.724358,36.981015,rainfall,1,31014040,삽교호,한국농어촌공사,13.95,False,,,,
+underpass_coordinates:505,고대지하차도,underpass_coordinates.csv,,,126.724358,36.981015,rainfall,2,31014090,당진시(순성초교),기후에너지환경부,15.35,False,,,,
+underpass_coordinates:505,고대지하차도,underpass_coordinates.csv,,,126.724358,36.981015,rainfall,3,11014040,화성시(양감면사무소),기후에너지환경부,22.69,False,,,,
+underpass_coordinates:506,동곡지하차도,underpass_coordinates.csv,,,126.703055,36.978605,waterlevel,1,1202670,남양(외),한국농어촌공사,8.95,False,N,,,
+underpass_coordinates:506,동곡지하차도,underpass_coordinates.csv,,,126.703055,36.978605,waterlevel,2,3201670,당진시(초대교),기후에너지환경부,10.46,False,N,2.94,2.5,2.2
+underpass_coordinates:506,동곡지하차도,underpass_coordinates.csv,,,126.703055,36.978605,waterlevel,3,3201690,당진시(채운교),기후에너지환경부,11.36,False,Y,7.52,6.5,5.0
+underpass_coordinates:506,동곡지하차도,underpass_coordinates.csv,,,126.703055,36.978605,rainfall,1,31014090,당진시(순성초교),기후에너지환경부,15.06,False,,,,
+underpass_coordinates:506,동곡지하차도,underpass_coordinates.csv,,,126.703055,36.978605,rainfall,2,31014040,삽교호,한국농어촌공사,15.11,False,,,,
+underpass_coordinates:506,동곡지하차도,underpass_coordinates.csv,,,126.703055,36.978605,rainfall,3,11014040,화성시(양감면사무소),기후에너지환경부,24.47,False,,,,
 underpass_coordinates:508,세교지하차도,underpass_coordinates.csv,,,127.093683,36.782157,waterlevel,1,3101670,천안시(휴대교),기후에너지환경부,1.78,True,N,5.97,4.7,3.7
 underpass_coordinates:508,세교지하차도,underpass_coordinates.csv,,,127.093683,36.782157,waterlevel,2,3101673,아산시(새터교),기후에너지환경부,3.04,True,N,4.74,3.9,3.0
 underpass_coordinates:508,세교지하차도,underpass_coordinates.csv,,,127.093683,36.782157,waterlevel,3,3101675,아산시(한내다리),기후에너지환경부,3.66,True,N,6.98,5.5,4.5
 underpass_coordinates:508,세교지하차도,underpass_coordinates.csv,,,127.093683,36.782157,rainfall,1,31014130,아산시(휴대교),기후에너지환경부,1.77,True,,,,
 underpass_coordinates:508,세교지하차도,underpass_coordinates.csv,,,127.093683,36.782157,rainfall,2,31014070,아산,한국농어촌공사,7.26,False,,,,
 underpass_coordinates:508,세교지하차도,underpass_coordinates.csv,,,127.093683,36.782157,rainfall,3,31014140,천안시(신흥교),기후에너지환경부,8.97,False,,,,
+underpass_coordinates:509,송용지하차도,underpass_coordinates.csv,,,127.020458,36.90905,waterlevel,1,1101688,아산시(운교교),기후에너지환경부,1.88,True,N,7.3,5.2,4.4
+underpass_coordinates:509,송용지하차도,underpass_coordinates.csv,,,127.020458,36.90905,waterlevel,2,1101690,노양,기후에너지환경부,3.26,True,N,,,
+underpass_coordinates:509,송용지하차도,underpass_coordinates.csv,,,127.020458,36.90905,waterlevel,3,1101685,아산호,한국농어촌공사,7.67,False,N,,,
+underpass_coordinates:509,송용지하차도,underpass_coordinates.csv,,,127.020458,36.90905,rainfall,1,11014080,평택시(군문교),기후에너지환경부,9.84,False,,,,
+underpass_coordinates:509,송용지하차도,underpass_coordinates.csv,,,127.020458,36.90905,rainfall,2,11014050,천안시(대홍초교),기후에너지환경부,12.23,False,,,,
+underpass_coordinates:509,송용지하차도,underpass_coordinates.csv,,,127.020458,36.90905,rainfall,3,31014150,아산시(강청교),기후에너지환경부,12.41,False,,,,
 underpass_coordinates:510,장재지하차도,underpass_coordinates.csv,,,127.10973,36.784434,waterlevel,1,3101670,천안시(휴대교),기후에너지환경부,0.53,True,N,5.97,4.7,3.7
 underpass_coordinates:510,장재지하차도,underpass_coordinates.csv,,,127.10973,36.784434,waterlevel,2,3101667,천안시(눈들교),기후에너지환경부,2.83,True,N,4.64,3.8,3.2
 underpass_coordinates:510,장재지하차도,underpass_coordinates.csv,,,127.10973,36.784434,waterlevel,3,3101673,아산시(새터교),기후에너지환경부,3.56,True,N,4.74,3.9,3.0
 underpass_coordinates:510,장재지하차도,underpass_coordinates.csv,,,127.10973,36.784434,rainfall,1,31014130,아산시(휴대교),기후에너지환경부,0.61,True,,,,
 underpass_coordinates:510,장재지하차도,underpass_coordinates.csv,,,127.10973,36.784434,rainfall,2,31014070,아산,한국농어촌공사,8.7,False,,,,
 underpass_coordinates:510,장재지하차도,underpass_coordinates.csv,,,127.10973,36.784434,rainfall,3,31014140,천안시(신흥교),기후에너지환경부,9.05,False,,,,
+underpass_coordinates:511,나들목 지하차도,underpass_coordinates.csv,,,127.164654,36.827144,waterlevel,1,3101667,천안시(눈들교),기후에너지환경부,4.67,True,N,4.64,3.8,3.2
+underpass_coordinates:511,나들목 지하차도,underpass_coordinates.csv,,,127.164654,36.827144,waterlevel,2,3101670,천안시(휴대교),기후에너지환경부,6.87,False,N,5.97,4.7,3.7
+underpass_coordinates:511,나들목 지하차도,underpass_coordinates.csv,,,127.164654,36.827144,waterlevel,3,3101672,아산시(덕지리),기후에너지환경부,7.2,False,N,4.66,3.9,3.1
+underpass_coordinates:511,나들목 지하차도,underpass_coordinates.csv,,,127.164654,36.827144,rainfall,1,11014110,천안시(성거읍사무소),기후에너지환경부,6.44,False,,,,
+underpass_coordinates:511,나들목 지하차도,underpass_coordinates.csv,,,127.164654,36.827144,rainfall,2,31014130,아산시(휴대교),기후에너지환경부,6.98,False,,,,
+underpass_coordinates:511,나들목 지하차도,underpass_coordinates.csv,,,127.164654,36.827144,rainfall,3,11014050,천안시(대홍초교),기후에너지환경부,13.71,False,,,,
 underpass_coordinates:512,두정지하차도,underpass_coordinates.csv,,,127.151459,36.838701,waterlevel,1,3101667,천안시(눈들교),기후에너지환경부,5.53,False,N,4.64,3.8,3.2
 underpass_coordinates:512,두정지하차도,underpass_coordinates.csv,,,127.151459,36.838701,waterlevel,2,3101672,아산시(덕지리),기후에너지환경부,6.08,False,N,4.66,3.9,3.1
 underpass_coordinates:512,두정지하차도,underpass_coordinates.csv,,,127.151459,36.838701,waterlevel,3,3101673,아산시(새터교),기후에너지환경부,7.0,False,N,4.74,3.9,3.0
@@ -1325,6 +1955,12 @@ underpass_coordinates:517,고명지하차도,underpass_coordinates.csv,,,128.229
 underpass_coordinates:517,고명지하차도,underpass_coordinates.csv,,,128.229196,37.118004,rainfall,1,10034140,단양군(가평리),한국수자원공사,7.4,False,,,,
 underpass_coordinates:517,고명지하차도,underpass_coordinates.csv,,,128.229196,37.118004,rainfall,2,10034150,제천시(삼거리),한국수자원공사,8.96,False,,,,
 underpass_coordinates:517,고명지하차도,underpass_coordinates.csv,,,128.229196,37.118004,rainfall,3,10034090,제천시(물태리),한국수자원공사,14.51,False,,,,
+underpass_coordinates:518,궁평2지하차도,underpass_coordinates.csv,,,127.3452,36.622705,waterlevel,1,3011665,청주시(미호강교),기후에너지환경부,0.48,True,Y,9.38,8.0,7.0
+underpass_coordinates:518,궁평2지하차도,underpass_coordinates.csv,,,127.3452,36.622705,waterlevel,2,3011685,세종시(미호교),기후에너지환경부,5.16,False,N,8.85,7.1,5.4
+underpass_coordinates:518,궁평2지하차도,underpass_coordinates.csv,,,127.3452,36.622705,waterlevel,3,3011675,세종시(상조천교),기후에너지환경부,5.34,False,Y,4.77,4.2,3.2
+underpass_coordinates:518,궁평2지하차도,underpass_coordinates.csv,,,127.3452,36.622705,rainfall,1,30114070,세종시(농정원),기후에너지환경부,5.78,False,,,,
+underpass_coordinates:518,궁평2지하차도,underpass_coordinates.csv,,,127.3452,36.622705,rainfall,2,30114110,옥산,기후에너지환경부,5.94,False,,,,
+underpass_coordinates:518,궁평2지하차도,underpass_coordinates.csv,,,127.3452,36.622705,rainfall,3,30104010,세종시(부강면사무소),기후에너지환경부,10.66,False,,,,
 underpass_coordinates:521,용암지하차도,underpass_coordinates.csv,,,127.516557,36.6195,waterlevel,1,3011639,청주시(운암1교),기후에너지환경부,1.01,True,N,4.0,3.3,2.6
 underpass_coordinates:521,용암지하차도,underpass_coordinates.csv,,,127.516557,36.6195,waterlevel,2,3011637,청주시(월오교),기후에너지환경부,1.72,True,N,3.16,2.6,2.1
 underpass_coordinates:521,용암지하차도,underpass_coordinates.csv,,,127.516557,36.6195,waterlevel,3,3011643,청주시(용평교),기후에너지환경부,1.93,True,N,4.9,4.0,3.2
@@ -1373,12 +2009,36 @@ underpass_coordinates:533,화전지하차도(항공대),underpass_coordinates.cs
 underpass_coordinates:533,화전지하차도(항공대),underpass_coordinates.csv,,,126.86884,37.602582,rainfall,1,10194030,아라김포TM,한국수자원공사,6.14,False,,,,
 underpass_coordinates:533,화전지하차도(항공대),underpass_coordinates.csv,,,126.86884,37.602582,rainfall,2,10194020,귤현보,한국수자원공사,9.69,False,,,,
 underpass_coordinates:533,화전지하차도(항공대),underpass_coordinates.csv,,,126.86884,37.602582,rainfall,3,10184070,서울,기후에너지환경부,11.56,False,,,,
+underpass_coordinates:548,철산지하차도,underpass_coordinates.csv,,,126.876058,37.474546,waterlevel,1,1018695,서울시(너부대교),기후에너지환경부,2.73,True,Y,4.9,4.5,3.5
+underpass_coordinates:548,철산지하차도,underpass_coordinates.csv,,,126.876058,37.474546,waterlevel,2,1018693,광명시(시흥대교),기후에너지환경부,2.91,True,N,8.9,6.5,4.7
+underpass_coordinates:548,철산지하차도,underpass_coordinates.csv,,,126.876058,37.474546,waterlevel,3,1018698,서울시(신대방1교),기후에너지환경부,3.71,True,Y,4.0,3.2,2.4
+underpass_coordinates:548,철산지하차도,underpass_coordinates.csv,,,126.876058,37.474546,rainfall,1,10184080,서울시(구로구청),기후에너지환경부,2.45,True,,,,
+underpass_coordinates:548,철산지하차도,underpass_coordinates.csv,,,126.876058,37.474546,rainfall,2,10184160,부천시(부안초교),기후에너지환경부,5.71,False,,,,
+underpass_coordinates:548,철산지하차도,underpass_coordinates.csv,,,126.876058,37.474546,rainfall,3,10184090,안양시(충훈1교),기후에너지환경부,8.12,False,,,,
+underpass_coordinates:555,평내지하차도,underpass_coordinates.csv,,,127.243805,37.652696,waterlevel,1,1018630,남양주시(진관교),기후에너지환경부,8.09,False,Y,5.0,4.5,3.9
+underpass_coordinates:555,평내지하차도,underpass_coordinates.csv,,,127.243805,37.652696,waterlevel,2,1018625,남양주시(내곡교),기후에너지환경부,8.2,False,N,6.0,4.0,3.5
+underpass_coordinates:555,평내지하차도,underpass_coordinates.csv,,,127.243805,37.652696,waterlevel,3,1018623,남양주시(연평대교),기후에너지환경부,8.36,False,N,4.2,3.5,2.8
+underpass_coordinates:555,평내지하차도,underpass_coordinates.csv,,,127.243805,37.652696,rainfall,1,10184060,남양주시(금곡초교),기후에너지환경부,3.41,True,,,,
+underpass_coordinates:555,평내지하차도,underpass_coordinates.csv,,,127.243805,37.652696,rainfall,2,10184110,남양주시(진관교),기후에너지환경부,8.09,False,,,,
+underpass_coordinates:555,평내지하차도,underpass_coordinates.csv,,,127.243805,37.652696,rainfall,3,10184220,남양주시(진접읍사무소),기후에너지환경부,9.44,False,,,,
 underpass_coordinates:556,소명지하차도,underpass_coordinates.csv,,,126.788634,37.482989,waterlevel,1,1018695,서울시(너부대교),기후에너지환경부,5.04,False,Y,4.9,4.5,3.5
 underpass_coordinates:556,소명지하차도,underpass_coordinates.csv,,,126.788634,37.482989,waterlevel,2,1019640,굴포천(내),한국수자원공사,5.13,False,N,,,
 underpass_coordinates:556,소명지하차도,underpass_coordinates.csv,,,126.788634,37.482989,waterlevel,3,1019620,부천시(도두리2교),기후에너지환경부,6.01,False,N,4.6,3.4,2.7
 underpass_coordinates:556,소명지하차도,underpass_coordinates.csv,,,126.788634,37.482989,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,2.06,True,,,,
 underpass_coordinates:556,소명지하차도,underpass_coordinates.csv,,,126.788634,37.482989,rainfall,2,10184080,서울시(구로구청),기후에너지환경부,8.73,False,,,,
 underpass_coordinates:556,소명지하차도,underpass_coordinates.csv,,,126.788634,37.482989,rainfall,3,10194020,귤현보,한국수자원공사,9.77,False,,,,
+underpass_coordinates:570,서현지하차도,underpass_coordinates.csv,,,127.116574,37.38675,waterlevel,1,1018650,성남시(궁내교),기후에너지환경부,2.0,True,N,5.1,4.2,3.3
+underpass_coordinates:570,서현지하차도,underpass_coordinates.csv,,,127.116574,37.38675,waterlevel,2,1018653,성남시(둔전교),기후에너지환경부,4.59,True,N,8.1,6.9,6.1
+underpass_coordinates:570,서현지하차도,underpass_coordinates.csv,,,127.116574,37.38675,waterlevel,3,1016606,광주시(동림3교),기후에너지환경부,8.8,False,N,5.5,4.8,4.1
+underpass_coordinates:570,서현지하차도,underpass_coordinates.csv,,,127.116574,37.38675,rainfall,1,10184130,성남시(대장동),기후에너지환경부,5.1,False,,,,
+underpass_coordinates:570,서현지하차도,underpass_coordinates.csv,,,127.116574,37.38675,rainfall,2,10184230,성남시(구미초교),기후에너지환경부,5.45,False,,,,
+underpass_coordinates:570,서현지하차도,underpass_coordinates.csv,,,127.116574,37.38675,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,5.85,False,,,,
+underpass_coordinates:571,송현지하차도,underpass_coordinates.csv,,,127.105403,37.411444,waterlevel,1,1018653,성남시(둔전교),기후에너지환경부,2.12,True,N,8.1,6.9,6.1
+underpass_coordinates:571,송현지하차도,underpass_coordinates.csv,,,127.105403,37.411444,waterlevel,2,1018650,성남시(궁내교),기후에너지환경부,4.62,True,N,5.1,4.2,3.3
+underpass_coordinates:571,송현지하차도,underpass_coordinates.csv,,,127.105403,37.411444,waterlevel,3,1018655,서울시(대곡교),기후에너지환경부,6.56,False,Y,8.5,7.1,5.8
+underpass_coordinates:571,송현지하차도,underpass_coordinates.csv,,,127.105403,37.411444,rainfall,1,10184040,성남시(한국학중앙연구원),기후에너지환경부,5.25,False,,,,
+underpass_coordinates:571,송현지하차도,underpass_coordinates.csv,,,127.105403,37.411444,rainfall,2,10184180,성남시(성남북초교),기후에너지환경부,6.0,False,,,,
+underpass_coordinates:571,송현지하차도,underpass_coordinates.csv,,,127.105403,37.411444,rainfall,3,10184130,성남시(대장동),기후에너지환경부,6.53,False,,,,
 underpass_coordinates:573,숲풍지하차도,underpass_coordinates.csv,,,127.115247,37.40875,waterlevel,1,1018653,성남시(둔전교),기후에너지환경부,2.15,True,N,8.1,6.9,6.1
 underpass_coordinates:573,숲풍지하차도,underpass_coordinates.csv,,,127.115247,37.40875,waterlevel,2,1018650,성남시(궁내교),기후에너지환경부,4.35,True,N,5.1,4.2,3.3
 underpass_coordinates:573,숲풍지하차도,underpass_coordinates.csv,,,127.115247,37.40875,waterlevel,3,1018655,서울시(대곡교),기후에너지환경부,6.72,False,Y,8.5,7.1,5.8
@@ -1391,6 +2051,42 @@ underpass_coordinates:574,안말지하차도,underpass_coordinates.csv,,,127.137
 underpass_coordinates:574,안말지하차도,underpass_coordinates.csv,,,127.137702,37.389211,rainfall,1,10184230,성남시(구미초교),기후에너지환경부,5.98,False,,,,
 underpass_coordinates:574,안말지하차도,underpass_coordinates.csv,,,127.137702,37.389211,rainfall,2,10184130,성남시(대장동),기후에너지환경부,6.83,False,,,,
 underpass_coordinates:574,안말지하차도,underpass_coordinates.csv,,,127.137702,37.389211,rainfall,3,10184180,성남시(성남북초교),기후에너지환경부,7.01,False,,,,
+underpass_coordinates:577,이매1지하보도,underpass_coordinates.csv,,,127.125456,37.402122,waterlevel,1,1018653,성남시(둔전교),기후에너지환경부,2.97,True,N,8.1,6.9,6.1
+underpass_coordinates:577,이매1지하보도,underpass_coordinates.csv,,,127.125456,37.402122,waterlevel,2,1018650,성남시(궁내교),기후에너지환경부,3.88,True,N,5.1,4.2,3.3
+underpass_coordinates:577,이매1지하보도,underpass_coordinates.csv,,,127.125456,37.402122,waterlevel,3,1018655,서울시(대곡교),기후에너지환경부,7.43,False,Y,8.5,7.1,5.8
+underpass_coordinates:577,이매1지하보도,underpass_coordinates.csv,,,127.125456,37.402122,rainfall,1,10184180,성남시(성남북초교),기후에너지환경부,5.93,False,,,,
+underpass_coordinates:577,이매1지하보도,underpass_coordinates.csv,,,127.125456,37.402122,rainfall,2,10184040,성남시(한국학중앙연구원),기후에너지환경부,6.67,False,,,,
+underpass_coordinates:577,이매1지하보도,underpass_coordinates.csv,,,127.125456,37.402122,rainfall,3,10184130,성남시(대장동),기후에너지환경부,6.8,False,,,,
+underpass_coordinates:583,초림지하차도,underpass_coordinates.csv,,,127.114037,37.384015,waterlevel,1,1018650,성남시(궁내교),기후에너지환경부,1.64,True,N,5.1,4.2,3.3
+underpass_coordinates:583,초림지하차도,underpass_coordinates.csv,,,127.114037,37.384015,waterlevel,2,1018653,성남시(둔전교),기후에너지환경부,4.91,True,N,8.1,6.9,6.1
+underpass_coordinates:583,초림지하차도,underpass_coordinates.csv,,,127.114037,37.384015,waterlevel,3,1016606,광주시(동림3교),기후에너지환경부,8.82,False,N,5.5,4.8,4.1
+underpass_coordinates:583,초림지하차도,underpass_coordinates.csv,,,127.114037,37.384015,rainfall,1,10184130,성남시(대장동),기후에너지환경부,4.74,True,,,,
+underpass_coordinates:583,초림지하차도,underpass_coordinates.csv,,,127.114037,37.384015,rainfall,2,10184230,성남시(구미초교),기후에너지환경부,5.15,False,,,,
+underpass_coordinates:583,초림지하차도,underpass_coordinates.csv,,,127.114037,37.384015,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,5.67,False,,,,
+underpass_coordinates:585,탄천2지하보도,underpass_coordinates.csv,,,127.123479,37.402262,waterlevel,1,1018653,성남시(둔전교),기후에너지환경부,2.92,True,N,8.1,6.9,6.1
+underpass_coordinates:585,탄천2지하보도,underpass_coordinates.csv,,,127.123479,37.402262,waterlevel,2,1018650,성남시(궁내교),기후에너지환경부,3.83,True,N,5.1,4.2,3.3
+underpass_coordinates:585,탄천2지하보도,underpass_coordinates.csv,,,127.123479,37.402262,waterlevel,3,1018655,서울시(대곡교),기후에너지환경부,7.41,False,Y,8.5,7.1,5.8
+underpass_coordinates:585,탄천2지하보도,underpass_coordinates.csv,,,127.123479,37.402262,rainfall,1,10184180,성남시(성남북초교),기후에너지환경부,5.98,False,,,,
+underpass_coordinates:585,탄천2지하보도,underpass_coordinates.csv,,,127.123479,37.402262,rainfall,2,10184040,성남시(한국학중앙연구원),기후에너지환경부,6.5,False,,,,
+underpass_coordinates:585,탄천2지하보도,underpass_coordinates.csv,,,127.123479,37.402262,rainfall,3,10184130,성남시(대장동),기후에너지환경부,6.68,False,,,,
+underpass_coordinates:590,태원지하보도,underpass_coordinates.csv,,,127.128347,37.402168,waterlevel,1,1018653,성남시(둔전교),기후에너지환경부,3.04,True,N,8.1,6.9,6.1
+underpass_coordinates:590,태원지하보도,underpass_coordinates.csv,,,127.128347,37.402168,waterlevel,2,1018650,성남시(궁내교),기후에너지환경부,3.99,True,N,5.1,4.2,3.3
+underpass_coordinates:590,태원지하보도,underpass_coordinates.csv,,,127.128347,37.402168,waterlevel,3,1018655,서울시(대곡교),기후에너지환경부,7.44,False,Y,8.5,7.1,5.8
+underpass_coordinates:590,태원지하보도,underpass_coordinates.csv,,,127.128347,37.402168,rainfall,1,10184180,성남시(성남북초교),기후에너지환경부,5.83,False,,,,
+underpass_coordinates:590,태원지하보도,underpass_coordinates.csv,,,127.128347,37.402168,rainfall,2,10184040,성남시(한국학중앙연구원),기후에너지환경부,6.93,False,,,,
+underpass_coordinates:590,태원지하보도,underpass_coordinates.csv,,,127.128347,37.402168,rainfall,3,10184130,성남시(대장동),기후에너지환경부,6.99,False,,,,
+underpass_coordinates:591,태평지하차도(1),underpass_coordinates.csv,,,127.124699,37.446377,waterlevel,1,1018653,성남시(둔전교),기후에너지환경부,2.14,True,N,8.1,6.9,6.1
+underpass_coordinates:591,태평지하차도(1),underpass_coordinates.csv,,,127.124699,37.446377,waterlevel,2,1018655,서울시(대곡교),기후에너지환경부,2.51,True,Y,8.5,7.1,5.8
+underpass_coordinates:591,태평지하차도(1),underpass_coordinates.csv,,,127.124699,37.446377,waterlevel,3,1018658,서울시(대치교),기후에너지환경부,7.28,False,N,13.5,11.1,8.7
+underpass_coordinates:591,태평지하차도(1),underpass_coordinates.csv,,,127.124699,37.446377,rainfall,1,10184180,성남시(성남북초교),기후에너지환경부,2.4,True,,,,
+underpass_coordinates:591,태평지하차도(1),underpass_coordinates.csv,,,127.124699,37.446377,rainfall,2,10184100,서울시(대곡교),기후에너지환경부,2.51,True,,,,
+underpass_coordinates:591,태평지하차도(1),underpass_coordinates.csv,,,127.124699,37.446377,rainfall,3,10164020,광주시(남한산초교),기후에너지환경부,6.44,False,,,,
+underpass_coordinates:592,태평지하차도(2),underpass_coordinates.csv,,,127.124699,37.446377,waterlevel,1,1018653,성남시(둔전교),기후에너지환경부,2.14,True,N,8.1,6.9,6.1
+underpass_coordinates:592,태평지하차도(2),underpass_coordinates.csv,,,127.124699,37.446377,waterlevel,2,1018655,서울시(대곡교),기후에너지환경부,2.51,True,Y,8.5,7.1,5.8
+underpass_coordinates:592,태평지하차도(2),underpass_coordinates.csv,,,127.124699,37.446377,waterlevel,3,1018658,서울시(대치교),기후에너지환경부,7.28,False,N,13.5,11.1,8.7
+underpass_coordinates:592,태평지하차도(2),underpass_coordinates.csv,,,127.124699,37.446377,rainfall,1,10184180,성남시(성남북초교),기후에너지환경부,2.4,True,,,,
+underpass_coordinates:592,태평지하차도(2),underpass_coordinates.csv,,,127.124699,37.446377,rainfall,2,10184100,서울시(대곡교),기후에너지환경부,2.51,True,,,,
+underpass_coordinates:592,태평지하차도(2),underpass_coordinates.csv,,,127.124699,37.446377,rainfall,3,10164020,광주시(남한산초교),기후에너지환경부,6.44,False,,,,
 underpass_coordinates:596,당암지하차도,underpass_coordinates.csv,,,127.061255,37.243902,waterlevel,1,1101604,수원시(백년교),기후에너지환경부,1.83,True,N,6.4,5.5,4.7
 underpass_coordinates:596,당암지하차도,underpass_coordinates.csv,,,127.061255,37.243902,waterlevel,2,1101605,화성시(화산교),기후에너지환경부,4.65,True,N,8.3,6.6,5.3
 underpass_coordinates:596,당암지하차도,underpass_coordinates.csv,,,127.061255,37.243902,waterlevel,3,1101601,수원시(매세교),기후에너지환경부,4.83,True,N,4.7,4.1,3.5
@@ -1463,18 +2159,48 @@ underpass_coordinates:649,삼막곡제2지하차도,underpass_coordinates.csv,,,
 underpass_coordinates:649,삼막곡제2지하차도,underpass_coordinates.csv,,,127.099447,37.295222,rainfall,1,10184230,성남시(구미초교),기후에너지환경부,5.0,False,,,,
 underpass_coordinates:649,삼막곡제2지하차도,underpass_coordinates.csv,,,127.099447,37.295222,rainfall,2,10184130,성남시(대장동),기후에너지환경부,7.67,False,,,,
 underpass_coordinates:649,삼막곡제2지하차도,underpass_coordinates.csv,,,127.099447,37.295222,rainfall,3,11014090,용인시(신갈저수지),기후에너지환경부,7.7,False,,,,
+underpass_coordinates:650,삼막곡터널,underpass_coordinates.csv,,,127.100015,37.296342,waterlevel,1,1101604,수원시(백년교),기후에너지환경부,7.18,False,N,6.4,5.5,4.7
+underpass_coordinates:650,삼막곡터널,underpass_coordinates.csv,,,127.100015,37.296342,waterlevel,2,1101601,수원시(매세교),기후에너지환경부,8.08,False,N,4.7,4.1,3.5
+underpass_coordinates:650,삼막곡터널,underpass_coordinates.csv,,,127.100015,37.296342,waterlevel,3,1018650,성남시(궁내교),기후에너지환경부,8.22,False,N,5.1,4.2,3.3
+underpass_coordinates:650,삼막곡터널,underpass_coordinates.csv,,,127.100015,37.296342,rainfall,1,10184230,성남시(구미초교),기후에너지환경부,4.87,True,,,,
+underpass_coordinates:650,삼막곡터널,underpass_coordinates.csv,,,127.100015,37.296342,rainfall,2,10184130,성남시(대장동),기후에너지환경부,7.57,False,,,,
+underpass_coordinates:650,삼막곡터널,underpass_coordinates.csv,,,127.100015,37.296342,rainfall,3,11014090,용인시(신갈저수지),기후에너지환경부,7.83,False,,,,
 underpass_coordinates:653,서정지하차도,underpass_coordinates.csv,,,127.054146,37.066503,waterlevel,1,1101663,평택시(진위1교),기후에너지환경부,3.17,True,Y,7.0,5.8,4.6
 underpass_coordinates:653,서정지하차도,underpass_coordinates.csv,,,127.054146,37.066503,waterlevel,2,1101665,평택시(회화리),기후에너지환경부,3.98,True,N,6.7,4.9,3.7
 underpass_coordinates:653,서정지하차도,underpass_coordinates.csv,,,127.054146,37.066503,waterlevel,3,1101670,평택시(동연교),기후에너지환경부,5.26,False,Y,10.1,8.5,7.5
 underpass_coordinates:653,서정지하차도,underpass_coordinates.csv,,,127.054146,37.066503,rainfall,1,11014070,평택시(회화리),기후에너지환경부,3.98,True,,,,
 underpass_coordinates:653,서정지하차도,underpass_coordinates.csv,,,127.054146,37.066503,rainfall,2,11014010,평택시(진위면사무소),기후에너지환경부,4.93,True,,,,
 underpass_coordinates:653,서정지하차도,underpass_coordinates.csv,,,127.054146,37.066503,rainfall,3,11014080,평택시(군문교),기후에너지환경부,9.5,False,,,,
+underpass_coordinates:656,신대지하차도,underpass_coordinates.csv,,,127.068449,37.286278,waterlevel,1,1101604,수원시(백년교),기후에너지환경부,4.56,True,N,6.4,5.5,4.7
+underpass_coordinates:656,신대지하차도,underpass_coordinates.csv,,,127.068449,37.286278,waterlevel,2,1101601,수원시(매세교),기후에너지환경부,5.08,False,N,4.7,4.1,3.5
+underpass_coordinates:656,신대지하차도,underpass_coordinates.csv,,,127.068449,37.286278,waterlevel,3,1101605,화성시(화산교),기후에너지환경부,8.73,False,N,8.3,6.6,5.3
+underpass_coordinates:656,신대지하차도,underpass_coordinates.csv,,,127.068449,37.286278,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,7.06,False,,,,
+underpass_coordinates:656,신대지하차도,underpass_coordinates.csv,,,127.068449,37.286278,rainfall,2,10184230,성남시(구미초교),기후에너지환경부,7.2,False,,,,
+underpass_coordinates:656,신대지하차도,underpass_coordinates.csv,,,127.068449,37.286278,rainfall,3,10184130,성남시(대장동),기후에너지환경부,8.2,False,,,,
+underpass_coordinates:661,위례지하보차도,underpass_coordinates.csv,,,127.144879,37.505427,waterlevel,1,1018655,서울시(대곡교),기후에너지환경부,4.52,True,Y,8.5,7.1,5.8
+underpass_coordinates:661,위례지하보차도,underpass_coordinates.csv,,,127.144879,37.505427,waterlevel,2,1018640,서울시(광진교),기후에너지환경부,5.41,False,N,13.0,10.6,8.6
+underpass_coordinates:661,위례지하보차도,underpass_coordinates.csv,,,127.144879,37.505427,waterlevel,3,1018645,자양,기후에너지환경부,6.25,False,N,,,
+underpass_coordinates:661,위례지하보차도,underpass_coordinates.csv,,,127.144879,37.505427,rainfall,1,10184100,서울시(대곡교),기후에너지환경부,4.52,True,,,,
+underpass_coordinates:661,위례지하보차도,underpass_coordinates.csv,,,127.144879,37.505427,rainfall,2,10164020,광주시(남한산초교),기후에너지환경부,4.69,True,,,,
+underpass_coordinates:661,위례지하보차도,underpass_coordinates.csv,,,127.144879,37.505427,rainfall,3,10184180,성남시(성남북초교),기후에너지환경부,6.03,False,,,,
+underpass_coordinates:662,창우지하차도,underpass_coordinates.csv,,,127.229192,37.538623,waterlevel,1,1018611,팔당대교,기후에너지환경부,1.26,True,N,,,
+underpass_coordinates:662,창우지하차도,underpass_coordinates.csv,,,127.229192,37.538623,waterlevel,2,1018610,남양주시(팔당대교),기후에너지환경부,1.36,True,N,15.6,12.7,9.5
+underpass_coordinates:662,창우지하차도,underpass_coordinates.csv,,,127.229192,37.538623,waterlevel,3,1018605,고안(등록문화재),기후에너지환경부,1.87,True,N,,0.0,0.0
+underpass_coordinates:662,창우지하차도,underpass_coordinates.csv,,,127.229192,37.538623,rainfall,1,10184050,고안(등록문화재),기후에너지환경부,1.87,True,,,,
+underpass_coordinates:662,창우지하차도,underpass_coordinates.csv,,,127.229192,37.538623,rainfall,2,10174020,남양주시(팔당댐),기후에너지환경부,4.94,True,,,,
+underpass_coordinates:662,창우지하차도,underpass_coordinates.csv,,,127.229192,37.538623,rainfall,3,10184232,팔당댐,한국수력원자력,4.94,True,,,,
 underpass_coordinates:663,구목포지하차도,underpass_coordinates.csv,,,127.039107,37.200198,waterlevel,1,1101605,화성시(화산교),기후에너지환경부,2.57,True,N,8.3,6.6,5.3
 underpass_coordinates:663,구목포지하차도,underpass_coordinates.csv,,,127.039107,37.200198,waterlevel,2,1101641,화성시(느티교),기후에너지환경부,3.99,True,N,,,
 underpass_coordinates:663,구목포지하차도,underpass_coordinates.csv,,,127.039107,37.200198,waterlevel,3,1101604,수원시(백년교),기후에너지환경부,5.64,False,N,6.4,5.5,4.7
 underpass_coordinates:663,구목포지하차도,underpass_coordinates.csv,,,127.039107,37.200198,rainfall,1,11014090,용인시(신갈저수지),기후에너지환경부,5.64,False,,,,
 underpass_coordinates:663,구목포지하차도,underpass_coordinates.csv,,,127.039107,37.200198,rainfall,2,11014060,화성시(수원대학교),기후에너지환경부,5.78,False,,,,
 underpass_coordinates:663,구목포지하차도,underpass_coordinates.csv,,,127.039107,37.200198,rainfall,3,11014070,평택시(회화리),기후에너지환경부,11.61,False,,,,
+underpass_coordinates:664,매송지하차도,underpass_coordinates.csv,,,127.120201,37.391384,waterlevel,1,1018650,성남시(궁내교),기후에너지환경부,2.6,True,N,5.1,4.2,3.3
+underpass_coordinates:664,매송지하차도,underpass_coordinates.csv,,,127.120201,37.391384,waterlevel,2,1018653,성남시(둔전교),기후에너지환경부,4.09,True,N,8.1,6.9,6.1
+underpass_coordinates:664,매송지하차도,underpass_coordinates.csv,,,127.120201,37.391384,waterlevel,3,1018655,서울시(대곡교),기후에너지환경부,8.62,False,Y,8.5,7.1,5.8
+underpass_coordinates:664,매송지하차도,underpass_coordinates.csv,,,127.120201,37.391384,rainfall,1,10184130,성남시(대장동),기후에너지환경부,5.66,False,,,,
+underpass_coordinates:664,매송지하차도,underpass_coordinates.csv,,,127.120201,37.391384,rainfall,2,10184230,성남시(구미초교),기후에너지환경부,5.96,False,,,,
+underpass_coordinates:664,매송지하차도,underpass_coordinates.csv,,,127.120201,37.391384,rainfall,3,10184040,성남시(한국학중앙연구원),기후에너지환경부,6.13,False,,,,
 underpass_coordinates:672,옥산지하차도,underpass_coordinates.csv,,,128.725501,35.823884,waterlevel,1,2012652,대구시(성동교),기후에너지환경부,3.12,True,N,4.93,4.1,3.2
 underpass_coordinates:672,옥산지하차도,underpass_coordinates.csv,,,128.725501,35.823884,waterlevel,2,2012653,대구시(안심교),기후에너지환경부,4.32,True,N,5.47,4.5,3.5
 underpass_coordinates:672,옥산지하차도,underpass_coordinates.csv,,,128.725501,35.823884,waterlevel,3,2012648,경산시(압량교),기후에너지환경부,4.85,True,Y,5.01,4.1,3.3
@@ -1487,6 +2213,12 @@ underpass_coordinates:673,장평지하차도,underpass_coordinates.csv,,,128.981
 underpass_coordinates:673,장평지하차도,underpass_coordinates.csv,,,128.981929,35.085487,rainfall,1,25044010,부산시(을숙도),기후에너지환경부,4.09,True,,,,
 underpass_coordinates:673,장평지하차도,underpass_coordinates.csv,,,128.981929,35.085487,rainfall,2,20224060,부산시(구포대교),기후에너지환경부,13.18,False,,,,
 underpass_coordinates:673,장평지하차도,underpass_coordinates.csv,,,128.981929,35.085487,rainfall,3,20224030,김해시(전하동),기후에너지환경부,16.73,False,,,,
+underpass_coordinates:698,문흥지하보도,underpass_coordinates.csv,,,126.921615,35.185607,waterlevel,1,5001676,광주특별시(신운교),기후에너지환경부,3.38,True,N,4.98,4.1,3.2
+underpass_coordinates:698,문흥지하보도,underpass_coordinates.csv,,,126.921615,35.185607,waterlevel,2,5001673,광주특별시(천교),기후에너지환경부,4.05,True,N,4.34,3.5,2.6
+underpass_coordinates:698,문흥지하보도,underpass_coordinates.csv,,,126.921615,35.185607,waterlevel,3,5001650,광주특별시(유촌교),기후에너지환경부,6.26,False,Y,5.97,5.0,4.0
+underpass_coordinates:698,문흥지하보도,underpass_coordinates.csv,,,126.921615,35.185607,rainfall,1,50014020,광주특별시(대성초교),기후에너지환경부,4.92,True,,,,
+underpass_coordinates:698,문흥지하보도,underpass_coordinates.csv,,,126.921615,35.185607,rainfall,2,50014030,담양군(광주댐),기후에너지환경부,6.37,False,,,,
+underpass_coordinates:698,문흥지하보도,underpass_coordinates.csv,,,126.921615,35.185607,rainfall,3,50014060,담양군(삼지교),기후에너지환경부,9.53,False,,,,
 underpass_coordinates:704,대봉교지하차도,underpass_coordinates.csv,,,128.607188,35.854934,waterlevel,1,2012667,대구시(수성교),기후에너지환경부,0.19,True,N,6.52,5.5,4.6
 underpass_coordinates:704,대봉교지하차도,underpass_coordinates.csv,,,128.607188,35.854934,waterlevel,2,2012664,대구시(동신교),기후에너지환경부,1.47,True,N,6.08,5.2,4.3
 underpass_coordinates:704,대봉교지하차도,underpass_coordinates.csv,,,128.607188,35.854934,waterlevel,3,2012661,대구시(신천교),기후에너지환경부,2.23,True,N,6.37,5.5,4.6
@@ -1547,6 +2279,12 @@ underpass_coordinates:720,상리지하차도,underpass_coordinates.csv,,,128.533
 underpass_coordinates:720,상리지하차도,underpass_coordinates.csv,,,128.533011,35.882409,rainfall,1,20124090,대구시(신암동),기후에너지환경부,9.2,False,,,,
 underpass_coordinates:720,상리지하차도,underpass_coordinates.csv,,,128.533011,35.882409,rainfall,2,20144020,대구시(사문진교),기후에너지환경부,9.44,False,,,,
 underpass_coordinates:720,상리지하차도,underpass_coordinates.csv,,,128.533011,35.882409,rainfall,3,20124160,칠곡군(금암리),기후에너지환경부,11.38,False,,,,
+underpass_coordinates:728,엑스포지하차도,underpass_coordinates.csv,,,127.388044,36.370843,waterlevel,1,3009675,대전시(대덕대교),기후에너지환경부,0.79,True,N,4.55,3.6,2.7
+underpass_coordinates:728,엑스포지하차도,underpass_coordinates.csv,,,127.388044,36.370843,waterlevel,2,3009673,대전시(한밭대교),기후에너지환경부,2.05,True,N,5.49,4.8,3.8
+underpass_coordinates:728,엑스포지하차도,underpass_coordinates.csv,,,127.388044,36.370843,waterlevel,3,3009680,대전시(원촌교),기후에너지환경부,2.13,True,Y,5.73,4.8,4.0
+underpass_coordinates:728,엑스포지하차도,underpass_coordinates.csv,,,127.388044,36.370843,rainfall,1,30094020,대전시(원촌교),기후에너지환경부,2.13,True,,,,
+underpass_coordinates:728,엑스포지하차도,underpass_coordinates.csv,,,127.388044,36.370843,rainfall,2,30094040,대전시(만년교),기후에너지환경부,4.04,True,,,,
+underpass_coordinates:728,엑스포지하차도,underpass_coordinates.csv,,,127.388044,36.370843,rainfall,3,30094050,대전시(인창교),기후에너지환경부,6.7,False,,,,
 underpass_coordinates:730,문현지하차도,underpass_coordinates.csv,,,129.067983,35.136886,waterlevel,1,2302670,부산시(범천동),기후에너지환경부,1.58,True,N,4.2,3.9,3.5
 underpass_coordinates:730,문현지하차도,underpass_coordinates.csv,,,129.067983,35.136886,waterlevel,2,2302661,부산시(좌수영교),기후에너지환경부,6.39,False,N,5.2,4.9,4.5
 underpass_coordinates:730,문현지하차도,underpass_coordinates.csv,,,129.067983,35.136886,waterlevel,3,2302655,부산시(세병교),기후에너지환경부,6.78,False,N,7.05,6.0,5.0
@@ -1565,6 +2303,12 @@ underpass_coordinates:753,중동지하차도,underpass_coordinates.csv,,,129.165
 underpass_coordinates:753,중동지하차도,underpass_coordinates.csv,,,129.165532,35.16641,rainfall,1,20224060,부산시(구포대교),기후에너지환경부,16.16,False,,,,
 underpass_coordinates:753,중동지하차도,underpass_coordinates.csv,,,129.165532,35.16641,rainfall,2,25044010,부산시(을숙도),기후에너지환경부,20.76,False,,,,
 underpass_coordinates:753,중동지하차도,underpass_coordinates.csv,,,129.165532,35.16641,rainfall,3,20224040,양산시(양산교),기후에너지환경부,24.28,False,,,,
+underpass_coordinates:754,수서지하차도,underpass_coordinates.csv,,,127.09995,37.493041,waterlevel,1,1018658,서울시(대치교),기후에너지환경부,2.33,True,N,13.5,11.1,8.7
+underpass_coordinates:754,수서지하차도,underpass_coordinates.csv,,,127.09995,37.493041,waterlevel,2,1018655,서울시(대곡교),기후에너지환경부,3.34,True,Y,8.5,7.1,5.8
+underpass_coordinates:754,수서지하차도,underpass_coordinates.csv,,,127.09995,37.493041,waterlevel,3,1018645,자양,기후에너지환경부,3.96,True,N,,,
+underpass_coordinates:754,수서지하차도,underpass_coordinates.csv,,,127.09995,37.493041,rainfall,1,10184100,서울시(대곡교),기후에너지환경부,3.34,True,,,,
+underpass_coordinates:754,수서지하차도,underpass_coordinates.csv,,,127.09995,37.493041,rainfall,2,10184180,성남시(성남북초교),기후에너지환경부,6.47,False,,,,
+underpass_coordinates:754,수서지하차도,underpass_coordinates.csv,,,127.09995,37.493041,rainfall,3,10184140,서울시(송정동),기후에너지환경부,7.66,False,,,,
 underpass_coordinates:761,국제선방향 지하차도,underpass_coordinates.csv,,,126.806414,37.561849,waterlevel,1,1019657,인천시(상야교),기후에너지환경부,3.31,True,N,5.0,4.1,3.2
 underpass_coordinates:761,국제선방향 지하차도,underpass_coordinates.csv,,,126.806414,37.561849,waterlevel,2,1019660,굴포천(한강),한국수자원공사,3.73,True,N,,,
 underpass_coordinates:761,국제선방향 지하차도,underpass_coordinates.csv,,,126.806414,37.561849,waterlevel,3,1019653,벌말교,한국수자원공사,3.85,True,N,,,
@@ -1583,12 +2327,54 @@ underpass_coordinates:764,인천공항방향 지하차도,underpass_coordinates.
 underpass_coordinates:764,인천공항방향 지하차도,underpass_coordinates.csv,,,126.804858,37.567635,rainfall,1,10194020,귤현보,한국수자원공사,3.32,True,,,,
 underpass_coordinates:764,인천공항방향 지하차도,underpass_coordinates.csv,,,126.804858,37.567635,rainfall,2,10194030,아라김포TM,한국수자원공사,3.63,True,,,,
 underpass_coordinates:764,인천공항방향 지하차도,underpass_coordinates.csv,,,126.804858,37.567635,rainfall,3,10194010,김포시(김포시청),기후에너지환경부,9.49,False,,,,
+underpass_coordinates:771,고척2지하차도,underpass_coordinates.csv,,,126.868869,37.499525,waterlevel,1,1018697,서울시(오금교),기후에너지환경부,1.09,True,Y,11.0,9.0,7.0
+underpass_coordinates:771,고척2지하차도,underpass_coordinates.csv,,,126.868869,37.499525,waterlevel,2,1018695,서울시(너부대교),기후에너지환경부,3.08,True,Y,4.9,4.5,3.5
+underpass_coordinates:771,고척2지하차도,underpass_coordinates.csv,,,126.868869,37.499525,waterlevel,3,1018698,서울시(신대방1교),기후에너지환경부,4.22,True,Y,4.0,3.2,2.4
+underpass_coordinates:771,고척2지하차도,underpass_coordinates.csv,,,126.868869,37.499525,rainfall,1,10184080,서울시(구로구청),기후에너지환경부,1.63,True,,,,
+underpass_coordinates:771,고척2지하차도,underpass_coordinates.csv,,,126.868869,37.499525,rainfall,2,10184160,부천시(부안초교),기후에너지환경부,5.49,False,,,,
+underpass_coordinates:771,고척2지하차도,underpass_coordinates.csv,,,126.868869,37.499525,rainfall,3,10184070,서울,기후에너지환경부,9.41,False,,,,
 underpass_coordinates:773,구로역지하차도,underpass_coordinates.csv,,,126.880931,37.502003,waterlevel,1,1018697,서울시(오금교),기후에너지환경부,0.92,True,Y,11.0,9.0,7.0
 underpass_coordinates:773,구로역지하차도,underpass_coordinates.csv,,,126.880931,37.502003,waterlevel,2,1018698,서울시(신대방1교),기후에너지환경부,3.34,True,Y,4.0,3.2,2.4
 underpass_coordinates:773,구로역지하차도,underpass_coordinates.csv,,,126.880931,37.502003,waterlevel,3,1018695,서울시(너부대교),기후에너지환경부,4.04,True,Y,4.9,4.5,3.5
 underpass_coordinates:773,구로역지하차도,underpass_coordinates.csv,,,126.880931,37.502003,rainfall,1,10184080,서울시(구로구청),기후에너지환경부,0.92,True,,,,
 underpass_coordinates:773,구로역지하차도,underpass_coordinates.csv,,,126.880931,37.502003,rainfall,2,10184160,부천시(부안초교),기후에너지환경부,6.58,False,,,,
 underpass_coordinates:773,구로역지하차도,underpass_coordinates.csv,,,126.880931,37.502003,rainfall,3,10184070,서울,기후에너지환경부,8.33,False,,,,
+underpass_coordinates:780,오류지하차도,underpass_coordinates.csv,,,126.840519,37.493438,waterlevel,1,1018695,서울시(너부대교),기후에너지환경부,1.68,True,Y,4.9,4.5,3.5
+underpass_coordinates:780,오류지하차도,underpass_coordinates.csv,,,126.840519,37.493438,waterlevel,2,1018697,서울시(오금교),기후에너지환경부,3.4,True,Y,11.0,9.0,7.0
+underpass_coordinates:780,오류지하차도,underpass_coordinates.csv,,,126.840519,37.493438,waterlevel,3,1018693,광명시(시흥대교),기후에너지환경부,6.54,False,N,8.9,6.5,4.7
+underpass_coordinates:780,오류지하차도,underpass_coordinates.csv,,,126.840519,37.493438,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,2.95,True,,,,
+underpass_coordinates:780,오류지하차도,underpass_coordinates.csv,,,126.840519,37.493438,rainfall,2,10184080,서울시(구로구청),기후에너지환경부,4.05,True,,,,
+underpass_coordinates:780,오류지하차도,underpass_coordinates.csv,,,126.840519,37.493438,rainfall,3,10194020,귤현보,한국수자원공사,10.62,False,,,,
+underpass_coordinates:781,박미지하차도,underpass_coordinates.csv,,,126.904171,37.438271,waterlevel,1,1018693,광명시(시흥대교),기후에너지환경부,1.82,True,N,8.9,6.5,4.7
+underpass_coordinates:781,박미지하차도,underpass_coordinates.csv,,,126.904171,37.438271,waterlevel,2,1018690,안양시(충훈1교),기후에너지환경부,3.73,True,N,5.2,4.1,3.0
+underpass_coordinates:781,박미지하차도,underpass_coordinates.csv,,,126.904171,37.438271,waterlevel,3,1018692,서울시(신림5교),기후에너지환경부,5.0,True,N,5.4,4.8,3.8
+underpass_coordinates:781,박미지하차도,underpass_coordinates.csv,,,126.904171,37.438271,rainfall,1,10184090,안양시(충훈1교),기후에너지환경부,3.73,True,,,,
+underpass_coordinates:781,박미지하차도,underpass_coordinates.csv,,,126.904171,37.438271,rainfall,2,10184080,서울시(구로구청),기후에너지환경부,6.5,False,,,,
+underpass_coordinates:781,박미지하차도,underpass_coordinates.csv,,,126.904171,37.438271,rainfall,3,10184150,과천시(한국수자원공사),기후에너지환경부,7.51,False,,,,
+underpass_coordinates:785,노원지하차도,underpass_coordinates.csv,,,127.055195,37.653104,waterlevel,1,1018669,서울시(창동교),기후에너지환경부,0.1,True,N,7.9,6.5,5.1
+underpass_coordinates:785,노원지하차도,underpass_coordinates.csv,,,127.055195,37.653104,waterlevel,2,1018670,서울시(월계2교),기후에너지환경부,3.25,True,N,6.2,5.1,3.9
+underpass_coordinates:785,노원지하차도,underpass_coordinates.csv,,,127.055195,37.653104,waterlevel,3,1018675,서울시(중랑교),기후에너지환경부,6.87,False,Y,7.9,6.5,5.0
+underpass_coordinates:785,노원지하차도,underpass_coordinates.csv,,,127.055195,37.653104,rainfall,1,10184200,서울시(월계2교),기후에너지환경부,3.25,True,,,,
+underpass_coordinates:785,노원지하차도,underpass_coordinates.csv,,,127.055195,37.653104,rainfall,2,10184190,서울시(동막골주차장),기후에너지환경부,3.61,True,,,,
+underpass_coordinates:785,노원지하차도,underpass_coordinates.csv,,,127.055195,37.653104,rainfall,3,10184125,의정부시(도봉차량기지),기후에너지환경부,5.5,False,,,,
+underpass_coordinates:790,마들지하차도,underpass_coordinates.csv,,,127.056883,37.645522,waterlevel,1,1018669,서울시(창동교),기후에너지환경부,0.84,True,N,7.9,6.5,5.1
+underpass_coordinates:790,마들지하차도,underpass_coordinates.csv,,,127.056883,37.645522,waterlevel,2,1018670,서울시(월계2교),기후에너지환경부,2.45,True,N,6.2,5.1,3.9
+underpass_coordinates:790,마들지하차도,underpass_coordinates.csv,,,127.056883,37.645522,waterlevel,3,1018675,서울시(중랑교),기후에너지환경부,6.02,False,Y,7.9,6.5,5.0
+underpass_coordinates:790,마들지하차도,underpass_coordinates.csv,,,127.056883,37.645522,rainfall,1,10184200,서울시(월계2교),기후에너지환경부,2.45,True,,,,
+underpass_coordinates:790,마들지하차도,underpass_coordinates.csv,,,127.056883,37.645522,rainfall,2,10184190,서울시(동막골주차장),기후에너지환경부,4.13,True,,,,
+underpass_coordinates:790,마들지하차도,underpass_coordinates.csv,,,127.056883,37.645522,rainfall,3,10184125,의정부시(도봉차량기지),기후에너지환경부,6.35,False,,,,
+underpass_coordinates:791,상계지하차도,underpass_coordinates.csv,,,127.052517,37.66172,waterlevel,1,1018669,서울시(창동교),기후에너지환경부,1.0,True,N,7.9,6.5,5.1
+underpass_coordinates:791,상계지하차도,underpass_coordinates.csv,,,127.052517,37.66172,waterlevel,2,1018670,서울시(월계2교),기후에너지환경부,4.18,True,N,6.2,5.1,3.9
+underpass_coordinates:791,상계지하차도,underpass_coordinates.csv,,,127.052517,37.66172,waterlevel,3,1018635,남양주시(퇴계원리),기후에너지환경부,7.76,False,N,4.5,3.6,2.8
+underpass_coordinates:791,상계지하차도,underpass_coordinates.csv,,,127.052517,37.66172,rainfall,1,10184190,서울시(동막골주차장),기후에너지환경부,3.27,True,,,,
+underpass_coordinates:791,상계지하차도,underpass_coordinates.csv,,,127.052517,37.66172,rainfall,2,10184200,서울시(월계2교),기후에너지환경부,4.18,True,,,,
+underpass_coordinates:791,상계지하차도,underpass_coordinates.csv,,,127.052517,37.66172,rainfall,3,10184125,의정부시(도봉차량기지),기후에너지환경부,4.53,True,,,,
+underpass_coordinates:801,중계로지하차도,underpass_coordinates.csv,,,127.082964,37.64096,waterlevel,1,1018669,서울시(창동교),기후에너지환경부,2.86,True,N,7.9,6.5,5.1
+underpass_coordinates:801,중계로지하차도,underpass_coordinates.csv,,,127.082964,37.64096,waterlevel,2,1018670,서울시(월계2교),기후에너지환경부,3.45,True,N,6.2,5.1,3.9
+underpass_coordinates:801,중계로지하차도,underpass_coordinates.csv,,,127.082964,37.64096,waterlevel,3,1018635,남양주시(퇴계원리),기후에너지환경부,4.87,True,N,4.5,3.6,2.8
+underpass_coordinates:801,중계로지하차도,underpass_coordinates.csv,,,127.082964,37.64096,rainfall,1,10184200,서울시(월계2교),기후에너지환경부,3.45,True,,,,
+underpass_coordinates:801,중계로지하차도,underpass_coordinates.csv,,,127.082964,37.64096,rainfall,2,10184190,서울시(동막골주차장),기후에너지환경부,3.76,True,,,,
+underpass_coordinates:801,중계로지하차도,underpass_coordinates.csv,,,127.082964,37.64096,rainfall,3,10184110,남양주시(진관교),기후에너지환경부,6.16,False,,,,
 underpass_coordinates:802,방학지하차도,underpass_coordinates.csv,,,127.044659,37.66277,waterlevel,1,1018669,서울시(창동교),기후에너지환경부,1.39,True,N,7.9,6.5,5.1
 underpass_coordinates:802,방학지하차도,underpass_coordinates.csv,,,127.044659,37.66277,waterlevel,2,1018670,서울시(월계2교),기후에너지환경부,4.32,True,N,6.2,5.1,3.9
 underpass_coordinates:802,방학지하차도,underpass_coordinates.csv,,,127.044659,37.66277,waterlevel,3,1018665,의정부시(신곡교),기후에너지환경부,8.1,False,Y,7.0,6.0,5.1
@@ -1607,18 +2393,42 @@ underpass_coordinates:811,고구동산 지하차도,underpass_coordinates.csv,,,
 underpass_coordinates:811,고구동산 지하차도,underpass_coordinates.csv,,,126.953692,37.508955,rainfall,1,10184070,서울,기후에너지환경부,2.94,True,,,,
 underpass_coordinates:811,고구동산 지하차도,underpass_coordinates.csv,,,126.953692,37.508955,rainfall,2,10184080,서울시(구로구청),기후에너지환경부,6.14,False,,,,
 underpass_coordinates:811,고구동산 지하차도,underpass_coordinates.csv,,,126.953692,37.508955,rainfall,3,10184150,과천시(한국수자원공사),기후에너지환경부,9.94,False,,,,
+underpass_coordinates:812,동작지하차도,underpass_coordinates.csv,,,126.979688,37.502015,waterlevel,1,1018681,서울시(반포2교),기후에너지환경부,0.99,True,N,,,
+underpass_coordinates:812,동작지하차도,underpass_coordinates.csv,,,126.979688,37.502015,waterlevel,2,1018680,서울시(잠수교),기후에너지환경부,2.18,True,N,15.6,6.2,5.5
+underpass_coordinates:812,동작지하차도,underpass_coordinates.csv,,,126.979688,37.502015,waterlevel,3,1018683,서울시(한강대교),기후에너지환경부,2.46,True,Y,13.3,10.5,8.5
+underpass_coordinates:812,동작지하차도,underpass_coordinates.csv,,,126.979688,37.502015,rainfall,1,10184070,서울,기후에너지환경부,3.67,True,,,,
+underpass_coordinates:812,동작지하차도,underpass_coordinates.csv,,,126.979688,37.502015,rainfall,2,10184080,서울시(구로구청),기후에너지환경부,8.27,False,,,,
+underpass_coordinates:812,동작지하차도,underpass_coordinates.csv,,,126.979688,37.502015,rainfall,3,10184140,서울시(송정동),기후에너지환경부,8.71,False,,,,
+underpass_coordinates:816,연대앞지하보도,underpass_coordinates.csv,,,126.935861,37.560047,waterlevel,1,1018686,서울시(홍남교),기후에너지환경부,1.89,True,N,5.3,4.6,3.9
+underpass_coordinates:816,연대앞지하보도,underpass_coordinates.csv,,,126.935861,37.560047,waterlevel,2,1018685,구용산,기후에너지환경부,4.98,True,N,,,
+underpass_coordinates:816,연대앞지하보도,underpass_coordinates.csv,,,126.935861,37.560047,waterlevel,3,1018683,서울시(한강대교),기후에너지환경부,5.39,False,Y,13.3,10.5,8.5
+underpass_coordinates:816,연대앞지하보도,underpass_coordinates.csv,,,126.935861,37.560047,rainfall,1,10184070,서울,기후에너지환경부,4.02,True,,,,
+underpass_coordinates:816,연대앞지하보도,underpass_coordinates.csv,,,126.935861,37.560047,rainfall,2,10184080,서울시(구로구청),기후에너지환경부,8.45,False,,,,
+underpass_coordinates:816,연대앞지하보도,underpass_coordinates.csv,,,126.935861,37.560047,rainfall,3,10184140,서울시(송정동),기후에너지환경부,10.59,False,,,,
 underpass_coordinates:821,내곡지하차도,underpass_coordinates.csv,,,126.804219,37.641569,waterlevel,1,1019630,서울시(행주대교),기후에너지환경부,4.38,True,N,10.9,9.0,7.2
 underpass_coordinates:821,내곡지하차도,underpass_coordinates.csv,,,126.804219,37.641569,waterlevel,2,1019635,아라한강갑문(내),한국수자원공사,4.48,True,N,,,
 underpass_coordinates:821,내곡지하차도,underpass_coordinates.csv,,,126.804219,37.641569,waterlevel,3,1019636,아라한강갑실,한국수자원공사,4.48,True,N,,,
 underpass_coordinates:821,내곡지하차도,underpass_coordinates.csv,,,126.804219,37.641569,rainfall,1,10194030,아라김포TM,한국수자원공사,4.64,True,,,,
 underpass_coordinates:821,내곡지하차도,underpass_coordinates.csv,,,126.804219,37.641569,rainfall,2,10194010,김포시(김포시청),기후에너지환경부,8.34,False,,,,
 underpass_coordinates:821,내곡지하차도,underpass_coordinates.csv,,,126.804219,37.641569,rainfall,3,10194020,귤현보,한국수자원공사,8.69,False,,,,
+underpass_coordinates:823,반포지하차도,underpass_coordinates.csv,,,126.998761,37.509825,waterlevel,1,1018680,서울시(잠수교),기후에너지환경부,0.88,True,N,15.6,6.2,5.5
+underpass_coordinates:823,반포지하차도,underpass_coordinates.csv,,,126.998761,37.509825,waterlevel,2,1018681,서울시(반포2교),기후에너지환경부,1.4,True,N,,,
+underpass_coordinates:823,반포지하차도,underpass_coordinates.csv,,,126.998761,37.509825,waterlevel,3,1018683,서울시(한강대교),기후에너지환경부,3.75,True,Y,13.3,10.5,8.5
+underpass_coordinates:823,반포지하차도,underpass_coordinates.csv,,,126.998761,37.509825,rainfall,1,10184070,서울,기후에너지환경부,3.85,True,,,,
+underpass_coordinates:823,반포지하차도,underpass_coordinates.csv,,,126.998761,37.509825,rainfall,2,10184140,서울시(송정동),기후에너지환경부,6.88,False,,,,
+underpass_coordinates:823,반포지하차도,underpass_coordinates.csv,,,126.998761,37.509825,rainfall,3,10184150,과천시(한국수자원공사),기후에너지환경부,9.64,False,,,,
 underpass_coordinates:834,성동지하차도,underpass_coordinates.csv,,,127.035319,37.561121,waterlevel,1,1018664,뚝도,기후에너지환경부,3.35,True,N,,,
 underpass_coordinates:834,성동지하차도,underpass_coordinates.csv,,,127.035319,37.561121,waterlevel,2,1018675,서울시(중랑교),기후에너지환경부,4.67,True,Y,7.9,6.5,5.0
 underpass_coordinates:834,성동지하차도,underpass_coordinates.csv,,,127.035319,37.561121,waterlevel,3,1018662,서울시(청담대교),기후에너지환경부,4.88,True,N,15.5,12.6,10.1
 underpass_coordinates:834,성동지하차도,underpass_coordinates.csv,,,127.035319,37.561121,rainfall,1,10184140,서울시(송정동),기후에너지환경부,2.04,True,,,,
 underpass_coordinates:834,성동지하차도,underpass_coordinates.csv,,,127.035319,37.561121,rainfall,2,10184070,서울,기후에너지환경부,6.8,False,,,,
 underpass_coordinates:834,성동지하차도,underpass_coordinates.csv,,,127.035319,37.561121,rainfall,3,10184200,서울시(월계2교),기후에너지환경부,7.13,False,,,,
+underpass_coordinates:837,행당지하보차도,underpass_coordinates.csv,,,127.038959,37.558683,waterlevel,1,1018664,뚝도,기후에너지환경부,2.98,True,N,,,
+underpass_coordinates:837,행당지하보차도,underpass_coordinates.csv,,,127.038959,37.558683,waterlevel,2,1018662,서울시(청담대교),기후에너지환경부,4.48,True,N,15.5,12.6,10.1
+underpass_coordinates:837,행당지하보차도,underpass_coordinates.csv,,,127.038959,37.558683,waterlevel,3,1018675,서울시(중랑교),기후에너지환경부,4.68,True,Y,7.9,6.5,5.0
+underpass_coordinates:837,행당지하보차도,underpass_coordinates.csv,,,127.038959,37.558683,rainfall,1,10184140,서울시(송정동),기후에너지환경부,1.63,True,,,,
+underpass_coordinates:837,행당지하보차도,underpass_coordinates.csv,,,127.038959,37.558683,rainfall,2,10184070,서울,기후에너지환경부,6.97,False,,,,
+underpass_coordinates:837,행당지하보차도,underpass_coordinates.csv,,,127.038959,37.558683,rainfall,3,10184200,서울시(월계2교),기후에너지환경부,7.35,False,,,,
 underpass_coordinates:839,솔샘지하차도,underpass_coordinates.csv,,,127.008567,37.613717,waterlevel,1,1018670,서울시(월계2교),기후에너지환경부,3.83,True,N,6.2,5.1,3.9
 underpass_coordinates:839,솔샘지하차도,underpass_coordinates.csv,,,127.008567,37.613717,waterlevel,2,1018669,서울시(창동교),기후에너지환경부,5.92,False,N,7.9,6.5,5.1
 underpass_coordinates:839,솔샘지하차도,underpass_coordinates.csv,,,127.008567,37.613717,waterlevel,3,1018675,서울시(중랑교),기후에너지환경부,5.95,False,Y,7.9,6.5,5.0
@@ -1655,6 +2465,30 @@ underpass_coordinates:858,여의교지하차도,underpass_coordinates.csv,,,126.
 underpass_coordinates:858,여의교지하차도,underpass_coordinates.csv,,,126.926992,37.514657,rainfall,1,10184070,서울,기후에너지환경부,4.07,True,,,,
 underpass_coordinates:858,여의교지하차도,underpass_coordinates.csv,,,126.926992,37.514657,rainfall,2,10184080,서울시(구로구청),기후에너지환경부,4.2,True,,,,
 underpass_coordinates:858,여의교지하차도,underpass_coordinates.csv,,,126.926992,37.514657,rainfall,3,10184160,부천시(부안초교),기후에너지환경부,10.88,False,,,,
+underpass_coordinates:861,영등포지하차도,underpass_coordinates.csv,,,126.91239,37.51686,waterlevel,1,1018698,서울시(신대방1교),기후에너지환경부,3.21,True,Y,4.0,3.2,2.4
+underpass_coordinates:861,영등포지하차도,underpass_coordinates.csv,,,126.91239,37.51686,waterlevel,2,1018685,구용산,기후에너지환경부,3.32,True,N,,,
+underpass_coordinates:861,영등포지하차도,underpass_coordinates.csv,,,126.91239,37.51686,waterlevel,3,1018697,서울시(오금교),기후에너지환경부,3.5,True,Y,11.0,9.0,7.0
+underpass_coordinates:861,영등포지하차도,underpass_coordinates.csv,,,126.91239,37.51686,rainfall,1,10184080,서울시(구로구청),기후에너지환경부,3.34,True,,,,
+underpass_coordinates:861,영등포지하차도,underpass_coordinates.csv,,,126.91239,37.51686,rainfall,2,10184070,서울,기후에너지환경부,5.13,False,,,,
+underpass_coordinates:861,영등포지하차도,underpass_coordinates.csv,,,126.91239,37.51686,rainfall,3,10184160,부천시(부안초교),기후에너지환경부,9.79,False,,,,
+underpass_coordinates:868,이태원지하보도,underpass_coordinates.csv,,,126.986732,37.537974,waterlevel,1,1018680,서울시(잠수교),기후에너지환경부,2.43,True,N,15.6,6.2,5.5
+underpass_coordinates:868,이태원지하보도,underpass_coordinates.csv,,,126.986732,37.537974,waterlevel,2,1018683,서울시(한강대교),기후에너지환경부,3.72,True,Y,13.3,10.5,8.5
+underpass_coordinates:868,이태원지하보도,underpass_coordinates.csv,,,126.986732,37.537974,waterlevel,3,1018685,구용산,기후에너지환경부,4.01,True,N,,,
+underpass_coordinates:868,이태원지하보도,underpass_coordinates.csv,,,126.986732,37.537974,rainfall,1,10184070,서울,기후에너지환경부,1.84,True,,,,
+underpass_coordinates:868,이태원지하보도,underpass_coordinates.csv,,,126.986732,37.537974,rainfall,2,10184140,서울시(송정동),기후에너지환경부,6.27,False,,,,
+underpass_coordinates:868,이태원지하보도,underpass_coordinates.csv,,,126.986732,37.537974,rainfall,3,10184080,서울시(구로구청),기후에너지환경부,10.06,False,,,,
+underpass_coordinates:872,의주로 지하차도,underpass_coordinates.csv,,,126.971403,37.559591,waterlevel,1,1018686,서울시(홍남교),기후에너지환경부,4.33,True,N,5.3,4.6,3.9
+underpass_coordinates:872,의주로 지하차도,underpass_coordinates.csv,,,126.971403,37.559591,waterlevel,2,1018685,구용산,기후에너지환경부,5.13,False,N,,,
+underpass_coordinates:872,의주로 지하차도,underpass_coordinates.csv,,,126.971403,37.559591,waterlevel,3,1018680,서울시(잠수교),기후에너지환경부,5.16,False,N,15.6,6.2,5.5
+underpass_coordinates:872,의주로 지하차도,underpass_coordinates.csv,,,126.971403,37.559591,rainfall,1,10184070,서울,기후에너지환경부,2.95,True,,,,
+underpass_coordinates:872,의주로 지하차도,underpass_coordinates.csv,,,126.971403,37.559591,rainfall,2,10184140,서울시(송정동),기후에너지환경부,7.46,False,,,,
+underpass_coordinates:872,의주로 지하차도,underpass_coordinates.csv,,,126.971403,37.559591,rainfall,3,10184200,서울시(월계2교),기후에너지환경부,9.98,False,,,,
+underpass_coordinates:873,퇴계로 지하차도,underpass_coordinates.csv,,,126.991422,37.561568,waterlevel,1,1018680,서울시(잠수교),기후에너지환경부,4.94,True,N,15.6,6.2,5.5
+underpass_coordinates:873,퇴계로 지하차도,underpass_coordinates.csv,,,126.991422,37.561568,waterlevel,2,1018686,서울시(홍남교),기후에너지환경부,5.93,False,N,5.3,4.6,3.9
+underpass_coordinates:873,퇴계로 지하차도,underpass_coordinates.csv,,,126.991422,37.561568,waterlevel,3,1018664,뚝도,기후에너지환경부,6.04,False,N,,,
+underpass_coordinates:873,퇴계로 지하차도,underpass_coordinates.csv,,,126.991422,37.561568,rainfall,1,10184070,서울,기후에너지환경부,3.82,True,,,,
+underpass_coordinates:873,퇴계로 지하차도,underpass_coordinates.csv,,,126.991422,37.561568,rainfall,2,10184140,서울시(송정동),기후에너지환경부,5.75,False,,,,
+underpass_coordinates:873,퇴계로 지하차도,underpass_coordinates.csv,,,126.991422,37.561568,rainfall,3,10184200,서울시(월계2교),기후에너지환경부,8.67,False,,,,
 underpass_coordinates:882,여천천지하차도,underpass_coordinates.csv,,,129.308114,35.530945,waterlevel,1,2201670,울산시(태화교),기후에너지환경부,2.4,True,Y,10.78,9.2,8.2
 underpass_coordinates:882,여천천지하차도,underpass_coordinates.csv,,,129.308114,35.530945,waterlevel,2,2301640,울산시(선암댐),한국수자원공사,2.58,True,N,,,
 underpass_coordinates:882,여천천지하차도,underpass_coordinates.csv,,,129.308114,35.530945,waterlevel,3,2201660,울산시(삼호교),기후에너지환경부,3.92,True,N,8.52,6.9,5.2
@@ -1673,6 +2507,24 @@ underpass_coordinates:888,병영성지하차도,underpass_coordinates.csv,,,129.
 underpass_coordinates:888,병영성지하차도,underpass_coordinates.csv,,,129.346546,35.577852,rainfall,1,22014080,울산시(태화교),기후에너지환경부,4.38,True,,,,
 underpass_coordinates:888,병영성지하차도,underpass_coordinates.csv,,,129.346546,35.577852,rainfall,2,22014020,울산시(신답교),기후에너지환경부,5.77,False,,,,
 underpass_coordinates:888,병영성지하차도,underpass_coordinates.csv,,,129.346546,35.577852,rainfall,3,23014011,울산시(선암댐),한국수자원공사,7.03,False,,,,
+underpass_coordinates:890,장수지하차도,underpass_coordinates.csv,,,126.747908,37.447292,waterlevel,1,1201660,인천시(연수교),기후에너지환경부,5.72,False,N,6.7,5.2,4.7
+underpass_coordinates:890,장수지하차도,underpass_coordinates.csv,,,126.747908,37.447292,waterlevel,2,1019612,인천시(굴포1교),기후에너지환경부,7.2,False,N,7.2,6.1,5.0
+underpass_coordinates:890,장수지하차도,underpass_coordinates.csv,,,126.747908,37.447292,waterlevel,3,1019640,굴포천(내),한국수자원공사,8.49,False,N,,,
+underpass_coordinates:890,장수지하차도,underpass_coordinates.csv,,,126.747908,37.447292,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,6.7,False,,,,
+underpass_coordinates:890,장수지하차도,underpass_coordinates.csv,,,126.747908,37.447292,rainfall,2,10184080,서울시(구로구청),기후에너지환경부,13.32,False,,,,
+underpass_coordinates:890,장수지하차도,underpass_coordinates.csv,,,126.747908,37.447292,rainfall,3,10194020,귤현보,한국수자원공사,13.66,False,,,,
+underpass_coordinates:891,동수지하차도,underpass_coordinates.csv,,,126.729096,37.48545,waterlevel,1,1019612,인천시(굴포1교),기후에너지환경부,2.67,True,N,7.2,6.1,5.0
+underpass_coordinates:891,동수지하차도,underpass_coordinates.csv,,,126.729096,37.48545,waterlevel,2,1019640,굴포천(내),한국수자원공사,4.98,True,N,,,
+underpass_coordinates:891,동수지하차도,underpass_coordinates.csv,,,126.729096,37.48545,waterlevel,3,1019620,부천시(도두리2교),기후에너지환경부,5.89,False,N,4.6,3.4,2.7
+underpass_coordinates:891,동수지하차도,underpass_coordinates.csv,,,126.729096,37.48545,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,7.31,False,,,,
+underpass_coordinates:891,동수지하차도,underpass_coordinates.csv,,,126.729096,37.48545,rainfall,2,10194020,귤현보,한국수자원공사,9.9,False,,,,
+underpass_coordinates:891,동수지하차도,underpass_coordinates.csv,,,126.729096,37.48545,rainfall,3,12014010,아라인천TM,한국수자원공사,13.1,False,,,,
+underpass_coordinates:892,동암굴다리,underpass_coordinates.csv,,,126.702653,37.46793,waterlevel,1,1019612,인천시(굴포1교),기후에너지환경부,4.89,True,N,7.2,6.1,5.0
+underpass_coordinates:892,동암굴다리,underpass_coordinates.csv,,,126.702653,37.46793,waterlevel,2,1201660,인천시(연수교),기후에너지환경부,5.73,False,N,6.7,5.2,4.7
+underpass_coordinates:892,동암굴다리,underpass_coordinates.csv,,,126.702653,37.46793,waterlevel,3,1019640,굴포천(내),한국수자원공사,7.93,False,N,,,
+underpass_coordinates:892,동암굴다리,underpass_coordinates.csv,,,126.702653,37.46793,rainfall,1,10184160,부천시(부안초교),기후에너지환경부,9.71,False,,,,
+underpass_coordinates:892,동암굴다리,underpass_coordinates.csv,,,126.702653,37.46793,rainfall,2,10194020,귤현보,한국수자원공사,12.62,False,,,,
+underpass_coordinates:892,동암굴다리,underpass_coordinates.csv,,,126.702653,37.46793,rainfall,3,12014010,아라인천TM,한국수자원공사,13.01,False,,,,
 underpass_coordinates:913,판정지하차도,underpass_coordinates.csv,,,127.188978,36.911917,waterlevel,1,1101631,천안시(장천교),기후에너지환경부,6.15,False,N,7.8,6.9,6.0
 underpass_coordinates:913,판정지하차도,underpass_coordinates.csv,,,127.188978,36.911917,waterlevel,2,1101616,안성시(고지교),기후에너지환경부,6.22,False,N,7.0,6.0,5.0
 underpass_coordinates:913,판정지하차도,underpass_coordinates.csv,,,127.188978,36.911917,waterlevel,3,1101620,안성시(건천리),기후에너지환경부,6.88,False,N,5.9,4.8,4.0
