@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FloodOps 운영</title>
+<!--
+  FloodOps 운영 앱. 기존 React 앱(src/)과 따로, 홈 아래 네 화면만으로 다시 짠 정적 앱이다.
+
+    #/            홈
+    #/watch       관제 보드 · 장마 중   (public/watch-board-integration.html 을 그대로 끼운다)
+    #/scorecard   기준 채점 · 장마 후
+    #/facility    시설 기준 · 장마 전   (/registry · /criteria · /backtest · /now)
+    #/cases       사례 재구성 · 근거    (/<event_id>)
+
+  API 주소는 ?api= 로 바꾼다(기본 http://127.0.0.1:8091). 숫자는 모두 서버가 계산한 값이다.
+  선행 분은 언제나 "무엇을 넘었나 · 다른 해에 몇 번 울렸나 · 같은 시각 몇 곳이 같이 올랐나"와 함께 보인다.
+-->
+<link rel="icon" href="../public/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<link rel="stylesheet" href="ops.css">
+</head>
+<body>
+<header class="op-top">
+  <a class="op-brand" href="#/" aria-label="FloodOps 홈">
+    <svg width="30" height="30" viewBox="0 0 48 48" aria-hidden="true"><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="none" stroke="currentColor" stroke-width="2"/><path d="M24 9c-6 8-10 13.5-10 18.5a10 10 0 0 0 20 0C34 22.5 30 17 24 9Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M17.5 29c2.2 1.6 4.3 1.6 6.5 0s4.3-1.6 6.5 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    <span><b>FloodOps</b><small>하천 접점 시설 통제 판단</small></span>
+  </a>
+  <nav class="op-tabs" id="op-tabs" aria-label="화면"></nav>
+  <div class="op-status" id="op-status"></div>
+</header>
+<main class="op-view" id="op-view"></main>
+<section class="op-watch" id="op-watch" hidden></section>
+<script type="module" src="app.js"></script>
+</body>
+</html>

@@ -58,6 +58,7 @@ body { display: flex; flex-direction: column; }
 .demo-menu nav a.demo-menu-sub { padding: 6px 10px 6px 20px; color: #a1a1aa; font-weight: 600; }
 .demo-menu nav a:hover, .demo-menu nav a[aria-current="page"] { background: #27272a; color: #f4f4f5; }
 .demo-top .sp { flex: 1; }
+body.wx-in-shell .demo-top { display: none; }
 .demo-mode { padding: 6px 12px; border: 1px solid #34d399; color: #34d399; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; }
 .demo-mode[data-mode="replay"] { border-color: #fbbf24; color: #fbbf24; }
 .demo-rain-mode[data-mode="replay"] { border-color: #fbbf24; color: #fbbf24; }
@@ -610,7 +611,7 @@ body { display: flex; flex-direction: column; }
   const WATCH = ["planned_flood", "warning", "advisory", "attention"];
   const REGION_CENTER = { 서울: [126.98, 37.56], 부산: [129.05, 35.18], 대구: [128.6, 35.87], 인천: [126.7, 37.46], 광주: [126.85, 35.16], 대전: [127.38, 36.35], 울산: [129.31, 35.54], 세종: [127.29, 36.48], 경기: [127.2, 37.45], 강원: [128.3, 37.6], 충북: [127.7, 36.75], 충남: [126.9, 36.5], 전북: [127.1, 35.75], 전남: [126.9, 34.85], 경북: [128.75, 36.4], 경남: [128.3, 35.35], 제주: [126.55, 33.4] };
 
-  const TWIN_HREF = root.dataset.twinHref || "/#twin?tab=now";
+  const TWIN_HREF = params.get("twin_href") || root.dataset.twinHref || "/#twin?tab=now";
   const st = { at: params.get("at") ?? root.dataset.at ?? "", overview: null, changes: null, region: params.get("region") ?? "", minStage: params.get("stage") || null, q: "", sort: "risk", facOnly: false, driver: params.get("driver") || "all", showCalm: true, selected: params.get("facility") || params.get("station") || null, rsort: "risk", rainLayer: false, rainReplay: params.get("rain") === "replay" };
   let map = null, marker = null, hoverPop = null, stSeq = 0, prevStage = null, liveRefresh = null;
   const rank = (r) => ORDER.indexOf(r.stage ?? "unrated");
@@ -1310,6 +1311,8 @@ body { display: flex; flex-direction: column; }
 })();
 </script>
 <script>
+  // 새 운영 앱(ops/)에 끼워질 때는 앱 상단 바가 메뉴·모드를 맡는다.
+  if (new URLSearchParams(window.location.search).get("shell") === "ops") document.body.classList.add("wx-in-shell");
   // 관측 데이터의 실시간/재생 모드를 헤더 배지에 표시한다.
   document.getElementById("wx-root").addEventListener("wx:mode", (e) => {
     const badge = document.getElementById("demo-mode");
