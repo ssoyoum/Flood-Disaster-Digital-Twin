@@ -198,6 +198,13 @@ body { display: flex; flex-direction: column; }
 .wx-vc-foot b { color: var(--wx-amber); }
 .wx-vc-legend { margin: 0; font-size: 11px; color: var(--wx-dim); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .wx-vc-legend i { display: inline-block; width: 14px; height: 6px; border-radius: 3px; }
+.wx-vc-then { margin-top: 10px; padding: 8px 10px; border-radius: 8px; background: rgba(52,211,153,.06); border: 1px solid rgba(52,211,153,.18); }
+.wx-vc-then p { margin: 0 0 6px; font-size: 11.5px; color: var(--wx-muted); }
+.wx-vc-then p b { color: var(--wx-text); }
+.wx-vc-then ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.wx-vc-then li { display: flex; gap: 8px; font-size: 12px; color: var(--wx-green); }
+.wx-vc-then li b { flex: none; width: 34px; color: var(--wx-ui); font-variant-numeric: tabular-nums; }
+.wx-vc-then li.wx-vc-lag { color: var(--wx-red); }
 .wx-vc-limits { margin: 0; padding-left: 16px; font-size: 11px; line-height: 1.55; color: var(--wx-dim); }
 .wx-q { color: var(--wx-amber); font-size: 11px; font-weight: 700; }
 .wx-lv { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; line-height: 1.25; }
@@ -1084,6 +1091,16 @@ body { display: flex; flex-direction: column; }
     $("wx-fac-list").innerHTML = `<div class="wx-detail-row"><b>잠김 원인</b><span>${f.driver === "river" ? "하천 수위" : "지역 강우(내수)"}</span></div><div class="wx-detail-row"><b>분류</b><span>${esc(f.kind_ko)} · ${tier}</span></div><div class="wx-detail-row"><b>판정 이유</b><span>${esc(f.why)}</span></div><div class="wx-detail-row"><b>기상청 호우특보</b><span>${esc(weatherText)}</span></div><div class="wx-detail-row"><b>강우 기준</b><span>${esc(st.overview.rain_basis || "자료 없음")}</span></div>${f.tier === "operational" ? `<a class="wx-link" href="${esc(TWIN_HREF)}" target="_top">운영 시설 상세로 이동 →</a>` : ""}`;
     const cases = validationCasesFor(f.facility_id);
     if (cases.length) {
+      // 지금 단계(주의 미만이면 주의)에 그날 처음 들어간 시각과, 그 뒤 실제 통제(오송은 유입)까지 걸린 분
+      const target = f.level >= 3 ? "경계" : "주의";
+      const past = cases.map((c) => {
+        const s = c.signals.find((x) => x.facility_id === f.facility_id && x.signal.endsWith(`${target} 이상`));
+        const year = c.reference.at.slice(0, 4), refWord = c.reference.kind === "inflow" ? "유입" : "통제";
+        if (!s || !s.at) return `<li><b>${year}</b><span>${target}에 들지 않음 · ${refWord} ${esc(c.reference.at.slice(11, 16))}</span></li>`;
+        const lead = s.lead_min, word = lead >= 0 ? `${refWord}까지 ${lead}분${s.lead_is_lower_bound ? " 이상" : ""}` : `${refWord}보다 ${-lead}분 늦게 도달`;
+        return `<li class="${lead >= 0 ? "" : "wx-vc-lag"}"><b>${year}</b><span>${esc(s.at.slice(5, 16).replace("T", " "))} ${target} → ${word}</span></li>`;
+      }).join("");
+      $("wx-fac-list").insertAdjacentHTML("beforeend", `<div class="wx-vc-then"><p>그날과 비교 · 이 시설이 <b>${target}</b>에 들어간 뒤</p><ul>${past}</ul></div>`);
       $("wx-fac-list").insertAdjacentHTML("beforeend", `<button type="button" class="wx-vc-open">검증 사례 ${cases.length}건 보기 → ${esc(cases.map((c) => c.title.split(" ").slice(-1)[0]).join(" · "))}</button>`);
       $("wx-fac-list").querySelector(".wx-vc-open").addEventListener("click", () => showTab("vc"));
     }

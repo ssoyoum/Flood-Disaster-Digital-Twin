@@ -40,6 +40,15 @@ def test_daejeon_2023_shows_the_rule_was_later_than_the_real_control():
     assert _signal(item, "공식 홍수주의보")["at"] == "2023-07-14T08:50"
 
 
+def test_stored_scorecard_still_matches_the_current_rule(monkeypatch):
+    """A short replay around the 2024 warning must give the stored first times; rebuild the scorecard if this fails."""
+    monkeypatch.setenv("FLOODOPS_TWIN_MODE", "replay")
+    stored = {s["signal"]: s["at"] for s in cv.scorecard("daejeon-2024-07-10")["signals"]}
+    fresh = {s["signal"]: s["at"] for s in cv.compute("daejeon-2024-07-10", start="2024-07-10T05:00", end="2024-07-10T05:30")["signals"]}
+    assert fresh["공식 홍수경보"] == stored["공식 홍수경보"] == "2024-07-10T05:20"
+    assert fresh["만년지하차도 경계 이상"] == stored["만년지하차도 경계 이상"] == "2024-07-10T05:20"
+
+
 def test_routes_serve_the_scorecard_and_reject_unknown_cases():
     client = TestClient(app)
     assert client.get("/api/watch/validation-cases").json()["cases"][0]["id"] == "osong-2023"

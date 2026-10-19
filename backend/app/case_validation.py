@@ -122,9 +122,9 @@ def _official_firsts(gauge: str, start: str, end: str) -> dict[str, dict[str, An
     return out
 
 
-def compute(case_id: str) -> dict[str, Any]:
-    """Replay one case every STEP_MINUTES (slow: one facility_risk call per step)."""
-    spec = case(case_id)
+def compute(case_id: str, start: str | None = None, end: str | None = None) -> dict[str, Any]:
+    """Replay one case every STEP_MINUTES (slow: one facility_risk call per step); start/end narrow it for checks."""
+    spec = {**case(case_id), **({"start": start} if start else {}), **({"end": end} if end else {})}
     region = nw.match_region(spec["region"])
     ref = spec["reference"]
     firsts: dict[str, dict[str, Any]] = {fid: {} for fid in spec["facility_ids"]}
