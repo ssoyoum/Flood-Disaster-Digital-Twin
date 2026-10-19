@@ -228,6 +228,7 @@ Phase 3 운영 트윈 (PROJECT_PLAN Phase 3, 앞당겨 진행):
   - 전체 백엔드 178개·프런트엔드 7개·E2E 11개·빌드 통과. 이후 UTC `Z` 케이스를 추가한 시설 테스트 19개도 통과했다.
 - [ ] 공개 서버 재배포(완성도 항목). 배포 전 `docs/DEPLOY_AWS.md` 체크리스트.
 - [x] `docs/PROJECT_PLAN.md` Definition·Phase를 2026-10-19 기준으로 갱신: 사건 재구성 중심에서 시설 중심 감시·판단 트윈으로 재정의하고, Phase 1 검증 완료·Phase 2 전국 감시 진행 중·Phase 3 시설 증거와 배포 준비로 정리했다. 수리 시뮬레이션은 별도 연구 트랙으로 둔다.
+  - KMA 상태도 최신화: AWS 매분 강우·현재 호우특보는 실시간 연결됐고, 특보 발표 이력(`wrn_met_data.php`)·ASOS 시간자료(`kma_sfctm2.php`)는 과거 검증용 승인 대기다.
 
 ## NOW
 

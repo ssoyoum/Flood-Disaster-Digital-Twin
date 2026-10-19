@@ -61,7 +61,7 @@ The reference case checks whether a facility rule would have raised a control re
 **Status: active.** The first operating view is the national watch board. The current risk API ranks 399 facilities by provisional driver: 144 river-driven and 255 pluvial. Only Gungpyeong 2 Underpass has an operational facility-specific rule; the remaining facilities are watch-level candidates.
 
 - Live HRFCO water levels and rainfall are kept separate from historical replay. Repeated source timestamps do not count as new observations; source quality and age remain visible.
-- River-driven facilities use the linked gauge stage, with an official flood advisory or warning as a minimum stage. Pluvial facilities compare nearby observed rainfall against KMA advisory amounts; KMA weather-warning issuance is still awaiting API access.
+- River-driven facilities use the linked gauge stage, with an official flood advisory or warning as a minimum stage. Pluvial facilities compare nearby observed rainfall against KMA advisory amounts; the current KMA heavy-rain warning sets a live-only floor for pluvial and riverside facilities. Historical replay does not use the current warning feed.
 - One-hour rainfall history is cached locally. Twelve-hour rainfall is shown only after 12 consecutive hourly observations exist.
 - The operational facility view supports current status, rule criteria review, historical backtest, and local operator confirmation records. A record captures the server-side observation and rule snapshot and distinguishes live from replay.
 - Watch-level estimates show their connected gauge or rainfall basis and limits. They do not become operational rules by being displayed or ranked.
@@ -72,7 +72,7 @@ The reference case checks whether a facility rule would have raised a control re
 
 - Obtain entrance low-point elevations, drainage or river inflow paths, field sensors, closure criteria, and time-stamped control histories from the responsible agencies.
 - Add facilities only after registry gates for inflow path, representative gauge, field measurement, and validation event are documented. Keep unresolved sites as watch-level candidates.
-- Apply for KMA weather-warning and AWS products before connecting official rain warnings or live KMA rainfall. Do not substitute an unavailable API with fabricated or stale values.
+- Approved KMA AWS minute rainfall and the current KMA warning feed are connected to live monitoring. Historical warning issuance (`wrn_met_data.php`) and ASOS hourly rainfall (`kma_sfctm2.php`) remain approval-gated for retrospective validation. Do not substitute unavailable historical data with fabricated or stale values.
 - Deploy the updated board only after cloud access and deployment prerequisites are approved; confirm live/replay separation and the memory limit on the target server.
 - Record agency interviews and pilot observations as evidence before changing facility rules or product claims.
 
