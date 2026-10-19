@@ -631,6 +631,17 @@ def twin_criteria_review_route(
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
+@app.get("/api/twin/facilities/{facility_id}/scorecard", tags=["twin"])
+def twin_scorecard_route(facility_id: str):
+    """Hit, miss, false-alarm candidates and close calls of the facility rule over the stored seasons."""
+
+    _require_operational_facility(facility_id, f"Unknown facility: {facility_id}")
+    try:
+        return agent_watch.scorecard(facility_id)
+    except (LookupError, ValueError) as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
 @app.get("/api/twin/facilities/{facility_id}/forecast-readiness", tags=["twin"])
 def twin_forecast_readiness(facility_id: str, at: str | None = None):
     """Real water-level lags and missing inputs for the external research model; not a forecast."""
@@ -897,6 +908,18 @@ def watch_flood_forecasts(
         return flood_forecast.summary(at)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/api/watch/flood-forecast-history", tags=["watch"])
+def watch_flood_forecast_history():
+    """Collected official forecast issuances and their lead over the observed crossing."""
+
+    from . import flood_forecast
+
+    try:
+        return flood_forecast.history_summary()
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.get("/api/watch/validation-cases", tags=["watch"])

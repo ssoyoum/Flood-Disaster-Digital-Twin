@@ -151,3 +151,14 @@ def summary(at: str | None = None) -> dict[str, Any]:
             "source": "HRFCO OpenAPI fldfct (홍수예보 발령)",
             "limitations": ["공식 특보는 관측소 단위이며 시설 단위 판단이 아니다.",
                             "재생 이력은 5~10월 수집분이다. 해제가 없으면 발령 후 72시간까지만 유효로 본다."]}
+
+
+def history_summary() -> dict[str, Any]:
+    """The collected issuance history and how far its warnings led the observed crossing, for the post-season screen."""
+    folder = HISTORY_FILE.parent
+    issuances = json.loads((folder / "flood_forecast_summary.json").read_text(encoding="utf-8"))
+    compared = json.loads((folder / "official_vs_observed_summary.json").read_text(encoding="utf-8"))
+    return {"issuances": issuances, "official_vs_observed": compared,
+            "limitations": ["5~10월 발령만 수집했다.",
+                            "선행 시간은 1시간 자료로 계산해 10분 단위보다 거칠다.",
+                            "발령 이후 바뀐 기준 수위는 현재값으로 비교한 경우가 있다(threshold_changed_since_issue)."]}
