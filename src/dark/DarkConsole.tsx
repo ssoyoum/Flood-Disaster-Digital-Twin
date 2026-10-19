@@ -81,6 +81,7 @@ const DATA_ATTRIBUTION = [
 const FALLBACK_EXAMPLES: AgentExampleQuestion[] = [
   { workflow: "closure_timing", label: "08:25 통제", question: "08:25에 지하차도를 통제했다면 유입까지 몇 분 남나요?" },
   { workflow: "inflow_delay", label: "유입 30분 지연", question: "차수벽으로 유입이 30분 늦어졌다면 어떻게 되나요?" },
+  { workflow: "breach_advance", label: "제방 붕괴 10분 빠르게", question: "제방 붕괴가 10분 빨랐다면 이후 기록 시각은 어떻게 되나요?" },
   { workflow: "exposure_inventory", label: "반경 500m 재고", question: "지하차도 반경 500m 안에 건물이 몇 개인가요?" },
 ];
 
@@ -1308,6 +1309,7 @@ const FINDINGS_BY_TOOL: Record<string, FindingsKind> = {
   analyze_hand_threshold: "hand_threshold",
   analyze_closure_timing: "closure_timing",
   analyze_inflow_delay: "inflow_delay",
+  analyze_breach_advance: "breach_advance",
   get_exposure_inventory: "exposure_inventory",
   analyze_alert_timing: "alert_timing",
   analyze_storage_capture: "storage_capture",
@@ -1414,6 +1416,29 @@ function Findings({ workflow, result }: { workflow: FindingsKind; result: Record
           ))}</tbody>
         </table>
       ))}</div>
+    ) : null;
+  }
+  if (workflow === "breach_advance") {
+    const scenarios = rows(result, "scenarios");
+    return scenarios.length ? (
+      <div className="dk-findings-stack">
+        {scenarios.map((scenario) => (
+          <table className="dk-table" key={String(scenario.advance_minutes)}>
+            <thead><tr><th colSpan={3}>제방 붕괴 {String(scenario.advance_minutes)}분 조기 가정</th></tr></thead>
+            <tbody>
+              <tr><th>단계</th><th>기준 기록</th><th>가정 시각</th></tr>
+              {(Array.isArray(scenario.milestones) ? (scenario.milestones as Array<Record<string, unknown>>) : []).map((milestone) => (
+                <tr key={String(milestone.state)}>
+                  <td>{String(milestone.label ?? milestone.state)}</td>
+                  <td>{clock(String(milestone.baseline_time))}</td>
+                  <td>{clock(String(milestone.scenario_time))}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ))}
+        <small>월류 전 기록을 고정한 시간 이동 가정입니다. 사건 순서를 보존하는 최대 앞당김은 {String(result.max_advance_minutes)}분이며, 수리·침수 효과는 계산하지 않습니다.</small>
+      </div>
     ) : null;
   }
   if (workflow === "exposure_inventory") {

@@ -241,6 +241,47 @@ class InflowDelayResult(BaseModel):
     limitations: list[str]
 
 
+class BreachAdvanceRequest(BaseModel):
+    """What-if C: advance the reconstructed temporary levee-failure time.
+
+    This is timeline arithmetic only. The service further bounds each value
+    so the moved failure does not precede the recorded milestone before it.
+    """
+
+    advance_minutes: list[Annotated[int, Field(ge=0, le=180)]] = Field(
+        default_factory=lambda: [5, 10, 15],
+        min_length=1,
+        max_length=10,
+    )
+
+
+class BreachAdvanceMilestone(BaseModel):
+    state: str
+    label: str
+    baseline_time: str
+    scenario_time: str
+    advanced_by_min: int
+
+
+class BreachAdvanceScenario(BaseModel):
+    advance_minutes: int
+    assumption: str
+    milestones: list[BreachAdvanceMilestone]
+
+
+class BreachAdvanceResult(BaseModel):
+    event_id: str
+    analysis: Literal["breach_advance_whatif"] = "breach_advance_whatif"
+    origin: Literal["TEMPORARY"] = "TEMPORARY"
+    coverage_status: CoverageStatus
+    coverage_note: str
+    max_advance_minutes: int
+    shifted_states: list[str]
+    scenarios: list[BreachAdvanceScenario]
+    assumptions: list[str]
+    limitations: list[str]
+
+
 class AgentToolDescriptor(BaseModel):
     name: str
     description: str
@@ -277,6 +318,7 @@ class AgentToolCallRequest(FacilityAgentScope):
     event_id: str = "osong-2023"
     closure_times: list[str] | None = None
     delay_minutes: list[Annotated[int, Field(ge=0, le=180)]] | None = None
+    advance_minutes: list[Annotated[int, Field(ge=0, le=180)]] | None = None
     radii_m: list[Annotated[int, Field(ge=50, le=20000)]] | None = None
     reduction_m: Annotated[float, Field(ge=0, le=2.5)] | None = None
     comparison_type: Literal["closure_timing", "inflow_delay"] = "closure_timing"
@@ -347,6 +389,7 @@ AgentWorkflowName = Literal[
     "situation",
     "closure_timing",
     "inflow_delay",
+    "breach_advance",
     "exposure_inventory",
 ]
 
@@ -358,6 +401,7 @@ class AgentWorkflowRequest(BaseModel):
     event_id: str = "osong-2023"
     closure_times: list[str] | None = None
     delay_minutes: list[Annotated[int, Field(ge=0, le=180)]] | None = None
+    advance_minutes: list[Annotated[int, Field(ge=0, le=180)]] | None = None
     radii_m: list[Annotated[int, Field(ge=50, le=20000)]] | None = None
 
 

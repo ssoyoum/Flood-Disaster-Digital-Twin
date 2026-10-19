@@ -19,6 +19,8 @@ from .schemas import (
     AgentWorkflowRequest,
     ClosureTimingRequest,
     ClosureTimingResult,
+    BreachAdvanceRequest,
+    BreachAdvanceResult,
     ExposureInventoryResult,
     InflowDelayRequest,
     InflowDelayResult,
@@ -26,6 +28,7 @@ from .schemas import (
 )
 from .services import (
     ReconstructionUnavailable,
+    analyze_breach_advance,
     analyze_closure_timing,
     analyze_inflow_delay,
     build_exposure_inventory,
@@ -93,6 +96,17 @@ _TOOL_CATALOG: tuple[dict[str, Any], ...] = (
         "can_say": "유입·주행불능·완전침수 시각이 각각 몇 시로 옮겨지는지(기록 시각 + 지연 분).",
         "cannot_say": "차수벽·펌프가 실제로 유입을 몇 분 늦추는지, 수위·침수 범위 변화. 지연 분은 사용자 가정이다.",
         "examples": ["유입이 10분 늦춰졌다면 주행불능 시각은?", "차수벽으로 유입이 30분 늦어졌다면?"],
+    },
+    {
+        "name": "analyze_breach_advance",
+        "description": "Shift the reconstructed levee-failure milestone and all listed downstream timestamps earlier by an explicit bounded amount.",
+        "input_fields": ["event_id", "advance_minutes"],
+        "output": "bounded levee-failure timing what-if result",
+        "use_when": "오송 임시제방 붕괴가 N분 빨랐거나 앞당겨졌다면 이후 기록 시각이 어떻게 되는지 물을 때만 사용한다.",
+        "parameters": "advance_minutes: [정수 분, ...], 질문에 명시된 값만 쓴다. 월류 07:50보다 붕괴가 먼저 오지 않도록 이 사건에서는 최대 18분이다.",
+        "can_say": "제방 붕괴·지하차도 유입·주행불능·완전침수 재구성 시각이 가정상 같은 분 수만큼 앞당겨진 결과.",
+        "cannot_say": "붕괴 폭·유량·침수심·속도·교통·인명·피해의 물리적 변화. 앞당김 값은 사용자 가정이며, 기록 사이 시간 간격은 고정한다.",
+        "examples": ["제방 붕괴가 10분 빨랐다면 이후 시각은?", "임시제방 붕괴를 15분 앞당긴 시간표를 보여줘"],
     },
     {
         "name": "get_exposure_inventory",
@@ -190,6 +204,13 @@ def _analyze_inflow_delay(event_id: str, request: AgentToolCallRequest) -> dict[
     ).model_dump()
 
 
+def _analyze_breach_advance(event_id: str, request: AgentToolCallRequest) -> dict[str, Any]:
+    advance_minutes = request.advance_minutes or BreachAdvanceRequest().advance_minutes
+    return BreachAdvanceResult.model_validate(
+        analyze_breach_advance(event_id, advance_minutes)
+    ).model_dump()
+
+
 def _analyze_hand_threshold(event_id: str, request: AgentToolCallRequest) -> dict[str, Any]:
     if request.reduction_m is None:
         raise ValueError("reduction_m is required for HAND threshold sensitivity")
@@ -270,6 +291,7 @@ _HANDLERS: dict[str, ToolHandler] = {
     "get_observation_summary": _get_observation_summary,
     "analyze_closure_timing": _analyze_closure_timing,
     "analyze_inflow_delay": _analyze_inflow_delay,
+    "analyze_breach_advance": _analyze_breach_advance,
     "analyze_hand_threshold": _analyze_hand_threshold,
     "get_exposure_inventory": _get_exposure_inventory,
     "compare_scenarios": _compare_scenarios,
@@ -313,6 +335,7 @@ def execute_agent_workflow(request: AgentWorkflowRequest) -> dict[str, Any]:
         event_id=request.event_id,
         closure_times=request.closure_times,
         delay_minutes=request.delay_minutes,
+        advance_minutes=request.advance_minutes,
         radii_m=request.radii_m,
     )
     if request.workflow == "situation":
@@ -322,6 +345,7 @@ def execute_agent_workflow(request: AgentWorkflowRequest) -> dict[str, Any]:
         analysis_tool = {
             "closure_timing": "analyze_closure_timing",
             "inflow_delay": "analyze_inflow_delay",
+            "breach_advance": "analyze_breach_advance",
             "exposure_inventory": "get_exposure_inventory",
         }[request.workflow]
         tool_names = ["get_event", analysis_tool]
@@ -372,6 +396,8 @@ def execute_agent_workflow(request: AgentWorkflowRequest) -> dict[str, Any]:
 
 _CLOSURE_MARKERS = ("차단", "통제", "폐쇄", "closure", "close")
 _INFLOW_MARKERS = ("유입", "차수벽", "inflow", "delay")
+_BREACH_MARKERS = ("제방 붕괴", "임시제방", "제방이 무너", "levee failure", "breach")
+_EARLIER_BREACH_MARKERS = ("일찍", "빨리", "빨랐", "앞당", "이른", "earlier", "sooner")
 _EXPOSURE_MARKERS = ("건물", "도로", "시설", "노출", "반경", "exposure", "inventory")
 _UNSUPPORTED_MARKERS = (
     "사망자",
@@ -418,6 +444,11 @@ _EXAMPLE_QUESTIONS: tuple[dict[str, str], ...] = (
         "workflow": "inflow_delay",
         "label": "유입 30분 지연",
         "question": "차수벽으로 유입이 30분 늦어졌다면 어떻게 되나요?",
+    },
+    {
+        "workflow": "breach_advance",
+        "label": "제방 붕괴 10분 빠르게",
+        "question": "제방 붕괴가 10분 빨랐다면 이후 기록 시각은 어떻게 되나요?",
     },
     {
         "workflow": "exposure_inventory",
@@ -524,6 +555,10 @@ def plan_agent_intent(request: AgentIntentPlanRequest) -> dict[str, Any]:
     # "유입까지" names the milestone to compare a closure against; it is not
     # a request to delay the water inflow itself.
     has_inflow = _contains_marker(text.replace("유입까지", ""), _INFLOW_MARKERS)
+    has_breach_advance = (
+        _contains_marker(text, _BREACH_MARKERS)
+        and _contains_marker(text, _EARLIER_BREACH_MARKERS)
+    )
     has_exposure = _contains_marker(text, _EXPOSURE_MARKERS)
     has_situation = _contains_marker(text, _SITUATION_MARKERS)
     actionable = [
@@ -531,6 +566,7 @@ def plan_agent_intent(request: AgentIntentPlanRequest) -> dict[str, Any]:
         for workflow, matched in (
             ("closure_timing", has_closure),
             ("inflow_delay", has_inflow),
+            ("breach_advance", has_breach_advance),
             ("exposure_inventory", has_exposure),
         )
         if matched
@@ -591,6 +627,17 @@ def plan_agent_intent(request: AgentIntentPlanRequest) -> dict[str, Any]:
                 )
             tool_names = ["get_event", "get_reconstruction", "analyze_inflow_delay"]
             reason = "Detected an inflow-delay or barrier-assumption request."
+        elif workflow == "breach_advance":
+            advance_minutes = _extract_minutes(text)
+            if advance_minutes:
+                parameters["advance_minutes"] = advance_minutes
+            else:
+                base["status"] = "NEEDS_CLARIFICATION"
+                base["reason"] = "The breach-advance analysis needs an explicit number of minutes."
+                base["suggestions"] = ["제방 붕괴를 몇 분 앞당길지 0~18분으로 적어 주세요."]
+                return base
+            tool_names = ["get_event", "get_reconstruction", "analyze_breach_advance"]
+            reason = "Detected a bounded levee-failure timing assumption."
         else:
             radii_m = _extract_radii(text)
             if radii_m:

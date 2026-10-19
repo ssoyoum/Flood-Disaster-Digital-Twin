@@ -280,7 +280,7 @@ export type ExposureInventory = {
   limitations: string[];
 };
 
-export type AgentWorkflowName = "situation" | "closure_timing" | "inflow_delay" | "exposure_inventory";
+export type AgentWorkflowName = "situation" | "closure_timing" | "inflow_delay" | "breach_advance" | "exposure_inventory";
 
 export type AgentIntentPlanResult = {
   status: "READY" | "NEEDS_CLARIFICATION" | "UNSUPPORTED";

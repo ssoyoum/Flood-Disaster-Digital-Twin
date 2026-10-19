@@ -172,6 +172,7 @@ _PARAMETERS: dict[str, set[str]] = {
     "get_observation_summary": set(),
     "analyze_closure_timing": {"closure_times"},
     "analyze_inflow_delay": {"delay_minutes"},
+    "analyze_breach_advance": {"advance_minutes"},
     "analyze_hand_threshold": {"reduction_m"},
     "get_exposure_inventory": {"radii_m"},
     "compare_scenarios": {"comparison_type", "closure_times", "delay_minutes"},
@@ -449,7 +450,7 @@ def _validated_tool_request(action: AgentAction, request: AgentAskRequest, calls
         clean = agent_watch.validate(name, params, supplied)
         return AgentToolCallRequest(event_id=request.event_id, facility_id=None, observation_at=request.observation_at,
                                     board="watch", **clean)
-    for key in ("delay_minutes", "radii_m"):
+    for key in ("delay_minutes", "advance_minutes", "radii_m"):
         if key in params:
             params[key] = _as_int_list(params[key])
     if "closure_times" in params:
@@ -485,6 +486,11 @@ def _validated_tool_request(action: AgentAction, request: AgentAskRequest, calls
         values = params["delay_minutes"]
         if not isinstance(values, list) or not values or len(values) > 10 or not all(type(v) is int and v in _extract_minutes(supplied) for v in values):
             raise ValueError("Delay minutes must appear in the user's question.")
+    if "advance_minutes" in params:
+        values = params["advance_minutes"]
+        if (not isinstance(values, list) or not values or len(values) > 10
+                or not all(type(v) is int and v in _extract_minutes(supplied) for v in values)):
+            raise ValueError("Breach advance minutes must appear in the user's question.")
     if "radii_m" in params:
         values = params["radii_m"]
         if not isinstance(values, list) or not values or len(values) > 10 or not all(type(v) is int and v in _extract_radii(supplied) for v in values):
@@ -496,7 +502,7 @@ def _validated_tool_request(action: AgentAction, request: AgentAskRequest, calls
             raise ValueError("HAND threshold reduction must be a 0–2.5 m value in the user's question.")
         if _is_physical_effect_question(request.message):
             raise ValueError("A physical intervention cannot be converted into a HAND threshold change.")
-    if name in {"analyze_closure_timing", "analyze_inflow_delay", "analyze_hand_threshold", "get_exposure_inventory"}:
+    if name in {"analyze_closure_timing", "analyze_inflow_delay", "analyze_breach_advance", "analyze_hand_threshold", "get_exposure_inventory"}:
         required = next(iter(_PARAMETERS[name]))
         if required not in params:
             raise ValueError(f"The question needs an explicit {required} value.")
@@ -695,6 +701,8 @@ def _reply(request: AgentAskRequest, status: str, answer: str, calls: list[dict[
 
 
 _DELAY_WORDS = re.compile(r"유입|늦춰|늦어|늦게|지연|delay", re.IGNORECASE)
+_BREACH_WORDS = re.compile(r"제방\s*붕괴|임시\s*제방|제방이\s*무너|levee\s*failure|breach", re.IGNORECASE)
+_BREACH_EARLIER_WORDS = re.compile(r"일찍|빨리|빨랐|앞당|이른|earlier|sooner", re.IGNORECASE)
 _CLOSURE_WORDS = re.compile(r"통제|막았|막으면|막는|막아|차단|폐쇄|close", re.IGNORECASE)
 _EXPOSURE_WORDS = re.compile(r"반경|주변|건물|도로|시설|학교|병원", re.IGNORECASE)
 _HAND_WORDS = re.compile(r"HAND|셀|판정 기준|선택 임계", re.IGNORECASE)
@@ -754,6 +762,8 @@ def _router_hints(message: str, event_id: str = "osong-2023") -> list[dict[str, 
     closure = bool(_CLOSURE_WORDS.search(text))
     relative = _relative_closure_clocks(text)
     inflow_named = bool(re.search(r"유입|지연|delay", text, re.IGNORECASE))
+    if delays and _BREACH_WORDS.search(text) and _BREACH_EARLIER_WORDS.search(text):
+        hints.append({"tool_name": "analyze_breach_advance", "parameters": {"advance_minutes": delays}})
     if delays and _DELAY_WORDS.search(text) and not _is_physical_effect_question(text) and (inflow_named or not closure):
         hints.append({"tool_name": "analyze_inflow_delay", "parameters": {"delay_minutes": delays}})
     if times and closure:

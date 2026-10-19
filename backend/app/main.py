@@ -68,6 +68,8 @@ from .schemas import (
     AgentToolDescriptor,
     AgentWorkflowRequest,
     AgentWorkflowResult,
+    BreachAdvanceRequest,
+    BreachAdvanceResult,
     InflowDelayRequest,
     InflowDelayResult,
     HandThresholdRequest,
@@ -84,6 +86,7 @@ from .services import (
     ReconstructionUnavailable,
     analyze_closure_timing,
     analyze_inflow_delay,
+    analyze_breach_advance,
     build_exposure_inventory,
     apply_intervention,
     calculate_baseline,
@@ -437,6 +440,23 @@ def inflow_delay_analysis(event_id: str, request: InflowDelayRequest):
     _require_event(event_id)
     try:
         return analyze_inflow_delay(event_id, request.delay_minutes)
+    except ReconstructionUnavailable as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post(
+    "/api/events/{event_id}/analysis/breach-advance",
+    response_model=BreachAdvanceResult,
+    tags=["analysis"],
+)
+def breach_advance_analysis(event_id: str, request: BreachAdvanceRequest):
+    """What-if C: advance the breach and downstream timestamps under a bounded assumption."""
+
+    _require_event(event_id)
+    try:
+        return analyze_breach_advance(event_id, request.advance_minutes)
     except ReconstructionUnavailable as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:

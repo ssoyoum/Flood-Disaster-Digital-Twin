@@ -13,6 +13,7 @@
 | get_observation_summary | 4개 사건 | 없음 | — | 오송: 강우·수위 최대값 / 서울: 강우계·침수흔적 집계 / 포항·안동: 보도 수치와 출처 | 예보, 보도에 없는 수치 |
 | analyze_closure_timing | 오송 | `closure_times` | 1~10개, 각 값이 질문의 HH:MM, 이번 요청의 `get_reconstruction` 단계 시각, 또는 기준 통제 08:27에서 계산한 "N분 일찍/늦게" 시각 | 통제 시각별 유입·주행불능·완전침수까지 분 | 차량·사상자·침수심 감소 |
 | analyze_inflow_delay | 오송 | `delay_minutes` | 1~10개 정수, 각 값이 질문에 "N분"으로 적힘, 0~180 | 단계 시각 이동 | 차수벽·펌프의 실제 지연 효과 |
+| analyze_breach_advance | 오송 | `advance_minutes` | 1~10개 정수, 각 값이 질문에 "N분"으로 적힘, 앞선 월류 07:50 이후 순서를 보존하는 최대 18분 | 제방 붕괴와 후속 기록 시각의 동일 분 이동 | 붕괴·유량·침수·교통·피해의 물리 변화 |
 | get_exposure_inventory | 오송 | `radii_m` | 1~10개 정수, 각 값이 질문에 적힘, 50~20,000 m | 반경별 건물·도로·시설 수 | 침수 건물 수·피해 |
 | compare_scenarios | 오송 | `comparison_type` + `closure_times` 또는 `delay_minutes` | 종류와 맞는 값이 있어야 함, 값 규칙은 위와 같음 | 기준 대비 단계 시각 차 | 피해 감소량 |
 | analyze_hand_threshold | 오송 | `reduction_m` | 질문에 "N m"로 적힌 0~2.5 값, 물리 시설 변경 질문이면 거부 | 단계별 HAND 셀 수 변화 | 제방·차수벽 효과, 실제 침수 범위 |

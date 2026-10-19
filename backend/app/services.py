@@ -313,6 +313,100 @@ def analyze_inflow_delay(event_id: str, delay_minutes: list[int]) -> dict:
     }
 
 
+def analyze_breach_advance(event_id: str, advance_minutes: list[int]) -> dict:
+    """Advance the failure and downstream timestamps under a bounded assumption.
+
+    Upstream milestones and the intervals between downstream milestones stay
+    fixed. Values are capped at the latest preceding replay milestone so the
+    scenario cannot put the levee failure before the recorded event sequence.
+    """
+
+    reconstruction = _reconstruction_for(event_id)
+    replay = reconstruction["replay"]
+    ordered_replay = sorted(replay, key=lambda entry: entry["time"])
+    states = _CLOSURE_MILESTONES
+    times = {entry["state"]: datetime.fromisoformat(entry["time"]) for entry in replay}
+    missing = [state for state in states if state not in times]
+    if missing:
+        raise ReconstructionUnavailable(
+            f"Reconstruction timeline for {event_id} is missing required states: {missing}"
+        )
+
+    breach_index = next(
+        index for index, entry in enumerate(ordered_replay)
+        if entry["state"] == "levee_failure"
+    )
+    if breach_index == 0:
+        max_advance = 180
+        preceding_state = None
+    else:
+        preceding = ordered_replay[breach_index - 1]
+        preceding_time = datetime.fromisoformat(preceding["time"])
+        gap_minutes = int((times["levee_failure"] - preceding_time).total_seconds() // 60)
+        max_advance = max(0, min(180, gap_minutes - 1))
+        preceding_state = preceding["state"]
+
+    scenarios = []
+    for value in dict.fromkeys(advance_minutes):
+        if type(value) is not int or value < 0 or value > max_advance:
+            raise ValueError(
+                f"advance_minutes values must be between 0 and {max_advance} to keep the recorded timeline order"
+            )
+        advance = timedelta(minutes=value)
+        milestones = []
+        for entry in ordered_replay:
+            state = entry["state"]
+            if state not in states:
+                continue
+            baseline_time = times[state]
+            milestones.append(
+                {
+                    "state": state,
+                    "label": entry["label"],
+                    "baseline_time": baseline_time.isoformat(),
+                    "scenario_time": (baseline_time - advance).isoformat(),
+                    "advanced_by_min": value,
+                }
+            )
+        scenarios.append(
+            {
+                "advance_minutes": value,
+                "assumption": (
+                    f"The levee-failure milestone and all later listed milestones are moved {value} minutes earlier; "
+                    "the intervals between them remain fixed."
+                ),
+                "milestones": milestones,
+            }
+        )
+
+    prior_note = (
+        f"The shift is capped so levee_failure remains after the preceding recorded milestone ({preceding_state})."
+        if preceding_state
+        else "No earlier milestone constrains the shift in this reconstruction."
+    )
+    return {
+        "event_id": event_id,
+        "coverage_status": "fallback",
+        "coverage_note": (
+            "Baseline timestamps are reconstruction values whose confidence is NEEDS_SOURCE_PAGE; "
+            "scenario times are bounded timeline arithmetic only."
+        ),
+        "max_advance_minutes": max_advance,
+        "shifted_states": list(states),
+        "scenarios": scenarios,
+        "assumptions": [
+            "The user-supplied advance changes the levee-failure time and every listed milestone after it by the same amount.",
+            "Recorded milestones before levee_failure remain fixed, and all intervals after levee_failure remain unchanged.",
+            prior_note,
+        ],
+        "limitations": [
+            "This is a bounded timeline assumption, not a breach-growth, hydraulic, flood-depth, velocity, traffic, casualty, or damage simulation.",
+            "The scenario does not estimate how an earlier failure would physically change inflow or later progression.",
+            "Underlying incident timestamps still need source-page evidence.",
+        ],
+    }
+
+
 def _minutes(start: datetime, end: datetime) -> int:
     return round((end - start).total_seconds() / 60)
 
