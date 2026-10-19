@@ -1,0 +1,27 @@
+# Image for a server that runs the national watch board (#watch) as well as the event consoles.
+# Build it from the context made by deploy/build_context.py (it carries the trimmed HRFCO series and the
+# research table that the repository .dockerignore leaves out); Dockerfile.aws stays the 1 GB EC2 image.
+FROM node:22-alpine AS frontend-build
+WORKDIR /web
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY index.html tsconfig.json tsconfig.app.json vite.config.ts ./
+COPY src ./src
+COPY public ./public
+ENV VITE_API_BASE=same-origin
+RUN npm run build
+
+FROM python:3.12-slim
+WORKDIR /app
+COPY backend/requirements.txt ./requirements.txt
+# LightGBM (6-hour rise model) needs OpenMP at runtime.
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir -r requirements.txt
+COPY backend/app ./backend/app
+COPY data ./data
+COPY docs/research/underpass_river_influence/facility_river_influence_ranked.csv ./docs/research/underpass_river_influence/
+COPY --from=frontend-build /web/dist ./dist
+ENV PYTHONPATH=/app/backend \
+    FLOODOPS_STATIC_DIR=/app/dist
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
