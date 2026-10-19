@@ -38,6 +38,7 @@ RAIN_3H_ADVISORY_MM = 60.0
 RAIN_3H_WARNING_MM = 90.0
 RAIN_12H_ADVISORY_MM = 110.0
 RAIN_12H_WARNING_MM = 180.0
+RAIN_1H_CASE_REFERENCE_MM_H = 95.0
 RAIN_1H_STRONG_MM = 15.0  # 기상청 강수강도 '강한 비' 하한, 3시간 자료가 없을 때 1시간으로 대신 본다
 SAME_RIVER_KM = 1.5
 ELEVATION_HINT_MIN_M = -3.0
@@ -242,6 +243,19 @@ def _pluvial_level(rain: dict[str, Any] | None) -> tuple[int, str]:
     return 0, "강우 없음"
 
 
+def _case_rainfall_reference(rain: dict[str, Any] | None) -> dict[str, Any]:
+    """Expose the Seoul 2022 one-hour comparison without treating it as a facility control rule."""
+    amount = rain.get("rain_1h_mm") if rain else None
+    return {
+        "case_id": "seoul-2022-sillim",
+        "window_minutes": 60,
+        "threshold_mm_h": RAIN_1H_CASE_REFERENCE_MM_H,
+        "observed_mm": amount,
+        "crossed": None if amount is None else amount >= RAIN_1H_CASE_REFERENCE_MM_H,
+        "reference_only": True,
+    }
+
+
 def _short_time(stamp: str, at: str | None) -> str:
     """'04:10' on the assessed day, '7.14 14:20' otherwise, so a day-old issuance does not read as today's."""
     if at and stamp[:10] == str(at)[:10]:
@@ -294,6 +308,9 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
                 why = "하천 관측소 없음 · " + why
         else:
             level, why = _pluvial_level(rain)
+        case_rainfall_reference = _case_rainfall_reference(rain) if kind == "pluvial" else None
+        if case_rainfall_reference and case_rainfall_reference["crossed"]:
+            why += f" · 서울 2022 사례 참고 1시간 {case_rainfall_reference['observed_mm']} mm (95 mm/h)"
         issued = official.get(item.get("station_code") or "") if kind == "river" else None
         if issued:
             level = max(level, OFFICIAL_LEVEL[issued["level"]])
@@ -316,6 +333,7 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
             # A gauge's minutes say nothing about an underpass that floods from local rain.
             "minutes_to_planned_flood": item.get("minutes_to_planned_flood") if kind == "river" else None,
             "rain": rain,
+            "case_rainfall_reference": case_rainfall_reference,
             "official": {k: issued[k] for k in ("level", "level_ko", "issued_at", "forecast_level_m", "forecast_time", "minutes_since_issue")} if issued else None,
             "weather_warning": {k: weather_warning[k] for k in ("region_code", "province", "area", "level", "level_ko", "issued_at", "effective_at")} if weather_warning else None,
         })
@@ -348,5 +366,7 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
             "filter": {"region": region, "driver": driver}, "counts": counts, "facilities": rows[:limit], "rain_gauges": rain_rows,
             "thresholds": {"rain_3h_advisory_mm": RAIN_3H_ADVISORY_MM, "rain_3h_warning_mm": RAIN_3H_WARNING_MM,
                            "rain_12h_advisory_mm": RAIN_12H_ADVISORY_MM, "rain_12h_warning_mm": RAIN_12H_WARNING_MM,
-                           "rain_1h_strong_mm": RAIN_1H_STRONG_MM},
+                           "rain_1h_strong_mm": RAIN_1H_STRONG_MM,
+                           "rain_1h_case_reference_mm_h": RAIN_1H_CASE_REFERENCE_MM_H,
+                           "rain_1h_case_reference_effect": "reference_only; does not change facility risk level"},
             "limitations": LIMITATIONS + status.get("limitations", [])[:2]}

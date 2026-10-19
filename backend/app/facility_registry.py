@@ -85,6 +85,13 @@ def validate_candidate(facility: dict[str, Any]) -> None:
         raise _fail(facility, "location", "must be [lon, lat] or null")
     if not isinstance(facility.get("nearby_gauges", []), list):
         raise _fail(facility, "nearby_gauges", "must be a list")
+    if not isinstance(facility.get("nearby_rain_gauges", []), list):
+        raise _fail(facility, "nearby_rain_gauges", "must be a list")
+    hypothesis = facility.get("driver_hypothesis")
+    if hypothesis is not None and hypothesis not in ("river", "pluvial"):
+        raise _fail(facility, "driver_hypothesis", "must be river, pluvial or omitted")
+    if hypothesis and facility.get("driver") != "unverified":
+        raise _fail(facility, "driver", "a CANDIDATE driver hypothesis may not be presented as verified")
     validate_gates(facility, allow_unknown=True)
 
 

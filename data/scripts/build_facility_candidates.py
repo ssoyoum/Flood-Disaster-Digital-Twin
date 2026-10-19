@@ -34,6 +34,8 @@ REGISTRY_JSON = REPO_ROOT / "data" / "facilities" / "registry.json"
 OUTPUT_JSON = REPO_ROOT / "data" / "facilities" / "candidates.json"
 
 SIDO = "충청북도"
+SEOUL = "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc"
+SEOUL_DEMO_ORDINAL = "43"  # Oebalsan comparison candidate; remains unverified
 MAX_GAUGE_KM = 5.0
 MAX_NEARBY = 3
 NATIONAL_DATASET_ID = "15124755"
@@ -81,7 +83,9 @@ def _num(value: str | None) -> float | None:
     return float(value) if value else None
 
 
-def slug_for(name: str, ordinal: str) -> str:
+def slug_for(name: str, ordinal: str, sido: str) -> str:
+    if sido == SEOUL and ordinal == SEOUL_DEMO_ORDINAL:
+        return "seoul-43-oebalsan"
     base = SLUGS.get(name.strip())
     return f"cb-{ordinal}-{base}" if base else f"cb-{ordinal}"
 
@@ -100,6 +104,16 @@ def nearby_gauges(links: list[dict[str, str]], facility_key: str) -> list[dict[s
             "warning_m": _num(r["warning_m"]),
             "advisory_m": _num(r["advisory_m"]),
         }
+        for r in rows[:MAX_NEARBY]
+    ]
+
+
+def nearby_rain_gauges(links: list[dict[str, str]], facility_key: str) -> list[dict[str, Any]]:
+    rows = [r for r in links if r["facility_id"] == facility_key and r["kind"] == "rainfall"]
+    rows.sort(key=lambda r: float(r["distance_km"]))
+    return [
+        {"station_id": r["station_code"], "name": r["station_name"], "agency": r["agency"] or None,
+         "distance_km": float(r["distance_km"])}
         for r in rows[:MAX_NEARBY]
     ]
 
@@ -153,11 +167,19 @@ def main() -> None:
     candidates: list[dict[str, Any]] = []
     seen: set[str] = set()
 
-    def add(ordinal: str, name: str, sido: str, sgg: str, location: list[float] | None, source: dict[str, Any], management: str | None, agency: str | None, structure: str | None, selected_by: str) -> None:
+    def add(ordinal: str, name: str, sido: str, sgg: str, location: list[float] | None, source: dict[str, Any], management: str | None, agency: str | None, structure: str | None, selected_by: str, driver_hypothesis: str | None = None) -> None:
         facility_key = f"underpass_coordinates:{ordinal}"
         gauges = nearby_gauges(links, facility_key) if location else []
+        rain_gauges = nearby_rain_gauges(links, facility_key) if location else []
+        gates = build_gates(gauges)
+        if driver_hypothesis == "pluvial" and rain_gauges and rain_gauges[0]["distance_km"] <= MAX_GAUGE_KM:
+            nearest = rain_gauges[0]
+            gates["representative_gauge"] = {
+                "status": "PENDING",
+                "note": f"{nearest['name']} {nearest['station_id']} · {nearest['distance_km']:.2f} km · representative rainfall gauge and catchment link need review",
+            }
         entry = {
-            "id": slug_for(name, ordinal),
+            "id": slug_for(name, ordinal, sido),
             "name": name,
             "kind": "underpass",
             "driver": "unverified",
@@ -171,12 +193,16 @@ def main() -> None:
             "source": source,
             "selected_by": selected_by,
             "nearby_gauges": gauges,
+            "nearby_rain_gauges": rain_gauges,
             "gauge": None,
             "control_rule": None,
             "reference_event": None,
-            "gates": build_gates(gauges),
+            "gates": gates,
             "review_notes": location_review(sgg, location, gauges, operational),
         }
+        if driver_hypothesis:
+            entry["driver_hypothesis"] = driver_hypothesis
+            entry["driver_hypothesis_note"] = "Comparison hypothesis only; inflow path, site instrumentation and a validation event are unconfirmed."
         candidates.append(entry)
         seen.add(ordinal)
 
@@ -200,6 +226,23 @@ def main() -> None:
             "coordinates": "underpass_coordinates.csv (OSM 이름 매칭)" if location else None,
         }
         add(ordinal, row["name"], sido, sgg, location, source, row["management_category"], row["agency_raw"], row["structure_raw"], "docs/UNDERPASS_EXPANSION.md 1차 확인 후보")
+
+    # One Seoul counterpart shows a pluvial driver hypothesis using the same CANDIDATE schema.
+    for row in coords:
+        if row["sido"] != SEOUL or row["molit_no"] != SEOUL_DEMO_ORDINAL or not row["latitude"] or not row["longitude"]:
+            continue
+        location = [float(row["longitude"]), float(row["latitude"])]
+        source = {
+            "dataset_id": NATIONAL_DATASET_ID,
+            "source_record_id": f"{NATIONAL_DATASET_ID}:{row['molit_no']}",
+            "molit_no": row["molit_no"],
+            "source_url": f"https://data.go.kr/data/{NATIONAL_DATASET_ID}/fileData.do",
+            "coordinates": "underpass_coordinates.csv (OSM matched name)",
+            "osm_way_ids": row["osm_way_ids"] or None,
+        }
+        add(row["molit_no"], row["name"], row["sido"], row["sgg"], location, source, row["management"], None, row["structure"],
+            "TODO.md pluvial-rule comparison candidate", "pluvial")
+        break
 
     # (a) Chungbuk rows with coordinates and a flood-forecast gauge within MAX_GAUGE_KM.
     excluded: list[dict[str, str]] = []
@@ -244,6 +287,7 @@ def main() -> None:
         "selection": {
             "sido": SIDO,
             "max_gauge_km": MAX_GAUGE_KM,
+            "seoul_comparison_candidate": {"dataset_id": NATIONAL_DATASET_ID, "molit_no": SEOUL_DEMO_ORDINAL, "driver_hypothesis": "pluvial", "operational": False},
             "rule": f"(a) {SIDO} 시설 중 좌표가 있고 {MAX_GAUGE_KM:g} km 안에 홍수예보 수위관측소가 있는 행 + (b) docs/UNDERPASS_EXPANSION.md의 청주 후보 3곳(순번 {', '.join(NAMED_CANDIDATE_ORDINALS)})",
             "not_a_ranking": "후보 순서는 국토부 순번이며 위험 순위가 아니다. 가까운 관측소는 후보일 뿐 대표성이 확인된 것이 아니다.",
         },
