@@ -171,6 +171,34 @@ body { display: flex; flex-direction: column; }
 .wx-badge.wx-up { background: rgba(248,113,113,.16); color: var(--wx-red); }
 .wx-badge.wx-fast { background: rgba(255,255,255,.08); color: var(--wx-ui); }
 .wx-badge.wx-official { flex: none; background: color-mix(in srgb, var(--wx-c) 18%, transparent); color: var(--wx-c); }
+#wx-vc-body { display: flex; flex-direction: column; gap: 10px; }
+.wx-vc-empty { margin: 0; font-size: 12px; color: var(--wx-muted); }
+.wx-vc-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.wx-vc-top b { font-size: 13.5px; color: var(--wx-text); }
+.wx-vc-go, .wx-vc-open { flex: none; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--wx-line); background: rgba(255,255,255,.04); color: var(--wx-ui); font-size: 11.5px; font-weight: 700; cursor: pointer; }
+.wx-vc-go:hover, .wx-vc-open:hover { border-color: var(--wx-green); color: var(--wx-green); }
+.wx-vc-open { margin-top: 8px; width: 100%; text-align: left; }
+.wx-vc-ref { margin: 6px 0 8px; font-size: 12px; line-height: 1.5; color: var(--wx-muted); }
+.wx-vc-ref b { color: var(--wx-text); }
+.wx-vc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.wx-vc-row { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) 54px; align-items: center; gap: 8px; font-size: 12px; }
+.wx-vc-sig { min-width: 0; color: var(--wx-ui); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wx-vc-sig small { display: block; font-size: 10.5px; color: var(--wx-dim); }
+.wx-vc-bar { position: relative; height: 8px; border-radius: 4px; background: rgba(255,255,255,.05); }
+.wx-vc-bar b { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1.5px; background: var(--wx-ui); }
+.wx-vc-bar i { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+.wx-vc-early { background: var(--wx-green); }
+.wx-vc-late { background: var(--wx-red); }
+.wx-vc-none { left: 0; right: 0; background: repeating-linear-gradient(90deg, rgba(255,255,255,.12) 0 4px, transparent 4px 8px); }
+.wx-vc-lead { text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--wx-green); }
+.wx-vc-lead small { font-size: 10px; font-weight: 600; margin-left: 1px; }
+.wx-vc-lag .wx-vc-lead { color: var(--wx-red); }
+.wx-vc-miss .wx-vc-lead { color: var(--wx-dim); }
+.wx-vc-foot { margin: 8px 0 0; font-size: 11.5px; color: var(--wx-muted); }
+.wx-vc-foot b { color: var(--wx-amber); }
+.wx-vc-legend { margin: 0; font-size: 11px; color: var(--wx-dim); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.wx-vc-legend i { display: inline-block; width: 14px; height: 6px; border-radius: 3px; }
+.wx-vc-limits { margin: 0; padding-left: 16px; font-size: 11px; line-height: 1.55; color: var(--wx-dim); }
 .wx-q { color: var(--wx-amber); font-size: 11px; font-weight: 700; }
 .wx-lv { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; line-height: 1.25; }
 .wx-lv b { display: block; font-size: 14px; font-weight: 700; }
@@ -501,6 +529,7 @@ body { display: flex; flex-direction: column; }
     <div class="wx-rtabs" role="tablist">
       <button class="wx-rtab wx-on" type="button" role="tab" id="wx-tab-st" aria-selected="true">시설 상세</button>
       <button class="wx-rtab" type="button" role="tab" id="wx-tab-ag" aria-selected="false">에이전트</button>
+      <button class="wx-rtab" type="button" role="tab" id="wx-tab-vc" aria-selected="false">검증 사례</button>
       <button class="wx-close" type="button" id="wx-close" aria-label="상세 닫기">✕</button>
     </div>
     <div class="wx-pane" id="wx-pane-st" role="tabpanel">
@@ -536,6 +565,11 @@ body { display: flex; flex-direction: column; }
       <small class="wx-ag-status" id="wx-ag-status" aria-live="polite">지역 이동, 우선순위, 변화 요약, 상황 보고를 물어보세요.</small>
       <p class="wx-ag-error" id="wx-ag-error" hidden></p>
       <div class="wx-thread" id="wx-turns"></div>
+    </div>
+    <div class="wx-pane" id="wx-pane-vc" role="tabpanel" hidden>
+      <div class="wx-ag-head"><h3>검증 사례</h3><span class="wx-ag-badge">10분 재생 채점</span></div>
+      <p class="wx-ag-intro">지금 보드의 판정 규칙을 과거 사건에 그대로 돌려, 규칙과 공식 특보가 실제 통제(오송은 유입)보다 몇 분 먼저였는지 봅니다. 통제 시각은 보도 기준입니다.</p>
+      <div id="wx-vc-body"><p class="wx-vc-empty">불러오는 중…</p></div>
     </div>
   </section>
 
@@ -852,10 +886,11 @@ body { display: flex; flex-direction: column; }
 
   /* ---------------- 공통 ---------------- */
   function showTab(which) {
-    const s = which === "st";
-    $("wx-tab-st").classList.toggle("wx-on", s); $("wx-tab-ag").classList.toggle("wx-on", !s);
-    $("wx-tab-st").setAttribute("aria-selected", s); $("wx-tab-ag").setAttribute("aria-selected", !s);
-    $("wx-pane-st").hidden = !s; $("wx-pane-ag").hidden = s;
+    ["st", "ag", "vc"].forEach((k) => {
+      const on = k === which;
+      $(`wx-tab-${k}`).classList.toggle("wx-on", on); $(`wx-tab-${k}`).setAttribute("aria-selected", on); $(`wx-pane-${k}`).hidden = !on;
+    });
+    if (which === "vc") loadValidation();
   }
   function renderAll() {
     $("wx-asof").innerHTML = `<b>${clock(st.overview?.observed_at ?? st.at)}</b> 관측 기준 · ${esc(st.region || "전국")} · ${base().length}곳`;
@@ -1039,6 +1074,11 @@ body { display: flex; flex-direction: column; }
     $("wx-fac-cap").textContent = "판정 근거와 자료 출처";
     const tier = f.tier === "operational" ? "시설별 통제 기준 등록" : f.tier === "rain_only" ? "수위계 없이 강우만 감시" : "감시 등급 · 대표성 미검증";
     $("wx-fac-list").innerHTML = `<div class="wx-detail-row"><b>잠김 원인</b><span>${f.driver === "river" ? "하천 수위" : "지역 강우(내수)"}</span></div><div class="wx-detail-row"><b>분류</b><span>${esc(f.kind_ko)} · ${tier}</span></div><div class="wx-detail-row"><b>판정 이유</b><span>${esc(f.why)}</span></div><div class="wx-detail-row"><b>강우 기준</b><span>${esc(st.overview.rain_basis || "자료 없음")}</span></div>${f.tier === "operational" ? `<a class="wx-link" href="${esc(TWIN_HREF)}" target="_top">운영 시설 상세로 이동 →</a>` : ""}`;
+    const cases = validationCasesFor(f.facility_id);
+    if (cases.length) {
+      $("wx-fac-list").insertAdjacentHTML("beforeend", `<button type="button" class="wx-vc-open">검증 사례 ${cases.length}건 보기 → ${esc(cases.map((c) => c.title.split(" ").slice(-1)[0]).join(" · "))}</button>`);
+      $("wx-fac-list").querySelector(".wx-vc-open").addEventListener("click", () => showTab("vc"));
+    }
   }
   function renderAll() {
     const driverButton = $("wx-faconly");
@@ -1054,12 +1094,14 @@ body { display: flex; flex-direction: column; }
     window.parent.postMessage({ type: "floodops-watch-view", view: { at: st.at || null, region: st.region || null, stage: st.minStage, station: st.selected, facility_id: st.selected, driver: st.driver } }, window.location.origin);
   }
   async function load() {
-    const query = new URLSearchParams({ limit: "2000", rain_mode: "live" });
+    // 검증 사례에서 넘어온 시각은 그날 강우로 재생한다(채점과 같은 조건). 직접 고른 시각은 현재 강우를 함께 본다.
+    const rainReplay = Boolean(st.at && st.rainReplay);
+    const query = new URLSearchParams({ limit: "2000", rain_mode: rainReplay ? "replay" : "live" });
     if (st.at) query.set("at", st.at);
     const data = adaptFacilityRisk(await get(`/api/watch/facility-risk?${query}`)); st.overview = data; st.changes = null;
     const rainAvailable = Boolean(data.rain_at);
     root.dispatchEvent(new CustomEvent("wx:mode", { detail: { mode: data.mode, stations: data.counts?.total ?? data.stations.length,
-      observed: data.stations.length, observed_at: data.observed_at, rain: { mode: rainAvailable ? "live" : "unavailable", available: rainAvailable, observed_at: data.rain_at, basis: data.rain_basis } } }));
+      observed: data.stations.length, observed_at: data.observed_at, rain: { mode: rainAvailable ? (rainReplay ? "replay" : "live") : "unavailable", available: rainAvailable, observed_at: data.rain_at, basis: data.rain_basis } } }));
     $("wx-limits").innerHTML = (data.limitations ?? []).map((x) => `<li>${esc(x)}</li>`).join("");
     if (st.selected && !data.stations.some((r) => r.code === st.selected)) { st.selected = null; openDrawer(false); }
     renderAll(); if (st.selected) renderStation(st.selected);
@@ -1075,9 +1117,49 @@ body { display: flex; flex-direction: column; }
     notifyView();
   }
 
+  // 검증 사례: 지금 판정 규칙을 과거 사건에 10분 간격으로 재생한 채점표(/api/watch/validation-cases)
+  let validation = null;
+  async function loadValidation() {
+    if (validation) return;
+    try { validation = await get("/api/watch/validation-cases"); renderValidation(); }
+    catch (err) { $("wx-vc-body").innerHTML = `<p class="wx-vc-empty">검증 사례를 불러오지 못했습니다(${esc(String(err.message || err))}).</p>`; }
+  }
+  function validationCasesFor(facilityId) {
+    return (validation?.cases ?? []).filter((c) => c.signals.some((s) => s.facility_id === facilityId));
+  }
+  function renderValidation() {
+    const cases = validation?.cases ?? [];
+    if (!cases.length) { $("wx-vc-body").innerHTML = `<p class="wx-vc-empty">저장된 검증 사례가 없습니다.</p>`; return; }
+    const span = Math.min(600, Math.max(60, ...cases.flatMap((c) => c.signals.map((s) => Math.abs(s.lead_min ?? 0)))));
+    const bar = (lead) => {
+      if (lead === null || lead === undefined) return `<span class="wx-vc-bar"><i class="wx-vc-none"></i></span>`;
+      const w = Math.min(50, Math.abs(lead) / span * 50);
+      return `<span class="wx-vc-bar"><i class="${lead >= 0 ? "wx-vc-early" : "wx-vc-late"}" style="${lead >= 0 ? `right:50%;width:${w}%` : `left:50%;width:${w}%`}"></i><b></b></span>`;
+    };
+    $("wx-vc-body").innerHTML = cases.map((c) => {
+      const ref = c.reference, near = c.region_at_reference || {};
+      const rows = c.signals.map((s) => `<li class="wx-vc-row${s.lead_min === null ? " wx-vc-miss" : s.lead_min >= 0 ? "" : " wx-vc-lag"}">
+          <span class="wx-vc-sig">${esc(s.signal)}<small>${s.at ? esc(s.at.slice(5, 16).replace("T", " ")) : "울리지 않음"}</small></span>${bar(s.lead_min)}
+          <span class="wx-vc-lead">${s.lead_min === null ? "—" : `${s.lead_min >= 0 ? "+" : "−"}${Math.abs(s.lead_min)}<small>분${s.lead_is_lower_bound ? "↑" : ""}</small>`}</span></li>`).join("");
+      return `<article class="wx-card wx-vc-case">
+        <div class="wx-vc-top"><b>${esc(c.title)}</b><button type="button" class="wx-vc-go" data-at="${esc(ref.at)}:00" data-title="${esc(c.title)}">그날 ${esc(ref.at.slice(11, 16))} 보드로</button></div>
+        <p class="wx-vc-ref">기준 <b>${esc(ref.at.slice(11, 16))}</b> ${esc(ref.label)} · ${esc(ref.precision_ko)}</p>
+        <ul class="wx-vc-list">${rows}</ul>
+        <p class="wx-vc-foot">기준 시각에 ${esc(c.region)} 시설 ${near.total ?? 0}곳 중 주의 이상 <b>${near.advisory_or_above ?? 0}</b>곳 · 경계 이상 ${near.warning_or_above ?? 0}곳</p>
+      </article>`;
+    }).join("") + `<p class="wx-vc-legend"><i class="wx-vc-early"></i>기준보다 먼저 <i class="wx-vc-late"></i>늦게 · 막대 끝 ${span}분 · ↑ 재생 시작 전부터(선행 분은 최소값)</p>
+      <ul class="wx-vc-limits">${(validation.limitations ?? []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
+    $("wx-vc-body").querySelectorAll(".wx-vc-go").forEach((b) => b.addEventListener("click", () => {
+      const sel = $("wx-time");
+      if (![...sel.options].some((o) => o.value === b.dataset.at)) sel.add(new Option(`${b.dataset.at.slice(0, 16).replace("T", " ").replaceAll("-", ".")} · ${b.dataset.title}`, b.dataset.at));
+      sel.value = b.dataset.at; st.at = b.dataset.at; st.rainReplay = true; st.selected = null; openDrawer(false); notifyView(); scheduleLiveRefresh(); load();
+    }));
+  }
+
   // 이벤트
   $("wx-tab-st").addEventListener("click", () => showTab("st"));
   $("wx-tab-ag").addEventListener("click", () => showTab("ag"));
+  $("wx-tab-vc").addEventListener("click", () => showTab("vc"));
   $("wx-kpihandle").addEventListener("click", () => { const w = $("wx-kpiwrap"), on = !w.classList.contains("wx-pin"); w.classList.toggle("wx-pin", on); $("wx-kpihandle").setAttribute("aria-expanded", on); });
   $("wx-kpis").addEventListener("click", () => { $("wx-kpiwrap").classList.remove("wx-pin"); $("wx-kpihandle").setAttribute("aria-expanded", "false"); });
   $("wx-close").addEventListener("click", () => { openDrawer(false); st.selected = null; renderList(); paintMap(); notifyView(); });
@@ -1087,7 +1169,7 @@ body { display: flex; flex-direction: column; }
   $("wx-faconly").addEventListener("click", (e) => { st.driver = st.driver === "all" ? "river" : st.driver === "river" ? "pluvial" : "all"; e.currentTarget.textContent = st.driver === "all" ? "전체 유형" : st.driver === "river" ? "하천형만" : "내수형만"; e.currentTarget.setAttribute("aria-pressed", String(st.driver !== "all")); renderList(); paintMap(); });
   $("wx-sort").addEventListener("change", (e) => { st.sort = e.target.value; renderList(); });
   root.querySelectorAll("[data-rsort]").forEach((b) => b.addEventListener("click", () => { st.rsort = b.dataset.rsort; root.querySelectorAll("[data-rsort]").forEach((x) => x.classList.toggle("wx-on", x === b)); renderRegions(); }));
-  $("wx-time").addEventListener("change", (e) => { st.at = e.target.value; notifyView(); scheduleLiveRefresh(); load(); });
+  $("wx-time").addEventListener("change", (e) => { st.at = e.target.value; st.rainReplay = false; notifyView(); scheduleLiveRefresh(); load(); });
   $("wx-rbtn").addEventListener("click", () => { openRegions(!$("wx-rpop").classList.contains("wx-open")); });
   const onDocClick = (e) => { if ($("wx-rpop").classList.contains("wx-open") && !e.target.closest?.("#wx-rpop, #wx-rbtn")) openRegions(false); };
   document.addEventListener("click", onDocClick);
@@ -1146,6 +1228,7 @@ body { display: flex; flex-direction: column; }
     marker = new maplibregl.Marker({ element: el, anchor: "left", offset: [-8, 0] }).setLngLat([127.8, 36.3]).addTo(map);
     await load();
     loadExamples();
+    loadValidation().then(() => { if (st.selected) renderStation(st.selected); });
     scheduleLiveRefresh();
     if (st.selected) openDrawer(true);
     // Start at an explicitly linked station, otherwise frame the currently visible risk stations.
