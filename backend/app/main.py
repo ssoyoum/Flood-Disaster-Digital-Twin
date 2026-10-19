@@ -40,6 +40,8 @@ from . import agent_facility, agent_watch, national_watch
 from . import facility_registry
 from . import decision_log
 from .decision_log import DecisionRecordCreate
+from . import closure_log, season_scorecard
+from .closure_log import ClosureRecordCreate, ClosureRecordEnd
 from .water_level_bridge import readiness as water_level_readiness
 from .rise_model import forecast as rise_forecast
 from .layer_payload import slim_layers
@@ -604,6 +606,46 @@ def twin_record_decision(
     if not status.get("observation"):
         raise HTTPException(status_code=409, detail="No gauge observation is available; confirmation was not recorded")
     return decision_log.append_record(TWIN_FACILITIES[facility_id], status, request)
+
+
+@app.get("/api/twin/facilities/{facility_id}/closures", tags=["twin"])
+def twin_closure_records(facility_id: str, season: int | None = Query(default=None, ge=2000, le=2100)):
+    """What operators actually did: closures (with reopening times) and decisions not to close."""
+
+    _require_operational_facility(facility_id, f"Unknown facility: {facility_id}")
+    return {"facility_id": facility_id, "season": season, "records": closure_log.list_records(facility_id, season)}
+
+
+@app.post("/api/twin/facilities/{facility_id}/closures", tags=["twin"])
+def twin_record_closure(facility_id: str, request: ClosureRecordCreate):
+    """Append one closure record. Times are KST wall time; a replayed past time is allowed for season review."""
+
+    _require_operational_facility(facility_id, f"Unknown facility: {facility_id}")
+    return closure_log.append_record(TWIN_FACILITIES[facility_id], request)
+
+
+@app.patch("/api/twin/facilities/{facility_id}/closures/{record_id}", tags=["twin"])
+def twin_end_closure(facility_id: str, record_id: str, request: ClosureRecordEnd):
+    """Add the reopening time to a closure; stored as an amendment line, the original entry is kept."""
+
+    _require_operational_facility(facility_id, f"Unknown facility: {facility_id}")
+    try:
+        return closure_log.end_record(TWIN_FACILITIES[facility_id], record_id, request)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/api/twin/facilities/{facility_id}/season-scorecard", tags=["twin"])
+def twin_season_scorecard(facility_id: str, season: int = Query(ge=2000, le=2100)):
+    """The rule's recommendations in one season matched with the operator's closure records."""
+
+    _require_operational_facility(facility_id, f"Unknown facility: {facility_id}")
+    try:
+        return season_scorecard.compute(facility_id, season)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
 @app.get("/api/twin/facilities/{facility_id}/backtest", tags=["twin"])
