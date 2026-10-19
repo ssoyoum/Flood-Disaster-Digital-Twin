@@ -434,6 +434,17 @@ body { display: flex; flex-direction: column; }
 .wx-sugs button::after { content: "›"; color: var(--wx-dim); font-size: 16px; }
 .wx-sugs button:hover:not(:disabled) { border-color: var(--wx-line-2); background: rgba(255,255,255,.06); }
 .wx-sugs button:disabled { opacity: .45; }
+.wx-sug-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.wx-sugs .wx-sug-group { display: grid; justify-content: stretch; align-content: start; gap: 2px; padding: 10px 11px; text-align: left; min-height: 92px; }
+.wx-sugs .wx-sug-group::after { content: none; }
+.wx-sug-group b { font-size: 14px; color: var(--wx-text); }
+.wx-sug-group small { font-size: 11px; color: var(--wx-muted); }
+.wx-sug-group span { font-size: 12px; color: var(--wx-dim); line-height: 1.4; }
+.wx-sug-group em { margin-top: 4px; font-style: normal; font-size: 11.5px; font-weight: 700; color: var(--wx-ui); }
+.wx-sugs .wx-sug-back { justify-content: flex-start; width: max-content; padding: 4px 9px; font-size: 12px; color: var(--wx-muted); }
+.wx-sugs .wx-sug-back::after { content: none; }
+.wx-sug-head { margin: 2px 0 2px; font-size: 12.5px; color: var(--wx-muted); }
+.wx-sug-head b { color: var(--wx-text); }
 .wx-sugs button b { font-weight: 700; color: var(--wx-text); margin-right: 6px; }
 .wx-thread { display: flex; flex-direction: column; gap: 10px; }
 #wx-pane-ag .wx-thread { order: 5; } #wx-pane-ag .wx-ag-error { order: 6; } #wx-pane-ag .wx-ag-status { order: 7; }
@@ -840,11 +851,32 @@ body { display: flex; flex-direction: column; }
   /* ---------------- 에이전트 ---------------- */
   const turns = []; let agBusy = false;
   const withCites = (t) => esc(t).replace(/\[(\d+)\]/g, '<span class="wx-cite">[$1]</span>');
-  async function loadExamples() {
-    let items = []; try { items = await get(`/api/agent/examples?event_id=osong-2023&board=watch`); } catch { /* 입력만 */ }
-    $("wx-ag-chips").innerHTML = items.map((i) => `<button type="button" class="wx-chip" data-q="${esc(i.question)}"><span><b>${esc(i.label)}</b>${esc(i.question)}</span></button>`).join("");
-    $("wx-ag-chips").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => ask(b.dataset.q)));
+  // 추천 질문: 멘토(공공기관·데이터·AI·시빅테크)가 보고 싶어 할 관점별 묶음. 항목을 누르면 그 질문 목록을 연다.
+  const SUG_GROUPS = [
+    { key: "ops", title: "현장 판단", who: "공공기관·지자체 담당자", note: "지금 어디를 먼저 볼지, 보고는 어떻게",
+      qs: ["지금 가장 먼저 볼 시설 5곳 알려줘", "지금 홍수특보 내려진 곳 있어?", "하천변 출입구 중 먼저 볼 곳 5곳 알려줘", "충북 상황 보고 초안 써줘"] },
+    { key: "proof", title: "근거·검증", who: "데이터 전문가", note: "기준이 실제 통제보다 빨랐는지",
+      qs: ["대전 사례에서 규칙이 실제 통제보다 빨랐어?", "검증 사례 보여줘", "궁평2지하차도 규칙 성적표 보여줘", "오송 사건 사후 검토 보고서 작성해줘"] },
+    { key: "ai", title: "AI 신뢰성", who: "AI 기업 전문가", note: "수치는 서버, AI는 설명 · 못 하는 건 거절",
+      qs: ["미호강교 지금 몇 단계야?", "지난 1시간 동안 뭐가 바뀌었어?", "내일 대전에 홍수 날까?"] },
+    { key: "civic", title: "시민 관점", who: "시빅테크 커뮤니티", note: "내 동네·비 오는 곳",
+      qs: ["대전 시설 중 위험한 곳 5곳 알려줘", "지금 비 많이 오는 곳 어디야?", "내수형 중 비 많이 오는 곳 5곳 알려줘"] },
+  ];
+  let sugOpen = null;
+  function renderSugs() {
+    const box = $("wx-ag-chips");
+    if (!sugOpen) {
+      box.innerHTML = `<div class="wx-sug-groups">${SUG_GROUPS.map((g) => `<button type="button" class="wx-sug-group" data-g="${g.key}"><b>${esc(g.title)}</b><small>${esc(g.who)}</small><span>${esc(g.note)}</span><em>${g.qs.length}개 질문 ›</em></button>`).join("")}</div>`;
+      box.querySelectorAll(".wx-sug-group").forEach((b) => b.addEventListener("click", () => { sugOpen = b.dataset.g; renderSugs(); }));
+      return;
+    }
+    const g = SUG_GROUPS.find((x) => x.key === sugOpen);
+    box.innerHTML = `<button type="button" class="wx-sug-back">‹ 항목으로</button><p class="wx-sug-head"><b>${esc(g.title)}</b> · ${esc(g.who)}</p>`
+      + g.qs.map((q) => `<button type="button" class="wx-chip" data-q="${esc(q)}"><span>${esc(q)}</span></button>`).join("");
+    box.querySelector(".wx-sug-back").addEventListener("click", () => { sugOpen = null; renderSugs(); });
+    box.querySelectorAll(".wx-chip").forEach((b) => b.addEventListener("click", () => ask(b.dataset.q)));
   }
+  async function loadExamples() { renderSugs(); }
   function applyView(v) {
     if (!v) return;
     if (v.min_stage !== undefined) st.minStage = v.min_stage ?? null;
