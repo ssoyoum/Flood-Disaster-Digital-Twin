@@ -135,3 +135,5 @@
   .tw-registry-item-head > small { white-space: nowrap; }
   .tw-registry-details { grid-template-columns: 1fr; }
 }
+
+.tw-season { margin-left: 6px; padding: 1px 7px; border: 1px solid #3f3f46; border-radius: 999px; color: #a1a1aa; font-size: 11px; font-weight: 700; vertical-align: middle; }

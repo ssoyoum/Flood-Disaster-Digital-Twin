@@ -175,3 +175,25 @@ export type ValidationSignal = { signal: string; at: string | null; lead_min: nu
 export type ValidationCase = { id: string; title: string; region: string; reference: { at: string; label: string; precision: string; precision_ko: string; kind: string }; signals: ValidationSignal[]; region_at_reference?: { total: number; advisory_or_above: number; warning_or_above: number } };
 export const getValidationCases = () => request<{ cases: ValidationCase[]; limitations: string[] }>("/api/watch/validation-cases");
 export const getFloodForecastSummary = () => request<{ mode: string; counts: { warning: number; advisory: number }; error: string | null }>("/api/watch/flood-forecasts");
+export type FacilityScorecard = {
+  facility_id: string; facility: string;
+  rule: { id: string; stage_floor: "advisory" | "warning"; lead_threshold_min: number } | null;
+  reference_event: Record<string, string> | null;
+  first_review: { time: string; water_level_m: number } | null;
+  lead_minutes: Record<string, number | null> | null;
+  scorecard: { hit: number; miss: number; false_alarm_candidates: number; review_without_planned_flood: number; close_call_years: number[]; years_covered: number[] };
+  other_episodes: Array<{ start: string; end: string; review_minutes: number; peak_water_level_m: number; peak_stage: string }>;
+  method: string; limitations: string[];
+};
+export const getFacilityScorecard = (facilityId: string) => request<FacilityScorecard>(`/api/twin/facilities/${encodeURIComponent(facilityId)}/scorecard`);
+type LeadStats = { n: number; median_min: number | null; p25_min: number | null; p75_min: number | null };
+export type FloodForecastHistory = {
+  issuances: { years: string; months: string; issuances: number; stations: number; by_year: Record<string, number>; by_kind: Record<string, number> };
+  official_vs_observed: {
+    issuances_compared: number;
+    "경보": { issuances: number; target_crossed: number; issued_before_crossing: number; issue_lead_over_crossing: LeadStats; rule_fired: number; rule_before_issue: number; rule_minus_issue: LeadStats };
+    "주의보": { issuances: number; target_crossed: number; issued_before_crossing: number; issue_lead_over_crossing: LeadStats };
+  };
+  limitations: string[];
+};
+export const getFloodForecastHistory = () => request<FloodForecastHistory>("/api/watch/flood-forecast-history");

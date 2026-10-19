@@ -1137,7 +1137,7 @@ function TwinBoardLink({ eventId }: { eventId: string }) {
     return () => { live = false; };
   }, [eventId]);
   if (!name) return null;
-  return <a className="dk-tab-link" href="#twin" title={`${name} 통제 판단 보드로 이동`}>통제 판단 보드 ↗</a>;
+  return <a className="dk-tab-link" href="#twin?tab=now" title={`${name} 통제 판단 보드로 이동`}>통제 판단 보드 ↗</a>;
 }
 
 // initialFacility opens the dock in facility mode (the twin board); facilityAt follows the board's replay time.

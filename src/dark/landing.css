@@ -245,3 +245,56 @@
   .fo-more { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .fo-topnav { flex-wrap: wrap; }
 }
+
+/* 홈: 장마 전·중·후 순환과 네 화면 입구 */
+.fo-kpi { border-left-color: var(--fo-c, #52525b); }
+.fo-topnav nav a small { margin-left: 5px; color: #71717a; font-size: 11px; font-weight: 600; }
+.fo-intro .fo-lead { white-space: normal; max-width: 60ch; }
+.fo-intro .fo-hero { grid-template-columns: minmax(0, 1.25fr) minmax(360px, 1fr); }
+.fo-cycle { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.fo-cycle svg { display: block; width: 100%; max-width: 520px; height: auto; margin: 0 auto; }
+.fo-cycle-edge { fill: none; stroke: #52525b; stroke-width: 1.6; }
+.fo-cycle-edge.back { stroke-dasharray: 4 5; }
+.fo-cycle-back { fill: #71717a; font-size: 12px; font-weight: 600; }
+.fo-cycle-node rect { fill: #18181b; stroke: #3f3f46; stroke-width: 1.2; transition: stroke .15s; }
+.fo-cycle a:hover .fo-cycle-node rect { stroke: #e4e4e7; }
+.fo-cycle-season { fill: #a1a1aa; font-size: 12px; font-weight: 700; }
+.fo-cycle-title { fill: #f4f4f5; font-size: 19px; font-weight: 800; }
+.fo-cycle-sub { fill: #71717a; font-size: 12px; }
+.fo-cycle figcaption { text-align: center; color: #71717a; font-size: 12px; }
+.fo-cycle figcaption a { color: #d4d4d8; }
+
+.fo-doors { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.fo-door { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 14px 16px; border: 1px solid rgba(255, 255, 255, .12); border-radius: 14px; background: rgba(24, 24, 27, .94); }
+.fo-door-head { display: flex; flex-direction: column; gap: 4px; color: inherit; text-decoration: none; }
+.fo-door-season { align-self: flex-start; padding: 1px 8px; border: 1px solid #3f3f46; border-radius: 999px; color: #a1a1aa; font-size: 11px; font-weight: 700; }
+.fo-door-title { display: flex; align-items: center; gap: 7px; }
+.fo-door-title strong { font-size: 17px; }
+.fo-door-title svg:last-child { margin-left: auto; color: #71717a; transition: transform .15s, color .15s; }
+.fo-door-head:hover .fo-door-title svg:last-child { color: #f4f4f5; transform: translateX(3px); }
+.fo-door-head em { color: #d4d4d8; font-size: 13px; font-style: normal; }
+.fo-door:has(.fo-door-head:hover) { border-color: #e4e4e7; }
+.fo-door-points { margin: 0; padding-left: 16px; color: var(--fo-muted); font-size: 12.5px; line-height: 1.6; }
+.fo-door-live { display: flex; align-items: center; gap: 7px; margin: auto 0 0; padding: 7px 10px; border-radius: 8px; background: rgba(255, 255, 255, .03); color: #e4e4e7; font-size: 12.5px; font-weight: 700; }
+.fo-door-live i { width: 7px; height: 7px; border-radius: 50%; background: #34d399; }
+.fo-door-live i.hot { background: #fb923c; }
+.fo-door .fo-val-list { margin-top: auto; }
+.fo-door-figures { display: grid; grid-template-columns: auto auto 1fr; gap: 8px; margin-top: auto; }
+.fo-door-figures span { display: flex; flex-direction: column; padding: 7px 10px; border-radius: 8px; background: rgba(255, 255, 255, .03); color: #71717a; font-size: 11.5px; }
+.fo-door-figures b { color: #f4f4f5; font-size: 18px; font-variant-numeric: tabular-nums; }
+.fo-door-links { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.fo-door-links a { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: 8px; padding: 6px 9px; border-radius: 8px; background: rgba(255, 255, 255, .03); color: inherit; text-decoration: none; }
+.fo-door-links a:hover { background: rgba(255, 255, 255, .07); }
+.fo-door-links strong { font-size: 12.5px; }
+.fo-door-links span { grid-row: 2; color: #71717a; font-size: 11.5px; }
+.fo-door-links svg { grid-row: 1 / 3; grid-column: 2; align-self: center; color: #71717a; }
+
+@media (max-width: 1200px) {
+  .fo-doors { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fo-intro .fo-hero { grid-template-columns: 1fr; }
+  .fo-topnav nav { display: none; }
+}
+@media (max-width: 640px) {
+  .fo-doors { grid-template-columns: 1fr; }
+  .fo-intro { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+}

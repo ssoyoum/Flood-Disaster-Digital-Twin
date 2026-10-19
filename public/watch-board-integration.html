@@ -48,13 +48,15 @@ html, body { margin: 0; height: 100%; background: #05080f; color: #e8eef7; font-
 body { display: flex; flex-direction: column; }
 .demo-top { position: relative; height: 56px; flex: 0 0 56px; display: flex; align-items: center; gap: 18px; padding: 0 18px; box-sizing: border-box; background: #05080f; border-bottom: 1px solid rgba(148,163,184,.16); }
 .demo-brand b { font-size: 16px; } .demo-brand small { display: block; color: #95a4ba; font-size: 12px; }
-.demo-menu { position: relative; z-index: 100; flex: none; color: #e8eef7; }
-.demo-menu > summary { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid #34445e; border-radius: 8px; background: #111a2b; color: #c7d3e2; cursor: pointer; list-style: none; font-size: 12px; font-weight: 750; white-space: nowrap; }
+.demo-menu { position: relative; z-index: 100; flex: none; color: #f4f4f5; }
+.demo-menu > summary { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid #3f3f46; border-radius: 8px; background: #18181b; color: #d4d4d8; cursor: pointer; list-style: none; font-size: 12px; font-weight: 750; white-space: nowrap; }
 .demo-menu > summary::-webkit-details-marker { display: none; }
-.demo-menu > summary:hover, .demo-menu[open] > summary { border-color: #38bdf8; color: #e8eef7; }
-.demo-menu nav { position: absolute; top: calc(100% + 7px); left: 0; display: grid; width: 208px; padding: 6px; border: 1px solid #34445e; border-radius: 10px; background: #111a2b; box-shadow: 0 16px 36px #0009; }
-.demo-menu nav a { padding: 9px 10px; border-radius: 6px; color: #b7c5d8; text-decoration: none; font-size: 12px; font-weight: 700; }
-.demo-menu nav a:hover, .demo-menu nav a[aria-current="page"] { background: #1a2940; color: #7dd3fc; }
+.demo-menu > summary:hover, .demo-menu[open] > summary { border-color: #e4e4e7; color: #f4f4f5; }
+.demo-menu nav { position: absolute; top: calc(100% + 7px); left: 0; display: grid; width: 220px; padding: 6px; border: 1px solid #3f3f46; border-radius: 10px; background: #18181b; box-shadow: 0 16px 36px #0009; }
+.demo-menu nav a { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 9px 10px; border-radius: 6px; color: #c2c2c6; text-decoration: none; font-size: 12px; font-weight: 700; }
+.demo-menu nav a small { color: #71717a; font-size: 11px; }
+.demo-menu nav a.demo-menu-sub { padding: 6px 10px 6px 20px; color: #a1a1aa; font-weight: 600; }
+.demo-menu nav a:hover, .demo-menu nav a[aria-current="page"] { background: #27272a; color: #f4f4f5; }
 .demo-top .sp { flex: 1; }
 .demo-mode { padding: 6px 12px; border: 1px solid #34d399; color: #34d399; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; }
 .demo-mode[data-mode="replay"] { border-color: #fbbf24; color: #fbbf24; }
@@ -465,13 +467,13 @@ body { display: flex; flex-direction: column; }
   <details class="demo-menu">
     <summary>화면 이동 <span aria-hidden="true">⌄</span></summary>
     <nav aria-label="FloodOps 화면">
-      <a href="/#" target="_top">홈 · FloodOps 소개</a>
-      <a href="/#watch" target="_top" aria-current="page">전국 관제 보드</a>
-      <a href="/#watch?tab=vc" target="_top">과거 홍수 검증</a>
-      <a href="/#event/osong-2023" target="_top">오송 HAND 시뮬레이션</a>
-      <a href="/#twin" target="_top">운영 시설 통제 판단</a>
-      <a href="/#cases" target="_top">사례 라이브러리</a>
-      <a href="/#compare" target="_top">사례 간 비교</a>
+      <a href="/#" target="_top">홈</a>
+      <a href="/#watch" target="_top" aria-current="page">관제 보드 <small>장마 중</small></a>
+      <a href="/#scorecard" target="_top">기준 채점 <small>장마 후</small></a>
+      <a href="/#twin" target="_top">시설 기준 <small>장마 전</small></a>
+      <a href="/#cases" target="_top">사례 재구성 <small>근거</small></a>
+      <a class="demo-menu-sub" href="/#event/osong-2023" target="_top">오송 HAND 시뮬레이션</a>
+      <a class="demo-menu-sub" href="/#compare" target="_top">사례 간 비교</a>
     </nav>
   </details>
   <div class="sp"></div>
@@ -481,7 +483,7 @@ body { display: flex; flex-direction: column; }
 
 <main class="demo-stage">
 <!-- ===== 컴포넌트 시작 ===== -->
-<div class="wx" id="wx-root" data-api="" data-twin-href="#twin">
+<div class="wx" id="wx-root" data-api="" data-twin-href="/#twin?tab=now">
 
   <!-- 지도: 늘 화면 전체 -->
   <section class="wx-mapcol" aria-label="지도">
@@ -608,8 +610,8 @@ body { display: flex; flex-direction: column; }
   const WATCH = ["planned_flood", "warning", "advisory", "attention"];
   const REGION_CENTER = { 서울: [126.98, 37.56], 부산: [129.05, 35.18], 대구: [128.6, 35.87], 인천: [126.7, 37.46], 광주: [126.85, 35.16], 대전: [127.38, 36.35], 울산: [129.31, 35.54], 세종: [127.29, 36.48], 경기: [127.2, 37.45], 강원: [128.3, 37.6], 충북: [127.7, 36.75], 충남: [126.9, 36.5], 전북: [127.1, 35.75], 전남: [126.9, 34.85], 경북: [128.75, 36.4], 경남: [128.3, 35.35], 제주: [126.55, 33.4] };
 
-  const TWIN_HREF = root.dataset.twinHref || "#twin";
-  const st = { at: params.get("at") ?? root.dataset.at ?? "", overview: null, changes: null, region: params.get("region") ?? "", minStage: params.get("stage") || null, q: "", sort: "risk", facOnly: false, driver: params.get("driver") || "all", showCalm: true, selected: params.get("facility") || params.get("station") || null, rsort: "risk", rainLayer: false };
+  const TWIN_HREF = root.dataset.twinHref || "/#twin?tab=now";
+  const st = { at: params.get("at") ?? root.dataset.at ?? "", overview: null, changes: null, region: params.get("region") ?? "", minStage: params.get("stage") || null, q: "", sort: "risk", facOnly: false, driver: params.get("driver") || "all", showCalm: true, selected: params.get("facility") || params.get("station") || null, rsort: "risk", rainLayer: false, rainReplay: params.get("rain") === "replay" };
   let map = null, marker = null, hoverPop = null, stSeq = 0, prevStage = null, liveRefresh = null;
   const rank = (r) => ORDER.indexOf(r.stage ?? "unrated");
   const clock = (iso) => (iso ? `${iso.slice(5, 7)}.${iso.slice(8, 10)} ${iso.slice(11, 16)}` : "—");
@@ -1240,6 +1242,8 @@ body { display: flex; flex-direction: column; }
   info.addEventListener("mouseleave", () => info.classList.remove("wx-closed"));
 
   async function init() {
+    // 기준 채점 화면에서 넘어온 시각은 목록에 없을 수 있다.
+    if (st.at && ![...$("wx-time").options].some((o) => o.value === st.at)) $("wx-time").add(new Option(`${st.at.slice(0, 16).replace("T", " ").replaceAll("-", ".")} · 그날 재생`, st.at));
     $("wx-time").value = st.at;
     const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas";
     map = new maplibregl.Map({ container: $("wx-map"), attributionControl: false, center: [127.8, 36.3], zoom: 6.3, maxZoom: 15,

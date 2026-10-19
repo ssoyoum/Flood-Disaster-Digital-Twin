@@ -11,11 +11,12 @@ import "./navigation.css";
 import "./twin.css";
 
 type BoardTab = "now" | "criteria" | "backtest" | "registry";
+// 장마 전 업무 순서: 어떤 시설을 운영할지 → 기준 → 과거 사건으로 확인 → 장마 중 지금 상태.
 const TABS: Array<{ id: BoardTab; label: string }> = [
-  { id: "now", label: "지금 상태" },
+  { id: "registry", label: "시설 등록" },
   { id: "criteria", label: "통제 기준 검토" },
   { id: "backtest", label: "백테스트" },
-  { id: "registry", label: "시설 등록" },
+  { id: "now", label: "지금 상태" },
 ];
 
 const GATE_IDS: TwinGateId[] = ["inflow_path", "representative_gauge", "site_instrumentation", "validation_event"];
@@ -52,7 +53,7 @@ function readAt(): string | null {
 
 function readTab(): BoardTab {
   const match = window.location.hash.match(/[?&]tab=([^&]+)/);
-  return TABS.find((item) => item.id === match?.[1])?.id ?? "now";
+  return TABS.find((item) => item.id === match?.[1])?.id ?? "registry";
 }
 
 export default function TwinBoard({ onBack }: { onBack: () => void }) {
@@ -108,8 +109,8 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
         <div className="dk-brand">
           <a className="dk-brand-mark" href="#" title="FloodOps 홈으로" aria-label="FloodOps 홈으로"><FloodOpsLogo size={30} /></a>
           <div>
-            <h1>지하차도 통제 판단 트윈</h1>
-            <p>FloodOps · 관측 수위로 지금 단계와 남은 시간을 보여주고, 과거 사건으로 규칙을 검증합니다</p>
+            <h1>시설 기준 <small className="tw-season">장마 전</small></h1>
+            <p>FloodOps · 이 시설은 어떤 신호로, 몇 분 전에 막나 — 운영 등록, 통제 기준 검토, 백테스트, 담당자 확인 기록</p>
           </div>
         </div>
         <nav className="dk-view-tabs" aria-label="FloodOps 화면">

@@ -3,9 +3,13 @@
 .fo-global-menu > summary::-webkit-details-marker { display: none; }
 .fo-global-menu > summary:hover, .fo-global-menu[open] > summary { border-color: #e4e4e7; color: #f4f4f5; }
 .fo-global-menu[open] .fo-global-menu-chevron { transform: rotate(180deg); }
-.fo-global-menu-panel { position: absolute; top: calc(100% + 7px); right: 0; display: grid; width: 208px; padding: 6px; border: 1px solid #3f3f46; border-radius: 10px; background: #18181b; box-shadow: 0 16px 36px #0009; }
+.fo-global-menu-panel { position: absolute; top: calc(100% + 7px); right: 0; display: grid; width: 220px; padding: 6px; border: 1px solid #3f3f46; border-radius: 10px; background: #18181b; box-shadow: 0 16px 36px #0009; }
 .fo-global-menu-panel a { padding: 9px 10px; border-radius: 6px; color: #c2c2c6; text-decoration: none; font-size: 12px; font-weight: 700; }
 .fo-global-menu-panel a:hover, .fo-global-menu-panel a[aria-current="page"] { background: #27272a; color: #f4f4f5; }
+.fo-global-menu-panel a { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.fo-global-menu-panel a small { color: #71717a; font-size: 11px; font-weight: 700; }
+.fo-global-menu-group + .fo-global-menu-group { border-top: 1px solid #27272a; margin-top: 2px; padding-top: 2px; }
+.fo-global-menu-panel a.fo-global-menu-sub { padding: 6px 10px 6px 20px; color: #a1a1aa; font-weight: 600; }
 .fo-app-header { width: 100%; box-sizing: border-box; }
 .fo-app-header > .fo-global-menu { margin-left: auto; }
 .dk-topbar > .fo-global-menu { margin-left: auto; }
