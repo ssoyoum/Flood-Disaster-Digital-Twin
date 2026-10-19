@@ -1,13 +1,16 @@
 import { ChevronDown, PanelsTopLeft } from "lucide-react";
+import "./navigation.css";
 
-export type FloodOpsRoute = "watch" | "twin" | "cases" | "compare" | "intro";
+export type FloodOpsRoute = "watch" | "validation" | "osong" | "twin" | "cases" | "compare" | "intro";
 
 const ROUTES: Array<{ id: FloodOpsRoute; label: string; href: string }> = [
-  { id: "watch", label: "전국 감시 보드", href: "#watch" },
+  { id: "intro", label: "홈 · FloodOps 소개", href: "#" },
+  { id: "watch", label: "전국 관제 보드", href: "#watch" },
+  { id: "validation", label: "과거 홍수 검증", href: "#watch?tab=vc" },
+  { id: "osong", label: "오송 HAND 시뮬레이션", href: "#event/osong-2023" },
   { id: "twin", label: "운영 시설 통제 판단", href: "#twin" },
-  { id: "cases", label: "사례 검증", href: "#cases" },
+  { id: "cases", label: "사례 라이브러리", href: "#cases" },
   { id: "compare", label: "사례 간 비교", href: "#compare" },
-  { id: "intro", label: "FloodOps 소개", href: "#intro" },
 ];
 
 export function AppNavigation({ active }: { active: FloodOpsRoute }) {

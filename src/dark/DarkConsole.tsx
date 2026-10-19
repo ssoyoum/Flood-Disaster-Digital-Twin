@@ -21,6 +21,7 @@ import "./dark.css";
 
 import { ROLE_KO, stageKo, statusKo, textKo } from "./ko";
 import { FloodOpsLogo } from "./Landing";
+import { AppNavigation } from "./Navigation";
 
 /*
  * 어두운 관제 화면.
@@ -242,7 +243,7 @@ export default function DarkConsole({
           "esri-dark-ref": { type: "raster", tiles: [`${ESRI}/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}`], tileSize: 256, maxzoom: 16 },
         },
         layers: [
-          { id: "background", type: "background", paint: { "background-color": "#0b1220" } },
+          { id: "background", type: "background", paint: { "background-color": "#09090b" } },
           { id: "esri-dark", type: "raster", source: "esri-dark", paint: { "raster-opacity": 0.92 } },
           { id: "esri-dark-ref", type: "raster", source: "esri-dark-ref", paint: { "raster-opacity": 0.75 } },
         ],
@@ -259,8 +260,8 @@ export default function DarkConsole({
       add("aoi"); add("waterways"); add("roads"); add("buildings"); add("hand_reconstruction"); add("underpass");
 
       map.addLayer({ id: "aoi-line", type: "line", source: "aoi", paint: { "line-color": "#22d3ee", "line-width": 1.2, "line-dasharray": [3, 3], "line-opacity": 0.55 } });
-      map.addLayer({ id: "buildings-fill", type: "fill", source: "buildings", paint: { "fill-color": "#3b4a63", "fill-opacity": ["case", ["boolean", ["feature-state", "hover"], false], 0.95, 0.55] } });
-      map.addLayer({ id: "roads-line", type: "line", source: "roads", paint: { "line-color": "#64748b", "line-width": 0.9, "line-opacity": 0.45 } });
+      map.addLayer({ id: "buildings-fill", type: "fill", source: "buildings", paint: { "fill-color": "#52525b", "fill-opacity": ["case", ["boolean", ["feature-state", "hover"], false], 0.95, 0.55] } });
+      map.addLayer({ id: "roads-line", type: "line", source: "roads", paint: { "line-color": "#71717a", "line-width": 0.9, "line-opacity": 0.45 } });
       map.addLayer({ id: "waterways-fill", type: "fill", source: "waterways", paint: { "fill-color": "#1d6fa5", "fill-opacity": 0.45 } });
       map.addLayer({ id: "waterways-line", type: "line", source: "waterways", paint: { "line-color": "#7dd3fc", "line-width": 1.2, "line-opacity": 0.9 } });
       // HAND 재구성 envelope: 현재 단계 셀만. 기준 시나리오는 붉게, 개입 시나리오는 청록으로.
@@ -439,6 +440,7 @@ export default function DarkConsole({
           <AgentDock eventId={eventData.id} compact />
         </div>
         <div className="dk-topbar-right">
+          <AppNavigation active={eventData.id === "osong-2023" ? "osong" : "cases"} />
           <span className="dk-clock">{now.toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })} {now.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} KST</span>
         </div>
       </header>
@@ -509,7 +511,7 @@ export default function DarkConsole({
             <span><i style={{ background: scenario === "intervention" ? "#2dd4bf" : "#f87171" }} />침수 추정 범위 (HAND 근사)</span>
             <span><i style={{ background: "#38bdf8" }} />하천</span>
             <span><i style={{ background: "#ff6b6b" }} />{eventData.focus_feature}</span>
-            <span><i style={{ background: "#3b4a63" }} />건축물</span>
+            <span><i style={{ background: "#52525b" }} />건축물</span>
           </div>
           <div className="dk-hint">← → 단계 이동 · 스페이스 재생 · 지하차도 마커나 침수 셀을 누르면 카드가 열립니다</div>
         </section>
@@ -572,7 +574,7 @@ export function ScenarioMap({
   const isHandScenario = mode === "intervention" && scenarioKind === "hand";
   const color = mode === "intervention" && !isHandScenario ? "#2dd4bf" : "#f87171";
   const closureActive = mode === "intervention" && !isHandScenario && Boolean(closureClock) && Boolean(current) && clock(current.time) >= (closureClock ?? "");
-  const underpassColor = mode === "intervention" && !isHandScenario ? (closureActive ? "#2dd4bf" : "#f87171") : "#94a3b8";
+  const underpassColor = mode === "intervention" && !isHandScenario ? (closureActive ? "#2dd4bf" : "#f87171") : "#a1a1aa";
   const markerColor = mode === "intervention" ? "#2dd4bf" : color;
 
   useEffect(() => {
@@ -587,7 +589,7 @@ export function ScenarioMap({
           "esri-dark-ref": { type: "raster", tiles: [`${ESRI}/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}`], tileSize: 256, maxzoom: 16 },
         },
         layers: [
-          { id: "background", type: "background", paint: { "background-color": "#0b1220" } },
+          { id: "background", type: "background", paint: { "background-color": "#09090b" } },
           { id: "esri-dark", type: "raster", source: "esri-dark", paint: { "raster-opacity": 0.92 } },
           { id: "esri-dark-ref", type: "raster", source: "esri-dark-ref", paint: { "raster-opacity": 0.75 } },
         ],
@@ -611,8 +613,8 @@ export function ScenarioMap({
       const add = (key: LayerKey) => map.addSource(key, { type: "geojson", data: layers[key].data as never });
       add("aoi"); add("waterways"); add("roads"); add("buildings"); add("hand_reconstruction"); add("underpass");
       map.addLayer({ id: "aoi-line", type: "line", source: "aoi", paint: { "line-color": "#22d3ee", "line-width": 1, "line-dasharray": [3, 3], "line-opacity": 0.5 } });
-      map.addLayer({ id: "buildings-fill", type: "fill", source: "buildings", paint: { "fill-color": "#3b4a63", "fill-opacity": 0.52 } });
-      map.addLayer({ id: "roads-line", type: "line", source: "roads", paint: { "line-color": "#64748b", "line-width": 0.8, "line-opacity": 0.42 } });
+      map.addLayer({ id: "buildings-fill", type: "fill", source: "buildings", paint: { "fill-color": "#52525b", "fill-opacity": 0.52 } });
+      map.addLayer({ id: "roads-line", type: "line", source: "roads", paint: { "line-color": "#71717a", "line-width": 0.8, "line-opacity": 0.42 } });
       map.addLayer({ id: "waterways-line", type: "line", source: "waterways", paint: { "line-color": "#7dd3fc", "line-width": 1.1, "line-opacity": 0.82 } });
       map.addLayer({ id: "hand-outline", type: "line", source: "hand_reconstruction", filter: ["all", ["==", ["geometry-type"], "Polygon"], ["==", ["get", "stage_index"], time]], paint: { "line-color": color, "line-width": 1, "line-opacity": 0.9 } });
       map.addLayer({ id: "hand-fill", type: "fill", source: "hand_reconstruction", filter: ["all", ["==", ["geometry-type"], "Polygon"], ["==", ["get", "stage_index"], time]], paint: { "fill-color": color, "fill-opacity": 0.28 } });

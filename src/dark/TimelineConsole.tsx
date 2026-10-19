@@ -4,6 +4,7 @@ import * as api from "../api";
 import type { FloodEvent, LayersResponse, ResponseTimingResult, TimelineReconstructionResponse } from "../types";
 import { AgentDock } from "./DarkConsole";
 import { FloodOpsLogo } from "./Landing";
+import { AppNavigation } from "./Navigation";
 import { CONFIDENCE_KO, ROLE_KO, localizeEvent, stageKo } from "./ko";
 import "./dark.css";
 import "./urban.css";
@@ -170,6 +171,7 @@ function TimelineConsoleView({ eventData, layers, reconstruction }: { eventData:
           <span className="dk-chip dk-chip-stage"><i />{current ? `${dayClock(current.time)} ${current.label}` : "—"}</span>
           <span className="dk-chip">근거 <small>언론 보도 시각</small></span>
         </div>
+        <AppNavigation active="cases" />
       </header>
 
       {view === "console" ? (
@@ -272,7 +274,7 @@ function TimelineMap({ layers, center, tone, time, children }: { layers: LayersR
           "esri-dark-ref": { type: "raster", tiles: [`${ESRI}/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}`], tileSize: 256, maxzoom: 16 },
         },
         layers: [
-          { id: "background", type: "background", paint: { "background-color": "#0b1220" } },
+          { id: "background", type: "background", paint: { "background-color": "#09090b" } },
           { id: "esri-dark", type: "raster", source: "esri-dark", paint: { "raster-opacity": 0.92 } },
           { id: "esri-dark-ref", type: "raster", source: "esri-dark-ref", paint: { "raster-opacity": 0.7 } },
         ],
@@ -287,7 +289,7 @@ function TimelineMap({ layers, center, tone, time, children }: { layers: LayersR
       const add = (key: keyof LayersResponse) => map.addSource(key, { type: "geojson", data: layers[key].data as never });
       add("aoi"); add("roads"); add("waterways"); add("buildings"); add("facilities"); add("hand_reconstruction");
       map.addLayer({ id: "aoi-line", type: "line", source: "aoi", paint: { "line-color": "#22d3ee", "line-width": 1.2, "line-dasharray": [3, 3], "line-opacity": 0.55 } });
-      map.addLayer({ id: "roads-line", type: "line", source: "roads", paint: { "line-color": "#64748b", "line-width": 0.9, "line-opacity": 0.5 } });
+      map.addLayer({ id: "roads-line", type: "line", source: "roads", paint: { "line-color": "#71717a", "line-width": 0.9, "line-opacity": 0.5 } });
       // 오송과 같은 붉은 HAND 셀. 단계가 바뀌면 필터만 바꾼다.
       map.addLayer({
         id: "hand-fill", type: "fill", source: "hand_reconstruction", filter: stageFilter(0),
@@ -295,9 +297,9 @@ function TimelineMap({ layers, center, tone, time, children }: { layers: LayersR
       });
       map.addLayer({ id: "hand-outline", type: "line", source: "hand_reconstruction", filter: stageFilter(0), paint: { "line-color": "#f87171", "line-width": 0.8, "line-opacity": 0.8 } });
       map.addLayer({ id: "waterways-line", type: "line", source: "waterways", paint: { "line-color": "#7dd3fc", "line-width": 2.6, "line-opacity": 0.9 } });
-      map.addLayer({ id: "buildings-fill", type: "fill", source: "buildings", paint: { "fill-color": "#3b4a63", "fill-opacity": 0.6 } });
+      map.addLayer({ id: "buildings-fill", type: "fill", source: "buildings", paint: { "fill-color": "#52525b", "fill-opacity": 0.6 } });
       map.addLayer({ id: "sites-halo", type: "circle", source: "facilities", paint: { "circle-radius": 14, "circle-color": "#fbbf24", "circle-opacity": 0.18 } });
-      map.addLayer({ id: "sites-dot", type: "circle", source: "facilities", paint: { "circle-radius": 5, "circle-color": "#fbbf24", "circle-stroke-color": "#0b1220", "circle-stroke-width": 2 } });
+      map.addLayer({ id: "sites-dot", type: "circle", source: "facilities", paint: { "circle-radius": 5, "circle-color": "#fbbf24", "circle-stroke-color": "#09090b", "circle-stroke-width": 2 } });
       // 글리프를 쓰지 않으므로 지명은 HTML 마커로 올린다.
       for (const site of layers.facilities.data.features) {
         const label = document.createElement("div");

@@ -131,13 +131,13 @@ export default function CrossSection({
         {/* 눈금 */}
         {Array.from({ length: Math.floor(top) + 1 }, (_, m) => (
           <g key={m}>
-            <line x1="34" x2={W - 8} y1={y(m)} y2={y(m)} stroke="#22304a" strokeWidth=".6" />
-            <text x="30" y={y(m) + 3} textAnchor="end" fontSize="8" fill="#8ea0b8">{m} m</text>
+            <line x1="34" x2={W - 8} y1={y(m)} y2={y(m)} stroke="#2e2e33" strokeWidth=".6" />
+            <text x="30" y={y(m) + 3} textAnchor="end" fontSize="8" fill="#a1a1aa">{m} m</text>
           </g>
         ))}
         {/* 셀(땅): HAND 높이까지 */}
-        <rect x={groundX} y={y(handM)} width={W - 8 - groundX} height={BASE - y(handM)} fill="#3b4a63" style={{ transition: "y .8s ease, height .8s ease" }} />
-        <text x={groundX + 8} y={y(handM) - 5} fontSize="9" fill="#e5ecf5" fontWeight="700">셀 표면 · HAND {handM.toFixed(2)} m</text>
+        <rect x={groundX} y={y(handM)} width={W - 8 - groundX} height={BASE - y(handM)} fill="#52525b" style={{ transition: "y .8s ease, height .8s ease" }} />
+        <text x={groundX + 8} y={y(handM) - 5} fontSize="9" fill="#f4f4f5" fontWeight="700">셀 표면 · HAND {handM.toFixed(2)} m</text>
         {/* 물: 배수 기준면에서 관측 상승분까지 */}
         <rect className="dk-xs-water" x="34" y={y(rise)} width={W - 42} height={BASE - y(rise)} fill="url(#dk-water)" style={{ transition: "y .8s ease, height .8s ease" }} />
         <path
@@ -154,8 +154,8 @@ export default function CrossSection({
         )}
         {/* 배수 기준면 */}
         <line x1="34" x2={W - 8} y1={BASE} y2={BASE} stroke="#7dd3fc" strokeWidth="1" />
-        <text x="36" y={BASE + 11} fontSize="8" fill="#8ea0b8">배수 기준면(하천) 0 m{cell?.local_drainage_elevation_m != null ? ` · 표고 ${cell.local_drainage_elevation_m.toFixed(1)} m` : ""}</text>
-        <text x={W - 10} y={BASE + 11} textAnchor="end" fontSize="8" fill="#8ea0b8">{cell ? `셀 ${cell.grid_id}${cell.mean_elevation_m != null ? ` · 평균 표고 ${cell.mean_elevation_m.toFixed(1)} m` : ""}` : "셀 정보 없음"}</text>
+        <text x="36" y={BASE + 11} fontSize="8" fill="#a1a1aa">배수 기준면(하천) 0 m{cell?.local_drainage_elevation_m != null ? ` · 표고 ${cell.local_drainage_elevation_m.toFixed(1)} m` : ""}</text>
+        <text x={W - 10} y={BASE + 11} textAnchor="end" fontSize="8" fill="#a1a1aa">{cell ? `셀 ${cell.grid_id}${cell.mean_elevation_m != null ? ` · 평균 표고 ${cell.mean_elevation_m.toFixed(1)} m` : ""}` : "셀 정보 없음"}</text>
       </svg>
       <div className="dk-xs-legend" aria-label="단면도 값 구분">
         <span><i className="measured" /> 파란 영역 · 관측 수위 기준 대비 상승분</span>

@@ -14,6 +14,8 @@ function buildFrameUrl() {
   const params = new URLSearchParams();
   params.set("api", import.meta.env.VITE_API_BASE === "same-origin" ? "" : import.meta.env.VITE_API_BASE ?? (import.meta.env.PROD ? "" : "http://localhost:8033"));
   Object.entries(readWatchView()).forEach(([key, value]) => { if (value) params.set(key, value); });
+  const tab = new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("tab");
+  if (tab) params.set("tab", tab);  // e.g. #watch?tab=vc opens the validation cases
   return `/watch-board-integration.html?${params.toString()}`;
 }
 

@@ -106,7 +106,7 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
     <div className="dk-root tw-root" style={{ ["--tone" as string]: tone }}>
       <header className="dk-topbar">
         <div className="dk-brand">
-          <a className="dk-brand-mark" href="#watch" title="감시 보드로 돌아가기" aria-label="감시 보드로 돌아가기"><FloodOpsLogo size={30} /></a>
+          <a className="dk-brand-mark" href="#" title="FloodOps 홈으로" aria-label="FloodOps 홈으로"><FloodOpsLogo size={30} /></a>
           <div>
             <h1>지하차도 통제 판단 트윈</h1>
             <p>FloodOps · 관측 수위로 지금 단계와 남은 시간을 보여주고, 과거 사건으로 규칙을 검증합니다</p>
@@ -128,7 +128,7 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
             <small>{tab === "now" || status?.mode !== "live" ? "저장된 10분 수위" : "홍수통제소 OpenAPI"}</small>
           </span>
           <AppNavigation active="twin" />
-          <button type="button" className="fo-ghost tw-back" onClick={onBack}><ArrowLeft size={14} /> 감시 보드</button>
+          <button type="button" className="fo-ghost tw-back" onClick={onBack}><ArrowLeft size={14} /> 관제 보드</button>
         </div>
       </header>
 

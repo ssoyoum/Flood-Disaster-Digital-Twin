@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Gauge, GitCompare, History, Lock, Scale } from "lucide-react";
-import { getTwinFacilities } from "../api";
+import { ArrowLeft, ArrowRight, Bot, Gauge, GitCompare, History, ListChecks, Lock, ShieldCheck, Waves } from "lucide-react";
+import { getFloodForecastSummary, getValidationCases, type ValidationCase, type ValidationSignal } from "../api";
 import type { FloodEvent } from "../types";
 import "./landing.css";
 
@@ -57,26 +57,26 @@ function ServiceSchematic() {
     <figure className="fo-schematic" aria-label="오송 지하차도 침수 모식도">
       <header>
         <div>
-          <span className="fo-schematic-tag">검증 사건 모식도</span>
+          <span className="fo-schematic-tag">검증 사례 · 257분의 공백</span>
           <strong>2023 오송 · 궁평2지하차도</strong>
         </div>
         <span className="fo-schematic-meta">근사 재구성 기준</span>
       </header>
       <div className="fo-schematic-map">
         <svg viewBox="0 0 640 300" role="img">
-          <rect width="640" height="300" rx="10" fill="#0c1422" />
+          <rect width="640" height="300" rx="10" fill="#121216" />
           {/* roads */}
-          <rect x="0" y="150" width="640" height="26" fill="#1a2740" />
-          <line x1="0" y1="163" x2="640" y2="163" stroke="#3a4d6e" strokeDasharray="7 7" />
-          <rect x="258" y="0" width="24" height="300" fill="#1a2740" />
-          <line x1="270" y1="0" x2="270" y2="300" stroke="#3a4d6e" strokeDasharray="7 7" />
+          <rect x="0" y="150" width="640" height="26" fill="#1f1f23" />
+          <line x1="0" y1="163" x2="640" y2="163" stroke="#52525b" strokeDasharray="7 7" />
+          <rect x="258" y="0" width="24" height="300" fill="#1f1f23" />
+          <line x1="270" y1="0" x2="270" y2="300" stroke="#52525b" strokeDasharray="7 7" />
           {/* flood envelope */}
           <path className="fo-flood" d="M150 118 C 188 104, 228 118, 252 140 C 300 150, 346 150, 372 176 C 396 206, 360 236, 318 232 C 280 230, 250 214, 222 196 C 190 176, 150 164, 138 144 C 132 132, 138 122, 150 118 Z" />
           {/* Miho River */}
           <path d="M-10 70 C 60 60, 110 110, 150 100 C 200 88, 220 40, 290 -10" fill="none" stroke="#12324d" strokeWidth="30" strokeLinecap="round" />
           <path d="M-10 70 C 60 60, 110 110, 150 100 C 200 88, 220 40, 290 -10" fill="none" stroke="#1f6fa3" strokeWidth="3" strokeDasharray="2 9" className="fo-river-flow" />
           {buildings.map(([x, y, w, h]) => (
-            <rect key={`${x}-${y}`} x={x} y={y} width={w} height={h} rx="3" fill="#16213a" stroke="#34466a" />
+            <rect key={`${x}-${y}`} x={x} y={y} width={w} height={h} rx="3" fill="#27272a" stroke="#3f3f46" />
           ))}
           {/* underpass */}
           <rect className="fo-underpass" x="296" y="148" width="64" height="30" rx="3" />
@@ -90,10 +90,10 @@ function ServiceSchematic() {
           <span className="fo-schematic-tag">선택 시설</span>
           <strong>궁평2지하차도</strong>
           <dl>
-            <dt>원상태</dt>
-            <dd className="bad">차량 진입 계속</dd>
-            <dt>개입</dt>
-            <dd className="ok">통제 시각 조정</dd>
+            <dt>공식 홍수경보</dt>
+            <dd className="ok">04:10</dd>
+            <dt>지하차도 유입</dt>
+            <dd className="bad">08:27 · 통제 없음</dd>
           </dl>
         </div>
       </div>
@@ -107,75 +107,121 @@ function ServiceSchematic() {
   );
 }
 
-export function IntroPage({ onStart, onTwin, onWatch }: { onStart: () => void; onTwin?: () => void; onWatch?: () => void }) {
-  const [operational, setOperational] = useState<string[] | null>(null);
+type IntroProps = { onStart: () => void; onTwin?: () => void; onWatch?: () => void; onValidation?: () => void; onOsong?: () => void };
+
+const FLOW_KPIS: Array<{ label: string; value: string; unit: string; tone: string }> = [
+  { label: "감시 시설", value: "536", unit: "곳", tone: "#e4e4e7" },
+  { label: "하천형 · 내수형", value: "142 · 394", unit: "곳", tone: "#38bdf8" },
+  { label: "기상청 AWS 강우", value: "736", unit: "곳", tone: "#0ea5e9" },
+  { label: "공식 홍수특보 이력", value: "1,151", unit: "건", tone: "#fb923c" },
+  { label: "과거 홍수 채점", value: "4", unit: "건", tone: "#34d399" },
+];
+
+function leadBadge(signal?: ValidationSignal) {
+  if (!signal || signal.lead_min === null) return <span className="fo-lead-badge none">—</span>;
+  const early = signal.lead_min >= 0;
+  return <span className={`fo-lead-badge ${early ? "early" : "late"}`}>{early ? "+" : "−"}{Math.abs(signal.lead_min)}분{signal.lead_is_lower_bound ? "↑" : ""}</span>;
+}
+
+export function IntroPage({ onStart, onTwin, onWatch, onValidation, onOsong }: IntroProps) {
+  const [cases, setCases] = useState<ValidationCase[] | null>(null);
+  const [official, setOfficial] = useState<{ warning: number; advisory: number } | null>(null);
   useEffect(() => {
     let live = true;
-    getTwinFacilities().then((items) => { if (live) setOperational(items.map((item) => item.name)); }).catch(() => { if (live) setOperational([]); });
+    getValidationCases().then((data) => { if (live) setCases(data.cases); }).catch(() => { if (live) setCases([]); });
+    getFloodForecastSummary().then((data) => { if (live && !data.error) setOfficial(data.counts); }).catch(() => undefined);
     return () => { live = false; };
   }, []);
-  const features = [
-    { icon: Gauge, title: "전국 감시 보드", href: "#watch", text: "홍수통제소 관측소 1,400여 곳을 각 관측소의 공식 기준 수위로 판정하고, 연결된 시설과 함께 지도에 올립니다. 에이전트에게 \"충북 보여줘\"라고 말하면 이동합니다." },
-    { icon: Scale, title: "운영 시설 · 통제 기준 검토", href: "#twin?tab=criteria", text: "검증된 시설은 시설별 규칙으로 통제 검토를 권고하고, 기준을 바꾸면 과거 사건에서 몇 분 먼저 알렸을지와 다른 해 권고 횟수를 함께 봅니다." },
-    { icon: History, title: "사건으로 검증", href: "#cases", text: "과거 사건을 관측 단계별로 재생하고 통제·대피 시각을 바꿔 남는 시간을 비교합니다. 규칙과 에이전트의 검증용입니다." },
+  const steps = [
+    { icon: Gauge, no: "01", title: "넓게 선별", sub: "전국 관제 보드", href: "#watch", text: "지하차도 414곳·하천변 출입구 122곳을 잠기는 원인에 맞는 지표로 10분마다 0~4단계로 순위화합니다. 하천형은 수위 단계와 공식 홍수특보, 내수형은 강우 누적과 호우특보로 봅니다." },
+    { icon: ListChecks, no: "02", title: "과거 홍수로 검증", sub: "검증 사례 채점", href: "#watch?tab=vc", text: "지금 규칙을 과거 홍수에 그대로 재생해 실제 통제(오송은 유입)보다 몇 분 먼저였는지 셉니다. 늦은 사례는 규칙을 고치는 근거입니다." },
+    { icon: ShieldCheck, no: "03", title: "검증된 시설부터 운영", sub: "운영 시설 통제 판단", href: "#twin", text: "관문 4개를 통과한 시설만 «통제 검토» 규칙과 담당자 확인 기록을 붙입니다. 장마 뒤에는 시설별 통제 성적표로 남깁니다." },
   ];
-  const scope = [
-    { title: "지하차도", state: "운영 1 · 감시 228", tone: "live", href: "#watch", detail: operational?.length ? `${operational.join("·")} 운영 등록` : "궁평2지하차도 운영 등록" },
-    { title: "하천변 출입구", state: "다음 확장", tone: "next", href: null, detail: "산책로·둔치주차장·하상도로" },
-    { title: "저지대 마을 대피", state: "사례 검증", tone: "case", href: "#event/andong-uiseong-2026", detail: "2026 안동·의성 대피 시각" },
+  const more = [
+    { icon: Waves, title: "오송 HAND 시뮬레이션", href: "#event/osong-2023", text: "관측 단계별 재구성 · 통제 시각 반사실" },
+    { icon: History, title: "사례 라이브러리", href: "#cases", text: "서울 2022 · 포항 2022 · 안동·의성 2026" },
+    { icon: GitCompare, title: "사례 간 비교", href: "#compare", text: "사건별 선행 시간을 한 표로" },
+    { icon: Bot, title: "보드 운영 에이전트", href: "#watch", text: "“지금 홍수특보 내려진 곳 있어?”" },
   ];
+  const total = official ? official.warning + official.advisory : 0;
   return (
     <main className="fo-landing fo-intro">
-      <Brand />
+      <header className="fo-topnav">
+        <Brand />
+        <nav aria-label="FloodOps 화면">
+          <a href="#watch">관제 보드</a>
+          <a href="#watch?tab=vc">과거 홍수 검증</a>
+          <a href="#event/osong-2023">오송 HAND 시뮬레이션</a>
+          <a href="#twin">운영 시설</a>
+          <a href="#cases">사례</a>
+        </nav>
+        <span className={`fo-live-pill ${total > 0 ? "hot" : ""}`}>
+          <i />{official ? `지금 공식 홍수특보 ${total}곳 · 경보 ${official.warning}` : "공식 홍수특보 확인 중"}
+        </span>
+      </header>
       <section className="fo-hero">
         <div className="fo-hero-copy">
-          <p className="fo-eyebrow">하천 접점 시설 통제·대피 판단 트윈</p>
+          <p className="fo-eyebrow">만약에 침수 · 하천 접점 시설 통제 판단 트윈</p>
           <h1>
-            강물이 넘치기 전에,
+            신호는 있었습니다.
             <br />
-            어디를 언제 막을까
+            어디를 먼저 막을지가 비어 있었습니다.
           </h1>
           <p className="fo-lead">
-            FloodOps는 하천 수위를 지하차도·하천변 출입구·저지대 마을의 단계와 통제까지 남은 시간으로 바꿔 보여주고,
+            2023 오송, 공식 홍수경보는 지하차도 유입보다 <b>257분</b> 먼저 나왔습니다.
             <br />
-            그 기준이 과거 홍수에서 몇 분 먼저 알렸을지, 평소에는 얼마나 자주 울렸을지
+            FloodOps는 홍수통제소 수위·공식 홍수특보와 기상청 강우·호우특보를 전국 하천 접점 시설의
             <br />
-            담당자가 직접 검증해 보는 판단 보조 도구입니다.
+            위험 단계로 10분마다 바꾸고, 그 기준을 과거 홍수의 실제 통제 시각으로 채점합니다.
           </p>
-          <ul className="fo-scope" aria-label="적용 시설">
-            {scope.map((item) => {
-              const body = <><span className={`fo-scope-state ${item.tone}`}>{item.state}</span><strong>{item.title}</strong><small>{item.detail}</small></>;
-              return <li key={item.title}>{item.href ? <a href={item.href}>{body}</a> : <div aria-disabled="true">{body}</div>}</li>;
-            })}
-          </ul>
+          <div className="fo-kpis" aria-label="주요 수치">
+            {FLOW_KPIS.map((kpi) => (
+              <div key={kpi.label} className="fo-kpi" style={{ ["--fo-c" as string]: kpi.tone }}>
+                <span>{kpi.label}</span>
+                <strong>{kpi.value}<small>{kpi.unit}</small></strong>
+              </div>
+            ))}
+          </div>
           <div className="fo-intro-actions">
-            {onWatch && (
-              <button className="fo-primary" type="button" onClick={onWatch}>
-                전국 감시 보드 <ArrowRight size={18} />
-              </button>
-            )}
-            {onTwin && (
-              <button className="fo-ghost" type="button" onClick={onTwin}>
-                운영 시설 통제 판단 <ArrowRight size={16} />
-              </button>
-            )}
-            <button className="fo-ghost" type="button" onClick={onStart}>
-              과거 사건 재생 <ArrowRight size={16} />
-            </button>
+            {onWatch && <button className="fo-primary" type="button" onClick={onWatch}>전국 관제 보드 <ArrowRight size={18} /></button>}
+            {onValidation && <button className="fo-ghost" type="button" onClick={onValidation}>과거 홍수 검증 <ArrowRight size={16} /></button>}
+            {onOsong && <button className="fo-ghost" type="button" onClick={onOsong}>오송 HAND 시뮬레이션 <ArrowRight size={16} /></button>}
+            {onTwin && <button className="fo-ghost" type="button" onClick={onTwin}>운영 시설 <ArrowRight size={16} /></button>}
           </div>
         </div>
         <ServiceSchematic />
       </section>
-      <section className="fo-features">
-        {features.map(({ icon: Icon, title, text, href }, index) => (
-          <a key={title} className="fo-feature" href={href} style={{ animationDelay: `${index * -2}s` }}>
-            <Icon size={20} />
-            <strong>{title} <ArrowRight size={14} /></strong>
+      <section className="fo-steps">
+        {steps.map(({ icon: Icon, no, title, sub, href, text }) => (
+          <a key={no} className="fo-step" href={href}>
+            <header><span className="fo-step-no">{no}</span><Icon size={18} /><strong>{title}</strong><em>{sub} <ArrowRight size={13} /></em></header>
             <p>{text}</p>
+            {no === "02" && (
+              <ul className="fo-val-list">
+                {(cases ?? []).map((item) => {
+                  const officialSignal = item.signals.find((s) => s.signal === "공식 홍수경보" && s.at) ?? item.signals.find((s) => s.signal === "공식 홍수주의보");
+                  const rule = item.signals.find((s) => s.signal.endsWith("첫 주의 이상"));
+                  return (
+                    <li key={item.id}>
+                      <b>{item.title.replace(/ \d{4}-\d{2}-\d{2}$/, "")}</b>
+                      <span className="fo-val-cell">특보 {leadBadge(officialSignal)}</span>
+                      <span className="fo-val-cell">규칙 {leadBadge(rule)}</span>
+                    </li>
+                  );
+                })}
+                {cases === null && <li className="fo-val-wait">채점표를 불러오는 중</li>}
+              </ul>
+            )}
           </a>
         ))}
       </section>
-      <p className="fo-footnote">권고는 하천 수위로 본 선행 지표이며, 통제 결정은 담당자 판단과 현장 기준(침수심)이 우선합니다. 침수 범위는 관측·지형 기반 근사 재구성이며 공식 침수범위가 아닙니다.</p>
+      <section className="fo-more" aria-label="다른 콘텐츠">
+        {more.map(({ icon: Icon, title, href, text }) => (
+          <a key={title} href={href}><Icon size={16} /><strong>{title}</strong><span>{text}</span></a>
+        ))}
+        <button type="button" onClick={onStart}><History size={16} /><strong>과거 사건 재생</strong><span>사례를 골라 관제 화면으로</span></button>
+      </section>
+      <p className="fo-footnote">순위·권고는 공개 관측과 공식 특보로 본 선행 지표이며, 통제 결정은 담당자 판단과 현장 기준이 우선합니다. 검증 사례의 통제 시각은 보도 기준(분 단위 기록은 오송뿐)이고, 침수 범위는 관측·지형 기반 근사 재구성이며 공식 침수범위가 아닙니다.</p>
     </main>
   );
 }

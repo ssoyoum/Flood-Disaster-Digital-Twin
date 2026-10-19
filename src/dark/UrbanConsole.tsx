@@ -4,6 +4,7 @@ import * as api from "../api";
 import type { AlertTimingResult, FloodEvent, LayersResponse, StorageCaptureResult, UrbanReconstructionResponse } from "../types";
 import { AgentDock } from "./DarkConsole";
 import { FloodOpsLogo } from "./Landing";
+import { AppNavigation } from "./Navigation";
 import { CONFIDENCE_KO, ROLE_KO, localizeEvent, stageKo } from "./ko";
 import "./dark.css";
 import "./urban.css";
@@ -51,7 +52,7 @@ const STAGE_NOTE_KO: Record<string, { description: string; source: string }> = {
 };
 
 const DEPTH_COLOR = ["step", ["get", "flood_depth_m"], "#7dd3fc", 0.3, "#38bdf8", 0.5, "#2563eb", 0.8, "#7c3aed"] as const;
-const BUILDING_DEPTH_COLOR = ["step", ["get", "max_trace_depth_m"], "#94a3b8", 0.3, "#fbbf24", 0.5, "#f97316", 0.8, "#ef4444"] as const;
+const BUILDING_DEPTH_COLOR = ["step", ["get", "max_trace_depth_m"], "#a1a1aa", 0.3, "#fbbf24", 0.5, "#f97316", 0.8, "#ef4444"] as const;
 
 const clock = (iso?: string | null) => (iso ? iso.slice(11, 16) : "—");
 const num = (value?: number | null) => (value === null || value === undefined ? "—" : value.toLocaleString("ko-KR"));
@@ -165,6 +166,7 @@ function UrbanConsoleView({ eventData, layers, reconstruction }: { eventData: Fl
           <span className="dk-chip">침수흔적 <small>{num(reconstruction.exposure.traces.count)}건</small></span>
           <span className="dk-chip">흔적 위 건축물 <small>{num(reconstruction.exposure.buildings.trace_intersecting)}동</small></span>
         </div>
+        <AppNavigation active="cases" />
       </header>
 
       {view === "console" ? (
@@ -256,7 +258,7 @@ function UrbanMap({ layers, tone, time, children }: { layers: LayersResponse; to
           "esri-dark-ref": { type: "raster", tiles: [`${ESRI}/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}`], tileSize: 256, maxzoom: 16 },
         },
         layers: [
-          { id: "background", type: "background", paint: { "background-color": "#0b1220" } },
+          { id: "background", type: "background", paint: { "background-color": "#09090b" } },
           { id: "esri-dark", type: "raster", source: "esri-dark", paint: { "raster-opacity": 0.92 } },
           { id: "esri-dark-ref", type: "raster", source: "esri-dark-ref", paint: { "raster-opacity": 0.7 } },
         ],
@@ -272,7 +274,7 @@ function UrbanMap({ layers, tone, time, children }: { layers: LayersResponse; to
       const add = (key: LayerKey) => map.addSource(key, { type: "geojson", data: layers[key].data as never });
       add("aoi"); add("roads"); add("waterways"); add("flood_extent"); add("buildings"); add("hand_reconstruction");
       map.addLayer({ id: "aoi-line", type: "line", source: "aoi", paint: { "line-color": "#22d3ee", "line-width": 1.2, "line-dasharray": [3, 3], "line-opacity": 0.55 } });
-      map.addLayer({ id: "roads-line", type: "line", source: "roads", paint: { "line-color": "#64748b", "line-width": 0.8, "line-opacity": 0.4 } });
+      map.addLayer({ id: "roads-line", type: "line", source: "roads", paint: { "line-color": "#71717a", "line-width": 0.8, "line-opacity": 0.4 } });
       map.addLayer({
         id: "hand-fill", type: "fill", source: "hand_reconstruction", filter: stageFilter(0),
         paint: { "fill-color": "#f87171", "fill-opacity": ["interpolate", ["linear"], ["get", "hand_threshold_m"], 0, 0.2, 3, 0.4] },
@@ -392,7 +394,7 @@ function Hyetograph({ reconstruction, currentTime, tone }: { reconstruction: Urb
       <svg viewBox={`0 0 ${width} ${height}`} className="ub-hyeto" role="img" aria-label="10분 강우와 60분 누적 강우">
         {[0, 50, 100].map((value) => (
           <g key={value}>
-            <line x1={pad.left} x2={width - pad.right} y1={y(value)} y2={y(value)} stroke="#22304a" />
+            <line x1={pad.left} x2={width - pad.right} y1={y(value)} y2={y(value)} stroke="#2e2e33" />
             <text x={pad.left - 4} y={y(value) + 3} textAnchor="end">{value}</text>
           </g>
         ))}

@@ -1,35 +1,35 @@
-.wb-root { position: fixed; inset: 0; width: 100%; height: 100dvh; margin: 0; overflow: hidden; background: #05080f; }
-.wb-root iframe { display: block; width: 100%; height: 100%; border: 0; background: #05080f; }
-.wb-river-toggle { position: absolute; z-index: 20; top: 14px; right: 16px; padding: 10px 14px; border: 1px solid rgba(123, 186, 255, .42); border-radius: 9px; background: rgba(11, 22, 39, .96); color: #e9f3ff; font-family: inherit; font-size: 13px; font-weight: 600; line-height: 1.2; cursor: pointer; box-shadow: 0 8px 26px rgba(0, 0, 0, .3); }
-.wb-river-toggle:hover, .wb-river-toggle:focus-visible { border-color: #7bbaff; outline: 2px solid rgba(123, 186, 255, .28); outline-offset: 2px; }
-.wb-river-panel { position: absolute; z-index: 21; top: 62px; right: 16px; display: flex; flex-direction: column; width: min(670px, calc(100vw - 32px)); max-height: calc(100dvh - 78px); overflow: hidden; border: 1px solid rgba(114, 154, 198, .34); border-radius: 14px; background: rgba(8, 15, 27, .98); color: #d9e7f7; box-shadow: 0 20px 60px rgba(0, 0, 0, .5); backdrop-filter: blur(16px); font: 13px/1.45 Inter, ui-sans-serif, system-ui, sans-serif; }
+.wb-root { position: fixed; inset: 0; width: 100%; height: 100dvh; margin: 0; overflow: hidden; background: #050505; }
+.wb-root iframe { display: block; width: 100%; height: 100%; border: 0; background: #050505; }
+.wb-river-toggle { position: absolute; z-index: 20; top: 14px; right: 16px; padding: 10px 14px; border: 1px solid rgba(255, 255, 255, .14); border-radius: 9px; background: rgba(24, 24, 27, .96); color: #f4f4f5; font-family: inherit; font-size: 13px; font-weight: 600; line-height: 1.2; cursor: pointer; box-shadow: 0 8px 26px rgba(0, 0, 0, .3); }
+.wb-river-toggle:hover, .wb-river-toggle:focus-visible { border-color: #e4e4e7; outline: 2px solid rgba(255, 255, 255, .18); outline-offset: 2px; }
+.wb-river-panel { position: absolute; z-index: 21; top: 62px; right: 16px; display: flex; flex-direction: column; width: min(670px, calc(100vw - 32px)); max-height: calc(100dvh - 78px); overflow: hidden; border: 1px solid rgba(114, 154, 198, .34); border-radius: 14px; background: rgba(9, 9, 11, .98); color: #e4e4e8; box-shadow: 0 20px 60px rgba(0, 0, 0, .5); backdrop-filter: blur(16px); font: 13px/1.45 Inter, ui-sans-serif, system-ui, sans-serif; }
 .wb-river-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 18px 20px 12px; }
-.wb-river-eyebrow { margin: 0 0 5px; color: #87a4c3; font-size: 11px; letter-spacing: .04em; }
+.wb-river-eyebrow { margin: 0 0 5px; color: #9f9fa3; font-size: 11px; letter-spacing: .04em; }
 .wb-river-header h2 { margin: 0; color: #f3f7fc; font-size: 17px; font-weight: 650; }
-.wb-river-close { flex: none; padding: 6px 9px; border: 1px solid #31445a; border-radius: 7px; background: #111d2c; color: #cfdaea; font: inherit; cursor: pointer; }
-.wb-river-close:hover, .wb-river-close:focus-visible { border-color: #7bbaff; outline: none; }
-.wb-river-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 0 20px 5px; color: #aebed0; font-size: 11px; }
+.wb-river-close { flex: none; padding: 6px 9px; border: 1px solid #414145; border-radius: 7px; background: #1b1b1f; color: #d8d8dc; font: inherit; cursor: pointer; }
+.wb-river-close:hover, .wb-river-close:focus-visible { border-color: #e4e4e7; outline: none; }
+.wb-river-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 0 20px 5px; color: #bbbbbf; font-size: 11px; }
 .wb-river-summary strong { color: #f2c66d; font-weight: 650; }
 .wb-river-mode { padding: 3px 7px; border: 1px solid #315d4c; border-radius: 999px; background: rgba(24, 92, 66, .2); color: #86e0b0; }
 .wb-river-mode-snapshot { border-color: #80653d; background: rgba(112, 77, 26, .2); color: #f4c879; }
-.wb-river-fetched { margin: 0; padding: 0 20px 12px; color: #74879d; font-size: 11px; }
-.wb-river-message { margin: 0 20px 12px; padding: 9px 11px; border: 1px solid #304a62; border-radius: 8px; background: #101e2e; color: #afc6df; }
+.wb-river-fetched { margin: 0; padding: 0 20px 12px; color: #848488; font-size: 11px; }
+.wb-river-message { margin: 0 20px 12px; padding: 9px 11px; border: 1px solid #454549; border-radius: 8px; background: #1b1b1f; color: #c2c2c6; }
 .wb-river-error { border-color: #78434a; color: #ffb5b7; }
 .wb-river-note { border-color: #735d36; color: #f2d395; }
-.wb-river-table-wrap { overflow: auto; min-height: 0; border-top: 1px solid #26374a; border-bottom: 1px solid #26374a; }
+.wb-river-table-wrap { overflow: auto; min-height: 0; border-top: 1px solid #2e2e33; border-bottom: 1px solid #2e2e33; }
 .wb-river-table { width: 100%; min-width: 570px; border-collapse: collapse; text-align: left; font-variant-numeric: tabular-nums; }
-.wb-river-table thead { position: sticky; top: 0; z-index: 1; background: #111d2b; color: #8299b1; font-size: 10px; letter-spacing: .04em; }
-.wb-river-table th, .wb-river-table td { padding: 9px 10px; border-bottom: 1px solid rgba(75, 99, 126, .24); vertical-align: middle; }
+.wb-river-table thead { position: sticky; top: 0; z-index: 1; background: #1a1a1e; color: #959599; font-size: 10px; letter-spacing: .04em; }
+.wb-river-table th, .wb-river-table td { padding: 9px 10px; border-bottom: 1px solid rgba(113, 113, 122, .24); vertical-align: middle; }
 .wb-river-table thead th:first-child, .wb-river-table tbody th { padding-left: 20px; }
-.wb-river-table tbody th { min-width: 158px; color: #e3edf8; font-size: 12px; font-weight: 550; }
-.wb-river-table tbody td { color: #cfdeed; white-space: nowrap; }
+.wb-river-table tbody th { min-width: 158px; color: #ebebef; font-size: 12px; font-weight: 550; }
+.wb-river-table tbody td { color: #dbdbdf; white-space: nowrap; }
 .wb-river-station-name, .wb-river-station-meta, .wb-river-freshness, .wb-river-status { display: block; }
-.wb-river-station-meta, .wb-river-freshness { margin-top: 2px; color: #788da4; font-size: 10px; font-weight: 400; }
+.wb-river-station-meta, .wb-river-freshness { margin-top: 2px; color: #89898d; font-size: 10px; font-weight: 400; }
 .wb-river-status { margin-top: 3px; color: #7fe0ad; font-size: 10px; }
 .wb-river-status-at_or_above { color: #ff9499; }
 .wb-river-status-no_reading { color: #f3ca75; }
 .wb-river-muted, .wb-river-freshness-stale { color: #e6b566; }
-.wb-river-limitations { overflow: auto; padding: 10px 20px 15px; color: #8da0b5; font-size: 10px; }
+.wb-river-limitations { overflow: auto; padding: 10px 20px 15px; color: #9c9ca0; font-size: 10px; }
 .wb-river-limitations p { margin: 3px 0; }
 .wb-river-limitations a { display: inline-block; margin-top: 7px; color: #8fc5ff; text-decoration: none; }
 .wb-river-limitations a:hover { text-decoration: underline; }

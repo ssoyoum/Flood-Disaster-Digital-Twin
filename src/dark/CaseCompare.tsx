@@ -9,7 +9,7 @@ import "./compare.css";
 /*
  * 사례 간 비교: 사례마다 실제 대응 시각과 등록된 반사실 시각이 기준 사건보다 몇 분 앞섰는지.
  * 덤벨 차트 하나(한 축, 분 단위)와 같은 값의 표. 값은 /api/cases/lead-times 가 각 사례 계산 함수에서 가져온다.
- * 색: 실제 #d97014(원), 반사실 #109c8e(마름모) — 다크 배경 #111a2b 기준 팔레트 검증 통과, 모양으로도 구분.
+ * 색: 실제 #d97014(원), 반사실 #109c8e(마름모) — 다크 배경 #18181b 기준 팔레트 검증 통과, 모양으로도 구분.
  */
 
 const ACTUAL = "#d97014";
@@ -88,7 +88,7 @@ export default function CaseComparePage({ onBack, onOpen }: { onBack: () => void
                     {actual !== null ? (
                       <g onMouseMove={(event) => show(event, `실제 ${item.actual.time} · ${item.actual.label} · ${minutes(actual)}`)}>
                         <circle cx={x(actual)} cy={y} r={14} fill="transparent" />
-                        <circle cx={x(actual)} cy={y} r={6} fill={ACTUAL} stroke="#111a2b" strokeWidth={2} />
+                        <circle cx={x(actual)} cy={y} r={6} fill={ACTUAL} stroke="#18181b" strokeWidth={2} />
                         <text x={x(actual)} y={y - 12} textAnchor="middle" className="cc-value">{actual}</text>
                       </g>
                     ) : (
@@ -97,7 +97,7 @@ export default function CaseComparePage({ onBack, onOpen }: { onBack: () => void
                     {whatif !== null && (
                       <g onMouseMove={(event) => show(event, `반사실 ${item.counterfactual.time} · ${item.counterfactual.label} · ${minutes(whatif)}`)}>
                         <circle cx={x(whatif)} cy={y} r={14} fill="transparent" />
-                        <rect x={x(whatif) - 5} y={y - 5} width={10} height={10} fill={WHATIF} stroke="#111a2b" strokeWidth={2} transform={`rotate(45 ${x(whatif)} ${y})`} />
+                        <rect x={x(whatif) - 5} y={y - 5} width={10} height={10} fill={WHATIF} stroke="#18181b" strokeWidth={2} transform={`rotate(45 ${x(whatif)} ${y})`} />
                         <text x={x(whatif)} y={y - 12} textAnchor="middle" className="cc-value">{whatif}</text>
                       </g>
                     )}

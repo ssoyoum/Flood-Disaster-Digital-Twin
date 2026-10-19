@@ -1,11 +1,11 @@
-.fo-global-menu { position: relative; z-index: 100; flex: none; color: #e5ecf5; }
-.fo-global-menu > summary { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid #34445e; border-radius: 8px; background: #111a2b; color: #c7d3e2; cursor: pointer; list-style: none; font-size: 12px; font-weight: 750; white-space: nowrap; }
+.fo-global-menu { position: relative; z-index: 100; flex: none; color: #f4f4f5; }
+.fo-global-menu > summary { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid #3f3f46; border-radius: 8px; background: #18181b; color: #d4d4d8; cursor: pointer; list-style: none; font-size: 12px; font-weight: 750; white-space: nowrap; }
 .fo-global-menu > summary::-webkit-details-marker { display: none; }
-.fo-global-menu > summary:hover, .fo-global-menu[open] > summary { border-color: #38bdf8; color: #e5ecf5; }
+.fo-global-menu > summary:hover, .fo-global-menu[open] > summary { border-color: #e4e4e7; color: #f4f4f5; }
 .fo-global-menu[open] .fo-global-menu-chevron { transform: rotate(180deg); }
-.fo-global-menu-panel { position: absolute; top: calc(100% + 7px); right: 0; display: grid; width: 208px; padding: 6px; border: 1px solid #34445e; border-radius: 10px; background: #111a2b; box-shadow: 0 16px 36px #0009; }
-.fo-global-menu-panel a { padding: 9px 10px; border-radius: 6px; color: #b7c5d8; text-decoration: none; font-size: 12px; font-weight: 700; }
-.fo-global-menu-panel a:hover, .fo-global-menu-panel a[aria-current="page"] { background: #1a2940; color: #7dd3fc; }
+.fo-global-menu-panel { position: absolute; top: calc(100% + 7px); right: 0; display: grid; width: 208px; padding: 6px; border: 1px solid #3f3f46; border-radius: 10px; background: #18181b; box-shadow: 0 16px 36px #0009; }
+.fo-global-menu-panel a { padding: 9px 10px; border-radius: 6px; color: #c2c2c6; text-decoration: none; font-size: 12px; font-weight: 700; }
+.fo-global-menu-panel a:hover, .fo-global-menu-panel a[aria-current="page"] { background: #27272a; color: #f4f4f5; }
 .fo-app-header { width: 100%; box-sizing: border-box; }
 .fo-app-header > .fo-global-menu { margin-left: auto; }
 .dk-topbar > .fo-global-menu { margin-left: auto; }

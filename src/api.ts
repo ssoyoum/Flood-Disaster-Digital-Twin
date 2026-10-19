@@ -169,3 +169,9 @@ export const getWatchFacilityStatus = (options: { at?: string | null } = {}, sig
   request<WatchFacilityStatus>(`/api/watch/facility-status${watchQuery(options)}`, { signal });
 export const getWatchFacilities = () => request<Array<WatchFacilityLink & { station_code: string }>>("/api/watch/facilities");
 export const getSeoulRiverStages = (signal?: AbortSignal) => request<SeoulRiverStageFeed>("/api/watch/seoul-river-stages", { signal });
+
+// Intro page: the validation scorecard and the official flood forecast count (both small, read-only).
+export type ValidationSignal = { signal: string; at: string | null; lead_min: number | null; lead_is_lower_bound?: boolean; verdict: string; facility_id?: string };
+export type ValidationCase = { id: string; title: string; region: string; reference: { at: string; label: string; precision: string; precision_ko: string; kind: string }; signals: ValidationSignal[]; region_at_reference?: { total: number; advisory_or_above: number; warning_or_above: number } };
+export const getValidationCases = () => request<{ cases: ValidationCase[]; limitations: string[] }>("/api/watch/validation-cases");
+export const getFloodForecastSummary = () => request<{ mode: string; counts: { warning: number; advisory: number }; error: string | null }>("/api/watch/flood-forecasts");

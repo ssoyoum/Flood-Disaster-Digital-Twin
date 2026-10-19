@@ -459,11 +459,13 @@ body { display: flex; flex-direction: column; }
   <details class="demo-menu">
     <summary>화면 이동 <span aria-hidden="true">⌄</span></summary>
     <nav aria-label="FloodOps 화면">
-      <a href="#watch" target="_top" aria-current="page">전국 감시 보드</a>
-      <a href="#twin" target="_top">운영 시설 통제 판단</a>
-      <a href="#cases" target="_top">사례 검증</a>
-      <a href="#compare" target="_top">사례 간 비교</a>
-      <a href="#intro" target="_top">FloodOps 소개</a>
+      <a href="/#" target="_top">홈 · FloodOps 소개</a>
+      <a href="/#watch" target="_top" aria-current="page">전국 관제 보드</a>
+      <a href="/#watch?tab=vc" target="_top">과거 홍수 검증</a>
+      <a href="/#event/osong-2023" target="_top">오송 HAND 시뮬레이션</a>
+      <a href="/#twin" target="_top">운영 시설 통제 판단</a>
+      <a href="/#cases" target="_top">사례 라이브러리</a>
+      <a href="/#compare" target="_top">사례 간 비교</a>
     </nav>
   </details>
   <div class="sp"></div>
@@ -1256,6 +1258,7 @@ body { display: flex; flex-direction: column; }
     loadValidation().then(() => { if (st.selected) renderStation(st.selected); });
     scheduleLiveRefresh();
     if (st.selected) openDrawer(true);
+    if (params.get("tab") === "vc") { openDrawer(true); showTab("vc"); }
     // Start at an explicitly linked station, otherwise frame the currently visible risk stations.
     const selected = st.overview?.stations.find((r) => r.code === st.selected);
     if (selected) map.jumpTo({ center: [selected.lon, selected.lat], zoom: 12 });
