@@ -220,3 +220,14 @@ Live LLM 평가는 질문·history·도구 결과를 외부 provider로 전송�
 다음 실험 하나: 기존 benchmark를 고정한 offline 기준선을 먼저 저장하고, 숫자·인용을 만족해도 주어·시점이 틀린 답변을 사람이 판독한다. 이 작업은 문서 설계만 했으며 결과 JSON을 생성하거나 테스트 통과를 주장하지 않는다.
 
 
+
+## trace 집계 실행 (2026-10-20)
+
+`backend/evaluation/summarize_traces.py`는 기존 opt-in JSONL을 읽어 요청 ID 중복·깨진 줄을 구분하고, 기존 ANSWERED/NEEDS_DATA/UNAVAILABLE 상태·실패 stage/code·도구 호출·p50/p95/max·모델 요청·보고된 토큰을 집계한다. 질문·응답·도구 payload는 출력하지 않는다. 빈 로그/잘못된 줄은 CLI 실패이며, 측정 불가 지표를 0% 성공으로 바꾸지 않는다.
+
+```bash
+FLOODOPS_AGENT_TRACE_LOG=/tmp/agent-traces.jsonl python backend/evaluation/agent_benchmark.py --mode offline --output /tmp/agent-benchmark.json
+python backend/evaluation/summarize_traces.py /tmp/agent-traces.jsonl --output /tmp/agent-trace-summary.json
+```
+
+새 trace 파일로 실행해야 서로 다른 실험이 섞이지 않는다. 이번 offline 37문항 중 HTTP 응답 계약에 들어온 34건이 집계됐다. ANSWERED 23·NEEDS_DATA 8·UNAVAILABLE 3, 모델 요청 0, p95 1,464ms였다. 오류 주입·키 없는 경로를 포함한 합성 평가이며 운영 지연/SLA가 아니다. 평가 성공 37/37과 ANSWERED 비율 23/34는 서로 다른 지표다. 422 등 Agent 실행 전 HTTP 거절·프로세스 소실은 이 로그 밖이며 별도 access log가 필요하다. 토큰 미보고는 비용이 0이라는 뜻이 아니고 이번 실행의 model_requests=0과 함께 해석한다. 의미·주어·시점·인과 정확성도 이 집계로 입증되지 않는다.

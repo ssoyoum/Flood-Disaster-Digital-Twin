@@ -1,5 +1,10 @@
 import { expect, test } from "@playwright/test";
 
+// A separate proxy client from the event conversation suite keeps the real 6/minute gate intact.
+test.beforeEach(async ({ page }) => {
+  await page.setExtraHTTPHeaders({ "X-Forwarded-For": "198.51.100.42" });
+});
+
 // Current home UI lives in an iframe and ranks facilities, rather than gauges.
 test("home ranks facilities and keeps selected region and facility in the URL", async ({ page }) => {
   await page.goto("/");

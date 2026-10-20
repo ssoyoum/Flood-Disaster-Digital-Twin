@@ -49,7 +49,7 @@ workflow는 contents:read, credential persistence 비활성화, lockfile/require
 - PR job은 contents:read만 기본. fork PR에는 모델·AWS·레지스트리 자격을 주지 않는다. push job에만 필요한 권한을 별도 부여한다.
 - Gemini 키는 build ARG나 이미지 layer가 아니라 런타임 환경변수. 프런트엔드 VITE_* 값은 번들에 노출되므로 비밀값이 아니다.
 - 실패하면 테스트 이름·traceback·관련 자료 경로·소스 SHA를 보관한다. 환경/의존성, 데이터 부재, 코드 회귀를 로그로 구분한다. continue-on-error로 필수 검증을 성공 처리하지 않는다.
-- E2E는 `playwright.config.ts`의 두 서비스와 브라우저가 필요하다. 수동 workflow_dispatch에서 e2e=true일 때만 브라우저 설치·E2E를 실행한다. 기본 PR/main 검사의 필수 단계가 아니며 이번에는 미실행이다. Gemini 키 공백·provider 고정·replay 환경을 적용한다.
+- E2E는 `playwright.config.ts`의 두 서비스와 브라우저가 필요하다. 검증한 현재 브라우저 회귀를 기본 PR/main 검사에 편입했다. 브라우저 설치·E2E가 실패하면 verify와 후속 image job이 차단된다. 선택적 agent-latency 측정은 새 서버에서 별도 실행하며 기본 suite에서는 skip한다. Gemini 키 공백·provider 고정·replay 환경을 적용한다.
 
 ## AWS 배포와 로컬 개발 구분
 
@@ -69,5 +69,11 @@ workflow는 contents:read, credential persistence 비활성화, lockfile/require
 - [ ] 처리 자료 누락 범위와 실제 지원 기능을 배포 기록에 명시.
 - [ ] 실제 배포 승인과 결과를 CI 성공과 구분.
 
-다음 작업 하나: **#51의 원격 Actions 결과 확인**. 로컬 성공은 원격 CI 통과와 별개다. AI PR 리뷰어(#52)·CI 로그 에이전트(#53)는 먼저 읽을 CI 실패 로그가 안정적으로 생성된 뒤 검토한다.
+최초 구현의 원격 Actions [39464078993](https://github.com/ssoyoum/Flood-Disaster-Digital-Twin/actions/runs/39464078993)은 verify/image success였다. 이후 브라우저·trace 변경의 최종 run은 해당 commit에서 별도 확인한다. 다음 작업 하나: **자료·업무 질문의 의미 검증을 독립 fixture로 보완**. 로컬 성공은 원격 CI 통과와 별개다. AI PR 리뷰어(#52)·CI 로그 에이전트(#53)는 먼저 읽을 CI 실패 로그가 안정적으로 생성된 뒤 검토한다.
 
+
+## 실행으로 보완한 범위 (2026-10-20)
+
+Python 325개·프런트 7개·offline 평가 37문항·브라우저 회귀 20개와 별도 지연 측정 1개가 로컬에서 통과했다. 기본 CI는 회귀 20개와 의도적으로 제외한 측정 1개를 구분한다. `MEASURE_LATENCY=1 npx playwright test e2e/agent-latency.spec.ts`는 단독으로 새 서버에서 실행한다. 전체 suite와 섞으면 앞선 요청이 기본 6/min 제한을 사용해 429를 받을 수 있다. 한도를 바꾸거나 429를 성공 지연으로 계산하지 않는다.
+
+offline benchmark는 `reports/agent-traces.jsonl`과 `agent-trace-summary.json`도 생성한다. 집계 분모·실패·비용 해석은 [AGENT_VALIDATION.md](AGENT_VALIDATION.md)의 trace 절이 원본이다. [로컬 Kubernetes](KUBERNETES_LEARNING_PLAN.md)의 성공은 kind 실습이며 workflow의 registry push·실제 배포를 구현한 것은 아니다.

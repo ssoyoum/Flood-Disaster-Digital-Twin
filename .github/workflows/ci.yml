@@ -6,11 +6,6 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      e2e:
-        description: Run browser regression tests against local replay services
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -42,7 +37,9 @@ jobs:
       - name: Backend tests
         run: python -m pytest backend/tests -q --junitxml=reports/backend.xml
       - name: Offline Agent benchmark
-        run: python backend/evaluation/agent_benchmark.py --mode offline --output reports/agent-benchmark-offline.json
+        run: |
+          FLOODOPS_AGENT_TRACE_LOG=reports/agent-traces.jsonl python backend/evaluation/agent_benchmark.py --mode offline --output reports/agent-benchmark-offline.json
+          python backend/evaluation/summarize_traces.py reports/agent-traces.jsonl --output reports/agent-trace-summary.json
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -54,11 +51,9 @@ jobs:
         run: npm test
       - name: Frontend build
         run: npm run build
-      - name: Install browser for optional E2E
-        if: github.event_name == 'workflow_dispatch' && inputs.e2e
+      - name: Install browser for offline E2E
         run: npx playwright install --with-deps chromium
       - name: Browser regression tests (local replay services)
-        if: github.event_name == 'workflow_dispatch' && inputs.e2e
         run: npm run test:e2e
       - name: Preserve test and evaluation reports
         if: always()
