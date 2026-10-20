@@ -477,15 +477,16 @@ body { display: flex; flex-direction: column; }
 </head>
 <body>
 <header class="demo-top">
-  <div class="demo-brand"><b>하천 접점 시설 감시 보드</b><small>FloodOps · 시설별 침수 원인에 맞춰 수위와 강우 위험을 평가합니다</small></div>
+  <div class="demo-brand"><b>통제 판단 보드</b><small>FloodOps · 공식 특보가 걸린 시설에 공식 기준을 대입해 보여줍니다</small></div>
   <details class="demo-menu">
     <summary>화면 이동 <span aria-hidden="true">⌄</span></summary>
     <nav aria-label="FloodOps 화면">
-      <a href="#watch" target="_top" aria-current="page">전국 감시 보드</a>
-      <a href="#twin" target="_top">운영 시설 통제 판단</a>
-      <a href="#cases" target="_top">사례 검증</a>
-      <a href="#compare" target="_top">사례 간 비교</a>
-      <a href="#intro" target="_top">FloodOps 소개</a>
+      <!-- 이 파일은 앱 안의 iframe이라 상대 해시(#twin)는 이 파일 주소로 풀린다. 앱 경로(/#…)로 적어야 앱 화면이 바뀐다. -->
+      <a href="/#watch" target="_top" aria-current="page">통제 판단 보드 · 특보 → 시설</a>
+      <a href="/#twin" target="_top">운영 시설 상세</a>
+      <a href="/#cases" target="_top">사례 검증</a>
+      <a href="/#compare" target="_top">효과성 채점표</a>
+      <a href="/#intro" target="_top">FloodOps 소개</a>
     </nav>
   </details>
   <div class="sp"></div>
@@ -495,7 +496,7 @@ body { display: flex; flex-direction: column; }
 
 <main class="demo-stage">
 <!-- ===== 컴포넌트 시작 ===== -->
-<div class="wx" id="wx-root" data-api="" data-twin-href="#twin">
+<div class="wx" id="wx-root" data-api="" data-twin-href="/#twin">
 
   <!-- 지도: 늘 화면 전체 -->
   <section class="wx-mapcol" aria-label="지도">
