@@ -272,7 +272,7 @@ def backtest(facility_id: str) -> dict[str, Any]:
 
 # ---- closure-criteria review -------------------------------------------------------------------
 CRITERIA_FLOORS = ("advisory", "warning")
-CRITERIA_LEADS = (0, 60, 120, 180)
+CRITERIA_LEADS = (0, 30, 60, 90, 120, 180)
 CRITERIA_MAX_LEAD = 360
 EPISODE_GAP = timedelta(hours=6)
 REFERENCE_WINDOW = timedelta(hours=24)
