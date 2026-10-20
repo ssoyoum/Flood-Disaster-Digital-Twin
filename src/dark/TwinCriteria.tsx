@@ -13,7 +13,7 @@ const FLOORS: Array<{ id: CriteriaFloor; label: string }> = [
   { id: "advisory", label: "주의보 수위부터" },
   { id: "warning", label: "경보 수위부터" },
 ];
-const LEADS = [0, 60, 120, 180];
+const LEADS = [0, 30, 60, 90, 120, 180];
 const STAGE_KO: Record<string, string> = { normal: "정상", attention: "관심", advisory: "주의보", warning: "경보", planned_flood: "계획홍수위" };
 
 const clock = (iso?: string | null) => (iso ? iso.slice(11, 16) : "—");

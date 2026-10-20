@@ -77,7 +77,7 @@ def test_criteria_review_current_rule_lead_and_other_seasons():
     assert result["lead_minutes"]["underpass_inflow"] == 157 and result["lead_minutes"]["official_requirement_met"] == 50
     assert result["other_episode_count"] == 0
     assert [y["year"] for y in result["by_year"]] == list(range(2019, 2027))
-    assert len(result["sweep"]) == 8
+    assert len(result["sweep"]) == 12
 
 
 def test_earlier_criteria_trade_lead_time_for_a_2025_review_episode():

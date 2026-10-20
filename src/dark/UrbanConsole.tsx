@@ -4,6 +4,7 @@ import * as api from "../api";
 import type { AlertTimingResult, FloodEvent, LayersResponse, StorageCaptureResult, UrbanReconstructionResponse } from "../types";
 import { AgentDock } from "./DarkConsole";
 import { FloodOpsLogo } from "./Landing";
+import { AppNavigation } from "./Navigation";
 import { CONFIDENCE_KO, ROLE_KO, localizeEvent, stageKo } from "./ko";
 import "./dark.css";
 import "./urban.css";
@@ -161,6 +162,7 @@ function UrbanConsoleView({ eventData, layers, reconstruction }: { eventData: Fl
           <AgentDock eventId={eventData.id} compact />
         </div>
         <div className="dk-status">
+          <AppNavigation active="cases" />
           <span className="dk-chip dk-chip-stage"><i />{current ? `${clock(current.time)} ${current.label}` : "—"}</span>
           <span className="dk-chip">침수흔적 <small>{num(reconstruction.exposure.traces.count)}건</small></span>
           <span className="dk-chip">흔적 위 건축물 <small>{num(reconstruction.exposure.buildings.trace_intersecting)}동</small></span>
