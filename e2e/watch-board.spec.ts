@@ -3,6 +3,8 @@ import { expect, test } from "@playwright/test";
 // A separate proxy client from the event conversation suite keeps the real 6/minute gate intact.
 test.beforeEach(async ({ page }) => {
   await page.setExtraHTTPHeaders({ "X-Forwarded-For": "198.51.100.42" });
+  // Exercise the actual failure boundary instead of relying on CI access to a public CDN.
+  await page.route("https://unpkg.com/**", route => route.abort());
 });
 
 // Current home UI lives in an iframe and ranks facilities, rather than gauges.
@@ -11,6 +13,7 @@ test("home ranks facilities and keeps selected region and facility in the URL", 
   const board = page.frameLocator('iframe[title="FloodOps 전국 하천 감시 보드"]');
   await expect(board.getByRole("heading", { name: "실시간 위험 순위" })).toBeVisible();
   await expect(board.locator("#demo-mode")).toContainText("수위 재생");
+  await expect(board.locator("#wx-map")).toContainText("시설 목록과 판정 근거는 계속 확인");
   await board.locator("#wx-rbtn").click();
   await board.locator('[data-r="충북"]').click();
   await expect(page).toHaveURL(/region=%EC%B6%A9%EB%B6%81/);

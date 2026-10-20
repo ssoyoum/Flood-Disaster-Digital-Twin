@@ -77,3 +77,6 @@ workflow는 contents:read, credential persistence 비활성화, lockfile/require
 Python 325개·프런트 7개·offline 평가 37문항·브라우저 회귀 20개와 별도 지연 측정 1개가 로컬에서 통과했다. 기본 CI는 회귀 20개와 의도적으로 제외한 측정 1개를 구분한다. `MEASURE_LATENCY=1 npx playwright test e2e/agent-latency.spec.ts`는 단독으로 새 서버에서 실행한다. 전체 suite와 섞으면 앞선 요청이 기본 6/min 제한을 사용해 429를 받을 수 있다. 한도를 바꾸거나 429를 성공 지연으로 계산하지 않는다.
 
 offline benchmark는 `reports/agent-traces.jsonl`과 `agent-trace-summary.json`도 생성한다. 집계 분모·실패·비용 해석은 [AGENT_VALIDATION.md](AGENT_VALIDATION.md)의 trace 절이 원본이다. [로컬 Kubernetes](KUBERNETES_LEARNING_PLAN.md)의 성공은 kind 실습이며 workflow의 registry push·실제 배포를 구현한 것은 아니다.
+
+
+원격 실패로 확인한 차단 사례: [39481499120](https://github.com/ssoyoum/Flood-Disaster-Digital-Twin/actions/runs/39481499120)에서 브라우저 2개가 초기 배지 미갱신으로 실패해 image job이 skipped됐다. 감시 보드의 CDN/style 로딩과 API 조회 결합을 제거하고 강제 CDN 차단 회귀를 추가했다. 이 실패를 Python 코드 문제나 모델 장애로 분류하지 않는다. 수정 commit의 새 run에서 최종 결과를 확인한다.

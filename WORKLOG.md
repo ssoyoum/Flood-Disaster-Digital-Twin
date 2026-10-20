@@ -4585,3 +4585,21 @@ UI 보완:
 문제/해결:
 - 문제: 관리형 Docker 안의 kind에서 /dev/kmsg 누락·중첩 overlayfs mount invalid argument로 control plane이 시작되지 않았다. kind load는 containerd transfer API의 unpack platform 오류가 났다.
   해결: 본인이 만든 노드 내부에 kmsg 장치를 만들고 containerd snapshotter만 native로 바꾼 뒤, ctr images import --local --platform linux/amd64 --snapshotter native로 동일 이미지를 적재했다. 외부 daemon storage driver를 바꾸거나 TLS 검증을 끄지 않았다. 정상 PC의 기본 경로와 이 환경의 차이를 학습 문서에 분리했다. 로컬 실습 성공을 EKS 운영·실서비스 배포로 표현하지 않는다.
+
+## 원격 CI의 지도 CDN 차이로 드러난 감시 자료 로딩 결합 제거
+
+- 작업일: 2026-10-20
+
+주요 작업:
+- 시설 API·목록·Agent·주기 갱신을 지도 초기화보다 먼저 시작하고 CDN/WebGL/style 장애와 분리했다.
+- 초기 미확인 배지를 실시간으로 표시하지 않고, 지도 미가용 시 목록/근거를 사용할 수 있음을 알린다.
+- 지도 레이어·팝업 준비 전 hover를 차단하고 CDN을 강제 차단한 브라우저 회귀로 검증했다.
+
+검증 결과:
+- 원격 Actions 39481499120은 Python·offline·프런트 build 성공 뒤 브라우저 18 passed / 2 failed / 선택 측정 1 skipped였다. image job은 실제 skipped로 차단됐다.
+- 실패는 초기 '실시간' 문자열이 그대로 남는 것이었다. init이 MapLibre와 style.load를 기다린 뒤에만 load를 호출해 API 상태가 갱신되지 않는 경로를 확인했다.
+- 수정 후 unpkg를 강제 차단한 감시 보드 3개 브라우저 검사와 build를 재검증했다. 기본 요청 제한·검증 assert·브라우저 검사는 제거하지 않았다.
+
+문제/해결:
+- 문제: 로컬에서는 CDN이 열려 통과했으나 GitHub runner에서는 지도 실패/지연이 데이터 조회까지 막았다. 관측을 받기 전에도 헤더가 '실시간'처럼 보였다.
+  해결: 데이터와 지도 init 함수를 나누고 지도 미가용을 명시했다. timeout 연장이나 재시도/skip으로 실패를 숨기지 않고 외부 CDN이 없어도 API 근거·지역 필터·후속 대화가 동작하도록 검증했다.
