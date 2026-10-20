@@ -956,6 +956,18 @@ function ClosureScenarioView({
         <span>{reconstruction.replay.length ? `${time + 1} / ${reconstruction.replay.length}` : "—"}</span>
       </div>
 
+      <section className="dk-compare-panel dk-compare-stage-panel">
+        <div className="dk-compare-panel-head"><p>공간 비교</p><span>두 시나리오는 같은 사건 단계, 오른쪽 근거는 현재 단계를 고정 표시</span></div>
+        <div className="dk-compare-stage-grid">
+          <ScenarioMap layers={layers} reconstruction={reconstruction} time={time} mode="baseline" title="원시나리오" sync={syncRef.current} />
+          <ScenarioMap layers={layers} reconstruction={reconstruction} time={time} mode="intervention" title="선택 시나리오" sync={syncRef.current} closureClock={closureClock} />
+          <aside className="dk-compare-evidence">
+            <EvidenceHandSection eventData={eventData} layers={layers} summary={summary} dataStatus={dataStatus} reconstruction={reconstruction} time={time} tone="#2dd4bf" compact />
+          </aside>
+        </div>
+        <small className="dk-compare-map-note">두 지도는 같은 재생 시점과 화면 배율을 공유합니다. 선택 시나리오의 지하차도 색은 아래에서 고른 통제 시각 전(붉음)·후(청록) 상태이며, 침수범위는 공식 범위나 수리모형 결과가 아니라 두 지도에서 같습니다.</small>
+      </section>
+
       <div className="dk-compare-cards">
         <section className="dk-compare-card baseline">
           <div className="dk-compare-card-label"><i />원시나리오 · 관측 재현</div>
@@ -1011,18 +1023,6 @@ function ClosureScenarioView({
           </article>
         </div>
         <small className="dk-compare-summary-note">이 비교는 관측된 사건 시각과 통제 가정의 차이입니다. 차량·인명 피해 감소 효과는 계산하지 않습니다.</small>
-      </section>
-
-      <section className="dk-compare-panel dk-compare-stage-panel">
-        <div className="dk-compare-panel-head"><p>공간 비교</p><span>두 시나리오는 같은 사건 단계, 오른쪽 근거는 현재 단계를 고정 표시</span></div>
-        <div className="dk-compare-stage-grid">
-          <ScenarioMap layers={layers} reconstruction={reconstruction} time={time} mode="baseline" title="원시나리오" sync={syncRef.current} />
-          <ScenarioMap layers={layers} reconstruction={reconstruction} time={time} mode="intervention" title="선택 시나리오" sync={syncRef.current} closureClock={closureClock} />
-          <aside className="dk-compare-evidence">
-            <EvidenceHandSection eventData={eventData} layers={layers} summary={summary} dataStatus={dataStatus} reconstruction={reconstruction} time={time} tone="#2dd4bf" compact />
-          </aside>
-        </div>
-        <small className="dk-compare-map-note">두 지도는 같은 재생 시점과 화면 배율을 공유합니다. 선택 시나리오의 지하차도 색은 통제 시각 전(붉음)·후(청록) 상태이며, 침수범위는 공식 범위나 수리모형 결과가 아니라 두 지도에서 같습니다.</small>
       </section>
 
       <small className="dk-compare-limit">근거: {intervention.trigger_basis} · {intervention.estimated_effect} · 공식 피해 감소율/사상자/실제 침수심은 산출하지 않습니다.</small>
