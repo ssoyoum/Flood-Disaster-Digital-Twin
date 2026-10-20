@@ -1,12 +1,12 @@
 # CI/CD 설계와 현재 배포 경계
 
-확인일: 2026-10-20. 기준 commit: `88a7ee489d9f62ac4943dff8b86330a57aa6b72e`. **설계 문서**이며 workflow·코드·Secret은 수정하지 않았다. CI 실행·이미지 빌드·배포도 하지 않았다.
+확인일: 2026-10-20. 초기 문서 기준은 `88a7ee489d9f62ac4943dff8b86330a57aa6b72e`이며, 이후 `8433fe9` checkout에서 `.github/workflows/ci.yml`과 재현 가능한 회귀 테스트를 구현했다. 로컬 테스트·offline 평가·이미지 build/smoke는 성공했다. 원격 Actions 결과와 실제 배포는 구분한다. Secret·운영 설정은 변경하지 않았다.
 
 ## 현재 구현
 
 | 근거 | 확인한 상태 |
 |---|---|
-| Git tree의 .github/workflows | 기준 커밋에 파일 없음. Actions runs 조회도 0건. “CI 통과” 근거 없음 |
+| `.github/workflows/ci.yml` | 신규 구현: PR/main push/수동 실행. verify 성공 후 image job. 원격 성공 여부는 실제 run 링크로 확인 |
 | `package.json` | test=vitest run, build=tsc -b && vite build, test:e2e=playwright test |
 | `backend/tests/conftest.py` | 테스트에서 .env 읽기를 막고 Gemini 키를 제거하는 fixture 존재 |
 | `Dockerfile` | Node 22 빌드 후 nginx 80. 프런트엔드 전용 |
@@ -18,9 +18,9 @@
 
 Compose가 PostGIS를 띄우고 DATABASE_URL을 준다는 사실은 API가 PostGIS를 실제 저장소로 사용한다는 증거가 아니다. 단일 EC2 Docker 운영과 Kubernetes/EKS 운영은 별도다.
 
-## 제안 파이프라인: 테스트 실패 시 뒤 단계 차단
+## 구현 파이프라인: 테스트 실패 시 뒤 단계 차단
 
-Career [#51](https://github.com/ssoyoum/career/issues/51)에 대응하는 **미구현 설계**다.
+Career [#51](https://github.com/ssoyoum/career/issues/51)에 대응한다. verify job은 Python 테스트 → offline benchmark → 프런트 단위 테스트·빌드 순서다. 실패하면 image job을 실행하지 않는다. image는 commit SHA 태그로 build 후 외부 네트워크 없는 컨테이너에서 health·사건 목록·정적 페이지를 검사한다.
 
 1. PR·main push 트리거에서 checkout. Python 3.12(`Dockerfile.aws`와 일치), Node 22 기준으로 고정.
 2. Python 의존성 설치 → 백엔드 테스트. 비밀값·운영 API 호출을 기본 CI에서 차단하고 필요한 replay 자료가 없으면 누락 자료를 명시해 실패 원인을 분류한다. 테스트를 삭제하거나 전부 skip해 통과시키지 않는다.
@@ -28,7 +28,7 @@ Career [#51](https://github.com/ssoyoum/career/issues/51)에 대응하는 **미�
 4. 위 검증이 전부 성공한 후 Docker 이미지 build. AWS 이미지 COPY 입력의 포함/제외를 .dockerignore와 대조한다. 로컬 전용 대용량 자료가 필요한 경우 “공개 Git 소스만으로 동일 기능 이미지 재현 가능”으로 표시하지 않는다.
 5. 기본 CI에서는 이미지 로컬 빌드까지. 레지스트리 push는 신뢰된 main 변경에 한정하고, 실제 배포는 별도 승인된 단계로 분리한다.
 
-검증 가능한 기존 명령(원본 저장소 루트, 이번에는 미실행):
+실행한 검증 명령(원본 저장소 루트, 실제 결과는 [AI_SERVICE_ENGINEERING_EVIDENCE.md](AI_SERVICE_ENGINEERING_EVIDENCE.md)):
 
 ```bash
 python -m pip install -r backend/requirements.txt
@@ -39,7 +39,7 @@ npm run build
 docker build -f Dockerfile.aws -t floodops:local-ci .
 ```
 
-독립 테스트 job을 병렬화할 수 있지만 Docker build/push/deploy는 의존성 성공 후에만 수행한다. workflow YAML은 이 작업에서 만들지 않는다.
+workflow는 contents:read, credential persistence 비활성화, lockfile/requirements 기반 캐시, 같은 ref의 이전 run 취소, job별 20분 timeout을 적용한다. report는 성공/실패 모두 7일 보관한다. 레지스트리 push·배포 단계는 만들지 않았다. PR fork에 별도 자격을 전달하지 않는다.
 
 ## 캐시·태그·권한·실패 처리 제안
 
@@ -49,7 +49,7 @@ docker build -f Dockerfile.aws -t floodops:local-ci .
 - PR job은 contents:read만 기본. fork PR에는 모델·AWS·레지스트리 자격을 주지 않는다. push job에만 필요한 권한을 별도 부여한다.
 - Gemini 키는 build ARG나 이미지 layer가 아니라 런타임 환경변수. 프런트엔드 VITE_* 값은 번들에 노출되므로 비밀값이 아니다.
 - 실패하면 테스트 이름·traceback·관련 자료 경로·소스 SHA를 보관한다. 환경/의존성, 데이터 부재, 코드 회귀를 로그로 구분한다. continue-on-error로 필수 검증을 성공 처리하지 않는다.
-- E2E는 `playwright.config.ts`의 두 서비스와 브라우저가 필요하다. replay fixture·모델 호출 차단을 확인한 뒤 별도 필수 job 채택 여부를 결정한다. 현재 “자동 E2E CI 실행”은 미구현이다.
+- E2E는 `playwright.config.ts`의 두 서비스와 브라우저가 필요하다. 수동 workflow_dispatch에서 e2e=true일 때만 브라우저 설치·E2E를 실행한다. 기본 PR/main 검사의 필수 단계가 아니며 이번에는 미실행이다. Gemini 키 공백·provider 고정·replay 환경을 적용한다.
 
 ## AWS 배포와 로컬 개발 구분
 
@@ -69,5 +69,5 @@ docker build -f Dockerfile.aws -t floodops:local-ci .
 - [ ] 처리 자료 누락 범위와 실제 지원 기능을 배포 기록에 명시.
 - [ ] 실제 배포 승인과 결과를 CI 성공과 구분.
 
-다음 작업 하나: **#51의 CI 구현**. 이 문서 작성은 CI 구현/실행의 완료가 아니다. AI PR 리뷰어(#52)·CI 로그 에이전트(#53)는 먼저 읽을 CI 실패 로그가 안정적으로 생성된 뒤 검토한다.
+다음 작업 하나: **#51의 원격 Actions 결과 확인**. 로컬 성공은 원격 CI 통과와 별개다. AI PR 리뷰어(#52)·CI 로그 에이전트(#53)는 먼저 읽을 CI 실패 로그가 안정적으로 생성된 뒤 검토한다.
 
