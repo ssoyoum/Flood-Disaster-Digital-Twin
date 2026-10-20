@@ -194,7 +194,7 @@ export function CaseSelectPage({ events, onSelect, onBack, onCompare, onTwin }: 
 
   useEffect(() => {
     const viewport = viewportRef.current;
-    if (!viewport || events.length < 2) return;
+    if (!viewport || availableEvents.length < 2) return;
     let waiting = false;
     let timer: number | undefined;
     const onWheel = (event: WheelEvent) => {
@@ -202,7 +202,7 @@ export function CaseSelectPage({ events, onSelect, onBack, onCompare, onTwin }: 
       event.preventDefault();
       if (waiting) return;
       waiting = true;
-      setSelectedIndex((index) => (index + (event.deltaY > 0 ? 1 : -1) + events.length) % events.length);
+      setSelectedIndex((index) => (index + (event.deltaY > 0 ? 1 : -1) + availableEvents.length) % availableEvents.length);
       timer = window.setTimeout(() => { waiting = false; }, 380);
     };
     viewport.addEventListener("wheel", onWheel, { passive: false });
@@ -210,7 +210,7 @@ export function CaseSelectPage({ events, onSelect, onBack, onCompare, onTwin }: 
       viewport.removeEventListener("wheel", onWheel);
       window.clearTimeout(timer);
     };
-  }, [events.length]);
+  }, [availableEvents.length]);
 
   return (
     <main className="fo-landing fo-cases-page">

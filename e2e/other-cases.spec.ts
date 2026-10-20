@@ -57,18 +57,16 @@ test("Pohang 2022 replays reported times and compares the entry-ban time", async
   await expect(table).toContainText("45분");
 });
 
-test("Iksan 2024 stays locked in the case library", async ({ page }) => {
+test("unavailable Iksan cannot be opened from the case library or a direct route", async ({ page }) => {
   await page.goto("/#cases");
-  const next = page.getByRole("button", { name: "다음 사례" });
-  for (let index = 0; index < 3; index += 1) await next.click();
-  const card = page.locator(".fo-case-slide.is-center .fo-case");
-  await expect(card).toHaveClass(/is-locked/);
-  await expect(card).toBeDisabled();
-  await expect(card).toContainText("데이터 연결 예정");
+  await expect(page.locator(".fo-case.is-ready")).toHaveCount(4);
+  await expect(page.getByRole("button", { name: /익산/ })).toHaveCount(0);
+  await page.goto("/#event/iksan-2024");
+  await expect(page).toHaveURL(/#cases$/);
 });
 
 test("Andong-Uiseong 2026 replays overnight times and compares the evacuation order", async ({ page }) => {
-  await openCase(page, 4, "andong-uiseong-2026");
+  await openCase(page, 3, "andong-uiseong-2026");
   await expect(page.locator("h1")).toContainText("안동");
   await expect(page.locator(".dk-stages button")).toHaveCount(7);
   // The HAND band is already present at the first reported isolation and widens up to the predicted peak.

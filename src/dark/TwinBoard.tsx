@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Activity, AlertTriangle, ArrowLeft, ArrowRight, Radio, RotateCcw } from "lucide-react";
 import * as api from "../api";
 import type { TwinBacktest, TwinFacility, TwinGateId, TwinRegistry, TwinRegistryFacility, TwinStatus } from "../types";
@@ -61,6 +61,8 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
   const [registryError, setRegistryError] = useState<string | null>(null);
   const [facilityId, setFacilityId] = useState<string | null>(null);
   const [at, setAt] = useState<string | null>(readAt);
+  const [initialAt] = useState(readAt);
+  const frameRef = useRef<HTMLIFrameElement>(null);
   const [status, setStatus] = useState<TwinStatus | null>(null);
   const [backtest, setBacktest] = useState<TwinBacktest | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -70,9 +72,22 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
     api.getTwinFacilities().then((list) => { setFacilities(list); setFacilityId((current) => current ?? list[0]?.id ?? null); }).catch((reason: Error) => setError(reason.message));
     api.getTwinRegistry().then(setRegistry).catch((reason: Error) => setRegistryError(reason.message));
     // 뒤로가기나 주소 직접 수정으로 ?at= 가 바뀌면 같은 컴포넌트에서 다시 읽는다.
-    const onHash = () => setAt(readAt());
+    const onHash = () => {
+      const next = readAt();
+      setAt(next);
+      frameRef.current?.contentWindow?.postMessage({ type: "floodops-twin-set-time", at: next }, window.location.origin);
+    };
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin || event.source !== frameRef.current?.contentWindow) return;
+      if (event.data?.type !== "floodops-twin-time" || typeof event.data.at !== "string" || !/^2023-07-15T\d{2}:\d{2}:00$/.test(event.data.at)) return;
+      setAt(event.data.at);
+      const params = new URLSearchParams(window.location.hash.split("?")[1] ?? "");
+      params.set("at", event.data.at);
+      window.history.replaceState(null, "", `#twin?${params}`);
+    };
     window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    window.addEventListener("message", onMessage);
+    return () => { window.removeEventListener("hashchange", onHash); window.removeEventListener("message", onMessage); };
   }, []);
 
   useEffect(() => {
@@ -134,8 +149,9 @@ export default function TwinBoard({ onBack }: { onBack: () => void }) {
 
       {tab === "now" && <main className="tw-now-frame">
         <iframe
+          ref={frameRef}
           title="현재 지하차도 통제 판단 트윈"
-          src={`/twin-now-c.html?api=${encodeURIComponent(import.meta.env.VITE_API_BASE === "same-origin" ? "" : import.meta.env.VITE_API_BASE ?? (import.meta.env.PROD ? "" : "http://localhost:8033"))}&facility=${encodeURIComponent(facility.id)}`}
+          src={`/twin-now-c.html?api=${encodeURIComponent(import.meta.env.VITE_API_BASE === "same-origin" ? "" : import.meta.env.VITE_API_BASE ?? (import.meta.env.PROD ? "" : "http://localhost:8033"))}&facility=${encodeURIComponent(facility.id)}${initialAt ? `&at=${encodeURIComponent(initialAt)}` : ""}`}
         />
       </main>}
 

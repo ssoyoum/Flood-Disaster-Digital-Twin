@@ -1154,7 +1154,7 @@ body { display: flex; flex-direction: column; }
     const nextRegion = view.region ?? (view.station_code || view.facility_id ? st.region : "");
     if ((nextRegion || "") !== st.region) st.region = nextRegion || "";
     st.selected = view.facility_id ?? view.station_code ?? st.selected; renderAll();
-    if (st.selected) { select(st.selected, false, true); } else openDrawer(false);
+    if (st.selected) { select(st.selected, false, true); } else if ($("wx-pane-ag").hidden) openDrawer(false);
     if (map && view.center) map.flyTo({ center: view.center, zoom: view.zoom ?? 10, duration: 1000 });
     notifyView();
   }
@@ -1289,7 +1289,7 @@ body { display: flex; flex-direction: column; }
     st.at = nextAt; st.region = view.region ?? ""; st.minStage = view.stage ?? null; st.selected = view.facility_id ?? view.station ?? null; st.driver = view.driver ?? st.driver;
     $("wx-time").value = st.at;
     if (changedAt) { scheduleLiveRefresh(); load().catch(() => undefined); }
-    else { renderAll(); if (st.selected) { openDrawer(true); renderStation(st.selected); } else openDrawer(false); }
+    else { renderAll(); if (st.selected) { openDrawer(true); renderStation(st.selected); } else if ($("wx-pane-ag").hidden) openDrawer(false); }
   });
   root.wx = { reload: load, destroy: () => { document.removeEventListener("click", onDocClick); document.removeEventListener("keydown", onDocKey); if (liveRefresh) window.clearInterval(liveRefresh); map?.remove(); map = null; } };
   init().catch((e) => { $("wx-body").innerHTML = `<div class="wx-empty"><b>불러오지 못했습니다</b>${esc(e.message)} · API(${API || window.location.origin}) 연결을 확인하세요</div>`; });

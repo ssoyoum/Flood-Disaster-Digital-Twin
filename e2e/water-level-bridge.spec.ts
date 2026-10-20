@@ -1,31 +1,37 @@
 import { expect, test } from "@playwright/test";
 
-test("real water-level history follows replay time without presenting the research model as a forecast", async ({ page }, testInfo) => {
+test("replay deep link and hash changes update observation time in the current iframe", async ({ page }) => {
   await page.goto("/#twin?at=2023-07-15T08%3A00%3A00");
-  const history = page.getByLabel("수위 이력과 예측 연결");
-  await expect(history).toContainText("07.15 08:00");
-  await expect(history).toContainText("9.91 m");
-  await expect(history.locator("tbody tr")).toHaveCount(6);
-  await history.locator("summary").click();
-  await expect(history).toContainText("입력 22종 중 수위 6종");
-  await expect(history).toContainText("0.222 m");
-  await expect(history).toContainText("모델 예측이나 통제 권고가 아닙니다");
-  await page.getByRole("button", { name: /04:10/ }).click();
-  await expect(history).toContainText("07.15 04:10");
-  await expect(history).toContainText("7.69 m");
-  await expect(page.getByLabel("관측과 임계")).toContainText("관측 04:10");
-  await expect(page.getByLabel("관측과 임계")).toContainText("7.69 m");
-  await history.locator("summary").click();
-  await history.scrollIntoViewIfNeeded();
-  await expect(history.locator("tbody tr").last()).toBeInViewport();
-  await expect(history.locator("details small")).toBeInViewport();
-  await testInfo.attach("water-level-history", { body: await page.screenshot(), contentType: "image/png" });
+  const frame = page.frameLocator('iframe[title="현재 지하차도 통제 판단 트윈"]');
+  await expect(frame.locator("#twc-at")).toContainText("08:00");
+  await expect(frame.locator("#twc-k-level")).toContainText("9.91");
+  await page.evaluate(() => { window.location.hash = "twin?at=2023-07-15T04%3A10%3A00"; });
+  await expect(frame.locator("#twc-at")).toContainText("04:10");
+  await expect(frame.locator("#twc-k-level")).toContainText("7.69");
+  await expect(frame.locator("#twc-badge")).toContainText("감시");
 });
 
-test("research input failure leaves the facility observation and review board usable", async ({ page }) => {
-  await page.route("**/forecast-readiness**", (route) => route.fulfill({ status: 503, json: { detail: "unavailable" } }));
+test("research forecast failure leaves observation and review usable even without the map CDN", async ({ page }) => {
+  await page.route("**/rise-forecast**", (route) => route.fulfill({ status: 503, json: { detail: "unavailable" } }));
+  await page.route(/https:\/\/(unpkg\.com|cdn\.jsdelivr\.net)\//, (route) => route.abort());
   await page.goto("/#twin?at=2023-07-15T08%3A00%3A00");
-  await expect(page.getByLabel("수위 이력과 예측 연결")).toContainText("수위 이력을 불러오지 못했습니다");
-  await expect(page.getByLabel("관측과 임계")).toContainText("9.91 m");
-  await expect(page.getByLabel("통제 검토 권고")).toContainText("통제 검토");
+  const frame = page.frameLocator('iframe[title="현재 지하차도 통제 판단 트윈"]');
+  await expect(frame.locator("#twc-rise-v")).toContainText("예측 없음");
+  await expect(frame.locator("#twc-k-level")).toContainText("9.91");
+  await expect(frame.locator("#twc-badge")).toContainText("통제 검토");
+});
+
+
+test("a failed later observation cannot retain the previous level or recommendation", async ({ page }) => {
+  await page.goto("/#twin?at=2023-07-15T08%3A00%3A00");
+  const frame = page.frameLocator('iframe[title="현재 지하차도 통제 판단 트윈"]');
+  await expect(frame.locator("#twc-k-level")).toContainText("9.91");
+  await page.route("**/api/twin/facilities/*/status**", route => {
+    if (route.request().frame().parentFrame()) return route.fulfill({ status: 503, json: { detail: "test failure" } });
+    return route.continue();
+  });
+  await page.evaluate(() => { window.location.hash = "twin?at=2023-07-15T04%3A10%3A00"; });
+  await expect(frame.locator("#twc-badge")).toHaveText("관측 없음");
+  await expect(frame.locator("#twc-k-level")).toHaveText("—");
+  await expect(frame.locator("#twc-alert")).toContainText("판단 보류");
 });
