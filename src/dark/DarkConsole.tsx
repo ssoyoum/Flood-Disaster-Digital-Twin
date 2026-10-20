@@ -1072,6 +1072,16 @@ function HandScenarioView({
       <span>{reconstruction.replay.length ? `${time + 1} / ${reconstruction.replay.length}` : "—"}</span>
     </div>
 
+    <section className="dk-compare-panel dk-compare-stage-panel">
+      <div className="dk-compare-panel-head"><p>공간 비교</p><span>두 지도는 같은 사건 시각과 화면 범위를 공유합니다.</span></div>
+      <div className="dk-compare-stage-grid">
+        <ScenarioMap layers={layers} reconstruction={reconstruction} time={time} mode="baseline" title="기준 재구성" sync={syncRef.current} scenarioKind="hand" />
+        <ScenarioMap layers={layers} reconstruction={reconstruction} time={time} mode="intervention" title="임계 변경 가정" sync={syncRef.current} scenarioKind="hand" handStage={handStage} />
+        <aside className="dk-compare-evidence"><EvidenceHandSection eventData={eventData} layers={layers} summary={summary} dataStatus={dataStatus} reconstruction={reconstruction} time={time} tone="#f87171" compact /></aside>
+      </div>
+      <small className="dk-compare-map-note">붉은 셀은 임시 HAND 선택 셀, 청록 셀은 임계를 낮추며 제외된 셀입니다. 오른쪽 단면은 기준 재구성 값이며, 변경된 임계는 아래 카드에 표시합니다.</small>
+    </section>
+
     <div className="dk-compare-cards">
       <section className="dk-compare-card baseline">
         <div className="dk-compare-card-label"><i />기준 · HAND 재구성</div>
@@ -1105,18 +1115,8 @@ function HandScenarioView({
       <div className="dk-compare-summary-grid">
         <article className="dk-compare-summary-card focus ahead"><span>01 · 기준에서 선택된 셀</span><strong>{num(handStage?.baseline_cell_count)}개</strong><p>현재 재생 단계의 임시 HAND 지도 셀 수입니다.</p></article>
         <article className="dk-compare-summary-card"><span>02 · 변경 후 선택된 셀</span><strong>{num(handStage?.scenario_cell_count)}개</strong><p>낮춘 판정 기준과 하천 쪽 연결 조건을 만족한 셀입니다.</p></article>
-        <article className="dk-compare-summary-card"><span>03 · 기준에서 제외된 셀</span><strong>{num(handStage?.removed_cell_count)}개</strong><p>오른쪽 지도에서 청록색으로 표시합니다. 실제 침수 감소 면적이 아닙니다.</p></article>
+        <article className="dk-compare-summary-card"><span>03 · 기준에서 제외된 셀</span><strong>{num(handStage?.removed_cell_count)}개</strong><p>위 오른쪽 지도에서 청록색으로 표시합니다. 실제 침수 감소 면적이 아닙니다.</p></article>
       </div>
-    </section>
-
-    <section className="dk-compare-panel dk-compare-stage-panel">
-      <div className="dk-compare-panel-head"><p>공간 비교</p><span>두 지도는 같은 사건 시각과 화면 범위를 공유합니다.</span></div>
-      <div className="dk-compare-stage-grid">
-        <ScenarioMap layers={layers} reconstruction={reconstruction} time={time} mode="baseline" title="기준 재구성" sync={syncRef.current} scenarioKind="hand" />
-        <ScenarioMap layers={layers} reconstruction={reconstruction} time={time} mode="intervention" title="임계 변경 가정" sync={syncRef.current} scenarioKind="hand" handStage={handStage} />
-        <aside className="dk-compare-evidence"><EvidenceHandSection eventData={eventData} layers={layers} summary={summary} dataStatus={dataStatus} reconstruction={reconstruction} time={time} tone="#f87171" compact /></aside>
-      </div>
-      <small className="dk-compare-map-note">붉은 셀은 임시 HAND 선택 셀, 청록 셀은 임계를 낮추며 제외된 셀입니다. 오른쪽 단면은 기준 재구성 값이며, 변경된 임계는 위 카드에 표시합니다.</small>
     </section>
     <small className="dk-compare-limit">{textKo(handResult?.coverage_note) ?? "HAND 재구성 자료 확인 중"} · 이 값은 공간 선택 규칙의 민감도이며 실제 침수범위·침수심·시설 효과가 아닙니다.</small>
   </main>;

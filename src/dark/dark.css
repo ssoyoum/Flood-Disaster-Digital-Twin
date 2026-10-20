@@ -249,7 +249,7 @@
 .dk-compare-map-foot i.road { background: #64748b; }
 .dk-compare-map-foot i.changed { background: #2dd4bf; }
 .dk-compare-map-note { display: block; margin-top: 9px; color: var(--dk-muted); font-size: 10.5px; line-height: 1.45; }
-.dk-compare-replay { display: grid; grid-template-columns: minmax(170px, auto) 32px auto 32px minmax(180px, 1fr) auto; align-items: center; gap: 8px; max-width: 1340px; width: 100%; margin: 0 auto; padding: 9px 12px; border: 1px solid var(--dk-line); border-radius: 10px; background: rgba(17, 26, 43, .92); }
+.dk-compare-replay { position: sticky; top: -22px; z-index: 10; display: grid; grid-template-columns: minmax(170px, auto) 32px auto 32px minmax(180px, 1fr) auto; align-items: center; gap: 8px; max-width: 1340px; width: 100%; margin: 0 auto; padding: 9px 12px; border: 1px solid var(--dk-line); border-radius: 10px; background: #111a2b; box-shadow: 0 8px 18px rgba(4, 8, 16, .55); }
 .dk-compare-replay-label { display: grid; gap: 2px; min-width: 0; }
 .dk-compare-replay-label span { color: var(--dk-muted); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; }
 .dk-compare-replay-label strong { overflow: hidden; color: var(--dk-text); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
@@ -487,7 +487,7 @@
   .dk-provenance { padding: 20px 14px 30px; }
   .dk-provenance-head { display: grid; }
   .dk-provenance-list { grid-template-columns: 1fr; }
-  .dk-compare-replay { grid-template-columns: 1fr 32px auto 32px auto; }
+  .dk-compare-replay { top: -20px; grid-template-columns: 1fr 32px auto 32px auto; }
   .dk-compare-replay-label { grid-column: 1 / -1; }
   .dk-compare-replay input[type="range"] { grid-column: 1 / -2; }
 }
