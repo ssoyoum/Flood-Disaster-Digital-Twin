@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import io
 import json
 import math
 import os
@@ -37,8 +38,10 @@ import httpx
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RAW_DIR = REPO_ROOT / "data" / "raw" / "hrfco"
 PROCESSED_DIR = REPO_ROOT / "data" / "processed" / "hrfco"
+QUALITY_DIR = REPO_ROOT / "data" / "processed" / "hrfco-quality"
 CATALOG_FILE = REPO_ROOT / "data" / "manifests" / "hrfco-stations.json"
 HISTORY_MANIFEST = REPO_ROOT / "data" / "manifests" / "hrfco-history.json"
+QUALITY_REPORT = REPO_ROOT / "data" / "manifests" / "hrfco-quality.json"
 BASE = "https://api.hrfco.go.kr/{key}"
 CODE_FIELD = {"waterlevel": "wlobscd", "rainfall": "rfobscd", "dam": "dmobscd", "bo": "boobscd"}
 VALUE_FIELD = {"waterlevel": "wl", "rainfall": "rf"}
@@ -231,7 +234,53 @@ def qc_jumps(kind: str, station: str, interval: str, jump_m: float) -> dict[str,
 EVENTS_FILE = REPO_ROOT / "data" / "manifests" / "hrfco-events.json"
 
 
-def summarize_events(interval: str = "1H", gap_hours: int = 24) -> dict[str, Any]:
+def load_event_reading_mask(code: str, source_path: Path, quality_report: dict[str, Any]) -> dict[str, bool]:
+    """Load an audited reading mask and reject stale or incomplete audit outputs."""
+
+    station = quality_report.get("stations", {}).get(code, {})
+    if station.get("status") != "AUDITED":
+        raise RuntimeError(f"No completed hourly quality audit for station {code}; run audit_hrfco_quality.py first")
+    if sha256(source_path).lower() != station.get("source_sha256", "").lower():
+        raise RuntimeError(f"Quality audit for station {code} is stale; rerun audit_hrfco_quality.py")
+    quality_path = QUALITY_DIR / station.get("quality_file", f"waterlevel_{code}_1H_quality.csv")
+    if not quality_path.exists():
+        raise RuntimeError(f"Quality mask for station {code} is missing or stale; rerun audit_hrfco_quality.py")
+
+    mask: dict[str, bool] = {}
+    digest = hashlib.sha256()
+
+    class HashingReader(io.RawIOBase):
+        def __init__(self, path: Path):
+            self.handle = path.open("rb")
+
+        def readable(self) -> bool:
+            return True
+
+        def readinto(self, buffer: Any) -> int | None:
+            size = self.handle.readinto(buffer)
+            if size:
+                digest.update(memoryview(buffer)[:size])
+            return size
+
+        def close(self) -> None:
+            self.handle.close()
+            super().close()
+
+    raw_reader = HashingReader(quality_path)
+    with io.TextIOWrapper(io.BufferedReader(raw_reader), encoding="utf-8-sig", newline="") as handle:
+        for row in csv.DictReader(handle):
+            if row.get("station_id") != code:
+                raise RuntimeError(f"Quality mask for station {code} contains a different station id")
+            stamp = datetime.strptime(row["timestamp_kst"], "%Y-%m-%dT%H:%M:%S").isoformat(timespec="seconds")
+            mask[stamp] = row.get("reading_usable", "").strip().casefold() == "true"
+    if digest.hexdigest() != station.get("quality_sha256", "").lower():
+        raise RuntimeError(f"Quality mask for station {code} is stale; rerun audit_hrfco_quality.py")
+    if not mask:
+        raise RuntimeError(f"Quality mask for station {code} is empty; rerun audit_hrfco_quality.py")
+    return mask
+
+
+def summarize_events(interval: str = "1H", gap_hours: int = 24, use_quality_masks: bool = True) -> dict[str, Any]:
     """Count flood events per downloaded water-level station against its official levels.
 
     An event is a run of samples at or above the attention level (attwl) separated by more than
@@ -241,13 +290,33 @@ def summarize_events(interval: str = "1H", gap_hours: int = 24) -> dict[str, Any
 
     catalog = json.loads(CATALOG_FILE.read_text(encoding="utf-8"))
     levels = {s["code"]: s for s in catalog["kinds"]["waterlevel"]["stations"]}
+    masks_applied = use_quality_masks and interval == "1H"
+    quality_report = json.loads(QUALITY_REPORT.read_text(encoding="utf-8")) if masks_applied else {}
     summary: dict[str, Any] = {"interval": interval, "gap_hours": gap_hours, "built_at": datetime.now().isoformat(timespec="seconds"), "stations": {}}
+    masked_total = 0
     for path in sorted(PROCESSED_DIR.glob(f"waterlevel_*_{interval}.csv")):
         code = path.stem.split("_")[1]
         info = levels.get(code, {})
         att, wrn, alm, pfh = (info.get(k) for k in ("attwl", "wrnwl", "almwl", "pfh"))
-        rows = [r for r in csv.DictReader(path.open(encoding="utf-8")) if r.get("wl")]
-        values = [(datetime.strptime(r["timestamp_kst"], "%Y-%m-%d %H:%M"), float(r["wl"])) for r in rows]
+        with path.open(encoding="utf-8-sig", newline="") as handle:
+            source_rows = list(csv.DictReader(handle))
+        reading_mask = load_event_reading_mask(code, path, quality_report) if masks_applied else None
+        values: list[tuple[datetime, float]] = []
+        masked_rows = 0
+        for row in source_rows:
+            stamp = datetime.strptime(row["timestamp_kst"], "%Y-%m-%d %H:%M")
+            if reading_mask is not None:
+                key = stamp.isoformat(timespec="seconds")
+                if key not in reading_mask:
+                    raise RuntimeError(f"Quality mask for station {code} does not cover {key}; rerun audit_hrfco_quality.py")
+                if not reading_mask[key]:
+                    masked_rows += 1
+                    continue
+            raw_value = row.get("wl", "").strip()
+            if raw_value:
+                value = float(raw_value)
+                if math.isfinite(value):
+                    values.append((stamp, value))
         events: list[dict[str, Any]] = []
         current: dict[str, Any] | None = None
         if att is not None:
@@ -269,7 +338,9 @@ def summarize_events(interval: str = "1H", gap_hours: int = 24) -> dict[str, Any
         summary["stations"][code] = {
             "name": info.get("name"), "agency": info.get("agency"), "flood_forecast_station": info.get("flood_forecast_station"),
             "levels_m": {"attention": att, "advisory": wrn, "warning": alm, "planned_flood": pfh},
-            "rows": len(rows), "first": rows[0]["timestamp_kst"] if rows else None, "last": rows[-1]["timestamp_kst"] if rows else None,
+            "rows": len(values), "source_rows": len(source_rows), "masked_rows": masked_rows,
+            "first": values[0][0].strftime("%Y-%m-%d %H:%M") if values else None,
+            "last": values[-1][0].strftime("%Y-%m-%d %H:%M") if values else None,
             "max_wl_m": max((w for _, w in values), default=None),
             "events_attention": len(events),
             "events_advisory": sum(1 for e in events if wrn is not None and e["peak"] >= wrn),
@@ -277,8 +348,16 @@ def summarize_events(interval: str = "1H", gap_hours: int = 24) -> dict[str, Any
             "events_planned_flood": sum(1 for e in events if pfh is not None and e["peak"] >= pfh),
             "events": events[:40],
         }
+        masked_total += masked_rows
     totals = {k: sum(v[k] for v in summary["stations"].values()) for k in ("events_attention", "events_advisory", "events_warning", "events_planned_flood")}
     summary["totals"] = {"stations": len(summary["stations"]), **totals}
+    summary["quality_masks"] = {
+        "applied": masks_applied,
+        "policy_id": quality_report.get("policy_id") if masks_applied else None,
+        "basis": "reading_usable; invalid, duplicate, missing, and explicit research-quarantine readings excluded; jump-review readings retained" if masks_applied else None,
+        "masked_rows": masked_total,
+        "reason_not_applied": None if masks_applied else ("--no-quality-masks" if not use_quality_masks else "quality masks cover hourly (1H) records only"),
+    }
     EVENTS_FILE.write_text(json.dumps(summary, ensure_ascii=False, indent=1), encoding="utf-8")
     return summary
 
@@ -313,10 +392,11 @@ def main() -> None:
     ev = sub.add_parser("events", help="count flood events per downloaded water-level station against official levels")
     ev.add_argument("--interval", default="1H", choices=["1H", "10M"])
     ev.add_argument("--gap-hours", type=int, default=24)
+    ev.add_argument("--no-quality-masks", action="store_true", help="include all source readings without the audited hourly reading mask")
     args = parser.parse_args()
     if args.command == "events":
-        out = summarize_events(args.interval, args.gap_hours)
-        print(json.dumps(out["totals"], ensure_ascii=False))
+        out = summarize_events(args.interval, args.gap_hours, use_quality_masks=not args.no_quality_masks)
+        print(json.dumps({"totals": out["totals"], "quality_masks": out["quality_masks"]}, ensure_ascii=False))
         return
     if args.command == "qc":
         for station in args.stations:
