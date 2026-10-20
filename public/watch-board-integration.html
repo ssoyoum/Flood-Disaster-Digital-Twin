@@ -399,6 +399,28 @@ body { display: flex; flex-direction: column; }
 .wx-risk-track i { display: block; height: 4px; flex: 1; border-radius: 4px; background: rgba(148,163,184,.18); }
 .wx-risk-track i.wx-active { background: var(--wx-c); }
 .wx-why { overflow: hidden; color: var(--wx-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+/* 공식 기준 적용 상태 · 담당자 확인 기록 (시설 판단 탭) */
+.wx-crit { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.wx-crit li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--wx-line); background: rgba(255,255,255,.03); }
+.wx-crit li.wx-cmp { border-style: dashed; opacity: .85; }
+.wx-crit b { font-size: 13px; color: var(--wx-text); }
+.wx-crit small { color: var(--wx-muted); font-size: 11.5px; line-height: 1.4; }
+.wx-crit .wx-clead { grid-column: 2; justify-self: end; color: var(--wx-ui); font-weight: 700; text-align: right; white-space: nowrap; }
+.wx-cst { align-self: center; justify-self: end; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.wx-cst-met { background: rgba(248,113,113,.18); color: var(--wx-red); }
+.wx-cst-ok { background: rgba(52,211,153,.14); color: var(--wx-green); }
+.wx-cst-unk { background: rgba(255,255,255,.08); color: var(--wx-ui); }
+.wx-cst-none { border: 1px dashed var(--wx-line-2); color: var(--wx-muted); }
+.wx-dec-form { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.wx-dec-form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--wx-muted); }
+.wx-dec-form input:not([type="checkbox"]), .wx-dec-form select, .wx-dec-form textarea { padding: 7px 10px; border-radius: 8px; border: 1px solid var(--wx-line-2); background: rgba(255,255,255,.04); font-size: 13px; color: var(--wx-text); font-family: inherit; }
+.wx-dec-form select option { background: #18181b; }
+.wx-dec-form label.wx-dec-ack { flex-direction: row; align-items: flex-start; gap: 8px; color: var(--wx-ui); }
+.wx-dec-form button { align-self: flex-start; min-height: 36px; padding: 0 14px; border-radius: 8px; border: 0; background: var(--wx-ui); color: #18181b; font-weight: 800; cursor: pointer; }
+.wx-dec-form button:disabled { opacity: .45; }
+.wx-dec-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.wx-dec-list li { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,.04); font-size: 12px; color: var(--wx-muted); }
+.wx-dec-list li b { color: var(--wx-text); font-size: 13px; }
 .wx-eta .wx-why { display: block; max-width: 76px; white-space: normal; line-height: 1.2; }
 /* (4) 지도 위 정보 카드 — 배차 지도의 선택 차량 카드: 이름·단계·핵심 값 3개 */
 .wx-fmk .wx-tip { padding: 10px 12px; border-radius: 10px; min-width: 210px; box-shadow: 0 10px 26px rgba(0,0,0,.5); }
@@ -489,10 +511,10 @@ body { display: flex; flex-direction: column; }
   </div>
 
   <!-- 왼쪽: 실시간 위험 순위 -->
-  <section class="wx-list wx-float" aria-label="실시간 위험 순위">
+  <section class="wx-list wx-float" aria-label="특보 영향 시설">
     <div class="wx-lhead">
       <div class="wx-title">
-        <h2>실시간 위험 순위</h2>
+        <h2>특보 영향 시설</h2>
         <div class="wx-info" id="wx-info">
           <button class="wx-info-btn" type="button" id="wx-info-btn" aria-label="판정 기준" aria-expanded="false">i</button>
           <div class="wx-info-pop" role="dialog" aria-label="판정 기준">
@@ -521,7 +543,7 @@ body { display: flex; flex-direction: column; }
         <button class="wx-togbtn" type="button" id="wx-faconly" aria-pressed="false" title="하천형·내수형 시설 필터">전체 유형</button>
       </div>
     </div>
-    <div class="wx-cols" aria-hidden="true"><span>#</span><span>시설 · 잠김 원인과 판단 근거</span><span>단계</span></div>
+    <div class="wx-cols" aria-hidden="true"><span>#</span><span>시설 · 공식 특보 · 판단 근거</span><span>단계</span></div>
     <div class="wx-body" id="wx-body" role="list"></div>
     <div class="wx-lfoot" id="wx-lfoot"></div>
     <div class="wx-rpop" id="wx-rpop" role="dialog" aria-label="지역 선택">
@@ -534,9 +556,9 @@ body { display: flex; flex-direction: column; }
   <!-- 오른쪽: 관측소를 누르면 열리는 드로어 -->
   <section class="wx-right wx-float" id="wx-drawer" aria-label="상세" aria-hidden="true">
     <div class="wx-rtabs" role="tablist">
-      <button class="wx-rtab wx-on" type="button" role="tab" id="wx-tab-st" aria-selected="true">시설 상세</button>
+      <button class="wx-rtab wx-on" type="button" role="tab" id="wx-tab-st" aria-selected="true">시설 판단</button>
+      <button class="wx-rtab" type="button" role="tab" id="wx-tab-vc" aria-selected="false">채점표</button>
       <button class="wx-rtab" type="button" role="tab" id="wx-tab-ag" aria-selected="false">에이전트</button>
-      <button class="wx-rtab" type="button" role="tab" id="wx-tab-vc" aria-selected="false">검증 사례</button>
       <button class="wx-close" type="button" id="wx-close" aria-label="상세 닫기">✕</button>
     </div>
     <div class="wx-pane" id="wx-pane-st" role="tabpanel">
@@ -553,6 +575,23 @@ body { display: flex; flex-direction: column; }
           <div class="wx-irow" id="wx-i-rain"><span class="wx-ico">☂</span><div><strong id="wx-v-rain">—</strong><span id="wx-l-rain">주변 실시간 강우</span></div></div>
         </div>
         <p class="wx-quality" id="wx-quality" hidden></p>
+      </article>
+      <article class="wx-card" id="wx-crit-card" aria-label="공식 기준 적용 상태">
+        <span class="wx-chart-cap">공식 기준 적용 상태 · 기준은 기관 지침, FloodOps는 시설에 대입만</span>
+        <ul class="wx-crit" id="wx-crit"></ul>
+        <p class="wx-note">침수심 기준은 현장 센서가 없어 판정하지 않습니다. 담당자 판단·현장 확인이 우선이며 FloodOps는 통제를 실행하지 않습니다.</p>
+      </article>
+      <article class="wx-card" id="wx-dec-card" aria-label="담당자 확인 기록" hidden>
+        <span class="wx-chart-cap">담당자 확인 기록 · <span id="wx-dec-mode">—</span></span>
+        <form class="wx-dec-form" id="wx-dec-form">
+          <label>확인자 이름 또는 역할<input name="checked_by" maxlength="80" required placeholder="예: 당직 담당자"></label>
+          <label>확인 결과<select name="confirmation" required><option value="CONFIRMED">관측값·등록 기준 확인</option><option value="NO_ACTION">확인 후 현재 조치 불필요</option><option value="ESCALATE">현장 확인 요청</option></select></label>
+          <label>메모<textarea name="note" maxlength="500" rows="2" placeholder="현장 확인 사항 (선택)"></textarea></label>
+          <label class="wx-dec-ack"><input name="acknowledged" type="checkbox" required><span>화면의 관측 시각·수위·공식 기준을 확인했습니다.</span></label>
+          <button type="submit" id="wx-dec-submit">확인 기록 저장</button>
+          <p class="wx-note" id="wx-dec-feedback" role="status"></p>
+        </form>
+        <ul class="wx-dec-list" id="wx-dec-list" aria-label="최근 확인 기록"></ul>
       </article>
        <article class="wx-card wx-chart">
         <span class="wx-chart-cap" id="wx-chart-cap">판정 기준</span>
@@ -601,7 +640,7 @@ body { display: flex; flex-direction: column; }
   const REGION_CENTER = { 서울: [126.98, 37.56], 부산: [129.05, 35.18], 대구: [128.6, 35.87], 인천: [126.7, 37.46], 광주: [126.85, 35.16], 대전: [127.38, 36.35], 울산: [129.31, 35.54], 세종: [127.29, 36.48], 경기: [127.2, 37.45], 강원: [128.3, 37.6], 충북: [127.7, 36.75], 충남: [126.9, 36.5], 전북: [127.1, 35.75], 전남: [126.9, 34.85], 경북: [128.75, 36.4], 경남: [128.3, 35.35], 제주: [126.55, 33.4] };
 
   const TWIN_HREF = root.dataset.twinHref || "#twin";
-  const st = { at: params.get("at") ?? root.dataset.at ?? "", overview: null, changes: null, region: params.get("region") ?? "", minStage: params.get("stage") || null, q: "", sort: "risk", facOnly: false, driver: params.get("driver") || "all", showCalm: true, selected: params.get("facility") || params.get("station") || null, rsort: "risk", rainLayer: false };
+  const st = { at: params.get("at") ?? root.dataset.at ?? "", overview: null, changes: null, region: params.get("region") ?? "", minStage: params.get("stage") || null, q: "", sort: "risk", facOnly: false, driver: params.get("driver") || "all", showCalm: true, selected: params.get("facility") || params.get("station") || null, rsort: "risk", rainLayer: false, officialOnly: !params.get("stage") };
   let map = null, marker = null, hoverPop = null, stSeq = 0, prevStage = null, liveRefresh = null;
   const rank = (r) => ORDER.indexOf(r.stage ?? "unrated");
   const clock = (iso) => (iso ? `${iso.slice(5, 7)}.${iso.slice(8, 10)} ${iso.slice(11, 16)}` : "—");
@@ -945,9 +984,12 @@ body { display: flex; flex-direction: column; }
   function filtered() {
     const q = st.q.trim().toLowerCase();
     return base().filter((r) => (st.minStage === null || rank(r) >= ORDER.indexOf(st.minStage))
+      && (!st.officialOnly || underOfficial(r))
       && (!st.driver || st.driver === "all" || r.driver === st.driver)
       && (!q || `${r.name} ${r.address} ${r.region} ${r.sgg ?? ""}`.toLowerCase().includes(q)));
   }
+  // 특보 입구: 공식 홍수특보·호우특보가 걸린 시설과 운영 등록 시설만
+  const underOfficial = (r) => Boolean(r.risk?.official || r.risk?.weather_warning || r.risk?.tier === "operational");
   function riskTrack(level) {
     const active = Number(level) || 0;
     return `<span class="wx-risk-track" aria-label="위험 단계 ${active}/4">${[1, 2, 3, 4].map((n) => `<i class="${n <= active ? "wx-active" : ""}"></i>`).join("")}</span>`;
@@ -956,11 +998,13 @@ body { display: flex; flex-direction: column; }
     const rows = base(), all = facilityRiskRows(); const by = Object.fromEntries(ORDER.map((k) => [k, 0]));
     rows.forEach((r) => { by[r.stage ?? "unrated"] += 1; });
     const atLeast = (s) => ORDER.slice(ORDER.indexOf(s)).reduce((a, k) => a + by[k], 0);
-    const tabs = [[null, "전체 시설", rows.length, "#e4e4e7"], ["advisory", "주의 이상", atLeast("advisory"), COLOR.advisory], ["warning", "경계 이상", atLeast("warning"), COLOR.warning], ["planned_flood", "심각", atLeast("planned_flood"), COLOR.planned_flood]];
-    const cur = st.minStage;
+    const officialRows = rows.filter(underOfficial);
+    const tabs = [["official", "특보 영향", officialRows.length, COLOR.warning], ["advisory", "주의 이상", atLeast("advisory"), COLOR.advisory], ["warning", "경계 이상", atLeast("warning"), COLOR.warning], [null, "전체 시설", rows.length, "#e4e4e7"]];
+    const cur = st.officialOnly ? "official" : st.minStage;
     $("wx-sum").innerHTML = tabs.map(([k, label, count, color]) => `<button type="button" role="tab" class="${cur === k ? "wx-on" : ""}${count ? "" : " wx-zero"}" data-s="${k ?? ""}" style="--wx-c:${color}" aria-selected="${cur === k}">${label}<b>${count}</b></button>`).join("");
-    $("wx-sum").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { st.minStage = b.dataset.s || null; renderAll(); notifyView(); }));
+    $("wx-sum").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { st.officialOnly = b.dataset.s === "official"; st.minStage = st.officialOnly ? null : (b.dataset.s || null); renderAll(); notifyView(); }));
     const serious = rows.filter((r) => r.risk.level >= 3).length;
+    const closureReview = rows.filter((r) => r.risk.tier === "operational" && r.risk.level >= 3).length;
     const river = rows.filter((r) => r.driver === "river").length, pluvial = rows.length - river;
     const rainy = rows.filter((r) => (r.risk.rain?.rain_3h_mm ?? r.risk.rain?.rain_1h_mm ?? 0) > 0).length;
     const rainTime = st.overview?.rain_at ? clock(st.overview.rain_at) : "자료 없음";
@@ -968,11 +1012,13 @@ body { display: flex; flex-direction: column; }
     const kmaWeatherFacilities = st.overview?.counts?.under_weather_warning ?? 0;
     const kpi = (label, value, unit, color, hot) => `<div class="wx-kpi${hot ? " wx-hotk" : ""}" style="--wx-c:${color}"><span>${label}</span><strong>${value}<small>${unit}</small></strong></div>`;
     $("wx-kpidot").classList.toggle("wx-alert", serious > 0);
-    $("wx-kpis").innerHTML = kpi(`전국 시설 · ${esc(st.region || "전국")}`, rows.length, "곳", "#71717a")
+    $("wx-kpis").innerHTML = kpi("공식 홍수특보 관측소", official.warning + official.advisory, `곳 · 경보 ${official.warning}`, COLOR.warning, official.warning > 0)
+      + kpi("특보 영향 시설", officialRows.length, "곳", COLOR.warning, officialRows.length > 0)
+      + kpi("운영 시설 · 통제 검토", closureReview, "곳", COLOR.planned_flood, closureReview > 0)
       + kpi("경계 이상", serious, "곳", COLOR.warning, serious > 0)
       + kpi("주의 이상", atLeast("advisory"), "곳", COLOR.advisory, atLeast("advisory") > 0)
-      + kpi("공식 홍수특보 관측소", official.warning + official.advisory, `곳 · 경보 ${official.warning}`, COLOR.warning, official.warning > 0)
       + kpi("기상청 호우특보 시설", kmaWeatherFacilities, "곳", COLOR.advisory, kmaWeatherFacilities > 0)
+      + kpi(`전국 시설 · ${esc(st.region || "전국")}`, rows.length, "곳", "#71717a")
       + kpi("하천형", river, "곳", "#38bdf8") + kpi("내수형", pluvial, "곳", "#0ea5e9")
       + kpi("강우 자료 연결", rainy, "곳", "#38bdf8")
       + kpi("강우 관측 기준", rainTime, "KST", "#71717a")
@@ -1104,6 +1150,55 @@ body { display: flex; flex-direction: column; }
       $("wx-fac-list").insertAdjacentHTML("beforeend", `<button type="button" class="wx-vc-open">검증 사례 ${cases.length}건 보기 → ${esc(cases.map((c) => c.title.split(" ").slice(-1)[0]).join(" · "))}</button>`);
       $("wx-fac-list").querySelector(".wx-vc-open").addEventListener("click", () => showTab("vc"));
     }
+    renderDecision(f);
+  }
+
+  // 공식 기준(홍수특보·하천 수위·호우특보·강우 기준량·행안부 침수심)을 이 시설에 대입한 상태. FloodOps 규칙은 운영 시설에서만, 비교 후보로 둔다.
+  let twinSeq = 0;
+  const critRow = (name, src, status, label, lead, cmp) => `<li class="${cmp ? "wx-cmp" : ""}"><b>${esc(name)}</b><span class="wx-cst wx-cst-${status}">${esc(label)}</span><small>${esc(src)}</small><small class="wx-clead">${esc(lead)}</small></li>`;
+  function renderCriteria(f, twin) {
+    const ev = f.factor_evidence ?? {}, river = ev.river ?? null, rain = ev.rain ?? null, off = f.official, kma = f.weather_warning;
+    const rows = [];
+    if (off) rows.push(critRow("홍수특보", `홍수통제소 · ${off.station_name ?? river?.station_name ?? ""} ${off.level_ko} ${off.issued_at.slice(5, 16).replace("T", " ")}${off.forecast_level_m != null ? ` · 예상 ${Number(off.forecast_level_m).toFixed(2)} m` : ""}`, "met", off.level_ko, `발령 ${off.minutes_since_issue}분 경과`));
+    else rows.push(critRow("홍수특보", river?.station_name ? `홍수통제소 · ${river.station_name} 발령 없음` : "홍수통제소 · 연결 관측소 없음", river ? "ok" : "none", river ? "해당 없음" : "관측소 없음", "—"));
+    if (river?.levels_m) {
+      const lv = river.levels_m, wl = river.stage_m; let s = "ok", l = "기준 미만";
+      if (wl != null && lv.planned_flood != null && wl >= lv.planned_flood) { s = "met"; l = "계획홍수위 도달"; }
+      else if (wl != null && lv.warning != null && wl >= lv.warning) { s = "met"; l = "경보 초과"; }
+      else if (wl != null && lv.advisory != null && wl >= lv.advisory) { s = "unk"; l = "주의보 초과"; }
+      rows.push(critRow("하천 수위", `홍수통제소 · 경보 ${lv.warning ?? "—"} m / 계획홍수위 ${lv.planned_flood ?? "—"} m`, wl == null ? "none" : s, wl == null ? "관측 없음" : l, wl == null ? "—" : `현재 ${Number(wl).toFixed(2)} m${river.minutes_to_planned_flood != null ? ` · 도달까지 ${river.minutes_to_planned_flood}분` : ""}`));
+    } else rows.push(critRow("하천 수위", "연결 수위 관측소 없음 · 내수형", "none", "해당 없음", "—"));
+    if (kma) rows.push(critRow("호우특보", `기상청 · ${kma.area} · 발효 ${kma.effective_at ?? "현재"}`, "met", kma.level_ko, "시군구 특보 적용"));
+    else {
+      const feed = st.overview?.weather_warning_feed;
+      rows.push(critRow("호우특보", feed?.mode === "replay-unavailable" ? "기상청 · 과거 특보 발표 이력 미연결(API 승인 뒤)" : feed?.available ? "기상청 · 이 시설 시군구에 특보 없음" : "기상청 · 특보 피드 조회 불가", feed?.available ? "ok" : "unk", feed?.available ? "해당 없음" : "미확인", "—"));
+    }
+    if (rain?.windows_mm) {
+      const w = rain.windows_mm, parts = [["3시간", w.rain_3h_mm, 60], ["12시간", w.rain_12h_mm, 110]].filter(([, v]) => v != null).map(([k, v, t]) => `${k} ${Number(v).toFixed(1)} mm (기준 ${t})`);
+      rows.push(critRow("강우 누적 · 호우특보 기준량", `${rain.station_name ?? ""}${rain.distance_km != null ? ` ${rain.distance_km} km` : ""} · ${parts.join(" · ") || "누적 자료 대기"}`, (rain.candidate_level ?? 0) >= 2 ? "met" : "ok", (rain.candidate_level ?? 0) >= 3 ? "경보량 이상" : (rain.candidate_level ?? 0) >= 2 ? "주의보량 이상" : "기준 미만", "참고 · 시설 기준 아님"));
+    }
+    rows.push(critRow("침수심 (행안부 통제기준)", "원문 확인 중 · 현장 센서 자료 없음", "none", "자료 없음", "현장 확인이 우선"));
+    if (f.tier === "operational") {
+      const reco = twin ? ({ CLOSURE_REVIEW: ["met", "통제 검토"], MONITOR: ["unk", "감시"], NORMAL: ["ok", "정상"] }[twin.recommendation] ?? ["none", "관측 없음"]) : ["unk", "확인 중"];
+      rows.push(critRow("FloodOps 규칙 (비교)", twin?.rule ? `${twin.rule.id} · ${twin.rule.review_when}` : "river_stage_v1 · 경보 이상 + 60분 내 계획홍수위", reco[0], reco[1], twin?.reason ?? "기준 개정 비교용", true));
+    } else rows.push(critRow("FloodOps 규칙 (비교)", "운영 등록 전 · 시설별 규칙 없음", "none", "미등록", "감시 단계만 표시", true));
+    $("wx-crit").innerHTML = rows.join("");
+  }
+  const CONFIRMATION_KO = { CONFIRMED: "관측·기준 확인", NO_ACTION: "현재 조치 불필요", ESCALATE: "현장 확인 요청" };
+  const localTime = (v) => (v ? new Date(v).toLocaleString("ko-KR", { hour12: false, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "시각 없음");
+  async function renderDecision(f) {
+    const card = $("wx-dec-card"), my = ++twinSeq;
+    renderCriteria(f, null);
+    if (f.tier !== "operational") { card.hidden = true; return; }
+    card.hidden = false; card.dataset.facility = f.facility_id;
+    $("wx-dec-mode").textContent = st.at ? "사건 재생 · 기록은 재생 확인으로 저장" : "실시간 · 기록은 현장 조치가 아닌 확인";
+    const q = st.at ? `?at=${encodeURIComponent(st.at)}` : "";
+    let status = null, records = [];
+    try { [status, records] = await Promise.all([get(`/api/twin/facilities/${encodeURIComponent(f.facility_id)}/status${q}`), get(`/api/twin/facilities/${encodeURIComponent(f.facility_id)}/decisions?limit=8`).catch(() => [])]); } catch { status = null; }
+    if (my !== twinSeq) return;
+    renderCriteria(f, status);
+    const list = Array.isArray(records) ? records : (records?.records ?? records?.decisions ?? []);
+    $("wx-dec-list").innerHTML = list.length ? list.map((r) => `<li><b>${esc(CONFIRMATION_KO[r.confirmation] ?? "확인 기록")} · ${esc(r.checked_by)}</b><span>${r.source_mode === "live" ? "실시간" : "재생"} · 관측 ${esc(localTime(r.observation_at))} · ${r.water_level_m == null ? "수위 미상" : `${Number(r.water_level_m).toFixed(2)} m`} · 기록 ${esc(localTime(r.recorded_at))}</span>${r.note ? `<span>${esc(r.note)}</span>` : ""}</li>`).join("") : `<li><span>저장된 확인 기록이 없습니다.</span></li>`;
   }
   function renderAll() {
     const driverButton = $("wx-faconly");
@@ -1190,6 +1285,20 @@ body { display: flex; flex-direction: column; }
   $("wx-close").addEventListener("click", () => { openDrawer(false); st.selected = null; renderList(); paintMap(); notifyView(); });
   $("wx-launch").addEventListener("click", () => { openDrawer(true); showTab("ag"); $("wx-ag-input").focus(); });
   $("wx-ag-form").addEventListener("submit", (e) => { e.preventDefault(); ask($("wx-ag-input").value); });
+  $("wx-dec-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget, id = $("wx-dec-card").dataset.facility; if (!id) return;
+    const values = new FormData(form); $("wx-dec-submit").disabled = true; $("wx-dec-feedback").textContent = "저장 중…";
+    try {
+      const q = st.at ? `?at=${encodeURIComponent(st.at)}` : "";
+      const res = await fetch(`${API}/api/twin/facilities/${encodeURIComponent(id)}/decisions${q}`, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ checked_by: values.get("checked_by"), confirmation: values.get("confirmation"), acknowledged: values.get("acknowledged") === "on", note: values.get("note") }) });
+      if (!res.ok) throw new Error(`API ${res.status}`);
+      form.reset(); $("wx-dec-feedback").textContent = "확인 기록을 저장했습니다.";
+      const f = facilityRiskRows().find((x) => x.code === id)?.risk; if (f) renderDecision(f);
+    } catch (err) { $("wx-dec-feedback").textContent = `저장하지 못했습니다: ${err.message}`; }
+    finally { $("wx-dec-submit").disabled = false; }
+  });
   $("wx-q").addEventListener("input", (e) => { st.q = e.target.value; renderList(); paintMap(); });
   $("wx-faconly").addEventListener("click", (e) => { st.driver = st.driver === "all" ? "river" : st.driver === "river" ? "pluvial" : "all"; e.currentTarget.textContent = st.driver === "all" ? "전체 유형" : st.driver === "river" ? "하천형만" : "내수형만"; e.currentTarget.setAttribute("aria-pressed", String(st.driver !== "all")); renderList(); paintMap(); });
   $("wx-sort").addEventListener("change", (e) => { st.sort = e.target.value; renderList(); });

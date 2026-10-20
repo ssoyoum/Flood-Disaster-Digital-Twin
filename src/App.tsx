@@ -13,7 +13,7 @@ import { CaseSelectPage, IntroPage } from "./dark/Landing";
 import { localizeEvent, localizeReconstruction } from "./dark/ko";
 import type { DataStatusResponse, ExposureMetrics, FloodEvent, LayersResponse, ReconstructionResponse } from "./types";
 
-// Hash routes keep the browser back button working: "" operational board, "#watch", "#intro", "#cases", "#event/<id>".
+// Hash routes keep the browser back button working: "" control board (#watch), "#twin", "#intro", "#cases", "#event/<id>".
 type Route = { page: "watch" } | { page: "intro" } | { page: "cases" } | { page: "compare" } | { page: "privacy" } | { page: "twin" } | { page: "event"; id: string };
 
 function readRoute(): Route {
@@ -23,9 +23,8 @@ function readRoute(): Route {
   if (hash === "compare") return { page: "compare" };
   if (hash === "twin" || hash.startsWith("twin?")) return { page: "twin" };
   if (hash === "privacy") return { page: "privacy" };
-  if (hash === "watch" || hash.startsWith("watch?")) return { page: "watch" };
   if (hash.startsWith("event/")) return { page: "event", id: decodeURIComponent(hash.slice(6)) };
-  return { page: "twin" };
+  return { page: "watch" };
 }
 
 // The layer payload is large; a slow or restarting server deserves a couple more tries before an error.
