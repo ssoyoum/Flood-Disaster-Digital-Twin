@@ -39,7 +39,9 @@ INPUTS = {
     "water_upstream": ROOT / "data/processed/hrfco/waterlevel_3011635_10M.csv",
     "water_downstream": ROOT / "data/processed/hrfco/waterlevel_3011685_10M.csv",
     "rain_primary": ROOT / "data/processed/hrfco/rainfall_30114070_10M.csv",
+    "rain_regional_sensitivity": ROOT / "data/processed/hrfco/rainfall_30114020_10M.csv",
     "flood_alerts": ROOT / "data/processed/flood_forecast/flood_forecast_issuances.csv",
+    "case_scorecard": ROOT / "data/processed/validation/case_scorecard.json",
     "history_manifest": ROOT / "data/manifests/hrfco-history.json",
     "osong_event_rain": ROOT / "data/processed/osong/osong_kma_aws_rainfall_2023-07-14_17.csv",
 }
@@ -423,6 +425,184 @@ def build_event_rainfall_crosscheck() -> tuple[Path, int]:
     return path, len(output_rows)
 
 
+def build_rain_gauge_sensitivity() -> tuple[Path, dict[str, Any]]:
+    """Compare local candidate rain gauges without treating distance as proof of representativeness."""
+    links = [row for row in read_csv(INPUTS["facility_links"])
+             if row.get("facility_id") == FACILITY_ID and row.get("kind") == "rainfall"]
+    links.sort(key=lambda row: int(row.get("rank") or 999))
+    candidates: list[dict[str, Any]] = []
+    for row in links:
+        candidates.append({
+            "station_id": row["station_code"], "station_name": row.get("station_name", ""),
+            "distance_km": maybe_float(row.get("distance_km")), "role": f"nearest_candidate_rank_{row.get('rank', '')}",
+        })
+
+    catalog = json.loads(INPUTS["station_catalog"].read_text(encoding="utf-8-sig"))
+    rain_stations = station_rows(catalog, "rainfall")
+    if not any(item["station_id"] == "30114020" for item in candidates):
+        facility_links = next(row for row in read_csv(INPUTS["facility_links"])
+                              if row.get("facility_id") == FACILITY_ID and row.get("kind") == "rainfall")
+        facility_lon, facility_lat = maybe_float(facility_links.get("facility_lon")), maybe_float(facility_links.get("facility_lat"))
+        station = rain_stations.get("30114020", {})
+        distance = (haversine_km(facility_lon, facility_lat, maybe_float(station.get("lon")), maybe_float(station.get("lat")))
+                    if facility_lon is not None and facility_lat is not None
+                    and maybe_float(station.get("lon")) is not None and maybe_float(station.get("lat")) is not None else None)
+        candidates.append({"station_id": "30114020", "station_name": station.get("name", ""),
+                           "distance_km": distance, "role": "available_regional_sensitivity_gauge"})
+
+    start = datetime(2023, 7, 14, 12, 0)
+    end = datetime(2023, 7, 15, 8, 40)
+    checkpoints = ["2023-07-15 04:10", "2023-07-15 06:40", "2023-07-15 08:27"]
+    event_times: list[str] = []
+    moment = start
+    while moment <= end:
+        event_times.append(moment.strftime("%Y-%m-%d %H:%M"))
+        moment += timedelta(minutes=10)
+
+    output_rows: list[dict[str, Any]] = []
+    candidate_summary: list[dict[str, Any]] = []
+    for candidate in candidates:
+        code = str(candidate["station_id"])
+        source_path = ROOT / f"data/processed/hrfco/rainfall_{code}_10M.csv"
+        status = "OBSERVED_SERIES" if source_path.exists() else "NO_SERIES_FILE"
+        series: dict[str, float | None] = {}
+        if source_path.exists():
+            series, _ = load_value_series(source_path, "rf")
+
+        rolling: dict[int, dict[str, tuple[float | None, int]]] = {}
+        for bins in (6, 18, 72):
+            values: dict[str, tuple[float | None, int]] = {}
+            for stamp in event_times:
+                end_at = parse_timestamp(stamp)
+                window_stamps = [(end_at - timedelta(minutes=10 * back)).strftime("%Y-%m-%d %H:%M")
+                                 for back in range(bins - 1, -1, -1)]
+                window = [series.get(item) for item in window_stamps]
+                valid = sum(value is not None for value in window)
+                total = sum(value for value in window if value is not None) if valid == bins else None
+                values[stamp] = (total, valid)
+            rolling[bins] = values
+
+        event_values = [series.get(stamp) for stamp in event_times]
+        valid_count = sum(value is not None for value in event_values)
+        expected_count = len(event_times)
+        peaks: dict[int, tuple[float | None, str]] = {}
+        for bins in (6, 18, 72):
+            usable = [(rolling[bins].get(stamp, (None, 0))[0], stamp) for stamp in event_times]
+            usable = [(value, stamp) for value, stamp in usable if value is not None]
+            peaks[bins] = max(usable, default=(None, ""), key=lambda item: item[0] if item[0] is not None else -1)
+
+        distance = candidate.get("distance_km")
+        distance_scope = "within_5km" if distance is not None and distance <= 5 else "within_10km" if distance is not None and distance <= 10 else "regional_over_10km" if distance is not None else "distance_unknown"
+        candidate_summary.append({
+            "station_id": code, "station_name": candidate.get("station_name", ""),
+            "distance_km": show_number(distance, 3), "role": candidate["role"], "series_status": status,
+            "event_expected_10m_bins": expected_count, "event_valid_10m_bins": valid_count,
+            "event_coverage_pct": show_number(valid_count / expected_count * 100 if expected_count else None, 2),
+        })
+        for checkpoint in checkpoints:
+            checkpoint_dt = parse_timestamp(checkpoint)
+            effective_stamp = (checkpoint_dt - timedelta(minutes=checkpoint_dt.minute % 10)).strftime("%Y-%m-%d %H:%M")
+            values = {bins: rolling[bins].get(effective_stamp, (None, 0)) for bins in (6, 18, 72)}
+            rain_10m = series.get(effective_stamp)
+            output_rows.append({
+                "event_id": EVENT_ID, "facility_id": FACILITY_ID, "station_id": code,
+                "station_name": candidate.get("station_name", ""), "candidate_role": candidate["role"],
+                "distance_to_facility_km": show_number(distance, 3), "distance_scope": distance_scope,
+                "source_file": source_path.relative_to(ROOT).as_posix(), "series_status": status,
+                "event_start_kst": event_times[0], "event_end_kst": event_times[-1],
+                "event_expected_10m_bins": expected_count, "event_valid_10m_bins": valid_count,
+                "event_coverage_pct": show_number(valid_count / expected_count * 100 if expected_count else None, 2),
+                "event_observed_subtotal_mm": show_number(sum(value for value in event_values if value is not None), 1) if valid_count else "",
+                "event_total_complete": str(valid_count == expected_count).lower(),
+                "peak_1h_mm": show_number(peaks[6][0], 1), "peak_1h_at_kst": peaks[6][1],
+                "peak_3h_mm": show_number(peaks[18][0], 1), "peak_3h_at_kst": peaks[18][1],
+                "peak_12h_mm": show_number(peaks[72][0], 1), "peak_12h_at_kst": peaks[72][1],
+                "checkpoint_at_kst": checkpoint, "latest_observation_at_or_before_checkpoint_kst": effective_stamp,
+                "rain_10m_mm": show_number(rain_10m, 1),
+                "rain_1h_mm": show_number(values[6][0], 1), "rain_1h_valid_bins": values[6][1],
+                "rain_3h_mm": show_number(values[18][0], 1), "rain_3h_valid_bins": values[18][1],
+                "rain_12h_mm": show_number(values[72][0], 1), "rain_12h_valid_bins": values[72][1],
+                "rain_3h_advisory_reference_exceeded": "" if values[18][0] is None else str(values[18][0] >= 60).lower(),
+                "rain_3h_warning_reference_exceeded": "" if values[18][0] is None else str(values[18][0] >= 90).lower(),
+                "rain_12h_advisory_reference_exceeded": "" if values[72][0] is None else str(values[72][0] >= 110).lower(),
+                "rain_12h_warning_reference_exceeded": "" if values[72][0] is None else str(values[72][0] >= 180).lower(),
+                "threshold_use": "OBSERVED_VS_KMA_EXPECTED_RAINFALL_REFERENCE_ONLY",
+            })
+
+    path = OUT / EVENT_ID / "rain-gauge-sensitivity.csv"
+    write_csv(path, list(output_rows[0].keys()), output_rows)
+    return path, {
+        "path": path.relative_to(ROOT).as_posix(), "rows": len(output_rows), "sha256": sha256(path),
+        "event_window": {"start_kst": event_times[0], "end_kst": event_times[-1], "expected_10m_bins": len(event_times)},
+        "candidates": candidate_summary,
+        "interpretation": "Observed gauge-to-gauge differences are a sensitivity check, not proof that any station represents the facility's local rainfall.",
+    }
+
+
+def build_event_case_coverage(profiles: list[dict[str, Any]]) -> tuple[Path, list[dict[str, Any]]]:
+    """Inventory candidate events while separating confirmed causes from secondary control reports."""
+    scorecard = json.loads(INPUTS["case_scorecard"].read_text(encoding="utf-8"))
+    profile_names = {row["facility_id"]: row.get("facility_name", "") for row in profiles}
+    mechanism_review = {
+        "osong-2023": {
+            "mechanism_class": "external_river_flood_via_temporary_levee_breach",
+            "mechanism_status": "CONFIRMED_BY_OFFICIAL_INVESTIGATION",
+            "source_class": "OFFICIAL_INVESTIGATION_PLUS_HRFCO_ISSUANCE",
+            "coverage_status": "ONE_CONFIRMED_EVENT_NOT_INDEPENDENT_VALIDATION_SET",
+            "missing_evidence": "facility-specific control SOP; surveyed low point; pump/onsite depth telemetry",
+        },
+        "daejeon-2020-07-30": {
+            "mechanism_class": "UNCLASSIFIED",
+            "mechanism_status": "NOT_ESTABLISHED_BY_CONTROL_REPORT",
+            "source_class": "SECONDARY_MEDIA_CONTROL_TIME_ONLY",
+            "coverage_status": "CANDIDATE_CONTROL_TIMING_ONLY",
+            "missing_evidence": "official control log; water-depth/flood outcome; event-specific rainfall and river-path attribution",
+        },
+        "daejeon-2023-07-14": {
+            "mechanism_class": "UNCLASSIFIED",
+            "mechanism_status": "FACILITY_EVENT_ASSOCIATION_UNVERIFIED",
+            "source_class": "SECONDARY_MEDIA_REGIONAL_CONTROL_REPORT",
+            "coverage_status": "CANDIDATE_ASSOCIATION_REQUIRES_OFFICIAL_CROSSWALK",
+            "missing_evidence": "proof that cited regional restriction covered each linked underpass; facility-level control and inundation records; cause attribution",
+        },
+        "daejeon-2024-07-10": {
+            "mechanism_class": "UNCLASSIFIED",
+            "mechanism_status": "NOT_ESTABLISHED_BY_CONTROL_REPORT",
+            "source_class": "SECONDARY_MEDIA_CONTROL_TIME_ONLY",
+            "coverage_status": "CANDIDATE_CONTROL_TIMING_ONLY",
+            "missing_evidence": "official facility control log; water-depth/flood outcome; Oryang underpass inflow-path attribution",
+        },
+    }
+    rows: list[dict[str, Any]] = []
+    for case in scorecard.get("cases", []):
+        case_id = case.get("id", "")
+        review = mechanism_review.get(case_id, {
+            "mechanism_class": "UNCLASSIFIED", "mechanism_status": "REVIEW_REQUIRED",
+            "source_class": "SOURCE_CLASS_UNREVIEWED", "coverage_status": "NOT_READY_FOR_CALIBRATION",
+            "missing_evidence": "review event source, target facility, inflow path, outcome and time precision",
+        })
+        reference = case.get("reference", {})
+        facility_ids = sorted({signal.get("facility_id") for signal in case.get("signals", []) if signal.get("facility_id")})
+        rows.append({
+            "case_id": case_id, "title": case.get("title", ""), "region": case.get("region", ""),
+            "facility_ids": ";".join(facility_ids),
+            "facility_names": ";".join(profile_names.get(facility_id, "") for facility_id in facility_ids),
+            "event_window_start": (case.get("window") or {}).get("start", ""),
+            "event_window_end": (case.get("window") or {}).get("end", ""),
+            "reference_at": reference.get("at", ""), "reference_kind": reference.get("kind", ""),
+            "reference_precision": reference.get("precision", ""), "reference_label": reference.get("label", ""),
+            "reference_source": reference.get("source", ""),
+            **review,
+            "path_calibration_allowed": "false",
+            "interpretation": "A reported control time alone does not confirm the facility's flood mechanism or a successful/failed inundation threshold.",
+        })
+    path = OUT / "event-case-coverage.csv"
+    if not rows:
+        raise RuntimeError("No event cases found in validation scorecard")
+    write_csv(path, list(rows[0].keys()), rows)
+    return path, rows
+
+
 def active_alert_rows() -> list[dict[str, str]]:
     rows = [row for row in read_csv(INPUTS["flood_alerts"]) if row.get("station_code") == "3011665"]
     rows.sort(key=lambda row: (row.get("issued_at", ""), row.get("number", "")))
@@ -648,15 +828,18 @@ def main() -> None:
     write_csv(labels_path, list(event_labels[0].keys()), event_labels)
 
     rainfall_crosscheck_path, rainfall_crosscheck_rows = build_event_rainfall_crosscheck()
+    rain_sensitivity_path, rain_sensitivity = build_rain_gauge_sensitivity()
+    case_coverage_path, event_case_coverage = build_event_case_coverage(profiles)
     panel_path, panel_summary = build_panel(thresholds)
-    output_files = [profile_path, threshold_path, readiness_path, stage_design_path, labels_path, rainfall_crosscheck_path, panel_path]
+    output_files = [profile_path, threshold_path, readiness_path, stage_design_path, labels_path,
+                    rainfall_crosscheck_path, rain_sensitivity_path, case_coverage_path, panel_path]
     inputs = {
         name: {"path": path.relative_to(ROOT).as_posix(), "sha256": sha256(path)}
         for name, path in INPUTS.items()
     }
     manifest = {
-        "schema_version": "1.0",
-        "dataset_id": "floodops-multifactor-v1",
+        "schema_version": "1.1",
+        "dataset_id": "floodops-multifactor-v2",
         "generated_at_utc": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "script": "data/scripts/build_multifactor_dataset.py",
         "scope": "facility candidate inventory plus an all-available-period 10-minute Osong external-flood feature panel",
@@ -664,6 +847,11 @@ def main() -> None:
         "osong_panel": panel_summary,
         "event_labels": {"path": labels_path.relative_to(ROOT).as_posix(), "rows": len(event_labels), "sha256": sha256(labels_path)},
         "event_rainfall_crosscheck": {"path": rainfall_crosscheck_path.relative_to(ROOT).as_posix(), "rows": rainfall_crosscheck_rows, "sha256": sha256(rainfall_crosscheck_path)},
+        "rain_gauge_sensitivity": rain_sensitivity,
+        "event_case_coverage": {"path": case_coverage_path.relative_to(ROOT).as_posix(), "rows": len(event_case_coverage),
+                                "confirmed_mechanisms": sum(row["mechanism_status"] == "CONFIRMED_BY_OFFICIAL_INVESTIGATION" for row in event_case_coverage),
+                                "calibration_ready_cases": sum(row["path_calibration_allowed"] == "true" for row in event_case_coverage),
+                                "sha256": sha256(case_coverage_path)},
         "feature_readiness": {"path": readiness_path.relative_to(ROOT).as_posix(), "rows": len(readiness), "sha256": sha256(readiness_path)},
         "stage_design": {"path": stage_design_path.relative_to(ROOT).as_posix(), "rows": len(stage_design), "sha256": sha256(stage_design_path)},
         "threshold_reference": {"path": threshold_path.relative_to(ROOT).as_posix(), "rows": len(thresholds), "sha256": sha256(threshold_path)},
@@ -672,8 +860,11 @@ def main() -> None:
             "Observed HRFCO rainfall is summed over the trailing 6, 18, and 72 ten-minute bins. A window is blank unless every bin is present and numeric.",
             "River 30-minute rates use endpoint change over 30 minutes, and are blank unless all four 10-minute readings are present. Linear time-to-threshold is a retrospective diagnostic, not a forecast.",
             "Observed rainfall is compared with KMA expected-rainfall criteria only as a reference screen; historical KMA warning issuance is not joined.",
+            "Rain-gauge sensitivity uses every nearby candidate link and any additional available station file; absent candidate series stay explicitly unavailable. The selected gauge is not presumed representative because it is nearest.",
+            "Missing rainfall windows remain blank. The sensitivity table records both the number of valid 10-minute bins and whether a complete window exists.",
             "Raw gauge values are preserved. A change of at least 0.3 m per 10 minutes is flagged for review; changes of at least 3 m are separately flagged. No reading is silently removed.",
             "The historical case labels an external river flood through temporary-levee failure. It does not supply a continuous levee-condition feature, measured underpass depth, pump telemetry, or surveyed low-point elevation.",
+            "The event-case coverage register draws candidate facilities, control/inflow reference times and source precision from the current replay scorecard. Except Osong's officially investigated cause, regional control reports do not establish facility-specific mechanism or outcome labels and are not admitted to path calibration.",
             "Current station thresholds are included as metadata references. Their values are not asserted to be the values in force during every historical year.",
         ],
         "outputs": [
@@ -688,6 +879,8 @@ def main() -> None:
         "facility_profiles": len(profiles),
         "event_labels": len(event_labels),
         "event_rainfall_crosscheck_rows": rainfall_crosscheck_rows,
+        "rain_gauge_sensitivity_rows": rain_sensitivity["rows"],
+        "event_case_coverage_rows": len(event_case_coverage),
         "panel_rows": panel_summary["rows"],
         "panel_start": panel_summary["first_timestamp_kst"],
         "panel_end": panel_summary["last_timestamp_kst"],
