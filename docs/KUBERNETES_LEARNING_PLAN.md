@@ -1,87 +1,65 @@
-# 로컬 Kubernetes 학습 계획
+# 로컬 Kubernetes 실행·복구 검증
 
-확인일: 2026-10-20. **미실행 실습 설계**다. 기준 구현은 Docker/Compose와 EC2 단일 컨테이너이며 Kubernetes manifest·workflow·EKS는 확인되지 않았다. 이 문서로 운영 경험을 추가하지 않는다.
+2026-10-20: 설계만 있던 계획을 `deploy/local/floodops.yaml`과 kind 로컬 실행으로 옮겼다. **AWS EKS 운영·클라우드 배포 경험이 아니다.** 비용이 드는 자원·레지스트리 push·실제 키 주입은 하지 않았다.
 
-## 현재 구성에서 달라지는 책임
+## 현재 구현
 
-| 현재 | kind 로컬 실습에서 배울 것 | 아직 얻지 못하는 증거 |
+| 요소 | 실제 구성·확인 | 보장하지 않는 것 |
 |---|---|---|
-| Dockerfile.aws의 FastAPI+dist 단일 이미지 | Deployment가 Pod 재생성·이미지 revision 관리 | 분리된 서비스·운영 클러스터 아키텍처 설계 |
-| EC2 localhost 8000 + Caddy 과거 기록 | ClusterIP Service + port-forward | AWS LB·인증서·DNS·EKS 운영 |
-| Compose PostGIS 기동, 앱은 demo-in-memory | 저장소 전환 없이 앱 한 개 replica | PostGIS 연동·다중 replica 데이터 정합성 |
-| 컨테이너 환경변수 | ConfigMap/Secret, Pod 재시작 시 설정 반영 | 비밀값 암호화·로테이션·권한 운영 |
+| 이미지 | 기존 Dockerfile.aws의 FastAPI+dist, 로컬 learning-v1/v2 태그 | 서비스 분리·운영 최적화 |
+| Deployment | replica 1, Recreate, imagePullPolicy Never | 메모리 시나리오의 영속성·다중 replica 일관성 |
+| Service | ClusterIP 8000, 실제 EndpointSlice·port-forward 확인 | Ingress·DNS·외부 로드밸런서 |
+| probe | /health readiness 5초/5초, liveness 30초/10초 | /health는 DB·모델·자료 최신성 검사 아님 |
+| 자원 | requests 100m/512Mi, limits 1CPU/1Gi | 측정 기반 운영 권장 용량·부하 SLA |
+| 설정 | replay·gemini ConfigMap, GEMINI_API_KEY가 빈 로컬 Secret | 키 로테이션·암호화·실제 모델 호출 |
+| 서비스 계정 | token 자동 mount 비활성 | 전체 클러스터 보안 검증 |
 
-첫 실습은 **kind 하나**로 한정한다. minikube를 함께 도입하지 않는다. Docker·kind·kubectl은 사용자가 준비한 환경에서 확인하고, 클라우드 노드·유료 자원은 생성하지 않는다.
+## 정상 환경 재현 명령
 
-## 실습 1 — 같은 이미지를 로컬 클러스터에서 실행
-
-원본 checkout의 처리 자료·Docker build 입력을 먼저 확인한다. 아래 명령은 표준 kind/kubectl 절차를 제안한 것으로 이번에 실행하거나 설치 여부를 확인하지 않았다.
+Docker·kind·kubectl 설치 후 본인이 소유한 로컬 cluster에서만 실행한다. 명시적 context를 유지해 다른 cluster를 변경하지 않는다.
 
 ```bash
 docker build -f Dockerfile.aws -t floodops:learning-v1 .
-kind create cluster --name floodops-learning
+kind create cluster --name floodops-learning --wait 120s
 kind load docker-image floodops:learning-v1 --name floodops-learning
-kubectl create namespace floodops-learning
-kubectl -n floodops-learning create deployment floodops --image=floodops:learning-v1 --port=8000 --replicas=1
-kubectl -n floodops-learning expose deployment floodops --port=8000 --target-port=8000 --type=ClusterIP
-kubectl -n floodops-learning rollout status deployment/floodops --timeout=180s
-kubectl -n floodops-learning get pods,services
-kubectl -n floodops-learning port-forward service/floodops 8000:8000
+kubectl --context kind-floodops-learning apply -f deploy/local/floodops.yaml
+kubectl --context kind-floodops-learning -n floodops-learning rollout status deployment/floodops --timeout=120s
+kubectl --context kind-floodops-learning -n floodops-learning get pods,service,endpointslices
+kubectl --context kind-floodops-learning -n floodops-learning port-forward service/floodops 18080:8000
 ```
 
-별도 터미널에서 `curl -fsS http://127.0.0.1:8000/health`와 `curl -fsS http://127.0.0.1:8000/api/events`를 확인한다. 정상 Pod·정적 페이지·사건 자료 가용성을 실행 기록에 남기면 완료다. 이미지 build가 실패하면 원자료/의존성/경로 문제를 해결하는 작업으로 되돌아가며 COPY를 무시하지 않는다.
+별도 터미널에서 `/health`, `/api/events`, `/`를 `http://127.0.0.1:18080`으로 확인한다. 실제 검사는 모두 HTTP 200, 사건 5건, Pod Ready=true·restart 0이었다. Pod 안의 Python urllib 검사도 통과했다. /health의 database는 demo-in-memory, postgis는 pending으로 표시됐다.
 
-메모리 기반 scenario_repository 때문에 replica는 1개로 유지한다. replica 2개로 늘려 일관된 서비스를 구현했다고 주장하지 않는다.
+## 이번 관리형 컨테이너 환경의 차이
 
-## 실습 2 — readiness/liveness와 자원 제한
+kind v0.31.0 / Kubernetes v1.35.0을 사용했다. 기본 생성은 kubelet의 `/dev/kmsg` 누락과 중첩 overlayfs `invalid argument`로 지연됐다. **본인이 만든 노드** `floodops-learning-control-plane`에 character device를 만들고, 그 노드 내부 containerd snapshotter만 native로 바꿔 기동했다. 외부 Docker daemon의 storage driver는 바꾸지 않았다.
 
-새 YAML 파일은 이번에 생성하지 않는다. 후속 실습에서 `kubectl -n floodops-learning edit deployment/floodops`로 컨테이너에 다음 probe를 설정하는 방법을 배운다.
-
-- readinessProbe: httpGet /health, port 8000, initialDelaySeconds 10, periodSeconds 5, failureThreshold 3.
-- livenessProbe: httpGet /health, port 8000, initialDelaySeconds 30, periodSeconds 10, failureThreshold 3.
-- 위 숫자는 **제안값**이다. 실제 startup 시간·자원 측정 후 조정한다.
-- /health는 고정 응답이다. 프로세스의 응답성과 Service 수신 여부만 검사하며 PostGIS·모델·자료 신선도 readiness를 검증하지 못한다. 외부 모델 일시 장애를 liveness 실패로 연결해 재시작 루프를 만들지 않는다.
+이 환경에서는 `kind load docker-image`가 containerd transfer API의 `no unpack platforms defined`로 실패했다. 동일 Docker archive를 다음처럼 노드의 native snapshotter에 local import하여 해결했다. 일반 개발 PC에서도 이 우회가 필요하다고 가정하지 않는다.
 
 ```bash
-kubectl -n floodops-learning set resources deployment/floodops --requests=cpu=100m,memory=512Mi --limits=cpu=1,memory=1Gi
-kubectl -n floodops-learning rollout status deployment/floodops --timeout=180s
-kubectl -n floodops-learning describe deployment floodops
-kubectl -n floodops-learning get endpoints floodops
-kubectl -n floodops-learning logs deployment/floodops --tail=100
+docker save floodops:learning-v1 | docker exec -i floodops-learning-control-plane ctr --namespace k8s.io images import --local --platform linux/amd64 --snapshotter native -
 ```
 
-자원값 역시 실습 가설이며 기존 EC2 상한을 복사한 운영 권장치가 아니다. 완료 조건은 probe 설정과 Pod Ready·Service endpoint·재시작 횟수를 대조하고, 문제 발생 시 describe의 Events와 로그로 ImagePull/CrashLoop/OOM 등 원인을 구분하는 것이다. metrics-server가 없는 kind에서 kubectl top 결과를 가정하지 않는다.
+HTTPS proxy CA는 이전 Docker 검증과 같이 임시 Dockerfile의 BuildKit secret mount로만 전달했다. 세션 인증서·실제 API 키·kubeconfig는 Git에 추가하지 않았다. 저장소 Dockerfile.aws는 변경하지 않았다.
 
-## 실습 3 — 설정·Secret·데이터 범위
+## rollout·실패·rollback 실습 결과
 
-- 첫 실행에는 실제 모델 키를 넣지 않는다. 모델 없음과 도구 결과 반환 경로를 관찰한다.
-- 일반 설정은 ConfigMap, 키는 Secret으로 분리하는 것이 **후속 구현 제안**이다. Secret은 기본적으로 base64 인코딩이며 그 자체가 암호화 보장은 아니다.
-- 실제 Gemini 키 주입은 Live 호출 가능성을 열므로 별도 승인한 경우만 한다. 값을 YAML/Git/명령 기록/로그에 노출하지 않는다.
-- 설정 이름은 기존 코드의 AGENT_LLM_PROVIDER, AGENT_ASK_TIMEOUT_SECONDS, FLOODOPS_TWIN_MODE, GEMINI_API_KEY를 재사용한다. 환경에 따라 replay/live 자료 연동 범위도 기록한다.
-- 완료 조건: 비밀값을 표시하지 않는 설정 참조, 모델 미설정 동작, Pod 교체 후 메모리 시나리오 상태 소실을 관찰·기록. 영속 저장소 구현은 별도 작업이다.
-
-## 실습 4 — rollout과 rollback
-
-동일 코드를 두 번째 로컬 태그로 build해 배포 절차를 연습할 수 있다. 실제 기능 변경/성능 개선과 구분한다.
+1. 환경변수 `FLOODOPS_LEARNING_REVISION=2`로 Pod template을 바꾸고 rollout 성공, undo 후 Ready와 /health 복구를 확인했다.
+2. 로컬에 없는 `floodops:learning-missing`으로 이미지를 바꿨다. `imagePullPolicy: Never`에 따라 ErrImageNeverPull, 20초 rollout timeout으로 실패했다. 실패를 무시하지 않고 undo한 뒤 Ready=true·restart 0·health 성공을 확인했다.
+3. 최신 작업 소스의 learning-v2 이미지(SHA `8f60248a1ea039752f287a6ff584f08b1a5a0bb3482a5482f589ef51ffcd51ae`)를 load/import하고 rollout 성공, 이미지 안의 재생시각 전달 코드와 health를 확인했다. 이 이미지는 이후 감시 보드 후속 대화 수정 전의 검증 이미지이며 최종 commit의 이미지 검사는 Actions 결과를 기준으로 한다.
 
 ```bash
-docker build -f Dockerfile.aws -t floodops:learning-v2 .
-kind load docker-image floodops:learning-v2 --name floodops-learning
-kubectl -n floodops-learning set image deployment/floodops floodops=floodops:learning-v2
-kubectl -n floodops-learning rollout status deployment/floodops --timeout=180s
-kubectl -n floodops-learning rollout history deployment/floodops
-kubectl -n floodops-learning rollout undo deployment/floodops
-kubectl -n floodops-learning rollout status deployment/floodops --timeout=180s
-kubectl -n floodops-learning get deployment floodops -o jsonpath='{.spec.template.spec.containers[0].image}'
+kubectl --context kind-floodops-learning -n floodops-learning set env deployment/floodops FLOODOPS_LEARNING_REVISION=2
+kubectl --context kind-floodops-learning -n floodops-learning rollout status deployment/floodops --timeout=90s
+kubectl --context kind-floodops-learning -n floodops-learning rollout undo deployment/floodops
+kubectl --context kind-floodops-learning -n floodops-learning rollout status deployment/floodops --timeout=90s
+kubectl --context kind-floodops-learning -n floodops-learning rollout history deployment/floodops
 ```
 
-위 컨테이너명 floodops는 create deployment 명령으로 만든 이름을 가정한다. 실제 get deployment로 이름을 먼저 대조한다. 이미지 변경 전후·rollback revision·/health·사건 자료 응답을 남기면 완료다. rollback은 이미지/Pod template 복원이지 메모리 데이터 복원이 아니다.
+rollback은 Pod template 복원이며 메모리 상태 복원이 아니다. restart/liveness 실패를 고의로 발생시키는 검사는 이번에 하지 않았다. probe 설정과 Ready를 확인한 것과 장애 탐지 성능 검증을 구분한다.
 
-## 실습 5 — Actions 연결은 설계까지만
+## CI와 실제 배포 경계
 
-[CI_CD_DESIGN.md](CI_CD_DESIGN.md)의 테스트 → 이미지 build → commit SHA 태그 → 레지스트리 push → 승인된 배포 → rollout 확인 → smoke → 실패 시 이전 digest 복원 순서를 학습한다. 현재 workflow는 없으며 레지스트리 자격·클러스터 접근·배포 코드는 별도 구현이다.
+현재 GitHub Actions는 테스트·offline 평가·브라우저 검사 → SHA 태그 이미지 build·network none smoke를 구현한다. registry push·kubectl 배포·EKS 접근 권한은 없다. 향후 실제 배포는 이미지 digest·자료 버전·Secret/OIDC·대상 환경·비용·rollback을 구체화한 뒤 별도 승인한다. GitHub runner에서 개인 PC kind로 자동 배포한다고 쓰지 않는다.
 
-GitHub-hosted runner가 개인 PC kind에 자동으로 접근할 수 있다고 가정하지 않는다. 로컬 검증은 이미지 load 방식, 실제 AWS 배포는 레지스트리·권한·네트워크·클러스터 비용 검토가 각각 필요하다. EKS·Ingress·HPA·영속 볼륨·운영 모니터링은 이 로컬 학습의 완료 기준에 포함하지 않는다.
-
-실습 종료 시 본인이 만든 클러스터만 `kind delete cluster --name floodops-learning`로 정리한다. 이 삭제 명령도 이번에 실행하지 않았다.
-
+실습 종료 시 본인이 만든 cluster만 `kind delete cluster --name floodops-learning`로 정리한다. 이번 실습의 floodops-learning cluster와 노드는 실제로 삭제했다.

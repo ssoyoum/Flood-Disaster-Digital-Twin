@@ -4566,3 +4566,22 @@ UI 보완:
 문제/해결:
 - 문제: 요청별 trace는 있었지만 실패·지연·비용 분모를 반복해서 비교할 집계 명령이 없었다. 설계 문서는 원격 workflow 부재·E2E 미실행 시점에 머물러 있었다.
   해결: 기존 진단 계약만 읽는 오프라인 CLI를 추가하고 실제 검증한 E2E를 기본 CI에 연결했다. 새로운 상태·외부 모델 호출·요청 제한 우회·배포 권한은 추가하지 않았다. HTTP 거절과 프로세스 소실은 별도 access log 범위로 명시했다.
+
+## kind 로컬 배포·실패 복구 검증
+
+- 작업일: 2026-10-20
+
+주요 작업:
+- deploy/local/floodops.yaml에 Namespace·ConfigMap·빈 offline Secret·Deployment·Service를 구현했다.
+- replica 1/Recreate·명시적 context·readiness/liveness·CPU/메모리 설정을 적용했다. registry push·실제 키·AWS/EKS 자원은 사용하지 않았다.
+
+검증 결과:
+- kind v0.31.0 / Kubernetes v1.35.0에서 Pod Ready=true, restart 0, EndpointSlice와 Service port-forward를 확인했다.
+- health / events / frontend HTTP 200, 사건 5건. database=demo-in-memory, postgis=pending을 그대로 확인했다.
+- 환경변수 revision rollout/undo, 없는 이미지의 ErrImageNeverPull·20초 rollout timeout, rollback 후 Ready·health 복구를 확인했다.
+- learning-v2 이미지 rollout과 변경된 재생 코드의 이미지 포함을 확인했다. 이후 UI 수정의 최종 이미지는 CI 검증 대상이다.
+- 직접 만든 floodops-learning cluster와 노드는 kind delete cluster로 정리했다. 생성한 kubeconfig·키·인증서는 커밋하지 않았다.
+
+문제/해결:
+- 문제: 관리형 Docker 안의 kind에서 /dev/kmsg 누락·중첩 overlayfs mount invalid argument로 control plane이 시작되지 않았다. kind load는 containerd transfer API의 unpack platform 오류가 났다.
+  해결: 본인이 만든 노드 내부에 kmsg 장치를 만들고 containerd snapshotter만 native로 바꾼 뒤, ctr images import --local --platform linux/amd64 --snapshotter native로 동일 이미지를 적재했다. 외부 daemon storage driver를 바꾸거나 TLS 검증을 끄지 않았다. 정상 PC의 기본 경로와 이 환경의 차이를 학습 문서에 분리했다. 로컬 실습 성공을 EKS 운영·실서비스 배포로 표현하지 않는다.
