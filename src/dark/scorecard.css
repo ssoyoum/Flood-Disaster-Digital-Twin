@@ -1,0 +1,15 @@
+/* 효과성 채점표. 머리·표는 compare.css(cc-*)를 쓰고, KPI와 색만 여기서 더한다. */
+.sc-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; width: 100%; max-width: 1180px; margin: 18px auto 0; box-sizing: border-box; }
+.sc-kpis div { padding: 14px 16px; border: 1px solid #22304a; border-radius: 10px; background: #111a2b; }
+.sc-kpis strong { display: block; font-size: 26px; color: #e5ecf5; font-variant-numeric: tabular-nums; }
+.sc-kpis span { display: block; margin-top: 4px; color: #8ea0b8; font-size: 11px; }
+.sc-kpis strong.sc-pos, .sc-table .sc-pos { color: #2dd4bf; font-weight: 700; }
+.sc-kpis strong.sc-neg, .sc-table .sc-neg { color: #f87171; font-weight: 700; }
+.sc-table .sc-na { color: #8ea0b8; }
+.cc-page .sc-table { max-width: 1180px; }
+.sc-pending { width: 100%; max-width: 1180px; margin: 22px auto 0; box-sizing: border-box; padding: 14px 18px; border: 1px solid #22304a; border-radius: 12px; background: #111a2b; }
+.sc-pending .fo-eyebrow { margin-bottom: 6px; }
+.sc-pending .cc-limits { margin-top: 0; max-width: none; }
+.cc-page .sc-limits { max-width: 1180px; }
+.sc-built { display: block; width: 100%; max-width: 1180px; margin: 10px auto 0; color: #8ea0b8; font-size: 11px; }
+@media (max-width: 720px) { .sc-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

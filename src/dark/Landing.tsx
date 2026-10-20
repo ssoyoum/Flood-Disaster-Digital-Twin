@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Gauge, GitCompare, History, Lock, Scale } from "lucide-react";
-import { getTwinFacilities } from "../api";
-import type { FloodEvent } from "../types";
+import { getTwinFacilities, getValidationCases } from "../api";
+import type { FloodEvent, ValidationCase } from "../types";
 import "./landing.css";
+import "./cases.css";
 
 type CaseText = { name: string; place: string; flow: string };
 
@@ -180,34 +181,24 @@ export function IntroPage({ onStart, onTwin, onWatch }: { onStart: () => void; o
   );
 }
 
-export function CaseSelectPage({ events, onSelect, onBack, onCompare, onTwin }: { events: FloodEvent[]; onSelect: (id: string) => void; onBack: () => void; onCompare?: () => void; onTwin?: () => void }) {
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const activeIndex = events.length ? selectedIndex % events.length : 0;
-  const move = (step: number) => {
-    if (events.length < 2) return;
-    setSelectedIndex((index) => (index + step + events.length) % events.length);
-  };
+const MAIN_CASE = "osong-2023";
+const leadText = (lead: number | null | undefined, label: string) => (lead == null ? `${label} 울리지 않음` : `${label} ${lead >= 0 ? "+" : "−"}${Math.abs(lead)}분`);
 
+/*
+ * 사례 검증: 본편은 기준 채점에 쓰는 지하차도·하천변 통제 사건(오송 재현 + 채점표의 대전 사건),
+ * 확장 사례는 원인이 달라 기준 검증에 쓰지 않는 관제 화면만 둔다.
+ */
+export function CaseSelectPage({ events, onSelect, onBack, onCompare, onTwin }: { events: FloodEvent[]; onSelect: (id: string) => void; onBack: () => void; onCompare?: () => void; onTwin?: () => void }) {
+  const [scored, setScored] = useState<ValidationCase[] | null>(null);
   useEffect(() => {
-    const viewport = viewportRef.current;
-    if (!viewport || events.length < 2) return;
-    let waiting = false;
-    let timer: number | undefined;
-    const onWheel = (event: WheelEvent) => {
-      if (!event.deltaY) return;
-      event.preventDefault();
-      if (waiting) return;
-      waiting = true;
-      setSelectedIndex((index) => (index + (event.deltaY > 0 ? 1 : -1) + events.length) % events.length);
-      timer = window.setTimeout(() => { waiting = false; }, 380);
-    };
-    viewport.addEventListener("wheel", onWheel, { passive: false });
-    return () => {
-      viewport.removeEventListener("wheel", onWheel);
-      window.clearTimeout(timer);
-    };
-  }, [events.length]);
+    getValidationCases().then((data) => setScored(data.cases)).catch(() => setScored([]));
+  }, []);
+
+  const osong = events.find((event) => event.id === MAIN_CASE);
+  const extras = events.filter((event) => event.id !== MAIN_CASE);
+  const osongScore = scored?.find((item) => item.id === MAIN_CASE);
+  const osongWarning = osongScore?.signals.find((signal) => signal.signal === "공식 홍수경보")?.lead_min;
+  const scoredOthers = (scored ?? []).filter((item) => item.id !== MAIN_CASE);
 
   return (
     <main className="fo-landing fo-cases-page">
@@ -217,53 +208,63 @@ export function CaseSelectPage({ events, onSelect, onBack, onCompare, onTwin }: 
           <ArrowLeft size={16} /> 소개
         </button>
         <div>
-          <p className="fo-eyebrow">CASE LIBRARY</p>
-          <h2>분석할 홍수 사례를 선택하세요</h2>
+          <p className="fo-eyebrow">VALIDATION</p>
+          <h2>기준을 검증한 사건</h2>
         </div>
         <div className="fo-cases-tools">
           {onTwin && <button className="fo-ghost" type="button" onClick={onTwin}><Gauge size={16} /> 통제 판단 보드</button>}
-          {onCompare && <button className="fo-ghost" type="button" onClick={onCompare}><GitCompare size={16} /> 사례 간 비교</button>}
+          {onCompare && <button className="fo-ghost" type="button" onClick={onCompare}><Scale size={16} /> 효과성 채점표</button>}
         </div>
       </header>
-      <section className="fo-case-library" aria-label="홍수 사례 목록">
-        <div
-          ref={viewportRef}
-          className="fo-case-viewport"
-          role="region"
-          aria-roledescription="carousel"
-          aria-label="홍수 사례를 휠이나 방향키로 탐색"
-          tabIndex={0}
-          onKeyDown={(event) => {
-            if (event.key === "ArrowRight" || event.key === "ArrowDown") { event.preventDefault(); move(1); }
-            if (event.key === "ArrowLeft" || event.key === "ArrowUp") { event.preventDefault(); move(-1); }
-          }}
-        >
-          {events.map((event, index) => {
-            const text = caseText(event);
-            const ready = READY_EVENTS.has(event.id);
-            const forward = (index - activeIndex + events.length) % events.length;
-            const offset = forward > Math.floor(events.length / 2) ? forward - events.length : forward;
-            const visible = Math.abs(offset) <= 1;
-            return (
-              <div key={event.id} className={`fo-case-slide ${offset === 0 ? "is-center" : offset === -1 ? "is-before" : offset === 1 ? "is-after" : offset < 0 ? "is-hidden is-hidden-before" : "is-hidden is-hidden-after"}`} aria-hidden={!visible}>
-                <button type="button" className={`fo-case ${ready ? "is-ready" : "is-locked"}`} disabled={!ready} tabIndex={visible ? 0 : -1} onClick={() => onSelect(event.id)}>
+      <section className="fo-case-sets" aria-label="검증 사건">
+        <div className="fo-case-set">
+          <p className="fo-eyebrow">본편 · 지하차도·하천변 통제 사건 — 기준 채점에 쓰는 사건</p>
+          <div className="fo-case-grid">
+            {osong && (
+              <button type="button" className="fo-case is-ready" onClick={() => onSelect(osong.id)}>
+                <span className="fo-case-status ready">깊은 재현 · 관제 가능</span>
+                <strong>{caseText(osong).name}</strong>
+                <span className="fo-case-place">{caseText(osong).place}</span>
+                <span className="fo-case-flow">{caseText(osong).flow}</span>
+                {osongWarning != null && <span className="fo-case-lead">{leadText(osongWarning, "공식 홍수경보")} · 유입 {osongScore?.reference.at.slice(11, 16)}</span>}
+                <span className="fo-case-go">관제 화면 열기 <ArrowRight size={15} /></span>
+              </button>
+            )}
+            {scoredOthers.map((item) => {
+              const advisory = item.signals.find((signal) => signal.signal === "공식 홍수주의보")?.lead_min ?? null;
+              return (
+                <button key={item.id} type="button" className="fo-case is-ready" onClick={onCompare}>
+                  <span className="fo-case-status ready">채점 · 보도 통제 시각 대조</span>
+                  <strong>{item.title}</strong>
+                  <span className="fo-case-place">{item.region} · 관측소 {item.gauge}</span>
+                  <span className="fo-case-flow">{item.reference.label}</span>
+                  <span className={`fo-case-lead ${advisory != null && advisory < 0 ? "late" : ""}`}>{leadText(advisory, "공식 홍수주의보")}</span>
+                  <span className="fo-case-go">채점표 보기 <ArrowRight size={15} /></span>
+                </button>
+              );
+            })}
+            {scored === null && <p className="fo-case-empty-note">채점 사건을 불러오는 중</p>}
+            {scored?.length === 0 && <p className="fo-case-empty-note">채점표를 불러오지 못했습니다. 백엔드 API 연결을 확인하세요.</p>}
+          </div>
+        </div>
+        <div className="fo-case-set fo-case-set-extra">
+          <p className="fo-eyebrow">확장 사례 · 원인이 다름 — 기준 검증에 쓰지 않음</p>
+          <div className="fo-case-grid">
+            {extras.map((event) => {
+              const text = caseText(event);
+              const ready = READY_EVENTS.has(event.id);
+              return (
+                <button key={event.id} type="button" className={`fo-case ${ready ? "is-ready" : "is-locked"}`} disabled={!ready} onClick={() => onSelect(event.id)}>
                   <span className={`fo-case-status ${ready ? "ready" : "locked"}`}>{ready ? "관제 가능" : <><Lock size={12} /> 데이터 연결 예정</>}</span>
                   <strong>{text.name}</strong>
                   <span className="fo-case-place">{text.place}</span>
                   <span className="fo-case-flow">{text.flow}</span>
                   {ready && <span className="fo-case-go">관제 화면 열기 <ArrowRight size={15} /></span>}
                 </button>
-              </div>
-            );
-          })}
-          {!events.length && <p className="fo-case-empty">표시할 사례가 없습니다.</p>}
+              );
+            })}
+          </div>
         </div>
-        <div className="fo-case-controls">
-          <button type="button" aria-label="이전 사례" disabled={events.length < 2} onClick={() => move(-1)}><ArrowLeft size={18} /></button>
-          <span aria-live="polite">{events.length ? `${String(activeIndex + 1).padStart(2, "0")} / ${String(events.length).padStart(2, "0")}` : "00 / 00"}</span>
-          <button type="button" aria-label="다음 사례" disabled={events.length < 2} onClick={() => move(1)}><ArrowRight size={18} /></button>
-        </div>
-        <p className="fo-case-help">마우스 휠을 내리거나 방향키로 사례를 넘겨 보세요. 마지막 다음에는 첫 사례로 돌아갑니다.</p>
       </section>
     </main>
   );

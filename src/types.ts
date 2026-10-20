@@ -717,3 +717,29 @@ export type SeoulRiverStageFeed = {
 export type WatchChange = { code: string; name: string; region: string; from: WatchStage; to: WatchStage; delta_m: number; rate_m_per_10min: number; facilities: number };
 export type WatchChanges = { mode: "live" | "replay"; at: string; compared_to?: string; since_min: number; available: boolean; note?: string; stage_up: WatchChange[]; stage_down: WatchChange[]; new_rising: WatchChange[] };
 export type AgentView = { region: string | null; min_stage: WatchStage | null; station_code: string | null; facility_id: string | null; center: [number, number] | null; zoom: number | null; layer?: "rain" | null };
+
+// ---- Validation scorecard (backend/app/case_validation.py) ----
+export type ValidationSignal = {
+  signal: string; at: string | null; lead_min: number | null; lead_is_lower_bound: boolean; verdict: string;
+  source?: string; facility_id?: string; first_facility?: string; why?: string | null; driver?: string | null;
+};
+export type ValidationCase = {
+  id: string; title: string; region: string; gauge: string;
+  window: { start: string; end: string; step_min: number };
+  reference: { at: string; precision: string; kind: "inflow" | "control"; label: string; source: string; precision_ko: string };
+  signals: ValidationSignal[];
+  region_at_reference: { at: string; advisory_or_above: number; warning_or_above: number; total: number };
+  timeline?: Array<{ at: string; levels: Record<string, number>; region_advisory_or_above: number }>;
+};
+export type ValidationScorecard = { built_at: string; step_min: number; rule: string; cases: ValidationCase[]; limitations: string[] };
+
+// ---- Official flood forecasts (backend/app/flood_forecast.py) ----
+export type FloodForecastActive = {
+  station_code: string; issued_at: string; kind: string; number: string; office: string; station_name: string; river: string;
+  level_at_issue_m: number | null; forecast_level_m: number | null; forecast_time: string | null;
+  level: "advisory" | "warning"; level_ko: string; minutes_since_issue: number;
+};
+export type FloodForecastSummary = {
+  mode: "live" | "replay"; at: string; fetched_at: string | null; error: string | null;
+  counts: { warning: number; advisory: number }; active: FloodForecastActive[];
+};

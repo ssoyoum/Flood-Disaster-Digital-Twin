@@ -3,10 +3,10 @@ import { ChevronDown, PanelsTopLeft } from "lucide-react";
 export type FloodOpsRoute = "watch" | "twin" | "cases" | "compare" | "intro";
 
 const ROUTES: Array<{ id: FloodOpsRoute; label: string; href: string }> = [
-  { id: "watch", label: "전국 감시 보드", href: "#watch" },
   { id: "twin", label: "운영 시설 통제 판단", href: "#twin" },
+  { id: "watch", label: "특보 입구 · 전국 감시", href: "#watch" },
   { id: "cases", label: "사례 검증", href: "#cases" },
-  { id: "compare", label: "사례 간 비교", href: "#compare" },
+  { id: "compare", label: "효과성 채점표", href: "#compare" },
   { id: "intro", label: "FloodOps 소개", href: "#intro" },
 ];
 

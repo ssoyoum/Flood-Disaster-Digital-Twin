@@ -1,0 +1,11 @@
+/* 사례 검증: 본편(채점 사건) 격자 + 확장 사례 격자. 카드 모양은 landing.css의 .fo-case를 그대로 쓴다. */
+.fo-case-sets { display: flex; flex-direction: column; gap: 28px; width: 100%; max-width: 1400px; margin: 0 auto; }
+.fo-case-set { display: flex; flex-direction: column; gap: 12px; }
+.fo-case-set > .fo-eyebrow { margin: 0; }
+.fo-case-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+.fo-case-grid .fo-case { width: 100%; min-height: 214px; }
+.fo-case-lead { font-size: 13px; font-weight: 800; color: var(--fo-ok); font-variant-numeric: tabular-nums; }
+.fo-case-lead.late { color: #f87171; }
+.fo-case-set-extra .fo-case { opacity: .72; }
+.fo-case-set-extra .fo-case:hover:not(:disabled) { opacity: 1; }
+.fo-case-empty-note { margin: 0; align-self: center; color: var(--fo-muted); font-size: 12px; }

@@ -4,7 +4,7 @@ import * as api from "./api";
 import DarkConsole from "./dark/DarkConsole";
 import UrbanConsole from "./dark/UrbanConsole";
 import TimelineConsole from "./dark/TimelineConsole";
-import CaseComparePage from "./dark/CaseCompare";
+import ScorecardPage from "./dark/Scorecard";
 import TwinBoard from "./dark/TwinBoard";
 import WatchBoard from "./dark/WatchBoard";
 import { ConsentBanner, PrivacyPage } from "./dark/Consent";
@@ -13,7 +13,7 @@ import { CaseSelectPage, IntroPage } from "./dark/Landing";
 import { localizeEvent, localizeReconstruction } from "./dark/ko";
 import type { DataStatusResponse, ExposureMetrics, FloodEvent, LayersResponse, ReconstructionResponse } from "./types";
 
-// Hash routes keep the browser back button working: "" watch board, "#intro", "#cases", "#event/<id>".
+// Hash routes keep the browser back button working: "" operational board, "#watch", "#intro", "#cases", "#event/<id>".
 type Route = { page: "watch" } | { page: "intro" } | { page: "cases" } | { page: "compare" } | { page: "privacy" } | { page: "twin" } | { page: "event"; id: string };
 
 function readRoute(): Route {
@@ -23,8 +23,9 @@ function readRoute(): Route {
   if (hash === "compare") return { page: "compare" };
   if (hash === "twin" || hash.startsWith("twin?")) return { page: "twin" };
   if (hash === "privacy") return { page: "privacy" };
+  if (hash === "watch" || hash.startsWith("watch?")) return { page: "watch" };
   if (hash.startsWith("event/")) return { page: "event", id: decodeURIComponent(hash.slice(6)) };
-  return { page: "watch" };
+  return { page: "twin" };
 }
 
 // The layer payload is large; a slow or restarting server deserves a couple more tries before an error.
@@ -89,7 +90,9 @@ function Screens() {
     return <CaseSelectPage events={events} onSelect={(id) => go(`event/${encodeURIComponent(id)}`)} onBack={() => go("watch")} onCompare={() => go("compare")} onTwin={() => go("twin")} />;
   }
   if (route.page === "privacy") return <PrivacyPage onBack={() => window.history.length > 1 ? window.history.back() : go("")} />;
-  if (route.page === "compare") return <CaseComparePage onBack={() => go("cases")} onOpen={(id) => go(`event/${encodeURIComponent(id)}`)} />;
+  if (route.page === "compare") {
+    return <ScorecardPage onBack={() => go("cases")} onOpenCase={(item) => go(item.id === "osong-2023" ? "event/osong-2023" : `watch?at=${encodeURIComponent(item.reference.at)}&region=${encodeURIComponent(item.region)}`)} />;
+  }
   // Rainfall-driven urban cases have no levee or underpass, so they use their own console.
   if (route.id === "seoul-2022") return <UrbanConsole key={route.id} eventId={route.id} />;
   // Cases connected only through reported incident times share a lighter timeline console.

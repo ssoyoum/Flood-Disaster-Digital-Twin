@@ -103,6 +103,17 @@
 .twc-right .twc-panel { background: #101827; backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none; }
 
 .twc-card { padding: 14px 16px; }
+.twc-crit { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.twc-crit li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; padding: 8px 10px; border: 1px solid var(--twc-line); border-radius: 10px; background: rgba(22, 33, 58, .6); }
+.twc-crit li.twc-cmp { border-style: dashed; opacity: .85; }
+.twc-crit b { font-size: 13px; color: #e5ecf5; }
+.twc-crit small { color: var(--twc-muted); font-size: 11.5px; line-height: 1.4; }
+.twc-crit .twc-clead { color: #c5d1e2; font-weight: 700; grid-column: 2; text-align: right; white-space: nowrap; }
+.twc-cst { align-self: center; justify-self: end; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.twc-cst-met { background: rgba(248, 113, 113, .18); color: #f87171; }
+.twc-cst-ok { background: rgba(56, 189, 248, .16); color: #38bdf8; }
+.twc-cst-unk { background: rgba(148, 163, 184, .14); color: #b6c3d6; }
+.twc-cst-none { border: 1px dashed #3a4d6e; color: #b6c3d6; }
 .twc-eyebrow-row { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; }
 .twc-eyebrow-row .twc-eyebrow { margin: 0; }
 .twc-tip-wrap { position: relative; }
@@ -268,6 +279,11 @@
 
 
   <section class="twc-right" aria-label="시각별 맥락">
+    <article class="twc-panel twc-card twc-reveal" style="--twc-d:700" id="twc-official">
+      <p class="twc-eyebrow">공식 기준 적용 상태 · 기준은 기관 지침, FloodOps는 시설에 대입만</p>
+      <ul class="twc-crit" id="twc-crit-list" aria-label="공식 기준별 상태"></ul>
+      <p class="twc-log-note">침수심 기준은 현장 센서가 없어 판정하지 않습니다. 호우특보는 특보 이력 API 승인 뒤 재생에 연결합니다.</p>
+    </article>
     <article class="twc-panel twc-card twc-reveal" style="--twc-d:760" id="twc-ops-card">
       <p class="twc-eyebrow">운영 알림 · 담당자 확인</p>
       <p class="twc-log-state" id="twc-log-mode">관측 기준 확인 중</p>
@@ -537,6 +553,31 @@
   let srcTimer = null;
   function showSrcTip() { const t = $("twc-src-tip"); t.classList.add("twc-show"); clearTimeout(srcTimer); srcTimer = setTimeout(() => t.classList.remove("twc-show"), 3000); }
   const setTone = (el, tone) => { el.classList.remove("twc-hot", "twc-ok", "twc-replay"); el.classList.add(`twc-${tone}`); };
+  // 공식 기준(홍수특보·하천 수위·호우특보·행안부 침수심)을 이 시설에 대입한 상태. FloodOps 규칙은 비교 후보로만 둔다.
+  function renderOfficial(st, forecasts) {
+    const list = $("twc-crit-list"); if (!list) return;
+    const code = facility?.gauge?.station_id;
+    const active = forecasts?.active?.find((a) => a.station_code === code) ?? null;
+    const lv = st.levels_m ?? {}; const wl = st.observation?.water_level_m;
+    const m = (v) => (v == null ? "—" : `${Number(v).toFixed(2)} m`);
+    const inflowLead = (iso) => Math.round((Date.parse(`${DAY}T08:27:00`) - Date.parse(iso.length === 16 ? `${iso}:00` : iso)) / 60000);
+    const rows = [];
+    if (active) {
+      const lead = sourceMode === "live" ? `발령 ${active.minutes_since_issue}분 경과` : `유입(08:27)보다 ${inflowLead(active.issued_at) >= 0 ? "+" : "−"}${Math.abs(inflowLead(active.issued_at))}분`;
+      rows.push({ name: "홍수특보", src: `홍수통제소 · ${active.station_name} ${active.level_ko} ${active.issued_at.slice(11, 16)}${active.forecast_level_m != null ? ` · 예상 ${m(active.forecast_level_m)}` : ""}`, st: "met", stLabel: active.level_ko, lead });
+    } else rows.push({ name: "홍수특보", src: `홍수통제소 · ${facility?.gauge?.name ?? "대표 관측소"} 발령 없음`, st: "ok", stLabel: "해당 없음", lead: "—" });
+    let stageSt = "ok", stageLabel = "기준 미만";
+    if (wl != null && lv.planned_flood != null && wl >= lv.planned_flood) { stageSt = "met"; stageLabel = "계획홍수위 도달"; }
+    else if (wl != null && lv.warning != null && wl >= lv.warning) { stageSt = "met"; stageLabel = "경보 초과"; }
+    else if (wl != null && lv.advisory != null && wl >= lv.advisory) { stageSt = "unk"; stageLabel = "주의보 초과"; }
+    rows.push({ name: "하천 수위", src: `홍수통제소 · 경보 ${m(lv.warning)} / 계획홍수위 ${m(lv.planned_flood)}`, st: wl == null ? "none" : stageSt, stLabel: wl == null ? "관측 없음" : stageLabel, lead: wl == null ? "—" : `현재 ${m(wl)}` });
+    rows.push({ name: "호우특보", src: sourceMode === "live" ? "기상청 · 실시간 특보는 감시 보드에서 적용" : "기상청 · 재생은 특보 이력 API 승인 뒤", st: "unk", stLabel: "미확인", lead: "—" });
+    rows.push({ name: "침수심 (행안부 통제기준)", src: "원문 확인 중 · 현장 센서 자료 없음", st: "none", stLabel: "자료 없음", lead: "현장 확인이 우선" });
+    const reco = { CLOSURE_REVIEW: ["met", "통제 검토"], MONITOR: ["unk", "감시"], NORMAL: ["ok", "정상"] }[st.recommendation] ?? ["none", "관측 없음"];
+    rows.push({ name: "FloodOps 규칙 (비교)", src: `${st.rule?.id ?? "river_stage_v1"} · ${st.rule?.review_when ?? "경보 이상 + 60분 내 계획홍수위"}`, st: reco[0], stLabel: reco[1], lead: "기준 개정 비교용", cmp: true });
+    list.innerHTML = rows.map((r) => `<li class="${r.cmp ? "twc-cmp" : ""}"><b>${r.name}</b><span class="twc-cst twc-cst-${r.st}">${r.stLabel}</span><small>${r.src}</small><small class="twc-clead">${r.lead}</small></li>`).join("");
+  }
+
   async function setTime(min, { chart = "redraw" } = {}) {
     current = min; const my = ++seq; const at = `${DAY}T${hhmm(min)}:00`;
     if (sourceMode !== "live") {
@@ -545,11 +586,13 @@
     }
     let st, rise;
     const query = sourceMode === "live" ? "" : `?at=${encodeURIComponent(at)}`;
-    try { [st, rise] = await Promise.all([get(`/api/twin/facilities/${FAC}/status${query}`), get(`/api/twin/facilities/${FAC}/rise-forecast${query}`).catch(() => null)]); }
+    let forecasts = null;
+    try { [st, rise, forecasts] = await Promise.all([get(`/api/twin/facilities/${FAC}/status${query}`), get(`/api/twin/facilities/${FAC}/rise-forecast${query}`).catch(() => null), get(`/api/watch/flood-forecasts${query}`).catch(() => null)]); }
     catch (error) { $("twc-why").textContent = `관측을 불러오지 못했습니다: ${error.message}`; renderAlert({ status: "NO_OBSERVATION" }); return; }
     if (my !== seq) return;
     currentStatus = st;
     renderAlert(st);
+    renderOfficial(st, forecasts);
     if (sourceMode === "live" && st.observation?.time) {
       const clock = st.observation.time.slice(11, 16);
       if (/^\d{2}:\d{2}$/.test(clock)) current = toMin(clock);

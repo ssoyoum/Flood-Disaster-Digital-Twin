@@ -1,6 +1,6 @@
 import type { CriteriaFloor, RiseForecast, TwinBacktest, TwinCriteriaReview, TwinFacility, TwinMode, TwinRegistry, TwinStatus, CaseLeadTimes, ResponseTimingResult, TimelineReconstructionResponse, AlertTimingResult, StorageCaptureResult, UrbanReconstructionResponse, ClosureTimingResult, ExposureInventory, AgentAskResult, AgentExampleQuestion, AgentIntentPlanResult, AgentWorkflowName, AgentWorkflowResult, HandThresholdResult, DataStatusResponse, ExposureMetrics, FloodEvent, GeoJson, LayersResponse, Observation, ReconstructionResponse, SafetyDataApiTestResult, ScenarioResult, InterventionType, PortfolioScenario, PortfolioScenarioRunResult, ScenarioIntervention } from "./types";
 import { boundedAgentHistory, type ConversationMessage } from "./agentConversation";
-import type { WaterLevelReadiness, WatchChanges, WatchFacilityLink, WatchFacilityStatus, WatchOverview, WatchStage, WatchStationDetail, SeoulRiverStageFeed } from "./types";
+import type { WaterLevelReadiness, WatchChanges, WatchFacilityLink, WatchFacilityStatus, WatchOverview, WatchStage, WatchStationDetail, SeoulRiverStageFeed, ValidationScorecard, FloodForecastSummary } from "./types";
 
 const configuredApiBase = import.meta.env.VITE_API_BASE;
 const API_BASE = configuredApiBase === "same-origin" ? "" : configuredApiBase ?? (import.meta.env.PROD ? "" : "http://localhost:8033");
@@ -169,3 +169,5 @@ export const getWatchFacilityStatus = (options: { at?: string | null } = {}, sig
   request<WatchFacilityStatus>(`/api/watch/facility-status${watchQuery(options)}`, { signal });
 export const getWatchFacilities = () => request<Array<WatchFacilityLink & { station_code: string }>>("/api/watch/facilities");
 export const getSeoulRiverStages = (signal?: AbortSignal) => request<SeoulRiverStageFeed>("/api/watch/seoul-river-stages", { signal });
+export const getValidationCases = () => request<ValidationScorecard>("/api/watch/validation-cases");
+export const getFloodForecasts = (at?: string | null, signal?: AbortSignal) => request<FloodForecastSummary>(`/api/watch/flood-forecasts${watchQuery({ at })}`, { signal });
