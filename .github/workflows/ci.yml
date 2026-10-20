@@ -22,6 +22,8 @@ jobs:
       # No live model calls or current observation lookups in the default checks.
       AGENT_LLM_PROVIDER: gemini
       GEMINI_API_KEY: ""
+      HRFCO_API_KEY: ""
+      KMA_API_HUB_KEY: ""
       FLOODOPS_TWIN_MODE: replay
     steps:
       - uses: actions/checkout@v4

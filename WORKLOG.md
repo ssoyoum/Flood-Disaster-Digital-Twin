@@ -4603,3 +4603,22 @@ UI 보완:
 문제/해결:
 - 문제: 로컬에서는 CDN이 열려 통과했으나 GitHub runner에서는 지도 실패/지연이 데이터 조회까지 막았다. 관측을 받기 전에도 헤더가 '실시간'처럼 보였다.
   해결: 데이터와 지도 init 함수를 나누고 지도 미가용을 명시했다. timeout 연장이나 재시도/skip으로 실패를 숨기지 않고 외부 CDN이 없어도 API 근거·지역 필터·후속 대화가 동작하도록 검증했다.
+
+## 강우 조회의 키 없는 외부 호출과 불필요한 전체 feed 갱신 차단
+
+- 작업일: 2026-10-20
+
+주요 작업:
+- facility_risk._live_totals가 기존 national_watch.refresh_live_rain을 사용하도록 수정했다. 수위·댐까지 갱신하지 않는다.
+- refresh_live는 HRFCO_API_KEY가 없으면 기존 상태와 명시적 오류를 반환하며 외부 bulk 요청을 보내지 않는다.
+- Playwright와 기본 CI에서 모델·HRFCO·KMA 키를 명시적으로 비워 로컬 설정이 실시간 호출을 열지 않게 했다.
+
+검증 결과:
+- Actions 39482529709도 초기 배지 2개가 미갱신이었다. 다운로드한 Chromium trace에서 facility-risk 요청이 완료되지 않았음을 확인했다.
+- 키 없는 fresh 프로세스 cProfile에서 8.11초 중 6.59초가 _live_totals → refresh_live → 빈 키 _bulk HTTP 대기였다. 로컬 proxy와 CI direct network의 실패 시간이 달랐다.
+- 신규 회귀 4개 통과: 키 없는 HTTP 0회, 강우 전용 갱신 사용, 키 설정 시 feed 호출 유지, 강우 미제공에도 실제 재생 시설 근거 보존.
+- 전체 회귀와 브라우저를 다시 실행하고 최종 결과는 새 Actions와 Career의 증거 노트에 연결한다. API·UI assert나 요청 제한을 완화하지 않았다.
+
+문제/해결:
+- 문제: 지도 초기화 결합을 끊어도 live 강우 요청 자체가 인증 없이 외부에 나갔다. 로컬에서 실패가 빨리 반환돼 감춰졌고 CI에서는 HTTP timeout까지 배지를 갱신하지 못했다.
+  해결: 이미 있는 rain-only 함수와 missing-key 계약을 재사용했다. timeout 연장 대신 인증 없는 I/O를 제거했고, 실제 키가 설정된 경로는 mock feed로 보존 검증했다. CDN 결함과 외부 API 대기는 다른 원인으로 기록한다.

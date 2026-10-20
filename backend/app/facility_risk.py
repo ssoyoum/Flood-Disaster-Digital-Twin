@@ -186,7 +186,7 @@ def _hourly_total(slots: dict[datetime, float], hours: int) -> float | None:
 
 
 def _live_totals() -> tuple[datetime | None, dict[str, dict[str, float | None]]]:
-    nw.refresh_live()
+    nw.refresh_live_rain()
     with _LOCK:
         for code, slots in nw._LIVE.rain_slots.items():
             mine = _RAIN_HISTORY.setdefault(code, {})

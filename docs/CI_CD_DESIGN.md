@@ -80,3 +80,6 @@ offline benchmark는 `reports/agent-traces.jsonl`과 `agent-trace-summary.json`�
 
 
 원격 실패로 확인한 차단 사례: [39481499120](https://github.com/ssoyoum/Flood-Disaster-Digital-Twin/actions/runs/39481499120)에서 브라우저 2개가 초기 배지 미갱신으로 실패해 image job이 skipped됐다. 감시 보드의 CDN/style 로딩과 API 조회 결합을 제거하고 강제 CDN 차단 회귀를 추가했다. 이 실패를 Python 코드 문제나 모델 장애로 분류하지 않는다. 수정 commit의 새 run에서 최종 결과를 확인한다.
+
+
+후속 [39482529709](https://github.com/ssoyoum/Flood-Disaster-Digital-Twin/actions/runs/39482529709)의 Chromium trace에서는 키 없는 live 강우 요청이 외부 bulk API를 기다리는 추가 원인을 확인했다. `_live_totals`는 기존 `refresh_live_rain`을 재사용하고 `refresh_live`도 키 없이 HTTP를 보내지 않도록 보완했다. Playwright/CI는 HRFCO·KMA·Gemini 키를 비우며 기본 제한은 유지한다. 실제 키가 있는 feed 경로와 키 없는 HTTP 0회를 회귀 테스트로 분리했다.
