@@ -4483,3 +4483,25 @@ UI 보완:
 문제/해결:
 - 문제: 사용자가 완성된 PPT와 같은 배치를 공유 가능한 PDF로 요청했습니다.
   해결: 내용을 재작성하지 않고 원본 PPT를 PowerPoint에서 직접 변환해 글꼴과 배치를 유지했습니다.
+
+## Agent 신뢰성·평가·CI/CD·Kubernetes 문서 근거 대조
+
+- 작업일: 2026-10-20
+
+주요 작업:
+- 기존 AGENT_TOOL_CONTRACTS에 ask/plan 경로·도구 검증·근거 전달·실패별 테스트 연결을 보완했습니다.
+- 기존 AGENT_VALIDATION에 동일 질문/자료 기준선·회귀 비교·지표 분모·Live 평가 승인 조건을 추가했습니다.
+- CI_CD_DESIGN과 KUBERNETES_LEARNING_PLAN을 작성해 현재 Docker/EC2 기록과 미구현 CI·로컬 실습 제안을 구분했습니다.
+
+검증 결과:
+- 기준 commit의 README·기존 문서·Agent runner/planner/schema/tools·평가 argparse·package scripts·Docker/Compose·health 코드를 정적으로 읽었습니다.
+- Git tree에 workflow가 없고 원격 Actions runs가 0건임을 조회했습니다. CI 통과·현재 공개 서버 가용성을 확인한 것은 아닙니다.
+- 테스트·오프라인 평가·Live 모델·Docker build·Kubernetes·실제 배포는 실행하지 않았습니다. 코드·데이터·Secret·설정·의존성 변경은 없습니다.
+
+문제/해결:
+- 문제: 이미 있는 도구 계약·평가 설명을 새 문서로 반복하면 실행 상태와 근거의 기준이 갈라집니다.
+  해결: 실행/실패/평가는 기존 문서에 통합하고, 새로운 책임인 CI 설계와 Kubernetes 학습만 분리했습니다.
+- 문제: 숫자·인용 가드, 모델 HTTP 예산, 고정 health 응답을 의미 검증·전체 도구 시간 제한·배포 준비 보장으로 오해할 수 있습니다.
+  해결: 실제 코드의 보장 범위와 아직 측정하지 않은 의미/인과·도구 지연·자료 준비 검증을 명시했습니다.
+
+

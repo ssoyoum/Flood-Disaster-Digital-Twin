@@ -64,3 +64,54 @@
 
 - 도구별 개별 시간 제한은 없다. 도구는 로컬 계산이고 요청 전체 예산만 적용된다. 첫 요청의 자료 적재(반경 재고 약 5 s)가 가장 길다.
 - 이 표는 손으로 맞춘 것이다. 카탈로그나 검증 규칙이 바뀌면 함께 고쳐야 한다.
+
+## 실행 경로와 근거 전달의 코드 연결 (2026-10-20 정적 검토)
+
+기준: `ssoyoum/Flood-Disaster-Digital-Twin` 커밋 `88a7ee489d9f62ac4943dff8b86330a57aa6b72e`. 이번 확인은 코드 읽기이며 테스트·API·Live 모델은 실행하지 않았다. 실행 수명주기와 실패 목록을 이 문서에서 관리하므로 별도 AGENT_EXECUTION_LIFECYCLE / AGENT_FAILURE_CATALOG 문서를 만들지 않는다.
+
+| 단계 | 실제 코드·함수 | 입력 → 출력 / 서버 경계 |
+|---|---|---|
+| HTTP 수신 | `backend/app/main.py:ask_agent_question`, `backend/app/schemas.py:AgentAskRequest` | POST /api/agent/ask. 사건·시설 범위와 rate limit을 확인한 뒤 ask_agent 호출. HTTP 입력 오류와 아래 업무 상태는 별개 |
+| 요청 격리 | `backend/app/agent_runner.py:ask_agent`, `_RunState` | ContextVar에 deadline·trace·실패·토큰 집계를 요청별 보관하고 finally에서 reset |
+| 질문 해석 | `backend/app/agent_context.py:resolve_question`, `agent_runner._ask_agent` | 사건 / 시설 / watch 라우터로 조건을 해석. 도움말은 capability, 모호한 후속 조건은 clarification으로 모델 호출 없이 종료 |
+| 모델 입력 | `_model_catalogue`, `_system_prompt`, `_model_action` | 질문·최대 6개 history·고정 scope·허용 도구·기존 observations·남은 호출 수를 전달 |
+| 모델 결정 | `_gemini_action` / `_ollama_action`, `AgentAction` | 구조화된 tool 또는 final 결정. JSON 검증 실패 시 1회 재요청. 모델이 도구를 고르는 것과 계산값을 산출하는 것을 분리 |
+| 서버 검증 | `_validated_tool_request`, `AgentToolCallRequest` | 도구 등록·범위·허용 인자·사용자/기록에 실제 있는 시각·숫자를 검사. 시설·사건·관측 시각 변경 금지 |
+| 실제 실행 | `backend/app/agent_tools.py:execute_agent_tool` | 등록 서비스 실행. 사건별 분기는 agent_cases, 시설은 agent_facility, watch는 agent_watch로 이어짐 |
+| 모델에 결과 재전달 | `agent_runner._observation` | 성공 결과를 observations에 추가. get_reconstruction의 지도 표시 필드와 HAND grid ID는 모델 입력에서 제외. 원본 호출 결과는 응답·근거 대조에 유지 |
+| 답변 검사 | `_grounded_answer`, `_numbers`, `_reply` | 인용 번호가 실제 호출 순번인지, 인용 표기와 답변 숫자가 인용 결과 JSON에 있는지 검사. 시설·watch의 추가 안전 표현은 각 도메인 처리 |
+| 응답·기록 | `schemas.AgentAskResult`, `_write_trace_log` | status·answer·tool_calls·evidence_calls·limitations·diagnostics 반환. 선택적 trace 파일에는 질문·인자·결과 원문을 쓰지 않음 |
+
+**plan 경로와 ask 루프를 혼동하지 않는다.** POST /api/agent/plan은 `main.plan_agent → llm_planner.plan_with_llm` 또는 `agent_tools.plan_agent_intent`로 실행하지 않는 계획을 만든다. /ask는 위 반복 루프다. plan의 workflow enum을 ask의 전체 도구 목록으로 쓰지 않는다.
+
+### 시간 예산의 실제 보장 범위
+
+- 모델 판단 최대 6회, 성공 도구 최대 4회. 성공 호출 중복은 기존 결과 참조 후 반복 시 종료하고, 실패 호출은 다시 계산하지 않도록 추적한다.
+- Gemini 기본 25초 / Ollama 기본 300초의 요청 deadline을 모델 호출·JSON 재시도가 공유한다. `_post_gemini`의 asyncio.wait_for가 HTTP 작업 취소를 수행한다.
+- **모든 동기 도구 실행을 강제로 중단하는 전체 요청 deadline은 아니다.** 도구·외부 자료 로딩이 오래 걸리면 요청 전체 지연이 모델 예산보다 길 수 있다. 이 위험의 별도 타임아웃·부하 검증은 미검증이다.
+
+### 실패 카탈로그: 구현과 테스트 존재를 분리
+
+다음 테스트는 파일·함수를 읽어 존재를 확인했으며 이번 실행 결과가 아니다. 동일 코드라도 확보한 도구 결과·질문 범위에 따라 상태가 달라지므로 실패 코드와 status를 일대일 대응시키지 않는다.
+
+| 실패 / 자료 상태 | 탐지·진단 | 외부 응답과 현재 처리 | 근거 테스트 |
+|---|---|---|---|
+| 미등록 도구·범위 밖 선택 | validation / tool_selection_rejected | 호출 거절. 다른 도구를 선택하거나 서버 근거로 응답 / 근거가 없으면 보류 | `backend/tests/test_agent_budget.py:test_api_distinguishes_input_rejection_from_tool_failure_and_resets_state` |
+| 사용자에게 없는 수치·인자·scope 변경 | validation / tool_input_rejected | 검증 실패 인자를 실행하지 않음 | `backend/tests/test_agent_facility.py:test_model_cannot_switch_facility_time_or_borrow_historical_tools` |
+| 반복 호출 | validation / tool_call_repeated | 재실행을 막고 확보한 결과 / 자료 부족으로 종료 | `backend/tests/test_agent_stability.py:test_retrying_a_failed_tool_stops_the_loop` |
+| 자료·분석 실행 실패 | tool / tool_execution_failed | 실패 분석을 모델이 시간표로 대신 계산하지 않음. 자료 부족 경로 | `backend/tests/test_agent_stability.py:test_failed_analysis_is_not_recomputed_by_the_model_from_the_timeline` |
+| 모델 설정·연결·HTTP·JSON 실패 | model_unavailable / model_connection_failed / model_http_error / model_invalid_decision | 사용자 조건의 등록 도구를 서버가 실행할 수 있으면 registered_tools. 반환 근거도 없으면 UNAVAILABLE, 계산 불가 질문은 NEEDS_DATA 가능 | `backend/tests/test_agent_budget.py`, `backend/tests/test_agent_ollama.py` |
+| 모델 예산 초과 | model / model_budget_exceeded | HTTP 취소. 확보 결과를 보존해 상태 결정 | `backend/tests/test_agent_budget.py:test_wall_clock_timeout_cancels_the_inflight_http_request`, `test_all_model_steps_share_one_deadline` |
+| 인용 누락·없는 숫자 | answer / answer_not_grounded | 근거 없는 설명을 성공으로 확정하지 않고 등록 결과 설명으로 대체하거나 NEEDS_DATA | `backend/tests/test_agent_stability.py:test_thousands_separators_match_tool_json_but_invented_values_do_not` |
+| 관측 stale / missing | 도구 결과 observation_quality + reply 범위별 처리 | 상태 확인에 오래된 자료가 쓰이면 NEEDS_DATA. live 실패를 과거 관측으로 대체하지 않음. 이 자료 상태 자체를 새로운 failure code로 만들지 않음 | `backend/tests/test_agent_facility.py:test_missing_and_stale_observations_are_not_a_present_safety_verdict`, `test_live_source_failure_does_not_leak_key_or_substitute_replay` |
+| 조건 모호·물리 효과 미지원 | router / answer의 clarification | NEEDS_DATA와 현재 계산 불가 범위. 수리모형이 없는 피해 감소량은 만들지 않음 | `backend/tests/test_agent_stability.py:test_outage_still_refuses_physical_effects_without_running_tools` |
+
+기존 status는 **ANSWERED / NEEDS_DATA / UNAVAILABLE**뿐이다. HTTP 200이어도 NEEDS_DATA·UNAVAILABLE일 수 있다. 422 입력 오류·404 범위 오류·429 요청 제한 등 HTTP 계층을 status enum에 추가하지 않는다.
+
+### 현재 검증의 한계와 다음 실험
+
+구현된 것은 도구 계약, 수치·인용 가드, 도메인 안전 표현, 실패·trace 수집이다. `_grounded_answer`는 숫자가 JSON 어딘가에 존재하는지 보는 가드로, 단위·주어·시점·인과가 맞는다는 증명은 아니다. 실패하지 않은 도구의 숫자를 잘못된 대상에 붙이거나, 숫자 없는 인과 주장을 하는 경우의 탐지율은 미측정이다.
+
+다음 회귀 후보는 **같은 숫자를 다른 관측소·단위에 연결하는 답변**과 **숫자 없이 안전/피해 감소를 단정하는 답변**이다. 실제 결과와 함께 판독 기준을 먼저 고정하고 [평가 절차](AGENT_VALIDATION.md#동일-질문-회귀-비교-절차-2026-10-20)를 따른다. 새 상태·코드·프레임워크 도입은 이 문서 작업에 포함하지 않는다.
+
+
