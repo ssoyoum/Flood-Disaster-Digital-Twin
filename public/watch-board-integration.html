@@ -198,6 +198,38 @@ body { display: flex; flex-direction: column; }
 .wx-vc-foot b { color: var(--wx-amber); }
 .wx-vc-legend { margin: 0; font-size: 11px; color: var(--wx-dim); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .wx-vc-legend i { display: inline-block; width: 14px; height: 6px; border-radius: 3px; }
+/* 즉시 통제 조건(지침 2.1.7(8)) · 남은 시간 · 지침 적용 대상 */
+.wx-cond { padding: 10px 12px; border-radius: 9px; border: 1px solid color-mix(in srgb, var(--wx-c) 50%, transparent); background: color-mix(in srgb, var(--wx-c) 12%, transparent); margin-bottom: 4px; }
+.wx-cond strong { display: block; color: var(--wx-c); font-size: 16px; font-weight: 900; }
+.wx-cond span { display: block; margin-top: 2px; color: #d4d4d8; font-size: 12px; }
+.wx-eta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin: 6px 0 10px; border-radius: 8px; overflow: hidden; background: var(--wx-line); }
+.wx-eta-grid div { padding: 9px 10px; background: #1c1c1f; }
+.wx-eta-grid span { display: block; color: var(--wx-muted); font-size: 11.5px; }
+.wx-eta-grid strong { display: block; font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.wx-eta-grid strong small { margin-left: 3px; color: var(--wx-muted); font-size: 12px; font-weight: 500; }
+.wx-eta-grid strong.wx-hotv { color: var(--wx-red); }
+.wx-eta-grid em { display: block; font-style: normal; color: var(--wx-dim); font-size: 11px; }
+.wx-crit li { grid-template-columns: 34px minmax(0, 1fr) auto; }
+.wx-crit .wx-cno { grid-row: span 2; align-self: start; padding: 1px 0; border-radius: 6px; background: rgba(255,255,255,.08); text-align: center; font-size: 11px; font-weight: 900; color: var(--wx-ui); }
+.wx-crit li small { grid-column: 2; }
+.wx-crit li .wx-clead { grid-column: 3; }
+.wx-facts { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 6px 10px; margin: 8px 0 0; font-size: 12.5px; }
+.wx-facts dt { color: var(--wx-muted); }
+.wx-facts dd { margin: 0; }
+.wx-facts dd small { display: block; color: var(--wx-dim); font-size: 11px; }
+.wx-dec-two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.wx-badge.wx-c2tag { margin-right: 5px; background: rgba(248,113,113,.18); color: var(--wx-red); }
+.wx-interp { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--wx-muted); }
+.wx-interp span { margin-right: 4px; font-weight: 700; }
+.wx-interp button { padding: 4px 9px; border-radius: 6px; border: 1px solid var(--wx-line-2); background: transparent; color: var(--wx-muted); font-size: 12px; font-weight: 700; cursor: pointer; }
+.wx-interp button[aria-pressed="true"] { border-color: var(--wx-red); background: rgba(248,113,113,.12); color: var(--wx-text); }
+.wx-tline { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); margin-top: 6px; }
+.wx-tline div { border-top: 3px solid var(--wx-orange); padding: 6px 6px 0 0; font-size: 11px; color: var(--wx-muted); }
+.wx-tline div[data-kind="advisory"] { border-color: var(--wx-amber); }
+.wx-tline div[data-kind="requirement"], .wx-tline div[data-kind="inflow"], .wx-tline div[data-kind="flooded"] { border-color: var(--wx-red); }
+.wx-tline b { display: block; color: var(--wx-text); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.wx-tline em { display: block; font-style: normal; font-weight: 700; color: var(--wx-ui); }
+.wx-vc-key .wx-vc-sig { color: var(--wx-text); font-weight: 800; }
 .wx-vc-then { margin-top: 10px; padding: 8px 10px; border-radius: 8px; background: rgba(52,211,153,.06); border: 1px solid rgba(52,211,153,.18); }
 .wx-vc-then p { margin: 0 0 6px; font-size: 11.5px; color: var(--wx-muted); }
 .wx-vc-then p b { color: var(--wx-text); }
@@ -401,7 +433,7 @@ body { display: flex; flex-direction: column; }
 .wx-why { overflow: hidden; color: var(--wx-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 /* 공식 기준 적용 상태 · 담당자 확인 기록 (시설 판단 탭) */
 .wx-crit { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.wx-crit li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--wx-line); background: rgba(255,255,255,.03); }
+.wx-crit li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 3px 10px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--wx-line); background: rgba(255,255,255,.03); }
 .wx-crit li.wx-cmp { border-style: dashed; opacity: .85; }
 .wx-crit b { font-size: 13px; color: var(--wx-text); }
 .wx-crit small { color: var(--wx-muted); font-size: 11.5px; line-height: 1.4; }
@@ -538,6 +570,7 @@ body { display: flex; flex-direction: column; }
         </select>
       </div>
       <div class="wx-tabs" id="wx-sum" role="tablist" aria-label="단계 이상 누적 · 누르면 거르기"></div>
+      <div class="wx-interp" id="wx-interp" role="group" aria-label="② 범람 우려 통보 해석"></div>
       <div class="wx-tools">
         <label class="wx-search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2.4" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="wx-q" placeholder="시설명 또는 시군 검색" aria-label="시설 검색"></label>
         <select class="wx-sort" id="wx-sort" aria-label="정렬"><option value="risk">위험 우선</option><option value="rain">3시간 강우순</option><option value="name">시설명순</option></select>
@@ -577,18 +610,28 @@ body { display: flex; flex-direction: column; }
         </div>
         <p class="wx-quality" id="wx-quality" hidden></p>
       </article>
-      <article class="wx-card" id="wx-crit-card" aria-label="공식 기준 적용 상태">
-        <span class="wx-chart-cap">공식 기준 적용 상태 · 기준은 기관 지침, FloodOps는 시설에 대입만</span>
+      <article class="wx-card" id="wx-crit-card" aria-label="즉시 통제 조건">
+        <div class="wx-cond-sum" id="wx-cond-sum"></div>
+        <span class="wx-chart-cap">기준까지 남은 시간</span>
+        <div class="wx-eta-grid" id="wx-eta"></div>
+        <span class="wx-chart-cap">즉시 통제 조건 · 국토부 「도로터널 방재·환기시설 설치 및 관리지침」 2.1.7(8)</span>
         <ul class="wx-crit" id="wx-crit"></ul>
-        <p class="wx-note">침수심 기준은 현장 센서가 없어 판정하지 않습니다. 담당자 판단·현장 확인이 우선이며 FloodOps는 통제를 실행하지 않습니다.</p>
+        <span class="wx-chart-cap">참고 · 조건이 아닌 판단 근거</span>
+        <ul class="wx-crit" id="wx-ref"></ul>
+        <p class="wx-note">통제 결정은 담당자 판단·현장 확인이 우선이며 FloodOps는 차단을 실행하지 않습니다.</p>
+      </article>
+      <article class="wx-card" id="wx-guide-card" aria-label="지침 적용 대상">
+        <span class="wx-chart-cap">지침 적용 대상 · 2.1.7(7) 침수심 기준 · 4.9.3(9) 진입차단설비</span>
+        <dl class="wx-facts" id="wx-guide"></dl>
       </article>
       <article class="wx-card" id="wx-dec-card" aria-label="담당자 확인 기록" hidden>
-        <span class="wx-chart-cap">담당자 확인 기록 · <span id="wx-dec-mode">—</span></span>
+        <span class="wx-chart-cap">담당자 확인 기록 · 지침 2.1.7(6) 상·하행 각 1명 · <span id="wx-dec-mode">—</span></span>
         <form class="wx-dec-form" id="wx-dec-form">
-          <label>확인자 이름 또는 역할<input name="checked_by" maxlength="80" required placeholder="예: 당직 담당자"></label>
-          <label>확인 결과<select name="confirmation" required><option value="CONFIRMED">관측값·등록 기준 확인</option><option value="NO_ACTION">확인 후 현재 조치 불필요</option><option value="ESCALATE">현장 확인 요청</option></select></label>
+          <div class="wx-dec-two"><label>상행 담당자<input name="checked_by" maxlength="80" required placeholder="이름 또는 역할"></label>
+          <label>하행 담당자<input name="checked_by_down" maxlength="80" required placeholder="이름 또는 역할"></label></div>
+          <label>확인 결과<select name="confirmation" required><option value="CONFIRMED">조건 확인 · 통제 실시</option><option value="ESCALATE">현장 확인 요청</option><option value="NO_ACTION">확인 후 현재 조치 불필요</option></select></label>
           <label>메모<textarea name="note" maxlength="500" rows="2" placeholder="현장 확인 사항 (선택)"></textarea></label>
-          <label class="wx-dec-ack"><input name="acknowledged" type="checkbox" required><span>화면의 관측 시각·수위·공식 기준을 확인했습니다.</span></label>
+          <label class="wx-dec-ack"><input name="acknowledged" type="checkbox" required><span>화면의 관측 시각·수위·즉시 통제 조건을 확인했습니다.</span></label>
           <button type="submit" id="wx-dec-submit">확인 기록 저장</button>
           <p class="wx-note" id="wx-dec-feedback" role="status"></p>
         </form>
@@ -641,7 +684,7 @@ body { display: flex; flex-direction: column; }
   const REGION_CENTER = { 서울: [126.98, 37.56], 부산: [129.05, 35.18], 대구: [128.6, 35.87], 인천: [126.7, 37.46], 광주: [126.85, 35.16], 대전: [127.38, 36.35], 울산: [129.31, 35.54], 세종: [127.29, 36.48], 경기: [127.2, 37.45], 강원: [128.3, 37.6], 충북: [127.7, 36.75], 충남: [126.9, 36.5], 전북: [127.1, 35.75], 전남: [126.9, 34.85], 경북: [128.75, 36.4], 경남: [128.3, 35.35], 제주: [126.55, 33.4] };
 
   const TWIN_HREF = root.dataset.twinHref || "#twin";
-  const st = { at: params.get("at") ?? root.dataset.at ?? "", overview: null, changes: null, region: params.get("region") ?? "", minStage: params.get("stage") || null, q: "", sort: "risk", facOnly: false, driver: params.get("driver") || "all", showCalm: true, selected: params.get("facility") || params.get("station") || null, rsort: "risk", rainLayer: false, officialOnly: !params.get("stage") };
+  const st = { at: params.get("at") ?? root.dataset.at ?? "", overview: null, changes: null, region: params.get("region") ?? "", minStage: params.get("stage") || null, q: "", sort: "risk", facOnly: false, driver: params.get("driver") || "all", showCalm: true, selected: params.get("facility") || params.get("station") || null, rsort: "risk", rainLayer: false, officialOnly: !params.get("stage"), condOnly: false, interp: params.get("interp") === "advisory" ? "advisory" : "warning" };
   let map = null, marker = null, hoverPop = null, stSeq = 0, prevStage = null, liveRefresh = null;
   const rank = (r) => ORDER.indexOf(r.stage ?? "unrated");
   const clock = (iso) => (iso ? `${iso.slice(5, 7)}.${iso.slice(8, 10)} ${iso.slice(11, 16)}` : "—");
@@ -987,11 +1030,23 @@ body { display: flex; flex-direction: column; }
     const q = st.q.trim().toLowerCase();
     return base().filter((r) => (st.minStage === null || rank(r) >= ORDER.indexOf(st.minStage))
       && (!st.officialOnly || underOfficial(r))
+      && (!st.condOnly || meetsCond2(r.risk))
       && (!st.driver || st.driver === "all" || r.driver === st.driver)
       && (!q || `${r.name} ${r.address} ${r.region} ${r.sgg ?? ""}`.toLowerCase().includes(q)));
   }
   // 특보 입구: 공식 홍수특보·호우특보가 걸린 시설과 운영 등록 시설만
   const underOfficial = (r) => Boolean(r.risk?.official || r.risk?.weather_warning || r.risk?.tier === "operational");
+  // 국토부 지침 2.1.7(8)② «홍수특보 발령 등으로 홍수통제소가 범람 우려를 통보한 경우 즉시 통제».
+  // 어느 특보부터 «범람 우려 통보»로 볼지는 기관 확인 전이라 화면에서 고르게 둔다(기본: 홍수경보부터).
+  const INTERP = { warning: "홍수경보부터", advisory: "홍수주의보부터" };
+  const meetsCond2 = (f) => Boolean(f?.official) && (st.interp === "advisory" || f.official.level === "warning");
+  const hhmm = (iso) => (iso ? String(iso).slice(11, 16) : "—");
+  function renderInterp() {
+    $("wx-interp").innerHTML = `<span>② 해석</span>${Object.entries(INTERP).map(([k, label]) => `<button type="button" data-interp="${k}" aria-pressed="${st.interp === k}">${label}</button>`).join("")}`;
+    $("wx-interp").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+      st.interp = b.dataset.interp; renderAll(); if (st.selected) renderStation(st.selected); if (validation) renderValidation();
+    }));
+  }
   function riskTrack(level) {
     const active = Number(level) || 0;
     return `<span class="wx-risk-track" aria-label="위험 단계 ${active}/4">${[1, 2, 3, 4].map((n) => `<i class="${n <= active ? "wx-active" : ""}"></i>`).join("")}</span>`;
@@ -1000,23 +1055,28 @@ body { display: flex; flex-direction: column; }
     const rows = base(), all = facilityRiskRows(); const by = Object.fromEntries(ORDER.map((k) => [k, 0]));
     rows.forEach((r) => { by[r.stage ?? "unrated"] += 1; });
     const atLeast = (s) => ORDER.slice(ORDER.indexOf(s)).reduce((a, k) => a + by[k], 0);
-    const officialRows = rows.filter(underOfficial);
-    const tabs = [["official", "특보 영향", officialRows.length, COLOR.warning], ["advisory", "주의 이상", atLeast("advisory"), COLOR.advisory], ["warning", "경계 이상", atLeast("warning"), COLOR.warning], [null, "전체 시설", rows.length, "#e4e4e7"]];
-    const cur = st.officialOnly ? "official" : st.minStage;
+    const officialRows = rows.filter(underOfficial), condRows = rows.filter((r) => meetsCond2(r.risk));
+    const tabs = [["official", "특보 영향", officialRows.length, COLOR.warning], ["cond", "② 충족", condRows.length, COLOR.planned_flood], ["warning", "경계 이상", atLeast("warning"), COLOR.warning], [null, "전체 시설", rows.length, "#e4e4e7"]];
+    const cur = st.condOnly ? "cond" : st.officialOnly ? "official" : st.minStage;
     $("wx-sum").innerHTML = tabs.map(([k, label, count, color]) => `<button type="button" role="tab" class="${cur === k ? "wx-on" : ""}${count ? "" : " wx-zero"}" data-s="${k ?? ""}" style="--wx-c:${color}" aria-selected="${cur === k}">${label}<b>${count}</b></button>`).join("");
-    $("wx-sum").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { st.officialOnly = b.dataset.s === "official"; st.minStage = st.officialOnly ? null : (b.dataset.s || null); renderAll(); notifyView(); }));
+    $("wx-sum").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+      st.officialOnly = b.dataset.s === "official"; st.condOnly = b.dataset.s === "cond";
+      st.minStage = st.officialOnly || st.condOnly ? null : (b.dataset.s || null); renderAll(); notifyView();
+    }));
+    renderInterp();
     const serious = rows.filter((r) => r.risk.level >= 3).length;
-    const closureReview = rows.filter((r) => r.risk.tier === "operational" && r.risk.level >= 3).length;
+    const opRow = facilityRiskRows().find((r) => r.risk.tier === "operational" && meetsCond2(r.risk));
     const river = rows.filter((r) => r.driver === "river").length, pluvial = rows.length - river;
     const rainy = rows.filter((r) => (r.risk.rain?.rain_3h_mm ?? r.risk.rain?.rain_1h_mm ?? 0) > 0).length;
     const rainTime = st.overview?.rain_at ? clock(st.overview.rain_at) : "자료 없음";
     const official = { warning: 0, advisory: 0, ...(st.overview?.counts?.official_gauges ?? {}) };
     const kmaWeatherFacilities = st.overview?.counts?.under_weather_warning ?? 0;
     const kpi = (label, value, unit, color, hot) => `<div class="wx-kpi${hot ? " wx-hotk" : ""}" style="--wx-c:${color}"><span>${label}</span><strong>${value}<small>${unit}</small></strong></div>`;
-    $("wx-kpidot").classList.toggle("wx-alert", serious > 0);
-    $("wx-kpis").innerHTML = kpi("공식 홍수특보 관측소", official.warning + official.advisory, `곳 · 경보 ${official.warning}`, COLOR.warning, official.warning > 0)
+    $("wx-kpidot").classList.toggle("wx-alert", serious > 0 || condRows.length > 0);
+    $("wx-kpis").innerHTML = kpi("② 즉시 통제 조건 충족 시설", condRows.length, `곳 · ${INTERP[st.interp]}`, COLOR.planned_flood, condRows.length > 0)
+      + kpi(opRow ? `${esc(opRow.name)} ② 경과` : "운영 시설 ②", opRow ? opRow.risk.official.minutes_since_issue : "미충족", opRow ? `분째 · ${hhmm(opRow.risk.official.issued_at)}부터` : "", COLOR.planned_flood, Boolean(opRow))
+      + kpi("공식 홍수특보 관측소", official.warning + official.advisory, `곳 · 경보 ${official.warning}`, COLOR.warning, official.warning > 0)
       + kpi("특보 영향 시설", officialRows.length, "곳", COLOR.warning, officialRows.length > 0)
-      + kpi("운영 시설 · 통제 검토", closureReview, "곳", COLOR.planned_flood, closureReview > 0)
       + kpi("경계 이상", serious, "곳", COLOR.warning, serious > 0)
       + kpi("주의 이상", atLeast("advisory"), "곳", COLOR.advisory, atLeast("advisory") > 0)
       + kpi("기상청 호우특보 시설", kmaWeatherFacilities, "곳", COLOR.advisory, kmaWeatherFacilities > 0)
@@ -1038,7 +1098,7 @@ body { display: flex; flex-direction: column; }
     const urgency = isRiver ? (value !== null && value !== undefined && value <= 60) : f.level >= 2;
     return `<button type="button" role="listitem" class="wx-row${r.code === st.selected ? " wx-sel" : ""}" data-code="${esc(r.code)}" style="--wx-c:${COLOR[stage]};animation-delay:${Math.min(i, 20) * 12}ms">
       <span class="wx-rk">${i + 1}</span><span class="wx-nm"><span class="wx-nmtop"><b>${esc(f.name)}</b>${driverTag}${officialTag}${weatherTag}<span class="wx-fac">${esc(f.kind_ko)}</span></span>
-      ${f.assessment_status === "INSUFFICIENT_DATA" ? `<span class="wx-quality" style="display:inline-block;margin:2px 0">자료 부족 · 위험 단계 미산정</span>` : riskTrack(f.level)}<span class="wx-gline"><b>${esc(f.assessment_status === "INSUFFICIENT_DATA" ? "자료 부족" : f.level_label)}</b><span>${esc(f.why)}</span></span></span>
+      ${f.assessment_status === "INSUFFICIENT_DATA" ? `<span class="wx-quality" style="display:inline-block;margin:2px 0">자료 부족 · 위험 단계 미산정</span>` : riskTrack(f.level)}<span class="wx-gline">${meetsCond2(f) ? `<span class="wx-badge wx-c2tag" title="국토부 지침 2.1.7(8)② · ${INTERP[st.interp]}">② ${hhmm(f.official.issued_at)}~</span>` : ""}<b>${esc(f.assessment_status === "INSUFFICIENT_DATA" ? "자료 부족" : f.level_label)}</b><span>${esc(f.why)}</span></span></span>
       <span class="wx-eta${urgency ? " wx-soon" : ""}"><strong>${value === null || value === undefined ? "—" : isRiver ? value : Number(value).toFixed(1)}</strong><small>${unit}</small><span class="wx-why">${rainText}</span></span></button>`;
   }
   function renderList() {
@@ -1084,7 +1144,7 @@ body { display: flex; flex-direction: column; }
     map.getSource("wx-rain").setData({ type: "FeatureCollection", features: rainRows.filter((g) => Number.isFinite(g.lon) && Number.isFinite(g.lat)).map((g) => ({ type: "Feature", geometry: { type: "Point", coordinates: [g.lon, g.lat] },
       properties: { code: g.code, name: g.name, rain10: g.rain_10m_mm, rain1: g.rain_1h_mm, rain3: g.rain_3h_mm, rain12: g.rain_12h_mm } })) });
     map.getSource("wx-st").setData({ type: "FeatureCollection", features: rows.map((r) => ({ type: "Feature", geometry: { type: "Point", coordinates: [r.lon, r.lat] },
-      properties: { code: r.code, name: r.name, color: COLOR[r.stage ?? "unrated"], rank: rank(r), label: r.risk.level_label, dim: !vis.has(r.code), sel: r.code === st.selected } })) });
+      properties: { code: r.code, name: r.name, color: COLOR[r.stage ?? "unrated"], rank: rank(r), label: r.risk.level_label, dim: !vis.has(r.code), sel: r.code === st.selected, cond: meetsCond2(r.risk) } })) });
     map.getSource("wx-fac").setData({ type: "FeatureCollection", features: [] });
     const row = rows.find((r) => r.code === st.selected);
     if (marker) { marker.getElement().style.display = row ? "flex" : "none"; if (row) marker.setLngLat([row.lon, row.lat]); }
@@ -1168,41 +1228,83 @@ body { display: flex; flex-direction: column; }
       $("wx-fac-list").insertAdjacentHTML("beforeend", `<button type="button" class="wx-vc-open">검증 사례 ${cases.length}건 보기 → ${esc(cases.map((c) => c.title.split(" ").slice(-1)[0]).join(" · "))}</button>`);
       $("wx-fac-list").querySelector(".wx-vc-open").addEventListener("click", () => showTab("vc"));
     }
+    // 지도 위 선택 시설 이름표: 시설 응답으로 채운다(관측소용 표만 채우고 있어 빈 막대로 보였다).
+    if (marker) {
+      const left = f.minutes_to_planned_flood;
+      marker.getElement().querySelector(".wx-tip").innerHTML = `<div class="wx-mc-top"><b>${esc(f.name)}</b><span class="wx-mc-pill">${esc(f.assessment_status === "INSUFFICIENT_DATA" ? "자료 부족" : f.level_label)}</span></div>
+        <div class="wx-mc-grid"><span>② 조건</span><span>공식 특보</span><span>계획홍수위까지</span>
+        <strong class="${meetsCond2(f) ? "wx-over" : ""}">${meetsCond2(f) ? `${hhmm(f.official.issued_at)}~` : "미충족"}</strong><strong>${f.official ? esc(f.official.level_ko) : "없음"}</strong><strong>${left == null ? "—" : f.level >= 4 ? "도달" : `${left}분`}</strong></div>`;
+    }
     renderDecision(f);
   }
 
-  // 공식 기준(홍수특보·하천 수위·호우특보·강우 기준량·행안부 침수심)을 이 시설에 대입한 상태. FloodOps 규칙은 운영 시설에서만, 비교 후보로 둔다.
+  // 시설 판단: 국토부 지침 2.1.7(8) 즉시 통제 조건별 판정 + 기준까지 남은 시간 + 지침 적용 대상.
+  // 수위·강우·FloodOps 규칙은 조건이 아니므로 «참고»로 따로 둔다. 판정할 자료가 없는 조건은 «현장 확인»으로 남긴다.
   let twinSeq = 0;
-  const critRow = (name, src, status, label, lead, cmp) => `<li class="${cmp ? "wx-cmp" : ""}"><b>${esc(name)}</b><span class="wx-cst wx-cst-${status}">${esc(label)}</span><small>${esc(src)}</small><small class="wx-clead">${esc(lead)}</small></li>`;
+  const condRow = (no, name, src, status, label, lead) => `<li><span class="wx-cno">${no}</span><b>${esc(name)}</b><span class="wx-cst wx-cst-${status}">${esc(label)}</span><small>${src}</small><small class="wx-clead">${esc(lead)}</small></li>`;
+  const critRow = (name, src, status, label, lead, cmp) => `<li class="${cmp ? "wx-cmp" : ""}"><span class="wx-cno">참고</span><b>${esc(name)}</b><span class="wx-cst wx-cst-${status}">${esc(label)}</span><small>${esc(src)}</small><small class="wx-clead">${esc(lead)}</small></li>`;
   function renderCriteria(f, twin) {
     const ev = f.factor_evidence ?? {}, river = ev.river ?? null, rain = ev.rain ?? null, off = f.official, kma = f.weather_warning;
+    const cond2 = meetsCond2(f), replay = st.overview?.mode === "replay" || Boolean(st.at);
+    // 요약
+    $("wx-cond-sum").innerHTML = cond2
+      ? `<div class="wx-cond" style="--wx-c:#f87171"><strong>즉시 통제 조건 ② 충족</strong><span>${hhmm(off.issued_at)}부터 ${off.minutes_since_issue}분째 · ${esc(off.level_ko)} · 해석: ${INTERP[st.interp]}</span></div>`
+      : `<div class="wx-cond" style="--wx-c:#38bdf8"><strong>충족된 즉시 통제 조건 없음</strong><span>판정 가능한 ②·④ 기준 · ①③⑤와 침수심은 현장 확인이 필요합니다.</span></div>`;
+    // 기준까지 남은 시간: 홍수통제소 발령문의 예상값 + 지금 속도 외삽
+    const nowIso = st.overview?.observed_at ?? null;
+    const fc = off?.forecast_time
+      ? `<strong>${hhmm(off.forecast_time)}<small>${off.forecast_level_m != null ? `${Number(off.forecast_level_m).toFixed(2)} m` : ""}</small></strong><em>${nowIso && Date.parse(off.forecast_time) <= Date.parse(nowIso) ? "예상 시각 지남" : nowIso ? `${Math.round((Date.parse(off.forecast_time) - Date.parse(nowIso)) / 60000)}분 뒤` : "발령문 예상"} · ${esc(off.level_ko)} 발령문</em>`
+      : `<strong>—</strong><em>발령 예상값 없음</em>`;
+    const lv = river?.levels_m, wl = river?.stage_m;
+    const ex = !river || wl == null ? `<strong>—</strong><em>하천 수위 연결 없음</em>`
+      : lv?.planned_flood != null && wl >= lv.planned_flood ? `<strong class="wx-hotv">도달</strong><em>계획홍수위 ${lv.planned_flood} m 이상</em>`
+        : river.minutes_to_planned_flood == null ? `<strong>상승 없음</strong><em>지금 속도 기준</em>`
+          : `<strong>${river.minutes_to_planned_flood >= 600 ? "10h+" : river.minutes_to_planned_flood}<small>${river.minutes_to_planned_flood >= 600 ? "" : "분"}</small></strong><em>지금 속도로 계획홍수위까지 · 예보 아님</em>`;
+    $("wx-eta").innerHTML = `<div><span>홍수통제소 발령 예상</span>${fc}</div><div><span>현재 상승 속도 외삽</span>${ex}</div>`;
+    // 즉시 통제 조건
     const rows = [];
-    if (off) rows.push(critRow("홍수특보", `홍수통제소 · ${off.station_name ?? river?.station_name ?? ""} ${off.level_ko} ${off.issued_at.slice(5, 16).replace("T", " ")}${off.forecast_level_m != null ? ` · 예상 ${Number(off.forecast_level_m).toFixed(2)} m` : ""}`, "met", off.level_ko, `발령 ${off.minutes_since_issue}분 경과`));
-    else rows.push(critRow("홍수특보", river?.station_name ? `홍수통제소 · ${river.station_name} 발령 없음` : "홍수통제소 · 연결 관측소 없음", river ? "ok" : "none", river ? "해당 없음" : "관측소 없음", "—"));
-    if (river?.levels_m) {
-      const lv = river.levels_m, wl = river.stage_m; let s = "ok", l = "기준 미만";
-      if (wl != null && lv.planned_flood != null && wl >= lv.planned_flood) { s = "met"; l = "계획홍수위 도달"; }
-      else if (wl != null && lv.warning != null && wl >= lv.warning) { s = "met"; l = "경보 초과"; }
-      else if (wl != null && lv.advisory != null && wl >= lv.advisory) { s = "unk"; l = "주의보 초과"; }
-      rows.push(critRow("하천 수위", `홍수통제소 · 경보 ${lv.warning ?? "—"} m / 계획홍수위 ${lv.planned_flood ?? "—"} m`, wl == null ? "none" : s, wl == null ? "관측 없음" : l, wl == null ? "—" : `현재 ${Number(wl).toFixed(2)} m${river.minutes_to_planned_flood != null ? ` · 도달까지 ${river.minutes_to_planned_flood}분` : ""}`));
-    } else rows.push(critRow("하천 수위", "연결 수위 관측소 없음 · 내수형", "none", "해당 없음", "—"));
-    if (kma) rows.push(critRow("호우특보", `기상청 · ${kma.area} · 발효 ${kma.effective_at ?? "현재"}`, "met", kma.level_ko, "시군구 특보 적용"));
-    else {
-      const feed = st.overview?.weather_warning_feed;
-      rows.push(critRow("호우특보", feed?.mode === "replay-unavailable" ? "기상청 · 과거 특보 발표 이력 미연결(API 승인 뒤)" : feed?.available ? "기상청 · 이 시설 시군구에 특보 없음" : "기상청 · 특보 피드 조회 불가", feed?.available ? "ok" : "unk", feed?.available ? "해당 없음" : "미확인", "—"));
+    let src2 = off ? `홍수통제소 · ${esc(river?.station_name ?? f.gauge ?? "")} ${esc(off.level_ko)} ${esc(off.issued_at.slice(5, 16).replace("T", " "))} · 해석: ${INTERP[st.interp]}` : `연결 관측소 ${esc(river?.station_name ?? f.gauge ?? "없음")} · 발령 없음 · 해석: ${INTERP[st.interp]}`;
+    const osongEvents = (validation?.cases ?? []).find((c) => c.id === "osong-2023")?.official_events ?? [];
+    const notice = f.tier === "operational" && st.at && st.at.startsWith("2023-07-15") ? osongEvents.find((e) => e.kind === "notice" && Date.parse(e.at) <= Date.parse(nowIso ?? st.at)) : null;
+    if (notice) src2 += `<br>추가 통보: ${hhmm(notice.at)} ${esc(notice.note)} ${esc(notice.label)}(국조실 경과표)`;
+    rows.push(condRow("②", "홍수특보 등으로 범람 우려 통보", src2, cond2 ? "met" : off ? "unk" : "ok", cond2 ? "충족" : off ? "해석상 미충족" : "미충족", cond2 ? `${hhmm(off.issued_at)}부터 ${off.minutes_since_issue}분째` : "—"));
+    const rate = river?.rise_m_per_10min;
+    const rateText = rate == null ? "수위 상승 자료 없음" : `수위 ${rate > 0 ? "↑" : rate < 0 ? "↓" : "→"}${Math.abs(rate).toFixed(3)} m/10분`;
+    if (kma) rows.push(condRow("④", "호우특보 중 급격한 수위 증가 예상", `기상청 ${esc(kma.level_ko)} · ${esc(kma.area)} · ${rateText} · «급격» 기준은 지침에 수치 없음`, "unk", "담당자 판단", rateText));
+    else rows.push(condRow("④", "호우특보 중 급격한 수위 증가 예상", `${replay ? "기상청 호우특보 과거 발표 이력 미연결(API 승인 대기)" : "이 시설 시군구에 호우특보 없음"} · ${rateText}`, replay ? "unk" : "ok", replay ? "판정 보류" : "미충족", replay ? "실시간에서만" : "—"));
+    rows.push(condRow("①", "배수펌프 미작동·물 고임", "현장 계측 비공개", "none", "현장 확인", "—"));
+    rows.push(condRow("③", "관계기관 통보", "경찰·소방·도로관리청 통보는 기록 연계 필요", "none", "현장 확인", "—"));
+    rows.push(condRow("⑤", "배수용량 초과", "펌프 용량·유입량 자료 없음", "none", "현장 확인", "—"));
+    rows.push(condRow("(7)", "침수심 통제기준", "센서 자료 비공개 · 적용 기준은 아래 «지침 적용 대상»", "none", "자료 없음", "판정 안 함"));
+    $("wx-crit").innerHTML = rows.join("");
+    // 참고
+    const refs = [];
+    if (lv && wl != null) {
+      let s = "ok", l = "기준 미만";
+      if (lv.planned_flood != null && wl >= lv.planned_flood) { s = "met"; l = "계획홍수위 도달"; }
+      else if (lv.warning != null && wl >= lv.warning) { s = "met"; l = "경보 수위 초과"; }
+      else if (lv.advisory != null && wl >= lv.advisory) { s = "unk"; l = "주의보 수위 초과"; }
+      refs.push(critRow("하천 수위", `${river.station_name ?? ""} · 경보 ${lv.warning ?? "—"} m / 계획홍수위 ${lv.planned_flood ?? "—"} m`, s, l, `현재 ${Number(wl).toFixed(2)} m`));
     }
     if (rain?.windows_mm) {
       const w = rain.windows_mm, parts = [["3시간", w.rain_3h_mm, 60], ["12시간", w.rain_12h_mm, 110]].filter(([, v]) => v != null).map(([k, v, t]) => `${k} ${Number(v).toFixed(1)} mm (기준 ${t})`);
-      rows.push(critRow("강우 누적 · 호우특보 기준량", `${rain.station_name ?? ""}${rain.distance_km != null ? ` ${rain.distance_km} km` : ""} · ${parts.join(" · ") || "누적 자료 대기"}`, (rain.candidate_level ?? 0) >= 2 ? "met" : "ok", (rain.candidate_level ?? 0) >= 3 ? "경보량 이상" : (rain.candidate_level ?? 0) >= 2 ? "주의보량 이상" : "기준 미만", "참고 · 시설 기준 아님"));
+      refs.push(critRow("강우 누적 · 호우특보 기준량", `${rain.station_name ?? ""}${rain.distance_km != null ? ` ${rain.distance_km} km` : ""} · ${parts.join(" · ") || "누적 자료 대기"}`, (rain.candidate_level ?? 0) >= 2 ? "met" : "ok", (rain.candidate_level ?? 0) >= 3 ? "경보량 이상" : (rain.candidate_level ?? 0) >= 2 ? "주의보량 이상" : "기준 미만", "시설 기준 아님"));
     }
-    rows.push(critRow("침수심 (행안부 통제기준)", "원문 확인 중 · 현장 센서 자료 없음", "none", "자료 없음", "현장 확인이 우선"));
     if (f.tier === "operational") {
       const reco = twin ? ({ CLOSURE_REVIEW: ["met", "통제 검토"], MONITOR: ["unk", "감시"], NORMAL: ["ok", "정상"] }[twin.recommendation] ?? ["none", "관측 없음"]) : ["unk", "확인 중"];
-      rows.push(critRow("FloodOps 규칙 (비교)", twin?.rule ? `${twin.rule.id} · ${twin.rule.review_when}` : "river_stage_v1 · 경보 이상 + 60분 내 계획홍수위", reco[0], reco[1], twin?.reason ?? "기준 개정 비교용", true));
-    } else rows.push(critRow("FloodOps 규칙 (비교)", "운영 등록 전 · 시설별 규칙 없음", "none", "미등록", "감시 단계만 표시", true));
-    $("wx-crit").innerHTML = rows.join("");
+      refs.push(critRow("FloodOps 규칙 (비교 후보)", twin?.rule ? `${twin.rule.id} · ${twin.rule.review_when}` : "river_stage_v1 · 경보 이상 + 60분 내 계획홍수위", reco[0], reco[1], "기준 개정 비교용", true));
+    }
+    $("wx-ref").innerHTML = refs.join("") || `<li><span class="wx-cno">참고</span><b>판단 근거 자료 없음</b></li>`;
+    // 지침 적용 대상
+    const g = f.guideline ?? {}, rv = g.nearest_river;
+    const within = rv ? rv.distance_m <= 500 : null;
+    $("wx-guide").innerHTML = `<dt>형식</dt><dd>${esc(g.structure ?? "미등록")}<small>국토부 시설 카탈로그 · U자형 여부는 형식만으로 판단 불가</small></dd>
+      <dt>가장 가까운 하천</dt><dd>${rv ? `${esc(rv.name)} ${Number(rv.distance_m).toLocaleString()} m` : "자료 없음"}<small>${esc(rv?.basis ?? "OSM 하천 중심선 기준")}</small></dd>
+      <dt>방재등급</dt><dd>미확인<small>하천구역 500 m 이내 U자형 3·4등급이면 진입차단설비 설치 대상</small></dd>
+      <dt>침수심 기준</dt><dd>${within ? "5 cm 이하 후보 (하천 500 m 이내)" : "판정 보류"}<small>기본 15 cm 이하 · 하천 500 m 이내 등은 5 cm 이하(2026판) · ${within ? "하천구역 경계로 다시 확인 필요" : rv ? "중심선 거리는 하천구역 경계보다 멀게 나옵니다" : "하천 거리 자료 없음"}</small></dd>
+      <dt>진입차단설비 대상</dt><dd>판정 보류<small>형식·등급·하천구역 거리를 모두 확인해야 합니다</small></dd>`;
   }
-  const CONFIRMATION_KO = { CONFIRMED: "관측·기준 확인", NO_ACTION: "현재 조치 불필요", ESCALATE: "현장 확인 요청" };
+  const CONFIRMATION_KO = { CONFIRMED: "조건 확인 · 통제 실시", NO_ACTION: "현재 조치 불필요", ESCALATE: "현장 확인 요청" };
   const localTime = (v) => (v ? new Date(v).toLocaleString("ko-KR", { hour12: false, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "시각 없음");
   async function renderDecision(f) {
     const card = $("wx-dec-card"), my = ++twinSeq;
@@ -1216,7 +1318,7 @@ body { display: flex; flex-direction: column; }
     if (my !== twinSeq) return;
     renderCriteria(f, status);
     const list = Array.isArray(records) ? records : (records?.records ?? records?.decisions ?? []);
-    $("wx-dec-list").innerHTML = list.length ? list.map((r) => `<li><b>${esc(CONFIRMATION_KO[r.confirmation] ?? "확인 기록")} · ${esc(r.checked_by)}</b><span>${r.source_mode === "live" ? "실시간" : "재생"} · 관측 ${esc(localTime(r.observation_at))} · ${r.water_level_m == null ? "수위 미상" : `${Number(r.water_level_m).toFixed(2)} m`} · 기록 ${esc(localTime(r.recorded_at))}</span>${r.note ? `<span>${esc(r.note)}</span>` : ""}</li>`).join("") : `<li><span>저장된 확인 기록이 없습니다.</span></li>`;
+    $("wx-dec-list").innerHTML = list.length ? list.map((r) => `<li><b>${esc(CONFIRMATION_KO[r.confirmation] ?? "확인 기록")} · 상행 ${esc(r.checked_by)}${r.checked_by_down ? ` · 하행 ${esc(r.checked_by_down)}` : ""}</b><span>${r.source_mode === "live" ? "실시간" : "재생"} · 관측 ${esc(localTime(r.observation_at))} · ${r.water_level_m == null ? "수위 미상" : `${Number(r.water_level_m).toFixed(2)} m`} · 기록 ${esc(localTime(r.recorded_at))}</span>${r.note ? `<span>${esc(r.note)}</span>` : ""}</li>`).join("") : `<li><span>저장된 확인 기록이 없습니다.</span></li>`;
   }
   function renderAll() {
     const driverButton = $("wx-faconly");
@@ -1232,8 +1334,8 @@ body { display: flex; flex-direction: column; }
     window.parent.postMessage({ type: "floodops-watch-view", view: { at: st.at || null, region: st.region || null, stage: st.minStage, station: st.selected, facility_id: st.selected, driver: st.driver } }, window.location.origin);
   }
   async function load() {
-    // 검증 사례에서 넘어온 시각은 그날 강우로 재생한다(채점과 같은 조건). 직접 고른 시각은 현재 강우를 함께 본다.
-    const rainReplay = Boolean(st.at && st.rainReplay);
+    // 과거 시각은 그날 강우로 재생한다. 수위만 과거이고 강우는 지금이면 2023 오송 화면에 오늘의 0 mm가 섞여 판단 근거가 어긋난다.
+    const rainReplay = Boolean(st.at);
     const query = new URLSearchParams({ limit: "2000", rain_mode: rainReplay ? "replay" : "live" });
     if (st.at) query.set("at", st.at);
     const data = adaptFacilityRisk(await get(`/api/watch/facility-risk?${query}`)); st.overview = data; st.changes = null;
@@ -1274,9 +1376,17 @@ body { display: flex; flex-direction: column; }
       const w = Math.min(50, Math.abs(lead) / span * 50);
       return `<span class="wx-vc-bar"><i class="${lead >= 0 ? "wx-vc-early" : "wx-vc-late"}" style="${lead >= 0 ? `right:50%;width:${w}%` : `left:50%;width:${w}%`}"></i><b></b></span>`;
     };
-    $("wx-vc-body").innerHTML = cases.map((c) => {
+    // 오송은 국조실 경과표를 띠로, 각 사건 맨 위에는 «② 충족(해석)» 줄을 둔다.
+    const keyName = st.interp === "advisory" ? "공식 홍수주의보" : "공식 홍수경보";
+    const osong = cases.find((c) => c.id === "osong-2023");
+    const strip = osong?.official_events?.length ? `<article class="wx-card"><span class="wx-chart-cap">오송 · 국조실 감찰 경과표</span><div class="wx-tline">${osong.official_events.map((e) => `<div data-kind="${esc(e.kind)}"><b>${esc(e.at.slice(5, 16).replace("T", " "))}</b><em>${esc(e.label)}</em>${esc(e.note)}</div>`).join("")}</div><p class="wx-note">② 조건은 04:10(경보)에, 통제 요건은 06:40에 충족됐지만 통제 없이 08:27에 유입했습니다.</p></article>` : "";
+    $("wx-vc-body").innerHTML = strip + cases.map((c) => {
       const ref = c.reference, near = c.region_at_reference || {};
-      const rows = c.signals.map((s) => `<li class="wx-vc-row${s.lead_min === null ? " wx-vc-miss" : s.lead_min >= 0 ? "" : " wx-vc-lag"}">
+      const key = c.signals.find((s) => s.signal === keyName);
+      const keyRow = key ? `<li class="wx-vc-row wx-vc-key${key.lead_min === null ? " wx-vc-miss" : key.lead_min >= 0 ? "" : " wx-vc-lag"}">
+          <span class="wx-vc-sig">② 충족 · ${INTERP[st.interp]}<small>${key.at ? esc(key.at.slice(5, 16).replace("T", " ")) : "울리지 않음"}</small></span>${bar(key.lead_min)}
+          <span class="wx-vc-lead">${key.lead_min === null ? "—" : `${key.lead_min >= 0 ? "+" : "−"}${Math.abs(key.lead_min)}<small>분</small>`}</span></li>` : "";
+      const rows = keyRow + c.signals.filter((s) => s !== key).map((s) => `<li class="wx-vc-row${s.lead_min === null ? " wx-vc-miss" : s.lead_min >= 0 ? "" : " wx-vc-lag"}">
           <span class="wx-vc-sig">${esc(s.signal)}<small>${s.at ? esc(s.at.slice(5, 16).replace("T", " ")) : "울리지 않음"}</small></span>${bar(s.lead_min)}
           <span class="wx-vc-lead">${s.lead_min === null ? "—" : `${s.lead_min >= 0 ? "+" : "−"}${Math.abs(s.lead_min)}<small>분${s.lead_is_lower_bound ? "↑" : ""}</small>`}</span></li>`).join("");
       return `<article class="wx-card wx-vc-case">
@@ -1310,7 +1420,7 @@ body { display: flex; flex-direction: column; }
     try {
       const q = st.at ? `?at=${encodeURIComponent(st.at)}` : "";
       const res = await fetch(`${API}/api/twin/facilities/${encodeURIComponent(id)}/decisions${q}`, { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ checked_by: values.get("checked_by"), confirmation: values.get("confirmation"), acknowledged: values.get("acknowledged") === "on", note: values.get("note") }) });
+        body: JSON.stringify({ checked_by: values.get("checked_by"), checked_by_down: values.get("checked_by_down"), confirmation: values.get("confirmation"), acknowledged: values.get("acknowledged") === "on", note: values.get("note") }) });
       if (!res.ok) throw new Error(`API ${res.status}`);
       form.reset(); $("wx-dec-feedback").textContent = "확인 기록을 저장했습니다.";
       const f = facilityRiskRows().find((x) => x.code === id)?.risk; if (f) renderDecision(f);
@@ -1361,6 +1471,7 @@ body { display: flex; flex-direction: column; }
         ["any", [">=", ["get", "rain12"], 30], [">=", ["get", "rain3"], 10], [">=", ["get", "rain1"], 5]], "#60a5fa",
         ["any", ["!=", ["get", "rain12"], null], ["!=", ["get", "rain3"], null], ["!=", ["get", "rain1"], null]], "#38bdf8", "#71717a"],
       "circle-opacity": 0.9, "circle-stroke-color": "#e4e4e7", "circle-stroke-width": 1.2 } });
+    map.addLayer({ id: "wx-cond", type: "circle", source: "wx-st", filter: ["==", ["get", "cond"], true], paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 9, 12, 17], "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#f87171", "circle-stroke-width": 1.6, "circle-stroke-opacity": ["case", ["boolean", ["get", "dim"], false], 0.2, 0.9] } });
     map.addLayer({ id: "wx-halo", type: "circle", source: "wx-st", filter: [">=", ["get", "rank"], 4], paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 11, 12, 24], "circle-color": ["get", "color"], "circle-blur": 1, "circle-opacity": ["case", ["boolean", ["get", "dim"], false], 0.08, 0.5] } });
     map.addLayer({ id: "wx-st", type: "circle", source: "wx-st", paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, ["case", [">=", ["get", "rank"], 2], 5, 3], 12, ["case", [">=", ["get", "rank"], 2], 10, 6]],
       "circle-color": ["get", "color"], "circle-opacity": ["case", ["boolean", ["get", "dim"], false], 0.2, 0.95], "circle-stroke-color": ["case", ["boolean", ["get", "sel"], false], "#fff", "#0b1220"], "circle-stroke-width": ["case", ["boolean", ["get", "sel"], false], 2.5, 0.8] } });

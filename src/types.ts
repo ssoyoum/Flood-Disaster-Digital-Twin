@@ -730,6 +730,8 @@ export type ValidationCase = {
   signals: ValidationSignal[];
   region_at_reference: { at: string; advisory_or_above: number; warning_or_above: number; total: number };
   timeline?: Array<{ at: string; levels: Record<string, number>; region_advisory_or_above: number }>;
+  official_events?: Array<{ at: string; kind: string; label: string; note: string }>;
+  official_events_source?: string | null;
 };
 export type ValidationScorecard = { built_at: string; step_min: number; rule: string; cases: ValidationCase[]; limitations: string[] };
 
