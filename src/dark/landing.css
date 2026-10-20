@@ -48,6 +48,8 @@
 .fo-schematic-pop dd.ok { color: var(--fo-ok); }
 .fo-schematic footer { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; font-size: 11px; color: var(--fo-muted); }
 .fo-schematic footer span { display: inline-flex; align-items: center; gap: 6px; }
+.fo-schematic-link { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; color: var(--fo-accent); font-weight: 700; text-decoration: none; }
+.fo-schematic-link:hover { color: #bae6fd; }
 .fo-schematic .sw { width: 13px; height: 10px; border-radius: 2px; border: 1px solid; }
 .fo-schematic .sw.river { background: #12324d; border-color: #1f6fa3; }
 .fo-schematic .sw.flood { background: rgba(56, 189, 248, .16); border-color: #38bdf8; }

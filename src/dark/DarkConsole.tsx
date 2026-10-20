@@ -21,6 +21,7 @@ import "./dark.css";
 
 import { ROLE_KO, stageKo, statusKo, textKo } from "./ko";
 import { FloodOpsLogo } from "./Landing";
+import { AppNavigation } from "./Navigation";
 
 /*
  * 어두운 관제 화면.
@@ -439,6 +440,7 @@ export default function DarkConsole({
           <AgentDock eventId={eventData.id} compact />
         </div>
         <div className="dk-topbar-right">
+          <AppNavigation active="cases" />
           <span className="dk-clock">{now.toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })} {now.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} KST</span>
         </div>
       </header>

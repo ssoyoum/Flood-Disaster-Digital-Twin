@@ -4,6 +4,7 @@ import * as api from "../api";
 import type { FloodEvent, LayersResponse, ResponseTimingResult, TimelineReconstructionResponse } from "../types";
 import { AgentDock } from "./DarkConsole";
 import { FloodOpsLogo } from "./Landing";
+import { AppNavigation } from "./Navigation";
 import { CONFIDENCE_KO, ROLE_KO, localizeEvent, stageKo } from "./ko";
 import "./dark.css";
 import "./urban.css";
@@ -167,6 +168,7 @@ function TimelineConsoleView({ eventData, layers, reconstruction }: { eventData:
           <AgentDock eventId={eventData.id} compact />
         </div>
         <div className="dk-status">
+          <AppNavigation active="cases" />
           <span className="dk-chip dk-chip-stage"><i />{current ? `${dayClock(current.time)} ${current.label}` : "—"}</span>
           <span className="dk-chip">근거 <small>언론 보도 시각</small></span>
         </div>

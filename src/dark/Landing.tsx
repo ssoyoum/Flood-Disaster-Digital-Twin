@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Gauge, GitCompare, History, Lock, Scale } from "lucide-react";
+import { ArrowLeft, ArrowRight, Gauge, GitCompare, History, Scale } from "lucide-react";
 import { getTwinFacilities } from "../api";
 import type { FloodEvent } from "../types";
+import { AppNavigation, type FloodOpsRoute } from "./Navigation";
 import "./landing.css";
 
 type CaseText = { name: string; place: string; flow: string };
@@ -11,11 +12,10 @@ const CASE_TEXT: Record<string, CaseText> = {
   "osong-2023": { name: "2023 오송 궁평2지하차도 침수", place: "충북 청주시 흥덕구 오송읍", flow: "미호천 제방 붕괴 → 월류 → 지하차도 침수 → 차량·통행자" },
   "seoul-2022": { name: "2022 서울 도림천 유역 침수", place: "서울 관악·동작·영등포 (도림천 유역)", flow: "집중호우 → 설계강우 초과 → 저지대 침수 → 구조 신고 → 경보 · 빗물터널" },
   "pohang-2022": { name: "2022 포항 태풍 힌남노 침수", place: "경북 포항 냉천 하류·인덕동", flow: "태풍 → 냉천 범람 → 지하주차장 유입 → 완전 침수 · 진입 금지 시각 비교" },
-  "iksan-2024": { name: "2024 익산 극한호우 침수", place: "전북 익산 산북천 유역(낭산·망성)", flow: "극한호우 → 배수·소하천 용량 초과 → 농가·농경지·도로" },
   "andong-uiseong-2026": { name: "2026 안동·의성 복합재난", place: "안동 일직면 귀미리 · 의성 단촌면 구계리", flow: "산불 이재민 임시주택 → 집중호우 → 미천 홍수경보 → 대피명령 시각 비교" },
 };
 
-const READY_EVENTS = new Set(["osong-2023", "seoul-2022", "pohang-2022", "andong-uiseong-2026"]);
+export const READY_EVENTS = new Set(["osong-2023", "seoul-2022", "pohang-2022", "andong-uiseong-2026"]);
 
 export function caseText(event: FloodEvent): CaseText {
   return CASE_TEXT[event.id] ?? { name: event.name, place: event.location, flow: event.analysis_flow };
@@ -32,15 +32,16 @@ export function FloodOpsLogo({ size = 44 }: { size?: number }) {
   );
 }
 
-function Brand() {
+function Brand({ active }: { active: FloodOpsRoute }) {
   return (
-    <div className="fo-brand">
+    <header className="fo-brand fo-app-header">
       <FloodOpsLogo />
       <div>
         <strong>FloodOps</strong>
         <span>홍수 대응 의사결정 디지털 트윈</span>
       </div>
-    </div>
+      <AppNavigation active={active} />
+    </header>
   );
 }
 
@@ -102,6 +103,7 @@ function ServiceSchematic() {
         <span><i className="sw flood" />침수 추정 범위</span>
         <span><i className="sw underpass" />지하차도</span>
         <span><i className="dot" />제방 붕괴 지점</span>
+        <a className="fo-schematic-link" href="#event/osong-2023">오송 사건 값 보기 <ArrowRight size={13} /></a>
       </footer>
     </figure>
   );
@@ -109,9 +111,10 @@ function ServiceSchematic() {
 
 export function IntroPage({ onStart, onTwin, onWatch }: { onStart: () => void; onTwin?: () => void; onWatch?: () => void }) {
   const [operational, setOperational] = useState<string[] | null>(null);
+  const [facilityLoadError, setFacilityLoadError] = useState(false);
   useEffect(() => {
     let live = true;
-    getTwinFacilities().then((items) => { if (live) setOperational(items.map((item) => item.name)); }).catch(() => { if (live) setOperational([]); });
+    getTwinFacilities().then((items) => { if (live) setOperational(items.map((item) => item.name)); }).catch(() => { if (live) { setOperational([]); setFacilityLoadError(true); } });
     return () => { live = false; };
   }, []);
   const features = [
@@ -120,13 +123,12 @@ export function IntroPage({ onStart, onTwin, onWatch }: { onStart: () => void; o
     { icon: History, title: "사건으로 검증", href: "#cases", text: "과거 사건을 관측 단계별로 재생하고 통제·대피 시각을 바꿔 남는 시간을 비교합니다. 규칙과 에이전트의 검증용입니다." },
   ];
   const scope = [
-    { title: "지하차도", state: "운영 1 · 감시 228", tone: "live", href: "#watch", detail: operational?.length ? `${operational.join("·")} 운영 등록` : "궁평2지하차도 운영 등록" },
-    { title: "하천변 출입구", state: "다음 확장", tone: "next", href: null, detail: "산책로·둔치주차장·하상도로" },
+    { title: "지하차도", state: facilityLoadError ? "연결 확인 필요" : operational ? `운영 ${operational.length}` : "시설 확인 중", tone: "live", href: "#twin", detail: facilityLoadError ? "운영 시설 API를 불러오지 못했습니다" : operational?.length ? operational.join("·") : "운영 시설 목록을 불러오는 중" },
     { title: "저지대 마을 대피", state: "사례 검증", tone: "case", href: "#event/andong-uiseong-2026", detail: "2026 안동·의성 대피 시각" },
   ];
   return (
     <main className="fo-landing fo-intro">
-      <Brand />
+      <Brand active="intro" />
       <section className="fo-hero">
         <div className="fo-hero-copy">
           <p className="fo-eyebrow">하천 접점 시설 통제·대피 판단 트윈</p>
@@ -181,12 +183,13 @@ export function IntroPage({ onStart, onTwin, onWatch }: { onStart: () => void; o
 }
 
 export function CaseSelectPage({ events, onSelect, onBack, onCompare, onTwin }: { events: FloodEvent[]; onSelect: (id: string) => void; onBack: () => void; onCompare?: () => void; onTwin?: () => void }) {
+  const availableEvents = events.filter((event) => READY_EVENTS.has(event.id));
   const viewportRef = useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const activeIndex = events.length ? selectedIndex % events.length : 0;
+  const activeIndex = availableEvents.length ? selectedIndex % availableEvents.length : 0;
   const move = (step: number) => {
-    if (events.length < 2) return;
-    setSelectedIndex((index) => (index + step + events.length) % events.length);
+    if (availableEvents.length < 2) return;
+    setSelectedIndex((index) => (index + step + availableEvents.length) % availableEvents.length);
   };
 
   useEffect(() => {
@@ -211,7 +214,7 @@ export function CaseSelectPage({ events, onSelect, onBack, onCompare, onTwin }: 
 
   return (
     <main className="fo-landing fo-cases-page">
-      <Brand />
+      <Brand active="cases" />
       <header className="fo-cases-head">
         <button className="fo-ghost" type="button" onClick={onBack}>
           <ArrowLeft size={16} /> 소개
@@ -238,30 +241,29 @@ export function CaseSelectPage({ events, onSelect, onBack, onCompare, onTwin }: 
             if (event.key === "ArrowLeft" || event.key === "ArrowUp") { event.preventDefault(); move(-1); }
           }}
         >
-          {events.map((event, index) => {
+          {availableEvents.map((event, index) => {
             const text = caseText(event);
-            const ready = READY_EVENTS.has(event.id);
-            const forward = (index - activeIndex + events.length) % events.length;
-            const offset = forward > Math.floor(events.length / 2) ? forward - events.length : forward;
+            const forward = (index - activeIndex + availableEvents.length) % availableEvents.length;
+            const offset = forward > Math.floor(availableEvents.length / 2) ? forward - availableEvents.length : forward;
             const visible = Math.abs(offset) <= 1;
             return (
               <div key={event.id} className={`fo-case-slide ${offset === 0 ? "is-center" : offset === -1 ? "is-before" : offset === 1 ? "is-after" : offset < 0 ? "is-hidden is-hidden-before" : "is-hidden is-hidden-after"}`} aria-hidden={!visible}>
-                <button type="button" className={`fo-case ${ready ? "is-ready" : "is-locked"}`} disabled={!ready} tabIndex={visible ? 0 : -1} onClick={() => onSelect(event.id)}>
-                  <span className={`fo-case-status ${ready ? "ready" : "locked"}`}>{ready ? "관제 가능" : <><Lock size={12} /> 데이터 연결 예정</>}</span>
+                <button type="button" className="fo-case is-ready" tabIndex={visible ? 0 : -1} onClick={() => onSelect(event.id)}>
+                  <span className="fo-case-status ready">관제 가능</span>
                   <strong>{text.name}</strong>
                   <span className="fo-case-place">{text.place}</span>
                   <span className="fo-case-flow">{text.flow}</span>
-                  {ready && <span className="fo-case-go">관제 화면 열기 <ArrowRight size={15} /></span>}
+                  <span className="fo-case-go">관제 화면 열기 <ArrowRight size={15} /></span>
                 </button>
               </div>
             );
           })}
-          {!events.length && <p className="fo-case-empty">표시할 사례가 없습니다.</p>}
+          {!availableEvents.length && <p className="fo-case-empty">연결된 사례가 없습니다.</p>}
         </div>
         <div className="fo-case-controls">
-          <button type="button" aria-label="이전 사례" disabled={events.length < 2} onClick={() => move(-1)}><ArrowLeft size={18} /></button>
-          <span aria-live="polite">{events.length ? `${String(activeIndex + 1).padStart(2, "0")} / ${String(events.length).padStart(2, "0")}` : "00 / 00"}</span>
-          <button type="button" aria-label="다음 사례" disabled={events.length < 2} onClick={() => move(1)}><ArrowRight size={18} /></button>
+          <button type="button" aria-label="이전 사례" disabled={availableEvents.length < 2} onClick={() => move(-1)}><ArrowLeft size={18} /></button>
+          <span aria-live="polite">{availableEvents.length ? `${String(activeIndex + 1).padStart(2, "0")} / ${String(availableEvents.length).padStart(2, "0")}` : "00 / 00"}</span>
+          <button type="button" aria-label="다음 사례" disabled={availableEvents.length < 2} onClick={() => move(1)}><ArrowRight size={18} /></button>
         </div>
         <p className="fo-case-help">마우스 휠을 내리거나 방향키로 사례를 넘겨 보세요. 마지막 다음에는 첫 사례로 돌아갑니다.</p>
       </section>

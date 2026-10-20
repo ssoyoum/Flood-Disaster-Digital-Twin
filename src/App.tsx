@@ -9,7 +9,8 @@ import TwinBoard from "./dark/TwinBoard";
 import WatchBoard from "./dark/WatchBoard";
 import { ConsentBanner, PrivacyPage } from "./dark/Consent";
 import { loadAnalytics, trackPageView } from "./analytics";
-import { CaseSelectPage, IntroPage } from "./dark/Landing";
+import { CaseSelectPage, IntroPage, READY_EVENTS } from "./dark/Landing";
+import "./dark/navigation.css";
 import { localizeEvent, localizeReconstruction } from "./dark/ko";
 import type { DataStatusResponse, ExposureMetrics, FloodEvent, LayersResponse, ReconstructionResponse } from "./types";
 
@@ -23,7 +24,10 @@ function readRoute(): Route {
   if (hash === "compare") return { page: "compare" };
   if (hash === "twin" || hash.startsWith("twin?")) return { page: "twin" };
   if (hash === "privacy") return { page: "privacy" };
-  if (hash.startsWith("event/")) return { page: "event", id: decodeURIComponent(hash.slice(6)) };
+  if (hash.startsWith("event/")) {
+    const id = decodeURIComponent(hash.slice(6));
+    return READY_EVENTS.has(id) ? { page: "event", id } : { page: "cases" };
+  }
   return { page: "watch" };
 }
 
@@ -62,6 +66,13 @@ function Screens() {
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
+
+  useEffect(() => {
+    const match = window.location.hash.match(/^#\/?event\/([^?]+)/);
+    if (!match) return;
+    const id = decodeURIComponent(match[1]);
+    if (!READY_EVENTS.has(id)) window.history.replaceState(null, "", "#cases");
+  }, [route]);
 
   useEffect(() => {
     api.getEvents().then(setEvents).catch(() => setEventsError(true));
