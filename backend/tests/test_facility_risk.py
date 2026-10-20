@@ -61,3 +61,12 @@ def test_official_warning_lifts_river_type_facilities_and_is_shown():
     assert "발령 7.14 14:20" in mannyeon["why"]  # a day-old issuance carries its date
     assert not any(r["official"] for r in fr.facility_risk("2023-07-14T12:00:00", limit=2000)["facilities"]
                    if r["facility_id"] == "gungpyeong2-underpass")
+
+
+def test_guideline_profile_keeps_unknowns_open():
+    profile = fr.guideline_profiles()["gungpyeong2-underpass"]
+    assert profile["structure"] == "박스형"
+    assert profile["nearest_river"]["basis"].startswith("OSM")
+    assert profile["protection_grade"] is None
+    row = next(r for r in fr.facility_risk(AT, limit=2000)["facilities"] if r["facility_id"] == "gungpyeong2-underpass")
+    assert row["guideline"] == profile

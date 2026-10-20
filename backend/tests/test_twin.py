@@ -126,3 +126,19 @@ def test_criteria_review_reports_history_quality():
     assert [q["id"] for q in quality["quarantines"]] == ["mihoganggyo_20230516_research_quarantine"] and excluded == 67
     assert not any(e["start"].startswith("2023-05-16") for e in result["episodes"])
     assert any(s["quarantined"] for s in quality["step_reviews"]) and result["other_episode_count"] == 0
+
+
+def test_decision_request_takes_a_second_checker():
+    from app.decision_log import DecisionRecordCreate
+
+    request = DecisionRecordCreate(checked_by=" 상행 당직 ", checked_by_down=" 하행 당직 ", confirmation="CONFIRMED", acknowledged=True)
+    assert (request.checked_by, request.checked_by_down) == ("상행 당직", "하행 당직")
+    assert DecisionRecordCreate(checked_by="상행", confirmation="NO_ACTION", acknowledged=True).checked_by_down == ""
+
+
+def test_osong_scorecard_carries_the_official_timeline():
+    from app import case_validation as cv
+
+    osong = next(c for c in cv.scorecard()["cases"] if c["id"] == "osong-2023")
+    assert [e["at"][11:] for e in osong["official_events"]] == ["17:20", "04:10", "06:34", "06:40", "08:27", "08:40"]
+    assert osong["official_events_source"].startswith("https://www.opm.go.kr/")

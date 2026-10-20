@@ -18,6 +18,7 @@ and those are not public. Facility-level control rules stay with the operational
 from __future__ import annotations
 
 import csv
+import re
 import threading
 from datetime import datetime, timedelta
 from functools import lru_cache
@@ -84,6 +85,43 @@ def river_type_underpasses() -> dict[str, dict[str, Any]]:
             out[row["facility_id"]] = {"grade": "A" if years_warning >= 1 else "B", "station_code": row["station_code"],
                                        "same_river_m": distance, "elevation_hint_m": hint,
                                        "years_advisory": int(years_advisory), "years_warning": int(years_warning)}
+    return out
+
+
+PROFILE_FILE = REPO_ROOT / "data" / "processed" / "multifactor" / "facility-profiles.csv"
+_RIVER_PART = re.compile(r"([^;(]+)\([rs]\)\s*([\d.]+)m")
+
+
+@lru_cache(maxsize=1)
+def guideline_profiles() -> dict[str, dict[str, Any]]:
+    """What 국토부 「도로터널 방재·환기시설 설치 및 관리지침」 2.1.7(7)·4.9.3(9) need per underpass, as far as public data goes.
+
+    The 500 m rule is about the 하천구역 boundary; OSM centre lines are farther than that boundary, so the distance is
+    only a hint and the protection grade is unknown. The screen keeps both checks as «판정 보류».
+    """
+    out: dict[str, dict[str, Any]] = {}
+    structures: dict[str, str] = {}
+    if PROFILE_FILE.exists():
+        with PROFILE_FILE.open(encoding="utf-8", newline="") as handle:
+            for row in csv.DictReader(handle):
+                structures[row["facility_id"]] = row.get("catalog_structure") or ""
+    if RESEARCH_FILE.exists():
+        with RESEARCH_FILE.open(encoding="utf-8-sig", newline="") as handle:
+            for row in csv.DictReader(handle):
+                fid = row["facility_id"]
+                structures.setdefault(fid, row.get("structure") or "")
+                rivers = [(name.strip(), float(dist)) for name, dist in _RIVER_PART.findall(row.get("fac_osm_rivers_1500m") or "")]
+                if rivers:
+                    name, dist = min(rivers, key=lambda item: item[1])
+                    out.setdefault(fid, {})["nearest_river"] = {"name": name, "distance_m": round(dist), "basis": "OSM 하천 중심선(하천구역 경계 아님)"}
+    for fid, text in structures.items():
+        match = re.search(r"형식\s*:\s*([^/]+)", text)
+        kind = match.group(1).strip() if match else None
+        out.setdefault(fid, {})["structure"] = None if kind in (None, "", "미등록") else kind
+    for item in out.values():
+        item.setdefault("nearest_river", None)
+        item.setdefault("structure", None)
+        item["protection_grade"] = None
     return out
 
 
@@ -440,6 +478,7 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
             "case_rainfall_reference": case_rainfall_reference,
             "official": {k: issued[k] for k in ("level", "level_ko", "issued_at", "forecast_level_m", "forecast_time", "minutes_since_issue")} if issued else None,
             "weather_warning": {k: weather_warning[k] for k in ("region_code", "province", "area", "level", "level_ko", "issued_at", "effective_at")} if weather_warning else None,
+            "guideline": guideline_profiles().get(item["facility_id"], {"structure": None, "nearest_river": None, "protection_grade": None}),
         })
 
     def order(row: dict[str, Any]) -> tuple:

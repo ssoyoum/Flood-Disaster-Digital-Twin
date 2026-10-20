@@ -39,6 +39,16 @@ CASES: list[dict[str, Any]] = [
         "reference": {"at": "2023-07-15T08:27", "precision": "minute", "kind": "inflow",
                       "label": "통제 없이 지하차도 유입 시작(08:40 완전 침수)",
                       "source": "국무조정실 감찰 결과 시각(osong_repository, 원문 쪽수 미연결)"},
+        # 국무조정실 「오송 궁평2지하차도 침수사고 감찰조사 결과」(2023-07-28) 경과표. 채점과 별개로 화면에 그대로 싣는다.
+        "official_events": [
+            {"at": "2023-07-14T17:20", "kind": "advisory", "label": "홍수주의보", "note": "미호천교 발령"},
+            {"at": "2023-07-15T04:10", "kind": "warning", "label": "홍수경보", "note": "미호천교 발령"},
+            {"at": "2023-07-15T06:34", "kind": "notice", "label": "계획홍수위 도달 경고", "note": "금강홍수통제소 → 흥덕구"},
+            {"at": "2023-07-15T06:40", "kind": "requirement", "label": "통제 요건 충족", "note": "계획홍수위 해발 29.02 m 도달"},
+            {"at": "2023-07-15T08:27", "kind": "inflow", "label": "지하차도 유입", "note": "통제 없음"},
+            {"at": "2023-07-15T08:40", "kind": "flooded", "label": "완전 침수", "note": ""},
+        ],
+        "official_events_source": "https://www.opm.go.kr/opm/news/press1.do?mode=download&articleNo=154431&attachNo=136402",
     },
     {
         "id": "daejeon-2020-07-30", "title": "대전 만년지하차도 2020-07-30", "region": "대전",
@@ -199,6 +209,11 @@ def scorecard(case_id: str | None = None) -> dict[str, Any]:
     if not SCORECARD_FILE.exists():
         raise FileNotFoundError("case scorecard not built: python data/scripts/build_case_validation.py")
     data = json.loads(SCORECARD_FILE.read_text(encoding="utf-8"))
+    # Official timelines are fixed records, so they come from CASES and need no rebuild of the stored sweep.
+    for item in data["cases"]:
+        spec = next((c for c in CASES if c["id"] == item["id"]), {})
+        item["official_events"] = spec.get("official_events", [])
+        item["official_events_source"] = spec.get("official_events_source")
     if case_id is None:
         return {**data, "cases": [{k: v for k, v in item.items() if k != "timeline"} for item in data["cases"]]}
     for item in data["cases"]:

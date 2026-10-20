@@ -17,7 +17,9 @@ _LOCK = threading.Lock()
 
 
 class DecisionRecordCreate(BaseModel):
+    # 국토부 지침 2.1.7(6): 지하차도별 담당자 2명 이상(상·하행 각 1명). checked_by는 상행, checked_by_down은 하행.
     checked_by: str = Field(min_length=1, max_length=80)
+    checked_by_down: str = Field(default="", max_length=80)
     confirmation: Literal["CONFIRMED", "NO_ACTION", "ESCALATE"]
     acknowledged: Literal[True]
     note: str = Field(default="", max_length=500)
@@ -29,6 +31,11 @@ class DecisionRecordCreate(BaseModel):
         if not value:
             raise ValueError("checked_by must contain a name or role")
         return value
+
+    @field_validator("checked_by_down")
+    @classmethod
+    def normalize_second(cls, value: str) -> str:
+        return value.strip()
 
     @field_validator("note")
     @classmethod
@@ -97,6 +104,7 @@ def append_record(
         "confirmation": request.confirmation,
         "acknowledged": request.acknowledged,
         "checked_by": request.checked_by,
+        "checked_by_down": request.checked_by_down,
         "note": request.note,
     }
 
