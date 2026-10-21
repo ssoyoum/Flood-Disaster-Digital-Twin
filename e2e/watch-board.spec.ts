@@ -1,48 +1,90 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
-// FLOODOPS_TWIN_MODE=replay makes the watch board read the stored hourly series, so the national
-// picture is the morning of 2023-07-15 without touching the live HRFCO feed.
-test("the watch board is the first screen and ranks gauges by their own official levels", async ({ page }) => {
+// FLOODOPS_TWIN_MODE=replay makes the control board read the stored hours, so the morning of 2023-07-15
+// is reproducible without the live HRFCO feed. The board itself is a static page inside an iframe.
+const board = (page: Page) => page.frameLocator(".wb-root iframe");
+const OSONG_0600 = "/#watch?at=2023-07-15T06%3A00%3A00";
+const count = async (tab: Locator) => Number((await tab.locator("b").textContent()) ?? "0");
+
+test("the control board is the first screen and counts facilities by the guideline's condition ②", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("h1")).toContainText("하천 접점 시설 감시 보드");
-  await expect(page.locator(".tw-mode")).toContainText("저장 자료 재생");
-
-  const priority = page.locator('[aria-label="우선순위"]');
-  await expect(priority.locator("li").first()).toContainText("계획홍수위");
-
-  await page.getByLabel("지역").selectOption("충북");
-  await expect(page).toHaveURL(/region=%EC%B6%A9%EB%B6%81/);
-  await expect(priority).toContainText("미호강교");
-
-  await priority.getByRole("button", { name: /미호강교/ }).click();
-  const station = page.locator('[aria-label="선택 관측소"]');
-  await expect(station).toContainText("청주시(미호강교)");
-  await expect(station).toContainText("예보 아님");
-  await expect(page.locator('[aria-label="연결 시설"]')).toContainText("궁평2지하차도");
-  await expect(page.locator('[aria-label="연결 시설"] a[href="#twin"]')).toBeVisible();
+  const frame = board(page);
+  await expect(frame.locator(".demo-brand")).toContainText("통제 판단 보드");
+  const tabs = frame.locator("#wx-sum button");
+  await expect(tabs).toHaveCount(4);
+  await expect(tabs.nth(0)).toContainText("특보 영향");
+  await expect(tabs.nth(1)).toContainText("② 충족");
+  await expect(tabs.nth(3)).toContainText("전체 시설");
+  await expect(frame.locator("#wx-kpis")).toContainText("② 즉시 통제 조건 충족 시설");
 });
 
-test("the board agent moves the map and answers from the watch tools without a model", async ({ page }) => {
+test("an Osong replay hour marks condition ② and explains every condition in the facility panel", async ({ page }) => {
+  await page.goto(OSONG_0600);
+  const frame = board(page);
+  const row = frame.locator("#wx-body .wx-row", { hasText: "궁평2지하차도" }).first();
+  await expect(row.locator(".wx-c2tag")).toContainText("②");
+  await row.click();
+
+  await expect(frame.locator("#wx-cond-sum")).toContainText("즉시 통제 조건 ② 충족");
+  const conditions = frame.locator("#wx-crit");
+  await expect(conditions.locator("li").first()).toContainText("②");
+  // ④ needs the live heavy-rain advisory, so a replay keeps it open instead of guessing.
+  await expect(conditions).toContainText("④");
+  await expect(conditions).toContainText("판정 보류");
+  await expect(frame.locator("#wx-eta")).not.toBeEmpty();
+  await expect(frame.locator("#wx-guide")).toContainText("하천 중심선");
+});
+
+test("reading condition ② from advisories never shrinks the set it counts", async ({ page }) => {
+  await page.goto(OSONG_0600);
+  const frame = board(page);
+  const condTab = frame.locator("#wx-sum button", { hasText: "② 충족" });
+  await expect(frame.locator("#wx-body .wx-row").first()).toBeVisible();
+  const fromWarning = await count(condTab);
+  await frame.locator("#wx-interp button[data-interp=advisory]").click();
+  await expect(frame.locator("#wx-interp button[data-interp=advisory]")).toHaveAttribute("aria-pressed", "true");
+  await expect.poll(() => count(condTab)).toBeGreaterThanOrEqual(fromWarning);
+});
+
+test("the duty record keeps one checker for each direction", async ({ page }) => {
+  await page.goto(OSONG_0600);
+  const frame = board(page);
+  await frame.locator("#wx-body .wx-row", { hasText: "궁평2지하차도" }).first().click();
+  const form = frame.locator("#wx-dec-form");
+  await expect(frame.locator("#wx-dec-card")).toBeVisible();
+  await form.locator("input[name=checked_by]").fill("상행 당직(E2E)");
+  await form.locator("input[name=checked_by_down]").fill("하행 당직(E2E)");
+  await form.locator("input[name=acknowledged]").check();
+  await frame.locator("#wx-dec-submit").click();
+  const latest = frame.locator("#wx-dec-list li").first();
+  await expect(latest).toContainText("상행 당직(E2E)");
+  await expect(latest).toContainText("하행 당직(E2E)");
+});
+
+test("the score tab lays the Osong official timeline next to condition ②", async ({ page }) => {
+  await page.goto(OSONG_0600);
+  const frame = board(page);
+  await frame.locator("#wx-body .wx-row", { hasText: "궁평2지하차도" }).first().click();
+  await frame.locator("#wx-tab-vc").click();
+  await expect(frame.locator(".wx-tline")).toContainText("06:34");
+  await expect(frame.locator(".wx-vc-key").first()).toContainText("② 충족");
+});
+
+test("the board agent moves the region from the registered tools without a model", async ({ page }) => {
   await page.goto("/");
-  await page.getByLabel("Agent request").fill("강원도로 가자");
-  await page.getByRole("button", { name: "질문" }).click();
-  await expect(page.locator(".dk-agent-answer").last()).toContainText("강원(으)로 이동했습니다");
+  const frame = board(page);
+  await frame.locator("#wx-launch").click();
+  await frame.locator("#wx-ag-input").fill("강원도로 가자");
+  await frame.locator("#wx-ag-send").click();
+  await expect(frame.locator("#wx-rname")).toContainText("강원");
   await expect(page).toHaveURL(/region=%EA%B0%95%EC%9B%90/);
-
-  // Answers stack in the panel, so each check reads the newest one.
-  await page.getByLabel("Agent request").fill("미호강교 지금 몇 단계야?");
-  await page.getByRole("button", { name: "질문" }).click();
-  await expect(page.locator(".dk-agent-answer").last()).toContainText("청주시(미호강교)");
-  await expect(page.locator('[aria-label="선택 관측소"]')).toContainText("청주시(미호강교)");
-  await expect(page.locator(".wb-rainline")).toContainText("근처 강우");
 });
 
-test("rain from the stored hours shows on the side card and answers a rain question", async ({ page }) => {
+test("the board menu changes the app screen, not the frame", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".wb-rain-toggle")).toContainText(/강우 중 \d+곳/);
-  await expect(page.locator('[aria-label="비 많이 오는 곳"] li').first()).toContainText("1시간");
-  await page.getByLabel("Agent request").fill("지금 비 많이 오는 곳 어디야?");
-  await page.getByRole("button", { name: "질문" }).click();
-  await expect(page.locator(".dk-agent-answer").last()).toContainText("강우 관측소");
-  await expect(page.locator(".dk-agent-answer").last()).toContainText("강우만으로 단계나 침수를 판정하지 않습니다");
+  const frame = board(page);
+  await frame.locator(".demo-menu summary").click();
+  await frame.getByRole("navigation", { name: "FloodOps 화면" }).getByRole("link", { name: "운영 시설 상세" }).click();
+  await expect(page).toHaveURL(/\/#twin$/);
+  await expect(page.locator("h1")).toContainText("운영 시설 통제 판단");
 });

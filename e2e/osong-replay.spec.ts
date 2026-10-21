@@ -1,11 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 test("enter Osong, replay stages, toggle a layer, and show provenance", async ({ page }) => {
-  await page.goto("/");
-  await page.getByRole("navigation", { name: "FloodOps 화면" }).getByRole("link", { name: "검증" }).click();
-  await expect(page).toHaveURL(/#cases$/);
-
-  await page.locator(".fo-case-slide.is-center .fo-case.is-ready").click();
+  await page.goto("/#cases");
+  // The first card of the main set is Osong; the scored cases after it open the scorecard instead.
+  await page.locator(".fo-case-set").first().locator(".fo-case").first().click();
   await expect(page).toHaveURL(/#event\/osong-2023$/);
 
   const stages = page.locator(".dk-stages button");

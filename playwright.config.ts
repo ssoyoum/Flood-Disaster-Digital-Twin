@@ -1,3 +1,5 @@
+import os from "node:os";
+import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
@@ -20,7 +22,8 @@ export default defineConfig({
       name: "FastAPI",
       // Browser regression tests exercise registered tools without paid model calls, and the twin board
       // replays the stored 2023 series so E2E never depends on the live gauge API.
-      env: { GEMINI_API_KEY: "", FLOODOPS_TWIN_MODE: "replay" },
+      // Duty records written by the board test go to a temp file, not the local operational log.
+      env: { GEMINI_API_KEY: "", FLOODOPS_TWIN_MODE: "replay", FLOODOPS_DECISION_LOG_PATH: path.join(os.tmpdir(), "floodops-e2e-decisions.jsonl") },
     },
     {
       command: "npm run dev -- --host 127.0.0.1 --port 5175",

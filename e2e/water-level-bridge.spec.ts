@@ -1,31 +1,21 @@
 import { expect, test } from "@playwright/test";
 
-test("real water-level history follows replay time without presenting the research model as a forecast", async ({ page }, testInfo) => {
-  await page.goto("/#twin?at=2023-07-15T08%3A00%3A00");
-  const history = page.getByLabel("수위 이력과 예측 연결");
-  await expect(history).toContainText("07.15 08:00");
-  await expect(history).toContainText("9.91 m");
-  await expect(history.locator("tbody tr")).toHaveCount(6);
-  await history.locator("summary").click();
-  await expect(history).toContainText("입력 22종 중 수위 6종");
-  await expect(history).toContainText("0.222 m");
-  await expect(history).toContainText("모델 예측이나 통제 권고가 아닙니다");
-  await page.getByRole("button", { name: /04:10/ }).click();
-  await expect(history).toContainText("07.15 04:10");
-  await expect(history).toContainText("7.69 m");
-  await expect(page.getByLabel("관측과 임계")).toContainText("관측 04:10");
-  await expect(page.getByLabel("관측과 임계")).toContainText("7.69 m");
-  await history.locator("summary").click();
-  await history.scrollIntoViewIfNeeded();
-  await expect(history.locator("tbody tr").last()).toBeInViewport();
-  await expect(history.locator("details small")).toBeInViewport();
-  await testInfo.attach("water-level-history", { body: await page.screenshot(), contentType: "image/png" });
+// 트윈 상세(iframe)는 저장된 2023년 10분 수위를 재생 시각에 맞춰 읽는다. 연구 모델(상승 예측)이 실패해도 관측과 조건 판정은 남는다.
+test("the twin follows the replay time with the stored 10-minute water levels", async ({ page }) => {
+  await page.goto("/#twin");
+  const twin = page.frameLocator(".tw-now-frame iframe");
+  await expect(twin.locator("#twc-at")).toContainText("08:00");
+  await expect(twin.locator("#twc-k-level")).toHaveText("9.91");
+  await twin.locator("#twc-marks .twc-mk", { hasText: "04:10" }).click();
+  await expect(twin.locator("#twc-at")).toContainText("04:10");
+  await expect(twin.locator("#twc-k-level")).toHaveText("7.69");
 });
 
-test("research input failure leaves the facility observation and review board usable", async ({ page }) => {
-  await page.route("**/forecast-readiness**", (route) => route.fulfill({ status: 503, json: { detail: "unavailable" } }));
-  await page.goto("/#twin?at=2023-07-15T08%3A00%3A00");
-  await expect(page.getByLabel("수위 이력과 예측 연결")).toContainText("수위 이력을 불러오지 못했습니다");
-  await expect(page.getByLabel("관측과 임계")).toContainText("9.91 m");
-  await expect(page.getByLabel("통제 검토 권고")).toContainText("통제 검토");
+test("a failed rise model leaves the observation and the guideline conditions usable", async ({ page }) => {
+  await page.route("**/rise-forecast**", (route) => route.fulfill({ status: 503, json: { detail: "unavailable" } }));
+  await page.goto("/#twin");
+  const twin = page.frameLocator(".tw-now-frame iframe");
+  await expect(twin.locator("#twc-k-level")).toHaveText("9.91");
+  await expect(twin.locator("#twc-rise-v")).toHaveText("예측 없음");
+  await expect(twin.locator("#twc-crit-list li").first()).toContainText("충족");
 });
