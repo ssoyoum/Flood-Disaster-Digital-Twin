@@ -106,6 +106,10 @@
 .twc-crit { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .twc-crit li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; padding: 8px 10px; border: 1px solid var(--twc-line); border-radius: 10px; background: rgba(22, 33, 58, .6); }
 .twc-crit li.twc-cmp { border-style: dashed; opacity: .85; }
+.twc-crit .twc-cno { display: inline-block; min-width: 22px; margin-right: 4px; color: #f87171; font-weight: 800; }
+.twc-crit li.twc-refrow .twc-cno { color: var(--twc-muted); font-size: 11px; }
+.twc-ref-cap { margin-top: 12px; }
+.twc-log-two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .twc-crit b { font-size: 13px; color: #e5ecf5; }
 .twc-crit small { color: var(--twc-muted); font-size: 11.5px; line-height: 1.4; }
 .twc-crit .twc-clead { color: #c5d1e2; font-weight: 700; grid-column: 2; text-align: right; white-space: nowrap; }
@@ -280,15 +284,18 @@
 
   <section class="twc-right" aria-label="시각별 맥락">
     <article class="twc-panel twc-card twc-reveal" style="--twc-d:700" id="twc-official">
-      <p class="twc-eyebrow">공식 기준 적용 상태 · 기준은 기관 지침, FloodOps는 시설에 대입만</p>
-      <ul class="twc-crit" id="twc-crit-list" aria-label="공식 기준별 상태"></ul>
-      <p class="twc-log-note">침수심 기준은 현장 센서가 없어 판정하지 않습니다. 호우특보는 특보 이력 API 승인 뒤 재생에 연결합니다.</p>
+      <p class="twc-eyebrow">즉시 통제 조건 · 국토부 「도로터널 방재·환기시설 설치 및 관리지침」 2.1.7(8)</p>
+      <ul class="twc-crit" id="twc-crit-list" aria-label="즉시 통제 조건"></ul>
+      <p class="twc-eyebrow twc-ref-cap">참고 · 조건이 아닌 판단 근거</p>
+      <ul class="twc-crit" id="twc-ref-list" aria-label="참고 판단 근거"></ul>
+      <p class="twc-log-note">② «범람 우려 통보»는 홍수경보부터로 읽습니다(주의보부터 해석은 통제 판단 보드에서 전환). 침수심 기준은 현장 센서가 없어 판정하지 않습니다.</p>
     </article>
     <article class="twc-panel twc-card twc-reveal" style="--twc-d:760" id="twc-ops-card">
       <p class="twc-eyebrow">운영 알림 · 담당자 확인</p>
       <p class="twc-log-state" id="twc-log-mode">관측 기준 확인 중</p>
       <form class="twc-log-form" id="twc-log-form">
-        <label>확인자 이름 또는 역할<input name="checked_by" autocomplete="name" maxlength="80" required placeholder="예: 당직 담당자" /></label>
+        <div class="twc-log-two"><label>상행 담당자<input name="checked_by" autocomplete="name" maxlength="80" required placeholder="이름 또는 역할" /></label>
+        <label>하행 담당자<input name="checked_by_down" maxlength="80" required placeholder="이름 또는 역할" /></label></div>
         <label>확인 결과<select name="confirmation" required><option value="CONFIRMED">관측값·등록 기준 확인</option><option value="NO_ACTION">확인 후 현재 조치 불필요</option><option value="ESCALATE">현장 확인 요청</option></select></label>
         <label>메모<textarea name="note" maxlength="500" placeholder="현장 확인 사항 (선택)"></textarea></label>
         <label class="twc-log-confirm"><input name="acknowledged" type="checkbox" required /><span>화면의 관측 시각·수위·운영 기준을 확인했습니다.</span></label>
@@ -417,7 +424,7 @@
     const confirmationLabels = { CONFIRMED: "관측·기준 확인", NO_ACTION: "현재 조치 불필요", ESCALATE: "현장 확인 요청" };
     records.forEach((record) => {
       const item = document.createElement("li"); item.className = "twc-log-item";
-      const title = document.createElement("strong"); title.textContent = `${confirmationLabels[record.confirmation] ?? "확인 기록"} · ${record.checked_by}`;
+      const title = document.createElement("strong"); title.textContent = `${confirmationLabels[record.confirmation] ?? "확인 기록"} · 상행 ${record.checked_by}${record.checked_by_down ? ` · 하행 ${record.checked_by_down}` : ""}`;
       const value = record.water_level_m == null ? "수위 미상" : `${Number(record.water_level_m).toFixed(2)} m`;
       const meta = document.createElement("span"); meta.textContent = `${record.source_mode === "live" ? "실시간" : "재생"} · 관측 ${localTime(record.observation_at)} · ${value} · 기록 ${localTime(record.recorded_at)}`;
       item.append(title, meta);
@@ -483,7 +490,8 @@
       body.addEventListener("pointermove", move); body.addEventListener("pointerup", up); move(ev);
     });
     const SHORT = { "04:10": "홍수경보", "06:40": "계획홍수위", "07:50": "월류", "08:09": "제방 붕괴", "08:27": "유입" };
-    const marks = [...STAGES.slice(0, 5).map((s) => ({ t: s.t, label: SHORT[s.t] })), firstReview && { t: firstReview, label: "트윈 첫 권고", bt: true }].filter(Boolean)
+    // 06:34는 사건 단계가 아니라 국조실 경과표의 «계획홍수위 도달 경고» 통보(금강홍수통제소 → 흥덕구)라 따로 넣는다.
+    const marks = [...STAGES.slice(0, 5).map((s) => ({ t: s.t, label: SHORT[s.t] })), { t: "06:34", label: "도달 경고 통보" }, firstReview && { t: firstReview, label: "트윈 첫 권고", bt: true }].filter(Boolean)
       .sort((x, y) => toMin(x.t) - toMin(y.t));
     const host = $("twc-marks");
     marks.forEach((m) => {
@@ -554,28 +562,43 @@
   function showSrcTip() { const t = $("twc-src-tip"); t.classList.add("twc-show"); clearTimeout(srcTimer); srcTimer = setTimeout(() => t.classList.remove("twc-show"), 3000); }
   const setTone = (el, tone) => { el.classList.remove("twc-hot", "twc-ok", "twc-replay"); el.classList.add(`twc-${tone}`); };
   // 공식 기준(홍수특보·하천 수위·호우특보·행안부 침수심)을 이 시설에 대입한 상태. FloodOps 규칙은 비교 후보로만 둔다.
+  // 즉시 통제 조건(국토부 지침 2.1.7(8))별 판정. 통제 판단 보드의 시설 판단 패널과 같은 표현을 쓴다.
+  // ②는 «홍수경보부터» 해석, ④는 실시간 호우특보가 있어야 해서 재생에서는 판정 보류, ①③⑤·침수심은 현장 확인.
   function renderOfficial(st, forecasts) {
     const list = $("twc-crit-list"); if (!list) return;
     const code = facility?.gauge?.station_id;
     const active = forecasts?.active?.find((a) => a.station_code === code) ?? null;
     const lv = st.levels_m ?? {}; const wl = st.observation?.water_level_m;
     const m = (v) => (v == null ? "—" : `${Number(v).toFixed(2)} m`);
+    const replay = sourceMode !== "live";
     const inflowLead = (iso) => Math.round((Date.parse(`${DAY}T08:27:00`) - Date.parse(iso.length === 16 ? `${iso}:00` : iso)) / 60000);
-    const rows = [];
-    if (active) {
-      const lead = sourceMode === "live" ? `발령 ${active.minutes_since_issue}분 경과` : `유입(08:27)보다 ${inflowLead(active.issued_at) >= 0 ? "+" : "−"}${Math.abs(inflowLead(active.issued_at))}분`;
-      rows.push({ name: "홍수특보", src: `홍수통제소 · ${active.station_name} ${active.level_ko} ${active.issued_at.slice(11, 16)}${active.forecast_level_m != null ? ` · 예상 ${m(active.forecast_level_m)}` : ""}`, st: "met", stLabel: active.level_ko, lead });
-    } else rows.push({ name: "홍수특보", src: `홍수통제소 · ${facility?.gauge?.name ?? "대표 관측소"} 발령 없음`, st: "ok", stLabel: "해당 없음", lead: "—" });
+    const cond2 = active?.level === "warning";
+    const row = (no, name, src, stc, label, lead, cls = "") => `<li class="${cls}"><b><span class="twc-cno">${no}</span>${name}</b><span class="twc-cst twc-cst-${stc}">${label}</span><small>${src}</small><small class="twc-clead">${lead}</small></li>`;
+    let src2 = active
+      ? `홍수통제소 · ${active.station_name} ${active.level_ko} ${active.issued_at.slice(11, 16)}${active.forecast_level_m != null ? ` · 예상 ${m(active.forecast_level_m)}${active.forecast_time ? ` ${active.forecast_time.slice(11, 16)}` : ""}` : ""} · 해석: 홍수경보부터`
+      : `홍수통제소 · ${facility?.gauge?.name ?? "대표 관측소"} 발령 없음 · 해석: 홍수경보부터`;
+    if (replay && current >= toMin("06:34")) src2 += "<br>추가 통보: 06:34 금강홍수통제소 → 흥덕구 계획홍수위 도달 경고(국조실 경과표)";
+    const lead2 = !cond2 ? "—" : replay ? `유입(08:27)보다 ${inflowLead(active.issued_at) >= 0 ? "+" : "−"}${Math.abs(inflowLead(active.issued_at))}분` : `${active.issued_at.slice(11, 16)}부터 ${active.minutes_since_issue}분째`;
+    const rate = st.rate_m_per_10min ?? st.observation?.rate_m_per_10min ?? null;
+    const rateText = rate == null ? "수위 상승 자료 없음" : `수위 ${rate > 0 ? "↑" : rate < 0 ? "↓" : "→"}${Math.abs(rate).toFixed(3)} m/10분`;
+    const rows = [
+      row("②", "홍수특보 등으로 범람 우려 통보", src2, cond2 ? "met" : active ? "unk" : "ok", cond2 ? "충족" : active ? "해석상 미충족" : "미충족", lead2),
+      row("④", "호우특보 중 급격한 수위 증가 예상", replay ? `기상청 호우특보 과거 발표 이력 미연결(API 승인 대기) · ${rateText}` : `기상청 실시간 특보는 통제 판단 보드에서 적용 · ${rateText}`, "unk", replay ? "판정 보류" : "보드에서 확인", replay ? "실시간에서만" : rateText),
+      row("①", "배수펌프 미작동·물 고임", "현장 계측 비공개", "none", "현장 확인", "—"),
+      row("③", "관계기관 통보", "경찰·소방·도로관리청 통보는 기록 연계 필요", "none", "현장 확인", "—"),
+      row("⑤", "배수용량 초과", "펌프 용량·유입량 자료 없음", "none", "현장 확인", "—"),
+      row("(7)", "침수심 통제기준", "센서 자료 비공개 · 하천 500 m 이내 등은 5 cm 이하(2026판)", "none", "자료 없음", "판정 안 함"),
+    ];
+    list.innerHTML = rows.join("");
     let stageSt = "ok", stageLabel = "기준 미만";
     if (wl != null && lv.planned_flood != null && wl >= lv.planned_flood) { stageSt = "met"; stageLabel = "계획홍수위 도달"; }
-    else if (wl != null && lv.warning != null && wl >= lv.warning) { stageSt = "met"; stageLabel = "경보 초과"; }
-    else if (wl != null && lv.advisory != null && wl >= lv.advisory) { stageSt = "unk"; stageLabel = "주의보 초과"; }
-    rows.push({ name: "하천 수위", src: `홍수통제소 · 경보 ${m(lv.warning)} / 계획홍수위 ${m(lv.planned_flood)}`, st: wl == null ? "none" : stageSt, stLabel: wl == null ? "관측 없음" : stageLabel, lead: wl == null ? "—" : `현재 ${m(wl)}` });
-    rows.push({ name: "호우특보", src: sourceMode === "live" ? "기상청 · 실시간 특보는 감시 보드에서 적용" : "기상청 · 재생은 특보 이력 API 승인 뒤", st: "unk", stLabel: "미확인", lead: "—" });
-    rows.push({ name: "침수심 (행안부 통제기준)", src: "원문 확인 중 · 현장 센서 자료 없음", st: "none", stLabel: "자료 없음", lead: "현장 확인이 우선" });
+    else if (wl != null && lv.warning != null && wl >= lv.warning) { stageSt = "met"; stageLabel = "경보 수위 초과"; }
+    else if (wl != null && lv.advisory != null && wl >= lv.advisory) { stageSt = "unk"; stageLabel = "주의보 수위 초과"; }
     const reco = { CLOSURE_REVIEW: ["met", "통제 검토"], MONITOR: ["unk", "감시"], NORMAL: ["ok", "정상"] }[st.recommendation] ?? ["none", "관측 없음"];
-    rows.push({ name: "FloodOps 규칙 (비교)", src: `${st.rule?.id ?? "river_stage_v1"} · ${st.rule?.review_when ?? "경보 이상 + 60분 내 계획홍수위"}`, st: reco[0], stLabel: reco[1], lead: "기준 개정 비교용", cmp: true });
-    list.innerHTML = rows.map((r) => `<li class="${r.cmp ? "twc-cmp" : ""}"><b>${r.name}</b><span class="twc-cst twc-cst-${r.st}">${r.stLabel}</span><small>${r.src}</small><small class="twc-clead">${r.lead}</small></li>`).join("");
+    $("twc-ref-list").innerHTML = [
+      row("참고", "하천 수위", `홍수통제소 · 경보 ${m(lv.warning)} / 계획홍수위 ${m(lv.planned_flood)}`, wl == null ? "none" : stageSt, wl == null ? "관측 없음" : stageLabel, wl == null ? "—" : `현재 ${m(wl)}`, "twc-refrow"),
+      row("참고", "FloodOps 규칙 (비교 후보)", `${st.rule?.id ?? "river_stage_v1"} · ${st.rule?.review_when ?? "경보 이상 + 60분 내 계획홍수위"}`, reco[0], reco[1], "기준 개정 비교용", "twc-refrow twc-cmp"),
+    ].join("");
   }
 
   async function setTime(min, { chart = "redraw" } = {}) {
@@ -718,7 +741,7 @@
       const query = sourceMode === "live" ? "" : `?at=${encodeURIComponent(currentStatus.at)}`;
       await request(`/api/twin/facilities/${encodeURIComponent(FAC)}/decisions${query}`, {
         method: "POST",
-        body: JSON.stringify({ checked_by: values.get("checked_by"), confirmation: values.get("confirmation"), acknowledged: values.get("acknowledged") === "on", note: values.get("note") }),
+        body: JSON.stringify({ checked_by: values.get("checked_by"), checked_by_down: values.get("checked_by_down"), confirmation: values.get("confirmation"), acknowledged: values.get("acknowledged") === "on", note: values.get("note") }),
       });
       form.elements.acknowledged.checked = false;
       $("twc-log-feedback").textContent = sourceMode === "live" ? "실시간 관측 확인을 저장했습니다." : "재생 시각 확인을 저장했습니다.";
