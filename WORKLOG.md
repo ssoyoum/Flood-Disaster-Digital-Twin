@@ -1,5 +1,27 @@
 # WORKLOG
 
+## Agent offline 기준선 실행과 프론트 구상 브랜치 공유
+
+- 작업일: 2026-10-22
+
+주요 작업:
+- `docs/AGENT_VALIDATION.md` «동일 질문 회귀 비교 절차»에서 «미실행»으로 남아 있던 offline 기준선 3개(benchmark·historical·facility)와 trace 집계를 실제로 실행하고 결과 기록 양식의 기준선 행을 채웠습니다.
+- 기준선 판독 절을 추가해 완료 경로·실패 코드·지연 차이·하지 않은 사람 판독을 구분했습니다.
+- 지침 2.1.7(8) 조건 기반 프론트 미리보기는 구상 미확정이라 main이 아니라 `preview/ia-official-criteria` 브랜치로 원격에 올렸습니다.
+
+검증 결과:
+- benchmark 37/37(needs_model 6 제외), tool_accuracy 1.0(n=25), evidence_validity 1.0(n=9), unsupported_claim_rate 0.0(n=34), 모델 요청 0.
+- evaluate_agent historical 13/13, facility 3/3(replay), 세 명령 모두 종료 코드 0.
+- trace 34건: ANSWERED 23·NEEDS_DATA 8·UNAVAILABLE 3, p50 0 ms·p95 9,031 ms·max 14,250 ms.
+
+문제/해결:
+- 문제: 10-21 새벽 문서는 기준선 명령을 «argparse만 확인했고 실행하지 않았다»고 적고 표를 «미측정»으로 두었습니다. 기준선이 없으면 이후 검색·도구 변경의 전후 비교를 할 수 없습니다.
+  해결: 문서 명령을 그대로 실행하고, 측정값만 표에 넣었습니다. 기대 도구·숫자·금지 주장 정규식은 바꾸지 않았습니다.
+- 문제: p95가 문서의 이전 값 1,464 ms보다 6배 넘게 컸습니다.
+  해결: 느린 문항 두 개(`n-facility-criteria`, `n-facility-rise`)를 특정해 기록했습니다. 이전 측정은 다른 OS·Python 3.12 관리형 환경이라 회귀로 단정하지 않았고, 원인 분해는 다음 작업으로 남겼습니다.
+- 문제: main 작업 폴더에 다른 작업의 미커밋 `WORKLOG.md`·테스트 수정과 스테이징된 문서가 있어, 그 폴더에서 커밋하면 남의 변경이 섞입니다.
+  해결: 평가는 자료가 있는 main 폴더에서 돌리고(Agent 코드는 미커밋 변경 없음 확인), 커밋은 원격 main에서 만든 별도 worktree에서 이 두 문서만 고쳐서 했습니다. 다른 작업의 하단 추가와 겹치지 않게 이 기록은 맨 위에 넣었습니다.
+
 ## 멘토링 피드백 정리와 공식 기준 원문 확인, 새 화면 구상
 
 - 작업일: 2026-10-20
