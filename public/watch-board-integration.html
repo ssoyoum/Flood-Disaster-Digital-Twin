@@ -522,8 +522,8 @@ body { display: flex; flex-direction: column; }
     </nav>
   </details>
   <div class="sp"></div>
-  <span class="demo-mode" id="demo-mode" data-mode="live">● 수위 실시간</span>
-  <span class="demo-mode demo-rain-mode" id="demo-rain-mode" data-mode="live" data-available="false">● 강우 실시간</span>
+  <span class="demo-mode" id="demo-mode" data-mode="unavailable">수위 자료 확인 중</span>
+  <span class="demo-mode demo-rain-mode" id="demo-rain-mode" data-mode="unavailable" data-available="false">강우 자료 확인 중</span>
 </header>
 
 <main class="demo-stage">
@@ -825,7 +825,7 @@ body { display: flex; flex-direction: column; }
     hoverPop.setLngLat([r.lon, r.lat]).setHTML(`<b>${esc(r.name)}</b><br>${KO[r.stage ?? "unrated"]} · ${r.observation?.water_level_m?.toFixed(2) ?? "—"} m`).addTo(map);
     if (!map.getBounds().contains([r.lon, r.lat])) map.easeTo({ center: [r.lon, r.lat], duration: 500 });
   }
-  function hoverOff() { if (!map) return; map.setFilter("wx-hover", ["==", ["get", "code"], "__none__"]); hoverPop.remove(); }
+  function hoverOff() { if (!map?.getLayer("wx-hover")) return; map.setFilter("wx-hover", ["==", ["get", "code"], "__none__"]); hoverPop?.remove(); }
 
   /* ---------------- 선택 관측소 ---------------- */
   function openDrawer(on) { root.classList.toggle("wx-drawer-open", on); $("wx-drawer").classList.toggle("wx-open", on); $("wx-drawer").setAttribute("aria-hidden", !on); }
@@ -1150,7 +1150,7 @@ body { display: flex; flex-direction: column; }
     if (marker) { marker.getElement().style.display = row ? "flex" : "none"; if (row) marker.setLngLat([row.lon, row.lat]); }
   }
   function hoverOn(code) {
-    const r = facilityRiskRows().find((x) => x.code === code); if (!r || !map) return;
+    const r = facilityRiskRows().find((x) => x.code === code); if (!r || !map?.getLayer("wx-hover") || !hoverPop) return;
     if (code === st.selected) { hoverOff(); return; }
     map.setFilter("wx-hover", ["==", ["get", "code"], code]);
     const levelText = r.risk.assessment_status === "INSUFFICIENT_DATA" ? "자료 부족 · 판단 보류" : r.risk.level_label;
@@ -1352,7 +1352,7 @@ body { display: flex; flex-direction: column; }
     const nextRegion = view.region ?? (view.station_code || view.facility_id ? st.region : "");
     if ((nextRegion || "") !== st.region) st.region = nextRegion || "";
     st.selected = view.facility_id ?? view.station_code ?? st.selected; renderAll();
-    if (st.selected) { select(st.selected, false, true); } else openDrawer(false);
+    if (st.selected) { select(st.selected, false, true); } else if ($("wx-pane-ag").hidden) openDrawer(false);
     if (map && view.center) map.flyTo({ center: view.center, zoom: view.zoom ?? 10, duration: 1000 });
     notifyView();
   }
@@ -1450,8 +1450,7 @@ body { display: flex; flex-direction: column; }
   $("wx-info-x").addEventListener("click", () => { info.classList.remove("wx-pinned"); info.classList.add("wx-closed"); $("wx-info-btn").setAttribute("aria-expanded", "false"); });
   info.addEventListener("mouseleave", () => info.classList.remove("wx-closed"));
 
-  async function init() {
-    $("wx-time").value = st.at;
+  async function initMap() {
     const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas";
     map = new maplibregl.Map({ container: $("wx-map"), attributionControl: false, center: [127.8, 36.3], zoom: 6.3, maxZoom: 15,
       style: { version: 8, sources: { base: { type: "raster", tiles: [`${ESRI}/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}`], tileSize: 256, maxzoom: 16 }, refs: { type: "raster", tiles: [`${ESRI}/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}`], tileSize: 256, maxzoom: 16 } },
@@ -1489,11 +1488,7 @@ body { display: flex; flex-direction: column; }
       $("wx-rain-toggle").textContent = st.rainLayer ? "강우 관측소 숨기기" : "강우 관측소 표시"; map.setLayoutProperty("wx-rain", "visibility", st.rainLayer ? "visible" : "none"); });
     const el = document.createElement("div"); el.className = "wx-fmk"; el.innerHTML = `<span class="wx-dot"></span><span class="wx-tip"></span>`; el.style.display = "none";
     marker = new maplibregl.Marker({ element: el, anchor: "left", offset: [-8, 0] }).setLngLat([127.8, 36.3]).addTo(map);
-    await load();
-    loadExamples();
-    loadValidation().then(() => { if (st.selected) renderStation(st.selected); });
-    scheduleLiveRefresh();
-    if (st.selected) openDrawer(true);
+    paintMap();
     // Start at an explicitly linked station, otherwise frame the currently visible risk stations.
     const selected = st.overview?.stations.find((r) => r.code === st.selected);
     if (selected) map.jumpTo({ center: [selected.lon, selected.lat], zoom: 12 });
@@ -1501,6 +1496,22 @@ body { display: flex; flex-direction: column; }
       const rows = filtered().filter((r) => WATCH.includes(r.stage));
       if (rows.length) { const b = new maplibregl.LngLatBounds(); rows.forEach((r) => b.extend([r.lon, r.lat])); map.fitBounds(b, { padding: { top: 80, left: 440, bottom: 80, right: 200 }, maxZoom: 10, duration: 1200 }); }
     }
+  }
+  function mapUnavailable() {
+    if (map) map.remove();
+    map = null;
+    $("wx-map").textContent = "지도를 불러오지 못했습니다. 시설 목록과 판정 근거는 계속 확인할 수 있습니다.";
+  }
+  async function init() {
+    $("wx-time").value = st.at;
+    // API state and follow-up actions must not depend on CDN/WebGL/style loading.
+    await load();
+    loadExamples();
+    loadValidation().then(() => { if (st.selected) renderStation(st.selected); });
+    scheduleLiveRefresh();
+    if (st.selected) openDrawer(true);
+    if (typeof maplibregl === "undefined") mapUnavailable();
+    else initMap().catch(mapUnavailable);
   }
   window.addEventListener("message", (e) => {
     if (e.source !== window.parent || e.origin !== window.location.origin || e.data?.type !== "floodops-watch-set-view") return;
@@ -1510,7 +1521,7 @@ body { display: flex; flex-direction: column; }
     st.at = nextAt; st.region = view.region ?? ""; st.minStage = view.stage ?? null; st.selected = view.facility_id ?? view.station ?? null; st.driver = view.driver ?? st.driver;
     $("wx-time").value = st.at;
     if (changedAt) { scheduleLiveRefresh(); load().catch(() => undefined); }
-    else { renderAll(); if (st.selected) { openDrawer(true); renderStation(st.selected); } else openDrawer(false); }
+    else { renderAll(); if (st.selected) { openDrawer(true); renderStation(st.selected); } else if ($("wx-pane-ag").hidden) openDrawer(false); }
   });
   root.wx = { reload: load, destroy: () => { document.removeEventListener("click", onDocClick); document.removeEventListener("keydown", onDocKey); if (liveRefresh) window.clearInterval(liveRefresh); map?.remove(); map = null; } };
   init().catch((e) => { $("wx-body").innerHTML = `<div class="wx-empty"><b>불러오지 못했습니다</b>${esc(e.message)} · API(${API || window.location.origin}) 연결을 확인하세요</div>`; });

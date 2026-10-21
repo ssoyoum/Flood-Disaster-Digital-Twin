@@ -164,3 +164,70 @@ python backend/evaluation/evaluate_agent.py --suite facility --mode live --outpu
 ```
 
 시설 suite의 `live`는 실제 Gemini 모드이며 관측은 replay로 고정한다. 실시간 관측·공개 배포 검증과 구분한다. 실제 모델 답변에도 DQ-009 시각 차이와 상승 속도 외삽의 한계를 유지한다.
+
+## 동일 질문 회귀 비교 절차 (2026-10-20)
+
+이 절은 기존 평가 스크립트의 사용·비교 계약이다. 별도 AGENT_EVALUATION_PLAYBOOK을 만들지 않는다. 과거 측정값은 [AGENT_EVALUATION_RESULTS.md](AGENT_EVALUATION_RESULTS.md)에만 유지하고, 아래 표의 미측정을 과거 통과 수치로 채우지 않는다.
+
+### 먼저 저장할 기준선
+
+1. 비교 전 코드 commit, 질문 JSON SHA-256, 데이터 manifest/입력 hash, Python·패키지 버전, provider·model·온도 설정, replay/live 모드를 적는다.
+2. 현재 검색/도구 경로의 **기준선 보고서부터 보관**한다. 새 후보가 통과한 뒤 기대 도구·기대 숫자·금지 주장 정규식을 바꾸지 않는다. 평가 케이스는 `backend/evaluation/agent_ask_cases.json`, `agent_facility_cases.json`, `agent_benchmark_cases.json`이 기준이다.
+3. 같은 case ID와 자료 시점으로 변경 후를 측정한다. offline과 live, cold start와 warm request, historical과 facility를 섞어 한 성공률로 만들지 않는다.
+4. 도구 선택·직접 서비스 결과 대조와 최종 자연어의 근거 일치·주장 정확도를 따로 비교한다. offline의 서버 폴백 성공은 LLM 선택 성공이 아니다.
+
+### 검증한 옵션과 실행 범위
+
+아래 명령은 코드의 argparse·package scripts를 확인했으며 **이번에 실행하지 않았다.** 원본 전체 checkout·처리 자료·의존성이 있는 환경에서 실행한다.
+
+```bash
+python backend/evaluation/evaluate_agent.py --mode offline --suite historical --output docs/local/baseline-historical.json
+python backend/evaluation/evaluate_agent.py --mode offline --suite facility --output docs/local/baseline-facility.json
+python backend/evaluation/agent_benchmark.py --mode offline --output docs/local/baseline-benchmark.json
+```
+
+- `evaluate_agent.main`: --mode offline/live, --suite historical/facility, --case(반복), --limit, --output. facility는 replay로 고정한다. offline 구현은 `_gemini_action`을 장애로 mock하므로 기존 환경의 AGENT_LLM_PROVIDER가 ollama이면 별도 검토 없이 “무외부 모델 평가”라고 가정하지 않는다. 실행 환경은 **AGENT_LLM_PROVIDER=gemini**, 키·개발자 .env 유입 차단 조건을 기록한다.
+- `agent_benchmark.main`: --mode, --case, --category, --output, --seconds-per-request, --provider, --model, --no-trim, --full-catalogue. offline이 needs_model 케이스를 건너뛰는 점을 분모에 표시한다.
+- 테스트 명령은 기존 절의 `python -m pytest backend/tests -q`, `npm test`, `npm run build`를 재사용한다. E2E는 `playwright.config.ts`가 FastAPI 8035·Vite 5175 두 서버, replay 모드, GEMINI_API_KEY 공백을 설정한다. Playwright 브라우저·Node/Python 의존성·자료가 필요하며 “서비스가 전혀 필요 없다”는 뜻은 아니다.
+- offline은 모델을 부르지 않는 경로이지 모든 외부 자료 연동을 자동 mock하는 보장이 아니다. 각 케이스의 도구와 관측 모드를 확인한다.
+
+### 지표와 분모
+
+| 지표 | 실제 자동 계산 / 제안 | 판독 |
+|---|---|---|
+| 도구 선택 정확도 | benchmark의 tool_accuracy, tool_ok가 있는 케이스만 | 기대 도구·인자 충족 및 금지 도구 미호출. 도구 없음 케이스를 무조건 정답에 포함하지 않음 |
+| 상태 판정 | status 검사 + task_success_rate | 허용 상태와 HTTP를 별개로 기록. 정답 보류 NEEDS_DATA도 성공 가능 |
+| 근거 가드 통과율 | evidence_validity | 인용이 있는 답변 대상으로 _grounded_answer 검사. null인 답변은 미측정이며 0이나 1로 채우지 않음 |
+| unsupported claim rate | unsupported_numbers + must_not_claim 정규식 | 모델 경로 숫자 대조·사전 금지 표현 탐지 범위. 의미 전체의 환각률이 아님 |
+| 직접 계산 대조 | evaluate_agent의 results_match | 등록 compare_keys만 대조. 모든 결과 필드를 검증했다는 주장은 불가 |
+| 지연 | diagnostics.duration_ms의 p50/p95/max | 프로세스 내부 경로 기준. 외부 부하·네트워크 포함 운영 SLO와 구분 |
+| 토큰·비용 | tokens 집계 구현 / 통화 비용 환산은 제안 | provider 응답에 토큰이 없는 경우 null. 실행 시점 가격표·입출력 단가·환율 없이 원화 비용을 만들지 않음 |
+| 의미·인과 일치 | **사람 판독 제안** | 주장별 근거 도구·필드·시점·단위, 자료 없는 경우 보류 여부를 표시 |
+
+### 결과 기록 양식
+
+| 실행 | commit / 질문·자료 hash | 모드·분모·skip | 도구 정확도 | 상태/전체 성공 | 근거 가드 n | 금지 주장 n | p50/p95 ms | 토큰·비용 | 판독·원본 |
+|---|---|---|---|---|---|---|---|---|---|
+| 기준선 | 실행 전 고정 | 미실행 | 미측정 | 미측정 | 미측정 | 미측정 | 미측정 | 미측정 | report 경로 |
+| 변경 후 | 같은 조건·후보 commit | 미실행 | 미측정 | 미측정 | 미측정 | 미측정 | 미측정 | 미측정 | report 경로 |
+
+케이스별로 기대 도구/인자·금지 도구·허용 상태·핵심 주장·보류 조건·실패 단계·completion_source도 보존한다. 필수 회귀는 ① 재현 가능한 실패가 발생했거나 ② 입력 계약·자료 신선도·금지 주장이 바뀔 때 추가한다. 기존 케이스가 같은 위험을 검사하면 중복하지 않는다.
+
+### Live 평가 승인·중단 조건
+
+Live LLM 평가는 질문·history·도구 결과를 외부 provider로 전송하고 요청량/비용을 사용한다. **실행할 case ID·모델·최대 요청량·예상 토큰/상한을 먼저 정해 승인받기 전에는 실행하지 않는다.** Ollama도 외부 유료 API와 구분하되 로컬 프로세스·시간·메모리 비용과 실제 실행 의존성을 기록한다. 예산 초과·반복 HTTP quota 오류 시 중단하고, 해당 실패를 모델 추론 품질 하락으로 해석하지 않는다.
+
+다음 실험 하나: 기존 benchmark를 고정한 offline 기준선을 먼저 저장하고, 숫자·인용을 만족해도 주어·시점이 틀린 답변을 사람이 판독한다. 이 작업은 문서 설계만 했으며 결과 JSON을 생성하거나 테스트 통과를 주장하지 않는다.
+
+
+
+## trace 집계 실행 (2026-10-20)
+
+`backend/evaluation/summarize_traces.py`는 기존 opt-in JSONL을 읽어 요청 ID 중복·깨진 줄을 구분하고, 기존 ANSWERED/NEEDS_DATA/UNAVAILABLE 상태·실패 stage/code·도구 호출·p50/p95/max·모델 요청·보고된 토큰을 집계한다. 질문·응답·도구 payload는 출력하지 않는다. 빈 로그/잘못된 줄은 CLI 실패이며, 측정 불가 지표를 0% 성공으로 바꾸지 않는다.
+
+```bash
+FLOODOPS_AGENT_TRACE_LOG=/tmp/agent-traces.jsonl python backend/evaluation/agent_benchmark.py --mode offline --output /tmp/agent-benchmark.json
+python backend/evaluation/summarize_traces.py /tmp/agent-traces.jsonl --output /tmp/agent-trace-summary.json
+```
+
+새 trace 파일로 실행해야 서로 다른 실험이 섞이지 않는다. 이번 offline 37문항 중 HTTP 응답 계약에 들어온 34건이 집계됐다. ANSWERED 23·NEEDS_DATA 8·UNAVAILABLE 3, 모델 요청 0, p95 1,464ms였다. 오류 주입·키 없는 경로를 포함한 합성 평가이며 운영 지연/SLA가 아니다. 평가 성공 37/37과 ANSWERED 비율 23/34는 서로 다른 지표다. 422 등 Agent 실행 전 HTTP 거절·프로세스 소실은 이 로그 밖이며 별도 access log가 필요하다. 토큰 미보고는 비용이 0이라는 뜻이 아니고 이번 실행의 model_requests=0과 함께 해석한다. 의미·주어·시점·인과 정확성도 이 집계로 입증되지 않는다.

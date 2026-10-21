@@ -446,6 +446,9 @@ def refresh_live(force: bool = False) -> _LiveState:
     key = os.environ.get("HRFCO_API_KEY", "")
     now = datetime.now().replace(microsecond=0)
     with _LOCK:
+        if not key:
+            _LIVE.last_error = "HRFCO_API_KEY is not configured"
+            return _LIVE
         latest = _LIVE.snapshots[-1] if _LIVE.snapshots else None
         if not force and latest and (now - latest.fetched_at).total_seconds() < REFRESH_SECONDS:
             return _LIVE

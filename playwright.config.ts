@@ -23,7 +23,10 @@ export default defineConfig({
       // Browser regression tests exercise registered tools without paid model calls, and the twin board
       // replays the stored 2023 series so E2E never depends on the live gauge API.
       // Duty records written by the board test go to a temp file, not the local operational log.
-      env: { GEMINI_API_KEY: "", FLOODOPS_TWIN_MODE: "replay", FLOODOPS_DECISION_LOG_PATH: path.join(os.tmpdir(), "floodops-e2e-decisions.jsonl") },
+      env: {
+        AGENT_LLM_PROVIDER: "gemini", GEMINI_API_KEY: "", HRFCO_API_KEY: "", KMA_API_HUB_KEY: "", FLOODOPS_TWIN_MODE: "replay",
+        FLOODOPS_DECISION_LOG_PATH: path.join(os.tmpdir(), "floodops-e2e-decisions.jsonl"),
+      },
     },
     {
       command: "npm run dev -- --host 127.0.0.1 --port 5175",

@@ -1,4 +1,6 @@
+import base64
 import sys
+from tempfile import TemporaryDirectory
 from pathlib import Path
 
 import pytest
@@ -11,6 +13,29 @@ from app.main import app
 
 
 client = TestClient(app)
+
+
+@pytest.fixture(params=[True, False], ids=["snapshot-present", "snapshot-missing"])
+def safemap_snapshot(request, monkeypatch):
+    """Exercise both asset states without depending on ignored local WMS data."""
+    from app import main, osong_repository
+
+    # The metadata contract reports a repository-relative path. Keep only this
+    # disposable fixture inside the repo; never create or alter a real raw file.
+    with TemporaryDirectory(prefix=".test-safemap-", dir=osong_repository.REPO_ROOT) as directory:
+        path = Path(directory) / "snapshot.png"
+        image = base64.b64decode(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII="
+        )
+        if request.param:
+            path.write_bytes(image)
+        monkeypatch.setattr(osong_repository, "SAFEMAP_WMS_SNAPSHOT", path)
+        monkeypatch.setattr(main, "SAFEMAP_WMS_SNAPSHOT", path)
+        osong_repository._osong_repository.cache_clear()
+        try:
+            yield image if request.param else None
+        finally:
+            osong_repository._osong_repository.cache_clear()
 
 
 def test_agent_ask_uses_observations_to_choose_multiple_tools(monkeypatch):
@@ -163,12 +188,13 @@ def test_osong_layers_ignore_current_osm_for_incident_analysis():
     assert layers["facilities"]["feature_count"] == 386
 
 
-def test_osong_status_separates_source_types():
+def test_osong_status_separates_source_types(safemap_snapshot):
     response = client.get("/api/events/osong-2023/status")
     assert response.status_code == 200
     status = response.json()
     assert status["flood_extent"]["status"] == "TEMPORARY"
-    assert status["safemap_floodmarks"]["status"] == "VERIFIED"
+    expected = "VERIFIED" if safemap_snapshot else "UNAVAILABLE"
+    assert status["safemap_floodmarks"]["status"] == expected
     assert status["safemap_floodmarks"]["source_type"] == "OFFICIAL_WMS_SNAPSHOT"
     assert status["safemap_floodmarks"]["data_vintage"] == "2024 collection"
     assert status["rainfall"]["source_type"] == "OBSERVATION"
@@ -193,7 +219,7 @@ def test_osong_timeline_uses_kma_observations():
     assert observations[0]["unit"] == "mm"
 
 
-def test_osong_summary_does_not_calculate_exposure_without_flood_extent():
+def test_osong_summary_does_not_calculate_exposure_without_flood_extent(safemap_snapshot):
     response = client.get("/api/events/osong-2023/summary")
     assert response.status_code == 200
     summary = response.json()
@@ -209,7 +235,7 @@ def test_osong_summary_does_not_calculate_exposure_without_flood_extent():
     assert summary["water_level_peak_m"] is not None
     assert summary["primary_water_level_peak_m"] is not None
     assert summary["underpass_available"] is True
-    assert summary["safemap_floodmarks_available"] is True
+    assert summary["safemap_floodmarks_available"] is bool(safemap_snapshot)
     assert summary["model_type"] == "Historical Disaster Reconstruction Digital Twin MVP"
     assert summary["response_window_min"] == 8
     assert summary["time_until_full_inundation_min"] == 13
@@ -234,11 +260,15 @@ def test_osong_reconstruction_serves_replay_and_rule_based_intervention():
     assert any("not a calibrated 2D hydraulic model" in item for item in reconstruction["limitations"])
 
 
-def test_osong_safemap_wms_snapshot_serves_local_png():
+def test_osong_safemap_wms_snapshot_serves_local_png(safemap_snapshot):
     response = client.get("/api/events/osong-2023/flood/safemap-wms-snapshot.png")
+    if safemap_snapshot is None:
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Safemap WMS snapshot not found"
+        return
     assert response.status_code == 200
     assert response.headers["content-type"] == "image/png"
-    assert response.content.startswith(b"\x89PNG")
+    assert response.content == safemap_snapshot
 
 
 def test_baseline_uses_pending_exposure_metrics():
@@ -412,6 +442,7 @@ def test_agent_tools_expose_only_registered_domain_tools():
         "get_observation_summary",
         "analyze_closure_timing",
         "analyze_inflow_delay",
+        "analyze_breach_advance",
         "get_exposure_inventory",
         "compare_scenarios",
         "analyze_hand_threshold",

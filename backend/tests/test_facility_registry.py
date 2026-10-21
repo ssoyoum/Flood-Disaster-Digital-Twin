@@ -41,10 +41,13 @@ def test_candidates_are_all_candidate_status_without_thresholds():
         assert c["gates"]["validation_event"]["status"] == "UNKNOWN"
         assert "CONFIRMED" not in {g["status"] for g in c["gates"].values()}
         assert facility_registry.get(c["id"]) is c or facility_registry.get(c["id"])["id"] == c["id"]
-    # A PENDING representative gauge must be backed by a flood-forecast gauge within 5 km, never by a copied threshold.
+    # River candidates use flood-forecast gauges; the pluvial comparison can use
+    # a nearby rain gauge. Neither hypothesis supplies operational thresholds.
     for c in candidates:
         pending = c["gates"]["representative_gauge"]["status"] == "PENDING"
         backed = any(g["flood_forecast_station"] and g["distance_km"] <= 5 for g in c["nearby_gauges"])
+        if c.get("driver_hypothesis") == "pluvial":
+            backed = backed or any(g["distance_km"] <= 5 for g in c["nearby_rain_gauges"])
         assert pending == backed, c["id"]
     assert facility_registry.get("nope") is None
 

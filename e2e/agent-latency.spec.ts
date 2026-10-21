@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// Stage 5 measurement, not a regression gate: MEASURE_LATENCY=1 npx playwright test e2e/agent-latency.spec.ts
+// Run alone with a fresh server: the six samples fit the production 6/minute limit.
+// MEASURE_LATENCY=1 npx playwright test e2e/agent-latency.spec.ts
 test.skip(!process.env.MEASURE_LATENCY, "Set MEASURE_LATENCY=1 to measure browser-side Agent latency.");
 
 type Row = { label: string; send_to_response_ms: number; server_ms: number; response_bytes: number; response_to_render_ms: number };
@@ -13,6 +14,7 @@ async function ask(page: Page, label: string, question: string, rendered: string
   const sent = Date.now();
   await input.press("Enter");
   const response = await pending;
+  expect(response.status(), "Latency samples require successful requests; run this file alone with a fresh server").toBe(200);
   const body = await response.json();
   const received = Date.now();
   await expect(page.locator(".dk-agent-answer").last()).toContainText(rendered, { timeout: 60_000 });

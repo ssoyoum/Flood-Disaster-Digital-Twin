@@ -14,7 +14,8 @@
 검증 결과:
 - 미리보기 서버(8036 재생 모드 · 5181)에서 새 스펙: 보드 7 · 트윈 2 · 사례 7 · 상승 예측 1 · 수위 재생 2 통과. 보드 스펙은 2회 반복 실행 14/14 통과.
 - 같은 4개 스펙(오송·다른 사례·트윈·보드)을 `main`(88a7ee4)에서 돌리면 12개 중 7개가 이미 실패했다(사례 캐러셀 클릭 시간 초과, 접힌 메뉴 링크, 옛 보드 제목). 상승 예측·수위 이력 3개도 `main`에서 실패한다(옛 React 카드가 iframe 전환 때 사라짐).
-- `vitest` 7개 통과. `pytest` 143개 통과·1개 실패: 미리보기 worktree에 gitignore 대상 원본(`data/raw/.../safemap_if_0092_wms`)이 없어 침수흔적 상태가 `UNAVAILABLE`로 나온다. 같은 테스트는 `main` 작업 트리에서 통과한다.
+- 병합 전: `vitest` 7개 통과. `pytest` 143개 통과·1개 실패(미리보기 worktree에 gitignore 대상 원본 `safemap_if_0092_wms`가 없어 침수흔적 `UNAVAILABLE`, `main` 작업 트리에서는 통과).
+- 원격 `main`(8d64d2d까지 7커밋) 병합 뒤: 프로젝트 설정 E2E 25개 통과·1개 건너뜀(지연 측정), `vitest` 7개, `pytest` 332개 통과. `pytest`는 실행마다 2~15개가 `WinError 10014` 소켓 오류로 산발 실패했고, 실패하는 테스트가 매번 달랐으며 단독 재실행과 마지막 전체 실행에서 모두 통과했다.
 
 문제/해결:
 - 문제: 멘토가 «지침을 확인했나»를 물었는데 시설 판단 패널이 FloodOps 자체 규칙(river_stage_v1)의 «통제 검토»를 앞세워, 공식 기준을 적용한 화면으로 읽히지 않았다.
@@ -27,6 +28,8 @@
   해결: 채점 데이터(`case_validation.py`)의 문구와 같게 고쳤다.
 - 문제: 전체 E2E를 한 번에 돌렸을 때 보드 2개·에이전트 1개가 실패했는데, 같은 스펙을 단독으로 돌리면 통과했다. 실행 중 PC가 절전에 들어가 총 시간이 1일로 찍혔다.
   해결: 단독·반복 실행으로 통과를 확인하고, 스펙은 고치지 않았다.
+- 문제: 같은 기간 원격 `main`에서도 같은 E2E 6개 파일을 옛 `main` 화면(사례 캐러셀·«실시간 위험 순위» 보드) 기준으로 고쳤고, 트윈 iframe에 재생 시각 주소 연동·관측 실패 시 값 지우기·지도 CDN 실패 분리가 들어와 9개 파일이 충돌했다.
+  해결: 사례 스펙은 미리보기(2단 격자) 쪽을 쓰고, 보드·트윈·수위 스펙은 양쪽 검사를 합쳤다(CDN 차단·주소 시각 연동·관측 실패 + 즉시 통제 조건·상·하행 기록). 트윈의 관측 실패 경로는 원격 처리를 쓰되, 이전 시각의 조건 판정이 남지 않도록 조건 목록도 «판정하지 않습니다»로 비우게 했다. 미리보기 브랜치는 푸시 전이라 리베이스 대신 병합했다.
 
 ## 멘토링 피드백 정리와 공식 기준 원문 확인, 새 화면 구상
 
@@ -4511,3 +4514,142 @@ UI 보완:
 문제/해결:
 - 문제: 사용자가 완성된 PPT와 같은 배치를 공유 가능한 PDF로 요청했습니다.
   해결: 내용을 재작성하지 않고 원본 PPT를 PowerPoint에서 직접 변환해 글꼴과 배치를 유지했습니다.
+
+## Agent 신뢰성·평가·CI/CD·Kubernetes 문서 근거 대조
+
+- 작업일: 2026-10-20
+
+주요 작업:
+- 기존 AGENT_TOOL_CONTRACTS에 ask/plan 경로·도구 검증·근거 전달·실패별 테스트 연결을 보완했습니다.
+- 기존 AGENT_VALIDATION에 동일 질문/자료 기준선·회귀 비교·지표 분모·Live 평가 승인 조건을 추가했습니다.
+- CI_CD_DESIGN과 KUBERNETES_LEARNING_PLAN을 작성해 현재 Docker/EC2 기록과 미구현 CI·로컬 실습 제안을 구분했습니다.
+
+검증 결과:
+- 기준 commit의 README·기존 문서·Agent runner/planner/schema/tools·평가 argparse·package scripts·Docker/Compose·health 코드를 정적으로 읽었습니다.
+- Git tree에 workflow가 없고 원격 Actions runs가 0건임을 조회했습니다. CI 통과·현재 공개 서버 가용성을 확인한 것은 아닙니다.
+- 테스트·오프라인 평가·Live 모델·Docker build·Kubernetes·실제 배포는 실행하지 않았습니다. 코드·데이터·Secret·설정·의존성 변경은 없습니다.
+
+문제/해결:
+- 문제: 이미 있는 도구 계약·평가 설명을 새 문서로 반복하면 실행 상태와 근거의 기준이 갈라집니다.
+  해결: 실행/실패/평가는 기존 문서에 통합하고, 새로운 책임인 CI 설계와 Kubernetes 학습만 분리했습니다.
+- 문제: 숫자·인용 가드, 모델 HTTP 예산, 고정 health 응답을 의미 검증·전체 도구 시간 제한·배포 준비 보장으로 오해할 수 있습니다.
+  해결: 실제 코드의 보장 범위와 아직 측정하지 않은 의미/인과·도구 지연·자료 준비 검증을 명시했습니다.
+
+## 추적 소스 기준 회귀 검증과 CI 구현
+
+- 작업일: 2026-10-20
+
+주요 작업:
+- PR/main push의 백엔드·offline Agent 평가·프런트 검증 뒤 Docker 이미지 build/smoke를 실행하는 CI를 추가했습니다.
+- Safemap 이미지 유무를 임시 fixture로 모두 검사하고, 현재 도구 카탈로그·내수형 강우 후보·지역/시간 변화 계약에 맞춰 회귀 테스트를 보완했습니다.
+- AI 서비스 역량 문서에 실행 구조와 실제 검증 수준을 연결했습니다.
+
+검증 결과:
+- 새 checkout과 backend/requirements.txt 환경에서 최초 312 passed/6 failed를 확인했고, 수정 뒤 전체 pytest 322 passed를 확인했습니다. 테스트 제거·추가 skip은 없습니다.
+- 프런트 3개 파일/7개 테스트·TypeScript/Vite 빌드 성공. offline benchmark 37/37, needs_model 6개 제외, model_requests 0회입니다.
+- Dockerfile.aws에 로컬 프록시 CA secret mount만 적용한 임시 빌드로 이미지 생성에 성공했습니다. 외부 네트워크 없는 컨테이너에서 /health·/api/events(5건)·정적 페이지 200을 확인하고 컨테이너를 삭제했습니다.
+- workflow YAML·git diff whitespace 검사 완료. 원격 Actions 성공은 푸시 후 별도 확인이며 E2E·Live LLM·AWS 배포는 실행하지 않았습니다.
+
+문제/해결:
+- 문제: 미추적 WMS 이미지가 있다고 가정한 API 테스트 3개가 깨끗한 checkout에서 실패했습니다.
+  해결: 실제 원자료를 내려받거나 skip하지 않고, 테스트에만 1px PNG를 격리해 파일 존재·부재와 상태/summary/404 계약을 모두 확인했습니다.
+- 문제: 등록된 붕괴 시각 비교 도구와 내수형 강우 관측소 후보가 추가됐지만 기존 테스트는 옛 도구 목록·하천형 조건만 기대했습니다. 재생 자료 3개 관측소는 모두 충북이라 지역 필터가 수를 줄인다는 가정도 틀렸고, 특정 시각의 단계 상승 기대도 자료와 맞지 않았습니다.
+  해결: 등록 도구 exact 목록을 유지해 새 도구를 포함하고, 내수형 강우 근거를 검증에 반영했습니다. 지역·단계 변화를 통제한 입력으로 분리해 필터/시간 비교의 오류를 탐지하도록 했습니다.
+- 문제: 기존 테스트·평가 명령은 있었지만 PR/main에서 자동으로 실행하는 workflow가 없었습니다.
+  해결: 자격 없이 offline/replay로 검증하고 실패 시 이미지 job을 차단하며, SHA 이미지 태그·report 보관·수동 E2E 선택을 구성했습니다. 레지스트리 push·운영 배포는 추가하지 않았습니다.
+
+
+
+## 브라우저 회귀로 확인한 재생 시각·실패·후속 대화 보완
+
+- 작업일: 2026-10-20
+
+주요 작업:
+- 현재 iframe 화면에 맞춰 사례·시설·감시 보드의 실제 클릭 경로를 검증했다.
+- 외부 재생 시각을 iframe에 전달하고 같은 origin/source의 메시지로 화면·Agent 시각·URL을 연결했다.
+- 지도/CDN 실패와 관측 API 실패를 분리하고 후자에서 이전 수위·권고를 지웠다.
+- Agent 지역 이동 뒤 대화창 유지, 준비된 사례 수에 맞춘 wheel 순환을 적용했다.
+
+검증 결과:
+- 최초 브라우저 9 passed / 10 failed / 선택 지연 측정 1 skipped. 실패를 삭제·skip으로 숨기지 않고 현재 UI와 실제 결함을 대조했다.
+- 수정 후 전체 실행에서 회귀 20개 통과. 선택 지연 측정은 앞선 6회 요청과 6/min 제한이 겹쳐 429를 받아 별도 측정으로 분리했다. 기본 한도는 변경하지 않았다.
+- 프런트 단위 7개와 최신 build 성공. API·CDN 실패 주입, 재생 deep link·hash 변경, Agent 후속 대화 검증 포함.
+
+문제/해결:
+- 문제: 예전 DOM·숨겨진 익산 카드와 화면 밖 요소를 테스트했고, iframe은 at를 받지 않아 04:10 링크도 08:00을 표시했다. 지도 load 이벤트에 관측 표시가 묶여 CDN 장애 시 권고도 사라졌다. 지역 도구 응답이 빈 시설 선택을 전송하면 대화창이 닫혔다.
+  해결: 현재 DOM/가용 사례 계약을 검증하면서 실제 시각 전달·같은 origin/source 동기화·관측 독립 표시·실패 시 이전 값 제거·대화 탭 유지로 고쳤다. 고정 sleep이나 테스트 제거로 성공시키는 방법은 쓰지 않았다. 선택 측정은 실제 HTTP 성공을 확인한 뒤 새 서버에서 따로 수행한다.
+
+## Agent trace 집계와 브라우저 기본 CI 편입
+
+- 작업일: 2026-10-20
+
+주요 작업:
+- 기존 요청 JSONL의 ID 중복·깨진 줄·상태·실패 stage/code·도구·지연·모델 요청·보고 토큰을 집계하는 CLI 추가.
+- 원문 질문/응답/도구 payload를 출력하지 않고 빈 결과·깨진 입력을 성공으로 세지 않는다. 원본과 기존 보고서는 덮어쓰지 않는다.
+- 브라우저 회귀를 기본 PR/main CI에 편입하고 offline benchmark trace·집계를 7일 artifact로 보관한다.
+
+검증 결과:
+- 전체 Python 325 passed, 프런트 7개·build 성공, offline 37/37·model_requests 0.
+- trace 34건에서 ANSWERED 23 / NEEDS_DATA 8 / UNAVAILABLE 3, 깨진 줄·중복 0. 오류 주입과 키 없는 실험이며 운영 성공률이 아니다.
+- CLI 보존 guard 이후 관련 3개 회귀 테스트 재실행 성공.
+- Chromium 회귀 20개와 새 서버에서 별도 지연 측정 1개(6요청) 성공. 시설 기준 cold 7,017ms / warm 72ms는 단일 로컬 관찰이며 성능 향상 주장으로 쓰지 않는다.
+
+문제/해결:
+- 문제: 요청별 trace는 있었지만 실패·지연·비용 분모를 반복해서 비교할 집계 명령이 없었다. 설계 문서는 원격 workflow 부재·E2E 미실행 시점에 머물러 있었다.
+  해결: 기존 진단 계약만 읽는 오프라인 CLI를 추가하고 실제 검증한 E2E를 기본 CI에 연결했다. 새로운 상태·외부 모델 호출·요청 제한 우회·배포 권한은 추가하지 않았다. HTTP 거절과 프로세스 소실은 별도 access log 범위로 명시했다.
+
+## kind 로컬 배포·실패 복구 검증
+
+- 작업일: 2026-10-20
+
+주요 작업:
+- deploy/local/floodops.yaml에 Namespace·ConfigMap·빈 offline Secret·Deployment·Service를 구현했다.
+- replica 1/Recreate·명시적 context·readiness/liveness·CPU/메모리 설정을 적용했다. registry push·실제 키·AWS/EKS 자원은 사용하지 않았다.
+
+검증 결과:
+- kind v0.31.0 / Kubernetes v1.35.0에서 Pod Ready=true, restart 0, EndpointSlice와 Service port-forward를 확인했다.
+- health / events / frontend HTTP 200, 사건 5건. database=demo-in-memory, postgis=pending을 그대로 확인했다.
+- 환경변수 revision rollout/undo, 없는 이미지의 ErrImageNeverPull·20초 rollout timeout, rollback 후 Ready·health 복구를 확인했다.
+- learning-v2 이미지 rollout과 변경된 재생 코드의 이미지 포함을 확인했다. 이후 UI 수정의 최종 이미지는 CI 검증 대상이다.
+- 직접 만든 floodops-learning cluster와 노드는 kind delete cluster로 정리했다. 생성한 kubeconfig·키·인증서는 커밋하지 않았다.
+
+문제/해결:
+- 문제: 관리형 Docker 안의 kind에서 /dev/kmsg 누락·중첩 overlayfs mount invalid argument로 control plane이 시작되지 않았다. kind load는 containerd transfer API의 unpack platform 오류가 났다.
+  해결: 본인이 만든 노드 내부에 kmsg 장치를 만들고 containerd snapshotter만 native로 바꾼 뒤, ctr images import --local --platform linux/amd64 --snapshotter native로 동일 이미지를 적재했다. 외부 daemon storage driver를 바꾸거나 TLS 검증을 끄지 않았다. 정상 PC의 기본 경로와 이 환경의 차이를 학습 문서에 분리했다. 로컬 실습 성공을 EKS 운영·실서비스 배포로 표현하지 않는다.
+
+## 원격 CI의 지도 CDN 차이로 드러난 감시 자료 로딩 결합 제거
+
+- 작업일: 2026-10-20
+
+주요 작업:
+- 시설 API·목록·Agent·주기 갱신을 지도 초기화보다 먼저 시작하고 CDN/WebGL/style 장애와 분리했다.
+- 초기 미확인 배지를 실시간으로 표시하지 않고, 지도 미가용 시 목록/근거를 사용할 수 있음을 알린다.
+- 지도 레이어·팝업 준비 전 hover를 차단하고 CDN을 강제 차단한 브라우저 회귀로 검증했다.
+
+검증 결과:
+- 원격 Actions 39481499120은 Python·offline·프런트 build 성공 뒤 브라우저 18 passed / 2 failed / 선택 측정 1 skipped였다. image job은 실제 skipped로 차단됐다.
+- 실패는 초기 '실시간' 문자열이 그대로 남는 것이었다. init이 MapLibre와 style.load를 기다린 뒤에만 load를 호출해 API 상태가 갱신되지 않는 경로를 확인했다.
+- 수정 후 unpkg를 강제 차단한 감시 보드 3개 브라우저 검사와 build를 재검증했다. 기본 요청 제한·검증 assert·브라우저 검사는 제거하지 않았다.
+
+문제/해결:
+- 문제: 로컬에서는 CDN이 열려 통과했으나 GitHub runner에서는 지도 실패/지연이 데이터 조회까지 막았다. 관측을 받기 전에도 헤더가 '실시간'처럼 보였다.
+  해결: 데이터와 지도 init 함수를 나누고 지도 미가용을 명시했다. timeout 연장이나 재시도/skip으로 실패를 숨기지 않고 외부 CDN이 없어도 API 근거·지역 필터·후속 대화가 동작하도록 검증했다.
+
+## 강우 조회의 키 없는 외부 호출과 불필요한 전체 feed 갱신 차단
+
+- 작업일: 2026-10-20
+
+주요 작업:
+- facility_risk._live_totals가 기존 national_watch.refresh_live_rain을 사용하도록 수정했다. 수위·댐까지 갱신하지 않는다.
+- refresh_live는 HRFCO_API_KEY가 없으면 기존 상태와 명시적 오류를 반환하며 외부 bulk 요청을 보내지 않는다.
+- Playwright와 기본 CI에서 모델·HRFCO·KMA 키를 명시적으로 비워 로컬 설정이 실시간 호출을 열지 않게 했다.
+
+검증 결과:
+- Actions 39482529709도 초기 배지 2개가 미갱신이었다. 다운로드한 Chromium trace에서 facility-risk 요청이 완료되지 않았음을 확인했다.
+- 키 없는 fresh 프로세스 cProfile에서 8.11초 중 6.59초가 _live_totals → refresh_live → 빈 키 _bulk HTTP 대기였다. 로컬 proxy와 CI direct network의 실패 시간이 달랐다.
+- 신규 회귀 4개 통과: 키 없는 HTTP 0회, 강우 전용 갱신 사용, 키 설정 시 feed 호출 유지, 강우 미제공에도 실제 재생 시설 근거 보존.
+- 전체 회귀와 브라우저를 다시 실행하고 최종 결과는 새 Actions와 Career의 증거 노트에 연결한다. API·UI assert나 요청 제한을 완화하지 않았다.
+
+문제/해결:
+- 문제: 지도 초기화 결합을 끊어도 live 강우 요청 자체가 인증 없이 외부에 나갔다. 로컬에서 실패가 빨리 반환돼 감춰졌고 CI에서는 HTTP timeout까지 배지를 갱신하지 못했다.
+  해결: 이미 있는 rain-only 함수와 missing-key 계약을 재사용했다. timeout 연장 대신 인증 없는 I/O를 제거했고, 실제 키가 설정된 경로는 mock feed로 보존 검증했다. CDN 결함과 외부 API 대기는 다른 원인으로 기록한다.

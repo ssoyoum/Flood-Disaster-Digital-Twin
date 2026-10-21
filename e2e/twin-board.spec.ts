@@ -1,24 +1,36 @@
 import { expect, test } from "@playwright/test";
 
 // The Playwright FastAPI server runs with FLOODOPS_TWIN_MODE=replay, so the board reads the stored 2023 series.
-test("the facility detail replays 2023 by the guideline's conditions and keeps the backtest", async ({ page }) => {
+test("the facility detail replays 2023 by the guideline's conditions, follows the URL time and keeps the backtest", async ({ page }) => {
   await page.goto("/#twin");
   await expect(page.locator("h1")).toContainText("운영 시설 통제 판단");
   await expect(page.locator(".tw-mode")).toContainText("2023년 사건 재생");
 
   // The "now" tab is the static twin page in an iframe; its replay opens at 08:00.
-  const twin = page.frameLocator(".tw-now-frame iframe");
-  await expect(twin.locator("#twc-fname")).toContainText("궁평2지하차도");
-  const conditions = twin.locator("#twc-crit-list");
+  const frame = page.frameLocator('iframe[title="현재 지하차도 통제 판단 트윈"]');
+  await expect(frame.locator("#twc-fname")).toContainText("궁평2지하차도");
+  const reco = frame.locator("#twc-badge");
+  await expect(reco).toContainText("통제 검토");
+  const conditions = frame.locator("#twc-crit-list");
   await expect(conditions.locator("li").first()).toContainText("②");
   await expect(conditions.locator("li").first()).toContainText("충족");
   await expect(conditions).toContainText("06:34 금강홍수통제소");
   await expect(conditions).toContainText("판정 보류");
-  await expect(twin.locator("#twc-ref-list")).toContainText("FloodOps 규칙");
-  await expect(twin.locator("#twc-marks")).toContainText("06:34");
+  await expect(frame.locator("#twc-ref-list")).toContainText("FloodOps 규칙");
+  await expect(frame.locator("#twc-marks")).toContainText("06:34");
 
-  await twin.locator("#twc-marks .twc-mk", { hasText: "04:10" }).click();
+  await frame.locator('.twc-mk[data-t="04:10"]').click();
+  await expect(page).toHaveURL(/at=2023-07-15T04%3A10%3A00/);
+  await expect(reco).toContainText("감시");
+  await expect(frame.locator("#twc-k-level")).toContainText("7.69");
   await expect(conditions).not.toContainText("06:34 금강홍수통제소");
+
+  await frame.locator("#twc-root").evaluate((el) => (el as HTMLElement & { twc: { setTime: (at: string) => void } }).twc.setTime("06:50"));
+  await expect(reco).toContainText("통제 검토");
+  await expect(frame.locator("#twc-s-time")).toContainText("06:40");
+  await expect(conditions).toContainText("06:34 금강홍수통제소");
+  await frame.getByRole("button", { name: "판단 기준 안내" }).click();
+  await expect(frame.getByRole("dialog", { name: "판단 기준", exact: true })).toContainText("침수심을 재지 않고");
 
   await page.getByRole("navigation", { name: "FloodOps 화면" }).getByRole("button", { name: "백테스트" }).click();
   const backtest = page.locator('[aria-label="백테스트"]');
