@@ -1,11 +1,11 @@
 {
   "schema_version": "1.1",
   "dataset_id": "floodops-multifactor-v2",
-  "generated_at_utc": "2026-10-19T08:57:03+00:00",
+  "generated_at_utc": "2026-10-26T11:01:25+00:00",
   "script": "data/scripts/build_multifactor_dataset.py",
   "scope": "facility candidate inventory plus an all-available-period 10-minute Osong external-flood feature panel",
   "profiles": {
-    "candidate_facility_count": 425,
+    "candidate_facility_count": 754,
     "inflow_path_confirmed_count": 1,
     "catalog_grade_available_count": 1,
     "facility_grade_note": "Catalog fields are preserved with their catalogue status; a catalogue listing is not a site inspection."
@@ -123,7 +123,7 @@
   "inputs": {
     "facility_links": {
       "path": "data/processed/facilities/facility_gauge_links.csv",
-      "sha256": "ff71f5510b25d5ff1a8dd427d2ec94bee8a0d73d5b304c1d8922f75ea8eab1bd"
+      "sha256": "d364e3685f138b2376ccfb7a05b739666be7af38c372018b425c7fa795bbf12c"
     },
     "underpass_inventory": {
       "path": "data/processed/facilities/underpass_inventory.csv",
@@ -167,7 +167,7 @@
     },
     "case_scorecard": {
       "path": "data/processed/validation/case_scorecard.json",
-      "sha256": "980422e450589d8d882f95a1c27ff8f793508927848564732c1cd823dac56d17"
+      "sha256": "686ad91ad793720489a7f19591e2cde706635f35033d6ef46acf7f35a0775d19"
     },
     "history_manifest": {
       "path": "data/manifests/hrfco-history.json",
@@ -192,8 +192,8 @@
   "outputs": [
     {
       "path": "data/processed/multifactor/facility-profiles.csv",
-      "sha256": "cab23ae819a6e53267b5cddb234ae7ecacf3d7712bce7660ef37b5a0422bfaf9",
-      "bytes": 150658
+      "sha256": "c679745bbd380cf9568ca84a37a065276ceb3957cc019e36c0a9579cab1b8caf",
+      "bytes": 270297
     },
     {
       "path": "data/processed/multifactor/threshold-reference.csv",

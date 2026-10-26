@@ -11,7 +11,9 @@ Selection:
   (b) the three Cheongju follow-up candidates named in docs/UNDERPASS_EXPANSION.md
       (오송바이오폴리스·용암·학평, source rows 15124755:519/521/523) even without coordinates.
 A named candidate that also appears in underpass_coordinates.csv (same 국토부 순번 and name) gets that
-row's coordinates and gauge links; the two sources are the same national list.
+row's coordinates and gauge links; the two sources are the same national list. Coordinates come from
+underpass_api_coordinates.csv (road-tunnel API first, OSM where the API has none), the same points
+facility_gauge_links.csv was built from.
 
     python data/scripts/build_facility_candidates.py
 """
@@ -28,6 +30,9 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PROCESSED = REPO_ROOT / "data" / "processed" / "facilities"
 COORDS_CSV = PROCESSED / "underpass_coordinates.csv"
+# Same coordinates as facility_gauge_links.csv: road-tunnel API point first, OSM only where the API has none.
+API_COORDS_CSV = PROCESSED / "underpass_api_coordinates.csv"
+COORD_SOURCE_KO = {"api": "국토부 도로터널 API", "osm": "OSM 이름 매칭"}
 LINKS_CSV = PROCESSED / "facility_gauge_links.csv"
 CHUNGBUK_CSV = PROCESSED / "chungbuk_underpass_candidates.csv"
 REGISTRY_JSON = REPO_ROOT / "data" / "facilities" / "registry.json"
@@ -68,6 +73,16 @@ SLUGS = {
 def read_csv(path: Path) -> list[dict[str, str]]:
     with path.open(encoding="utf-8-sig", newline="") as handle:
         return list(csv.DictReader(handle))
+
+
+def read_coords() -> list[dict[str, str]]:
+    rows = read_csv(COORDS_CSV)
+    best = {r["molit_no"]: r for r in read_csv(API_COORDS_CSV)}
+    for row in rows:
+        b = best.get(row["molit_no"], {})
+        row["latitude"], row["longitude"] = b.get("best_latitude", ""), b.get("best_longitude", "")
+        row["coordinate_source"] = COORD_SOURCE_KO.get(b.get("best_source", ""), "")
+    return rows
 
 
 def haversine_km(lon1: float, lat1: float, lon2: float, lat2: float) -> float:
@@ -148,16 +163,16 @@ def location_review(sgg: str, location: list[float] | None, gauges: list[dict[st
     for f in operational:
         loc = f.get("location")
         if loc and haversine_km(location[0], location[1], loc[0], loc[1]) <= OVERLAP_KM:
-            notes.append(f"좌표가 운영 시설 {f['name']}({f['id']})과 {OVERLAP_KM:g} km 안에 겹침 — OSM 이름 매칭이 이웃 시설을 가리켰을 수 있어 좌표 확인 필요")
+            notes.append(f"좌표가 운영 시설 {f['name']}({f['id']})과 {OVERLAP_KM:g} km 안에 겹침 — 이름 매칭이 이웃 시설을 가리켰을 수 있어 좌표 확인 필요")
     key = sgg.strip()[:2]
     if gauges and key and not any(key in g["name"] for g in gauges):
         places = sorted({g["name"].split("(")[0] for g in gauges})
-        notes.append(f"가까운 수위 관측소가 모두 다른 시군({', '.join(places)})에 있음 — 목록상 위치 {sgg}와 OSM 좌표가 어긋날 수 있어 확인 필요")
+        notes.append(f"가까운 수위 관측소가 모두 다른 시군({', '.join(places)})에 있음 — 목록상 위치 {sgg}와 좌표가 어긋날 수 있어 확인 필요")
     return notes
 
 
 def main() -> None:
-    coords = read_csv(COORDS_CSV)
+    coords = read_coords()
     links = read_csv(LINKS_CSV)
     chungbuk = read_csv(CHUNGBUK_CSV)
     registry = json.loads(REGISTRY_JSON.read_text(encoding="utf-8"))
@@ -223,7 +238,7 @@ def main() -> None:
             "source_url": row["source_url"],
             "source_date": row["source_date"],
             "source_updated_at": row["source_updated_at"],
-            "coordinates": "underpass_coordinates.csv (OSM 이름 매칭)" if location else None,
+            "coordinates": f"underpass_api_coordinates.csv ({coord_row['coordinate_source']})" if location else None,
         }
         add(ordinal, row["name"], sido, sgg, location, source, row["management_category"], row["agency_raw"], row["structure_raw"], "docs/UNDERPASS_EXPANSION.md 1차 확인 후보")
 
@@ -237,7 +252,7 @@ def main() -> None:
             "source_record_id": f"{NATIONAL_DATASET_ID}:{row['molit_no']}",
             "molit_no": row["molit_no"],
             "source_url": f"https://data.go.kr/data/{NATIONAL_DATASET_ID}/fileData.do",
-            "coordinates": "underpass_coordinates.csv (OSM matched name)",
+            "coordinates": f"underpass_api_coordinates.csv ({row['coordinate_source']})",
             "osm_way_ids": row["osm_way_ids"] or None,
         }
         add(row["molit_no"], row["name"], row["sido"], row["sgg"], location, source, row["management"], None, row["structure"],
@@ -263,7 +278,7 @@ def main() -> None:
             "source_url": f"https://data.go.kr/data/{NATIONAL_DATASET_ID}/fileData.do",
             "source_date": None,
             "source_updated_at": None,
-            "coordinates": "underpass_coordinates.csv (OSM 이름 매칭)",
+            "coordinates": f"underpass_api_coordinates.csv ({row['coordinate_source']})",
             "osm_way_ids": row["osm_way_ids"] or None,
         }
         add(row["molit_no"], row["name"], row["sido"], row["sgg"], location, source, row["management"], None, row["structure"], f"{SIDO} · 좌표 있음 · {MAX_GAUGE_KM:g} km 안 홍수예보 수위관측소")
@@ -279,6 +294,7 @@ def main() -> None:
         "generator": "data/scripts/build_facility_candidates.py",
         "inputs": {
             "underpass_coordinates.csv": {"rows": len(coords), "chungbuk_rows": sum(1 for r in coords if r["sido"] == SIDO), "chungbuk_rows_with_coordinates": sum(1 for r in coords if r["sido"] == SIDO and r["latitude"] and r["longitude"]), "sha256": sha256(COORDS_CSV)},
+            "underpass_api_coordinates.csv": {"sha256": sha256(API_COORDS_CSV)},
             "facility_gauge_links.csv": {"rows": len(links), "sha256": sha256(LINKS_CSV)},
             "chungbuk_underpass_candidates.csv": {"rows": len(chungbuk), "sha256": sha256(CHUNGBUK_CSV)},
             "registry.json": {"operational": len(operational), "sha256": sha256(REGISTRY_JSON)},
