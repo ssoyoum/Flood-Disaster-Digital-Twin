@@ -1,5 +1,30 @@
 # WORKLOG
 
+## 지침 기준 보드 공개 서버 배포
+
+- 작업일: 2026-10-29
+
+주요 작업:
+- `main`(b753588)을 `preview/ia-official-criteria`에 병합했다(`bb9cddf`, 로컬). `WORKLOG.md`만 충돌해 양쪽 기록을 모두 남겼다.
+- 공개 서버(`floodops.duckdns.org`) 컨테이너를 `floodops:c71e78a`에서 `floodops:bb9cddf`로 교체했다. 프런트는 로컬에서 `VITE_API_BASE=same-origin`으로 빌드하고, `deploy/build_context.py` 묶음에서 프런트 소스를 뺀 뒤 `dist`를 넣어 서버에서는 Python 이미지만 빌드했다. 이전 이미지는 `floodops:rollback`(= c71e78a)으로 다시 태그했다.
+- 컨테이너 설정은 그대로 뒀다(127.0.0.1:8000, 600 MB, `--env-file /etc/floodops.env`, `floodops-local`·`floodops-interim` 볼륨, `unless-stopped`).
+
+검증 결과:
+- 로컬: `tsc -b && vite build` 통과(번들 `index-PFYxu7Y4.js`). `pytest` 296 통과·40 실패였고, 실패 원인을 다시 모아 보니 `OSError: [WinError 10014]` 소켓 오류였다. 처음 `-x` 실행에서 실패한 `test_model_number_formats_are_normalised_before_validation`은 단독 실행에서 통과했다.
+- 서버 카나리(127.0.0.1:8001, 같은 이미지): `/health`·`/api/events`·`/api/watch/facility-risk`·`/api/watch/validation-cases`·`/api/twin/facilities`·`/api/twin/mode`·`/api/cases/lead-times`·`/`·`/watch-board-integration.html`·`/twin-now-c.html` 전부 200, OpenAPI 경로 55개, 위험 응답에 `guideline` 포함, 메모리 382 MiB / 600 MiB, 로그 오류 없음.
+- 교체 후 공개 주소 `floodops.duckdns.org`·`floodops.54-180-81-225.sslip.io`의 `/health`·`/api/watch/facility-risk`·`/api/twin/facilities`·`/` 200, 번들 `index-PFYxu7Y4.js`. 반지하(`54-180-81-225.sslip.io`) 200.
+- 계정 크레딧 $107.52(만료 2027-03-08), 서버 swap 2 GB 기존 존재, 디스크 여유 9.8 GB.
+
+문제/해결:
+- 문제: 새 버전을 올리면 무료 크레딧 한도를 넘거나 1 GB 서버 메모리가 모자라, 반지하 컨테이너를 내려야 하는지 판단이 필요했다. 반지하를 내리면 포트폴리오의 주소가 깨진다.
+  해결: `aws freetier get-account-plan-state`와 서버 `docker stats`·`free`로 확인했다. 같은 인스턴스에서 이미지만 바꾸면 비용이 거의 늘지 않고, swap 2 GB가 이미 있어 반지하를 유지한 채 배포했다.
+- 문제: 지침 기준 보드는 `preview/ia-official-criteria`에만 있었고 `main`보다 커밋 5개가 뒤처져 있었다(10-22·10-26 기상청 특보·강우, 도로터널 좌표 관측소 연결).
+  해결: 배포 전에 `main`을 미리보기 브랜치에 병합했다. 원격 푸시는 하지 않았다.
+- 문제: 미리보기 worktree에는 git에 올라간 HRFCO 시계열 7개만 있어 `build_context.py`를 그대로 돌리면 재생 창 시계열이 빠진다. `build_context.py`는 시계열 경로를 `ROOT` 기준 상대 경로로 계산해 다른 폴더의 원본을 받을 수 없다.
+  해결: 묶음 스크립트에서 코드·추적 데이터는 미리보기 HEAD의 `git archive`로, 추적되지 않은 시계열은 `main` 폴더 원본(902 MB)을 같은 재생 창 규칙으로 줄여(38.6 MB) 넣었다. 최종 묶음은 16.5 MB였다.
+- 문제: PowerShell에서 `ssh`에 긴 원격 명령을 넘기면 안쪽 따옴표가 사라져 원격 bash에서 구문 오류가 났다.
+  해결: 원격 명령을 heredoc으로 `ssh ... 'bash -s'`에 넘겼다.
+
 ## Agent offline 기준선 실행과 프론트 구상 브랜치 공유
 
 - 작업일: 2026-10-22
