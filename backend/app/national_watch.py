@@ -192,7 +192,7 @@ def facility_catalog() -> tuple[dict[str, Any], ...]:
                 if row["kind"] == "waterlevel" and row["rank"] == "1" and row["facility_source"] != "twin_registry":
                     raw.append({"facility_id": row["facility_id"], "name": row["facility_name"], "kind": "underpass", "sido": row.get("sido", ""),
                                 "sgg": row.get("sgg") or None, "lon": float(row["facility_lon"]), "lat": float(row["facility_lat"]),
-                                "river_name": None, "source": "국토교통부 지하차도 현황 + OSM 좌표"})
+                                "river_name": None, "source": "국토교통부 지하차도 현황 + 도로터널 API 좌표(없으면 OSM)"})
     if RIVERSIDE_FILE.exists():
         with RIVERSIDE_FILE.open(encoding="utf-8", newline="") as handle:
             for row in csv.DictReader(handle):

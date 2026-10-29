@@ -93,6 +93,7 @@ STARTUP WATER 제안서에 적은 일정과 맞춘다.
 - `python data/scripts/link_facilities_to_gauges.py tunnels --hyear 2024` → `road_tunnels.csv`. 첫 호출에서 실제 좌표 필드명을 확인해 매칭 스크립트에 반영.
 - 국토부 938행과 이름·시군구로 매칭, 좌표는 시작·끝점 중점. 깔때기(3절)를 다시 계산.
 - OSM 터널 도로로 넓혀 본 시도는 13곳만 늘고 대부분 터널·지하보도라 되돌렸다(2026-10-18).
+- 2026-10-26 완료: API 2024년 자료로 938곳 중 722곳 좌표(`match_underpasses_api.py`), 감시 보드 연결 425 → 754곳. 매칭 규칙과 OSM 오매칭은 `docs/UNDERPASS_EXPANSION.md` "공공 API로 확보한 자료". 3절 깔때기 숫자(282·229·93·25·9)는 OSM 좌표 기준이라 다시 계산해야 한다.
 
 ### N-6. 등록 진행 화면
 

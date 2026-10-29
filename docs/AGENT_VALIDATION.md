@@ -208,7 +208,7 @@ python backend/evaluation/agent_benchmark.py --mode offline --output docs/local/
 
 | 실행 | commit / 질문·자료 hash | 모드·분모·skip | 도구 정확도 | 상태/전체 성공 | 근거 가드 n | 금지 주장 n | p50/p95 ms | 토큰·비용 | 판독·원본 |
 |---|---|---|---|---|---|---|---|---|---|
-| 기준선 | 실행 전 고정 | 미실행 | 미측정 | 미측정 | 미측정 | 미측정 | 미측정 | 미측정 | report 경로 |
+| 기준선 (2026-10-22, offline) | `8d64d2d`, Agent 코드 미커밋 없음 / 문항 `c833f1acf851`·프롬프트 `8dcc20b54e04`·시설 프롬프트 `f3c9c16655c8` | offline·gemini 지정·키 공백. benchmark 37(needs_model 6 제외), historical 13, facility 3(replay) | 1.0 (n=25) | 37/37 · 13/13 · 3/3 | 1.0 (n=9) | 0.0 (n=34) | 0 / 9,031 (max 14,250) | 모델 요청 0·토큰 미보고 | 아래 기준선 판독. JSON은 로컬 산출물 |
 | 변경 후 | 같은 조건·후보 commit | 미실행 | 미측정 | 미측정 | 미측정 | 미측정 | 미측정 | 미측정 | report 경로 |
 
 케이스별로 기대 도구/인자·금지 도구·허용 상태·핵심 주장·보류 조건·실패 단계·completion_source도 보존한다. 필수 회귀는 ① 재현 가능한 실패가 발생했거나 ② 입력 계약·자료 신선도·금지 주장이 바뀔 때 추가한다. 기존 케이스가 같은 위험을 검사하면 중복하지 않는다.
@@ -217,7 +217,20 @@ python backend/evaluation/agent_benchmark.py --mode offline --output docs/local/
 
 Live LLM 평가는 질문·history·도구 결과를 외부 provider로 전송하고 요청량/비용을 사용한다. **실행할 case ID·모델·최대 요청량·예상 토큰/상한을 먼저 정해 승인받기 전에는 실행하지 않는다.** Ollama도 외부 유료 API와 구분하되 로컬 프로세스·시간·메모리 비용과 실제 실행 의존성을 기록한다. 예산 초과·반복 HTTP quota 오류 시 중단하고, 해당 실패를 모델 추론 품질 하락으로 해석하지 않는다.
 
-다음 실험 하나: 기존 benchmark를 고정한 offline 기준선을 먼저 저장하고, 숫자·인용을 만족해도 주어·시점이 틀린 답변을 사람이 판독한다. 이 작업은 문서 설계만 했으며 결과 JSON을 생성하거나 테스트 통과를 주장하지 않는다.
+### offline 기준선 판독 (2026-10-22)
+
+위 «먼저 저장할 기준선»의 세 명령과 trace 집계를 Windows 11·Python 3.10.4 로컬에서 실행했다. 환경은 `AGENT_LLM_PROVIDER=gemini`, `GEMINI_API_KEY`·`HRFCO_API_KEY`·`KMA_API_HUB_KEY` 공백이다. CI의 Python 3.12와 다르다. 질문 JSON의 SHA-256(커밋된 내용 `git show 8d64d2d:<경로> | sha256sum` 기준, benchmark 보고서의 `cases_sha256` 앞자리와 일치)은 아래와 같다.
+
+```text
+c899df4c8ce63e1c4856364312267ec599ca682ed8f5172a9cf7ebf195126cec  agent_ask_cases.json
+97d3ba56df78512d3a5afe5844616bd938f60e119a01e77e3ff7fe1f42ed55a1  agent_facility_cases.json
+c833f1acf851d0d95f9be401a38282b457f99f37ead9b45a93542de5419ae96a  agent_benchmark_cases.json
+```
+
+- 세 평가 모두 종료 코드 0이다. 완료 경로는 benchmark가 registered_tools 24·clarification 6·unavailable 3·capability 1, historical이 registered_tools 11·clarification 2, facility가 registered_tools 3이다. 모델 경로 0건이므로 **LLM 도구 선택 성공이 아니라 서버 폴백 성공**이다.
+- trace 집계는 34건(깨진 줄·중복 0), ANSWERED 23·NEEDS_DATA 8·UNAVAILABLE 3이다. 실패 코드는 model/model_unavailable 30(의도한 모델 장애), tool/tool_execution_failed 3(오류 주입 문항)이다.
+- p95 9,031 ms·max 14,250 ms는 2026-10-20 관리형 환경의 p95 1,464 ms보다 크다. 느린 두 건은 `n-facility-criteria` 14,250 ms와 `n-facility-rise` 9,031 ms다. 나머지는 `s-osong-exposure` 2,359 ms 아래다. 환경(OS·Python·디스크)이 달라 같은 지표로 비교하지 않고, 원인은 아직 분해하지 않았다.
+- 사람 판독(주어·시점이 틀린 답변)은 이번에 하지 않았다. 다음 실험은 이 기준선 JSON을 고정한 채 그 판독을 하는 것이다.
 
 
 

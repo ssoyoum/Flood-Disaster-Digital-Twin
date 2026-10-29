@@ -1,0 +1,72 @@
+{
+ "event": "busan-choryang-2020-07-23",
+ "generated_at": "2026-10-26T17:04:31",
+ "source": "KMA API hub wrn_now_data.php with tm (alerts in effect at that minute)",
+ "areas": [
+  "부산광역시"
+ ],
+ "window_kst": {
+  "start": "2020-07-23T06:00",
+  "end": "2020-07-24T03:00",
+  "step_min": 10
+ },
+ "samples": 127,
+ "requests_failed": [],
+ "changes": [
+  {
+   "area": "부산광역시",
+   "first_sampled_at": "2020-07-23T06:00",
+   "level": "none",
+   "level_ko": "",
+   "issued_at": "",
+   "effective_at": "",
+   "in_effect": "",
+   "command": ""
+  },
+  {
+   "area": "부산광역시",
+   "first_sampled_at": "2020-07-23T13:00",
+   "level": "advisory",
+   "level_ko": "호우주의보",
+   "issued_at": "2020-07-23T13:00",
+   "effective_at": "2020-07-23T14:00",
+   "in_effect": "false",
+   "command": "발표"
+  },
+  {
+   "area": "부산광역시",
+   "first_sampled_at": "2020-07-23T14:00",
+   "level": "advisory",
+   "level_ko": "호우주의보",
+   "issued_at": "2020-07-23T13:00",
+   "effective_at": "2020-07-23T14:00",
+   "in_effect": "true",
+   "command": "발표"
+  },
+  {
+   "area": "부산광역시",
+   "first_sampled_at": "2020-07-23T20:00",
+   "level": "warning",
+   "level_ko": "호우경보",
+   "issued_at": "2020-07-23T20:00",
+   "effective_at": "2020-07-23T20:00",
+   "in_effect": "true",
+   "command": "변경"
+  },
+  {
+   "area": "부산광역시",
+   "first_sampled_at": "2020-07-24T00:30",
+   "level": "none",
+   "level_ko": "",
+   "issued_at": "",
+   "effective_at": "",
+   "in_effect": "",
+   "command": ""
+  }
+ ],
+ "note": "issued_at is KMA TM_FC of the zone's latest command. in_effect=false means that command takes effect later; the alert it replaces is not returned, so the level in effect during that gap is unknown. level 'none' means no heavy-rain row for the zone.",
+ "output": {
+  "path": "data/processed/kma/events/busan-choryang-2020-07-23_warnings.csv",
+  "sha256": "6963a64d397c7c506b2be1c99abf6076d67b97a7440360015064b0d57e09cb37"
+ }
+}

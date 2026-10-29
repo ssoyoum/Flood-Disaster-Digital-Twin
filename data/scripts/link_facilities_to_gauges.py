@@ -33,6 +33,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import unquote
 
 import httpx
 
@@ -68,7 +69,8 @@ def fetch_tunnels(hyear: int, page_size: int = 1000) -> dict[str, Any]:
         load_dotenv(REPO_ROOT / ".env", override=False)
     except ImportError:
         pass
-    key = os.environ.get("DATA_GO_KR_SERVICE_KEY", "").strip()
+    # data.go.kr issues an already URL-encoded key; httpx would encode it again (%2F -> %252F).
+    key = unquote(os.environ.get("DATA_GO_KR_SERVICE_KEY", "").strip())
     if not key:
         sys.exit("DATA_GO_KR_SERVICE_KEY is not set. Issue a data.go.kr key and apply for 국토교통부_도로 교량 및 터널 현황정보 (1613000/btiData).")
     RAW_TUNNELS.mkdir(parents=True, exist_ok=True)
@@ -81,7 +83,8 @@ def fetch_tunnels(hyear: int, page_size: int = 1000) -> dict[str, Any]:
             payload = json.loads(raw.read_text(encoding="utf-8"))
         else:
             response = httpx.get(TUNNEL_ENDPOINT, params={"serviceKey": key, "responseType": "json", "numOfRows": page_size, "pageNo": page, "hyear": hyear}, timeout=90)
-            response.raise_for_status()
+            if response.is_error:
+                sys.exit(f"HTTP {response.status_code} on page {page}: {response.text[:300]}")
             payload = response.json()
             raw.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
             time.sleep(0.3)
@@ -119,7 +122,8 @@ def _pick(row: dict[str, Any], names: tuple[str, ...]) -> str | None:
     return None
 
 
-def facilities_from_sources(csv_path: Path | None, name_col: str | None, lat_col: str | None, lon_col: str | None) -> list[dict[str, Any]]:
+def facilities_from_sources(csv_path: Path | None, name_col: str | None, lat_col: str | None, lon_col: str | None,
+                            id_prefix: str | None = None, sido_col: str | None = None, sgg_col: str | None = None) -> list[dict[str, Any]]:
     sites: list[dict[str, Any]] = []
     try:
         from app.twin import FACILITIES  # registered twin facilities
@@ -134,7 +138,8 @@ def facilities_from_sources(csv_path: Path | None, name_col: str | None, lat_col
                 name = row.get(name_col or "name")
                 lat, lon = row.get(lat_col or "latitude"), row.get(lon_col or "longitude")
                 if name and lat and lon:
-                    sites.append({"source": csv_path.name, "id": f"{csv_path.stem}:{i + 1}", "name": name, "lon": float(lon), "lat": float(lat)})
+                    sites.append({"source": csv_path.name, "id": f"{id_prefix or csv_path.stem}:{i + 1}", "name": name, "lon": float(lon), "lat": float(lat),
+                                  "sido": row.get(sido_col, "") if sido_col else "", "sgg": row.get(sgg_col, "") if sgg_col else ""})
     elif TUNNELS_CSV.exists():
         with TUNNELS_CSV.open(encoding="utf-8-sig", newline="") as handle:
             for i, row in enumerate(csv.DictReader(handle)):
@@ -173,13 +178,16 @@ def main() -> None:
     l.add_argument("--name-col", default=None)
     l.add_argument("--lat-col", default=None)
     l.add_argument("--lon-col", default=None)
+    l.add_argument("--id-prefix", default=None, help="facility id prefix (default: CSV stem); keep ids stable when the coordinate source changes")
+    l.add_argument("--sido-col", default=None)
+    l.add_argument("--sgg-col", default=None)
     l.add_argument("--max-km", type=float, default=5.0)
     l.add_argument("--top", type=int, default=3)
     args = parser.parse_args()
     if args.command == "tunnels":
         print(json.dumps(fetch_tunnels(args.hyear), ensure_ascii=False, indent=1))
         return
-    sites = facilities_from_sources(args.csv, args.name_col, args.lat_col, args.lon_col)
+    sites = facilities_from_sources(args.csv, args.name_col, args.lat_col, args.lon_col, args.id_prefix, args.sido_col, args.sgg_col)
     rows = link(sites, args.max_km, args.top)
     LINKS_CSV.parent.mkdir(parents=True, exist_ok=True)
     with LINKS_CSV.open("w", encoding="utf-8", newline="") as handle:

@@ -1,0 +1,46 @@
+{
+ "generated_at": "2026-10-26T19:58:10",
+ "source_endpoint": "https://apis.data.go.kr/1613000/btiData/getTunlList",
+ "inputs": {
+  "catalog": {
+   "path": "data/processed/facilities/underpass_coordinates.csv",
+   "rows": 938
+  },
+  "road_tunnels": {
+   "path": "data/processed/facilities/road_tunnels.csv",
+   "rows": 3924,
+   "underpass_rows": 927,
+   "underpass_rows_with_valid_start": 897
+  }
+ },
+ "catalog_rows": 938,
+ "api_status": {
+  "API_VALID": 722,
+  "NO_API_MATCH": 194,
+  "API_INVALID_COORD": 22
+ },
+ "with_osm_coordinate": 424,
+ "with_api_coordinate": 722,
+ "with_either_coordinate": 757,
+ "api_only_new_coordinates": 333,
+ "api_underpasses_not_in_catalog": 175,
+ "osm_vs_api_distance_m": {
+  "pairs": 389,
+  "median": 17,
+  "p90": 207,
+  "over_1000m": 22
+ },
+ "best_coordinate_source": {
+  "api": 722,
+  "osm": 31,
+  "none": 185
+ },
+ "api_point_shared_by_several_catalog_rows": 35,
+ "osm_point_is_other_facility": 7,
+ "osm_point_dropped": 4,
+ "output": {
+  "path": "data/processed/facilities/underpass_api_coordinates.csv",
+  "sha256": "f4904ad988303cee5863adbd345b08c0615292e02c3f17286a448b2a5dd5f763"
+ },
+ "note": "API coordinates are the mean of start/end points of the tunnel record, not the underpass low point. A catalog row matched by name is a candidate match; rows with large OSM/API distance need review."
+}
