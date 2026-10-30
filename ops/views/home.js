@@ -4,17 +4,20 @@ import { arrow, cached, esc, num, splitBar, unitDots, yearBars } from "../lib.js
 const CYCLE = `<figure class="op-cycle" aria-label="장마 전·중·후 업무 순환">
   <svg viewBox="0 0 460 330" role="img">
     <defs><marker id="op-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#71717a"/></marker></defs>
-    <path class="edge" d="M110 192 L178 112" marker-end="url(#op-arrow)"/>
-    <path class="edge" d="M282 112 L350 192" marker-end="url(#op-arrow)"/>
-    <path class="edge back" d="M268 262 C 240 300, 220 300, 192 262" marker-end="url(#op-arrow)"/>
+    <path class="edge flow" d="M110 192 L178 112" marker-end="url(#op-arrow)"/>
+    <path class="edge flow" d="M282 112 L350 192" marker-end="url(#op-arrow)"/>
+    <path class="edge back flow" d="M268 262 C 240 300, 220 300, 192 262" marker-end="url(#op-arrow)"/>
     <text class="backlabel" x="230" y="316" text-anchor="middle">다음 해 기준 수정</text>
     ${[
       { x: 30, y: 196, season: "장마 전", title: "시설 기준", sub: "어떤 신호로 몇 분 전에", href: "#/facility" },
       { x: 150, y: 24, season: "장마 중", title: "관제 보드", sub: "지금 어디를 먼저", href: "#/watch" },
       { x: 270, y: 196, season: "장마 후", title: "기준 채점", sub: "실제 통제보다 빨랐나", href: "#/scorecard" },
-    ].map((n) => `<a href="${n.href}"><g class="node" transform="translate(${n.x} ${n.y})"><rect width="160" height="84" rx="12"/><text class="season" x="16" y="26">${n.season}</text><text class="title" x="16" y="52">${n.title}</text><text class="sub" x="16" y="72">${n.sub}</text></g></a>`).join("")}
+    ].map((n, i) => `<a href="${n.href}" aria-label="${n.season} ${n.title} 화면 열기"><g class="node" transform="translate(${n.x} ${n.y})" style="--i:${i}">
+      <rect class="ring" width="160" height="84" rx="12"/><rect class="card" width="160" height="84" rx="12"/>
+      <text class="season" x="16" y="26">${n.season}</text><text class="title" x="16" y="52">${n.title}</text><text class="sub" x="16" y="72">${n.sub}</text>
+      <text class="go" x="146" y="26" text-anchor="end">열기 →</text></g></a>`).join("")}
   </svg>
-  <figcaption><a href="#/cases">사례 재구성</a>은 세 시기를 뒷받침하는 근거 자료입니다.</figcaption>
+  <figcaption>상자를 누르면 그 시기의 화면으로 갑니다 · <a href="#/cases">사례 재구성</a>은 세 시기를 뒷받침하는 근거 자료입니다.</figcaption>
 </figure>`;
 
 function kpi({ label, value, unit, color, chart, caption }) {
@@ -75,6 +78,10 @@ export async function renderHome(view) {
       foot: [["오송 HAND 시뮬레이션", "2023 · 붕괴 시각까지 단계별 범위", "osong-2023"], ["서울 도림천", "2022 · 내수 침수", "seoul-2022"], ["포항 냉천", "2022 · 지하주차장", "pohang-2022"], ["안동·의성", "2026 · 대피명령", "andong-uiseong-2026"]]
         .map(([t, s, id]) => `<a class="op-mini-link" href="#/cases/${id}"><b>${t}</b><span>${arrow}</span><small>${s}</small></a>`).join("") },
   ].map((d) => `<article class="op-door">
+      <a class="op-door-shot" href="#/${d.id}" tabindex="-1" aria-hidden="true">
+        <img src="previews/${d.id}.jpg" alt="" loading="lazy" width="720" height="450">
+        <span>화면 열기 ${arrow}</span>
+      </a>
       <a class="op-door-head" href="#/${d.id}"><span class="op-chip">${d.season}</span><b>${d.title}${arrow}</b><em>${d.q}</em></a>
       ${d.points.length ? `<ul>${d.points.map((p) => `<li>${p}</li>`).join("")}</ul>` : ""}
       ${d.foot ? `<div class="op-door-foot">${d.foot}</div>` : ""}

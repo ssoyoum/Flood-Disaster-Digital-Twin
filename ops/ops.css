@@ -81,8 +81,30 @@ button { font: inherit; color: inherit; }
 .op-cycle svg { display: block; width: 100%; max-width: 480px; height: auto; margin: 0 auto; }
 .op-cycle .edge { fill: none; stroke: #52525b; stroke-width: 1.6; }
 .op-cycle .edge.back { stroke-dasharray: 4 5; }
-.op-cycle .node rect { fill: var(--panel); stroke: #3f3f46; stroke-width: 1.2; }
-.op-cycle a:hover .node rect { stroke: var(--ui); }
+.op-cycle a { cursor: pointer; outline: none; }
+.op-cycle .node rect.card { fill: var(--panel); stroke: #3f3f46; stroke-width: 1.2; transition: fill .2s, stroke .2s, filter .2s;
+  animation: op-node-glow 4.5s ease-in-out infinite; animation-delay: calc(var(--i) * 1.5s); }
+.op-cycle .node rect.ring { fill: none; stroke: var(--green); stroke-width: 2; opacity: 0; transform-box: fill-box; transform-origin: center;
+  animation: op-node-ring 4.5s ease-out infinite; animation-delay: calc(var(--i) * 1.5s); pointer-events: none; }
+.op-cycle .node .go { fill: var(--green); font-size: 11px; font-weight: 800; opacity: 0; transition: opacity .2s; }
+.op-cycle a:hover .node rect.card, .op-cycle a:focus-visible .node rect.card { fill: #1f2a26; stroke: var(--green); stroke-width: 2; filter: drop-shadow(0 0 10px rgba(52,211,153,.45)); animation: none; }
+.op-cycle a:hover .node .go, .op-cycle a:focus-visible .node .go { opacity: 1; }
+.op-cycle a:hover .node .title, .op-cycle a:focus-visible .node .title { fill: #fff; }
+.op-cycle .edge.flow { stroke-dasharray: 6 6; animation: op-edge-flow 1.2s linear infinite; }
+.op-cycle .edge.back.flow { stroke-dasharray: 4 5; }
+@keyframes op-node-glow {
+  0%, 22%, 100% { stroke: #3f3f46; filter: none; }
+  8% { stroke: var(--green); filter: drop-shadow(0 0 8px rgba(52,211,153,.55)); }
+}
+@keyframes op-node-ring {
+  0% { opacity: .9; transform: scale(1); }
+  20% { opacity: 0; transform: scale(1.12); }
+  100% { opacity: 0; transform: scale(1.12); }
+}
+@keyframes op-edge-flow { to { stroke-dashoffset: -12; } }
+@media (prefers-reduced-motion: reduce) {
+  .op-cycle .node rect.card, .op-cycle .node rect.ring, .op-cycle .edge.flow { animation: none; }
+}
 .op-cycle .season { fill: var(--muted); font-size: 12px; font-weight: 700; }
 .op-cycle .title { fill: var(--text); font-size: 19px; font-weight: 800; }
 .op-cycle .sub { fill: var(--dim); font-size: 12px; }
@@ -103,7 +125,15 @@ button { font: inherit; color: inherit; }
 
 .op-doors { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .op-door { min-width: 0; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
-.op-door:has(.op-door-head:hover) { border-color: var(--ui); }
+.op-door { transition: border-color .2s, transform .2s, box-shadow .2s; }
+.op-door:has(.op-door-head:hover), .op-door:has(.op-door-shot:hover) { border-color: var(--green); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+.op-door-shot { position: relative; display: block; overflow: hidden; border-radius: 8px; border: 1px solid var(--line); aspect-ratio: 16 / 10; background: #0b0b0e; }
+.op-door-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; transition: transform .35s ease, filter .35s; filter: saturate(.9) brightness(.85); }
+.op-door-shot span { position: absolute; right: 8px; bottom: 8px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 999px;
+  background: rgba(9,9,11,.82); border: 1px solid rgba(52,211,153,.5); color: var(--green); font-size: 11.5px; font-weight: 800; opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; }
+.op-door:hover .op-door-shot img { transform: scale(1.04); filter: none; }
+.op-door:hover .op-door-shot span { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .op-door, .op-door-shot img { transition: none; } .op-door:hover .op-door-shot img { transform: none; } }
 .op-door-head { display: flex; flex-direction: column; gap: 3px; text-decoration: none; }
 .op-door-head .op-chip { align-self: flex-start; }
 .op-door-head b { font-size: 17px; display: flex; align-items: center; justify-content: space-between; }
