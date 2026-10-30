@@ -4811,3 +4811,27 @@ UI 보완:
   해결: CI와 같이 저장소 루트에서 `python -m pytest backend/tests`로 실행했다.
 - 문제: 전체 테스트 실패가 13 → 47 → 64개로 늘고, 등록부 409 테스트는 작업 트리에서 연속 실패해 이번 후보 변경 탓인지 판단이 필요했다.
   해결: 실패 메시지를 직접 확인하고(WinError 10014, 이벤트 루프 생성 단계), HEAD worktree와 실패율을 비교해 변경 전부터 있는 오류임을 확인했다. 재시도로 모든 테스트가 한 번 이상 통과한 것까지만 기록하고 "전체 통과"로 쓰지 않는다.
+
+## 4탭 운영 앱(`ops/`) 공개 서버 배포
+
+- 작업일: 2026-10-30
+
+주요 작업:
+- `main`(b753588)을 `ops-app`에 병합했다(`a3362d3`). 관제 보드 html은 `main`의 지도 분리 구조(`initMap`·`mapUnavailable`)를 쓰고, `ops-app`의 «채점 화면에서 넘어온 시각 추가»와 `tab=vc` 열기를 `init()`에 옮겼다. React 앱 충돌(`App.tsx`·`DarkConsole.tsx`·`Landing.tsx`)은 `ops-app` 쪽, `dark.css`는 재생 바 고정이 들어간 `main` 쪽을 썼다.
+- `ops/lib.js` 기본 API 주소를 `/ops/`로 열 때만 `http://127.0.0.1:8091`, 서버가 루트에서 내보낼 때는 같은 주소로 바꿨다(`0fe6833`).
+- 공개 서버(`floodops.duckdns.org`) 컨테이너를 `floodops:bb9cddf`에서 `floodops:ops-0fe6833`으로 교체했다. 정적 폴더 루트에 `ops/` 파일을, 그 아래 `public/`에 관제 보드·트윈 html을 두어 `../public/...` 상대 주소가 그대로 맞게 했다. `floodops:rollback`(= c71e78a)과 `floodops:bb9cddf`는 서버에 남겼다.
+
+검증 결과:
+- `tsc -b` 통과. 병합 코드 + 메인 데이터로 `test_scorecard_routes`·`test_closure_season`·`test_agent_facility`·`test_kma_weather_warning`·`test_national_watch` 62개 중 60 통과·2 실패였다. 기준 후보 개수 실패는 테스트 기대값을 12로 고쳤고, 지역 필터 실패는 로컬 확장 자료(저장 관측소 224곳) 때문이며 그 수정은 `main` 작업 트리에 미커밋으로 이미 있다.
+- 로컬 8092(서버와 같은 루트 서빙)에서 홈·관제 보드·기준 채점·시설 기준·사례 재구성 화면을 Chrome으로 확인했다.
+- 서버 카나리(127.0.0.1:8001): 화면 파일 8개와 `/api/twin/facilities`·`/api/watch/flood-forecasts`·`facility-risk`·`flood-forecast-history`·`validation-cases`·궁평2 `scorecard`·`season-scorecard?season=2023`·`backtest?points=true`·`/api/events` 전부 200, 메모리 396 MiB / 600 MiB, 로그 오류 없음.
+- 교체 후 `floodops.duckdns.org`·`floodops.54-180-81-225.sslip.io`의 `/health`·`/`·`/app.js`·`/public/watch-board-integration.html`·궁평2 `scorecard` 200, Chrome 콘솔 오류 0. 반지하 200.
+
+문제/해결:
+- 문제: 10-29에 «새 기획안»을 지침 기준 미리보기(`preview/ia-official-criteria`)로 잘못 알고 배포했다. 사용자가 뜻한 것은 «오송을 빼고 4탭»으로 가기로 한 `ops/` 앱이었고, 이 결정은 문서·작업 기록 어디에도 남아 있지 않았다.
+  해결: `ops/` 앱을 로컬에서 띄워 사용자에게 화면으로 확인받은 뒤 배포했다. «오송을 뺀다»의 범위(사례 재구성의 오송 HAND만인지, 운영 시설 궁평2까지인지)는 아직 확인받지 않아 이번 배포에는 반영하지 않았다.
+- 문제: `ops/`는 기본 API가 `http://127.0.0.1:8091`로 고정돼 공개 서버에서 그대로 쓰면 방문자 PC의 8091을 부른다.
+  해결: 경로가 `/ops/`일 때만 로컬 API를 쓰도록 했다. `?api=`는 그대로 우선한다.
+- 문제: 첫 서버 빌드가 `COPY dist ./dist`에서 실패했다. 묶음 스크립트가 `build_context.main()`을 부르려고 `sys.argv`를 덮어써서 정적 폴더 인자를 잃었고, 빈 `dist`로 묶였다.
+  해결: 인자를 먼저 저장하고 `dist/index.html`이 없으면 묶기를 멈추게 했다.
+- 남은 것: 예전 React 앱 주소(`/#twin`, `/#event/...`)로 들어오면 이제 `ops/` 홈이 열린다. 포트폴리오 등에 걸린 링크가 특정 화면을 가리키면 새 주소(`/#/facility`, `/#/cases` 등)로 바꿔야 한다.
