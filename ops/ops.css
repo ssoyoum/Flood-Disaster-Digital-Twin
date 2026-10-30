@@ -128,12 +128,14 @@ button { font: inherit; color: inherit; }
 .op-door { transition: border-color .2s, transform .2s, box-shadow .2s; }
 .op-door:has(.op-door-head:hover), .op-door:has(.op-door-shot:hover) { border-color: var(--green); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.35); }
 .op-door-shot { position: relative; display: block; overflow: hidden; border-radius: 8px; border: 1px solid var(--line); aspect-ratio: 16 / 10; background: #0b0b0e; }
-.op-door-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; transition: transform .35s ease, filter .35s; filter: saturate(.9) brightness(.85); }
+.op-door-shot svg { display: block; width: 100%; height: 100%; transition: transform .35s ease, filter .35s; filter: saturate(.9) brightness(.9); }
+.op-door-shot svg .pulse { transform-box: fill-box; transform-origin: center; animation: op-dot-pulse 1.8s ease-in-out infinite; }
+@keyframes op-dot-pulse { 50% { transform: scale(1.8); opacity: .55; } }
 .op-door-shot span { position: absolute; right: 8px; bottom: 8px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 999px;
   background: rgba(9,9,11,.82); border: 1px solid rgba(52,211,153,.5); color: var(--green); font-size: 11.5px; font-weight: 800; opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; }
-.op-door:hover .op-door-shot img { transform: scale(1.04); filter: none; }
+.op-door:hover .op-door-shot svg { transform: scale(1.04); filter: none; }
 .op-door:hover .op-door-shot span { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) { .op-door, .op-door-shot img { transition: none; } .op-door:hover .op-door-shot img { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .op-door, .op-door-shot svg { transition: none; } .op-door:hover .op-door-shot svg { transform: none; } .op-door-shot svg .pulse { animation: none; } }
 .op-door-head { display: flex; flex-direction: column; gap: 3px; text-decoration: none; }
 .op-door-head .op-chip { align-self: flex-start; }
 .op-door-head b { font-size: 17px; display: flex; align-items: center; justify-content: space-between; }

@@ -1159,7 +1159,7 @@ body.wx-in-shell .demo-top { display: none; }
     driverButton.textContent = st.driver === "river" ? "하천형만" : st.driver === "pluvial" ? "내수형만" : "전체 유형";
     driverButton.setAttribute("aria-pressed", String(st.driver !== "all"));
     $("wx-asof").innerHTML = `<b>${clock(st.overview?.observed_at ?? st.overview?.rain_at ?? st.at)}</b> 강우·수위 판단 기준 · ${esc(st.region || "전국")} · ${base().length}곳`;
-    $("wx-mode").textContent = st.overview?.mode === "replay" ? "과거 수위 재생" : "실시간 수위";
+    $("wx-mode").textContent = st.overview?.mode === "simulation" ? `가상 강우 테스트 · ${st.overview.simulation?.label ?? ""}` : st.overview?.mode === "replay" ? "과거 수위 재생" : "실시간 수위";
     $("wx-live").classList.toggle("wx-is-live", st.overview?.mode === "live");
     renderSummary(); renderRegions(); renderList(); paintMap();
   }
@@ -1169,13 +1169,17 @@ body.wx-in-shell .demo-top { display: none; }
   }
   async function load() {
     // 검증 사례에서 넘어온 시각은 그날 강우로 재생한다(채점과 같은 조건). 직접 고른 시각은 현재 강우를 함께 본다.
-    const rainReplay = Boolean(st.at && st.rainReplay);
+    // «sim:<preset>»은 테스트용 가상 강우다. 실제 관측·특보 대신 가상 폭우로 단계를 매긴다.
+    const sim = st.at.startsWith("sim:") ? st.at.slice(4) : null;
+    const at = sim ? "" : st.at;
+    const rainReplay = Boolean(at && st.rainReplay);
     const query = new URLSearchParams({ limit: "2000", rain_mode: rainReplay ? "replay" : "live" });
-    if (st.at) query.set("at", st.at);
+    if (at) query.set("at", at);
+    if (sim) query.set("sim", sim);
     const data = adaptFacilityRisk(await get(`/api/watch/facility-risk?${query}`)); st.overview = data; st.changes = null;
     const rainAvailable = Boolean(data.rain_at);
-    root.dispatchEvent(new CustomEvent("wx:mode", { detail: { mode: data.mode, stations: data.counts?.total ?? data.stations.length,
-      observed: data.stations.length, observed_at: data.observed_at, rain: { mode: rainAvailable ? (rainReplay ? "replay" : "live") : "unavailable", available: rainAvailable, observed_at: data.rain_at, basis: data.rain_basis } } }));
+    root.dispatchEvent(new CustomEvent("wx:mode", { detail: { mode: data.mode, simulation: data.simulation ?? null, stations: data.counts?.total ?? data.stations.length,
+      observed: data.stations.length, observed_at: data.observed_at, rain: { mode: !rainAvailable ? "unavailable" : sim ? "simulation" : rainReplay ? "replay" : "live", available: rainAvailable, observed_at: data.rain_at, basis: data.rain_basis } } }));
     $("wx-limits").innerHTML = (data.limitations ?? []).map((x) => `<li>${esc(x)}</li>`).join("");
     if (st.selected && !data.stations.some((r) => r.code === st.selected)) { st.selected = null; openDrawer(false); }
     renderAll(); if (st.selected) renderStation(st.selected);
@@ -1318,6 +1322,12 @@ body.wx-in-shell .demo-top { display: none; }
       [...$("wx-time").options].filter((o) => o.value).forEach((o) => o.remove());
       $("wx-tab-vc").hidden = true;
     }
+    // 비가 오지 않을 때 단계·필터·정렬을 시험해 보는 가상 강우. 실제 관측이 아니라는 표시를 함께 붙인다.
+    const simGroup = document.createElement("optgroup");
+    simGroup.label = "테스트 · 가상 강우";
+    [["central", "중부 집중호우(서울·경기)"], ["chungcheong", "충청 국지성 호우(청주·대전)"], ["south", "남부 장마전선(광주~부산)"]]
+      .forEach(([id, label]) => simGroup.appendChild(new Option(`가상 · ${label}`, `sim:${id}`)));
+    $("wx-time").appendChild(simGroup);
     // 기준 채점 화면에서 넘어온 시각은 목록에 없을 수 있다.
     if (st.at && ![...$("wx-time").options].some((o) => o.value === st.at)) $("wx-time").add(new Option(`${st.at.slice(0, 16).replace("T", " ").replaceAll("-", ".")} · 그날 재생`, st.at));
     $("wx-time").value = st.at;

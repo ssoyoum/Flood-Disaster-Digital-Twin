@@ -29,6 +29,7 @@ from . import flood_forecast as ff
 from . import kma_aws
 from . import kma_weather_warning as kww
 from . import national_watch as nw
+from . import rain_simulation as rs
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RESEARCH_FILE = REPO_ROOT / "docs" / "research" / "underpass_river_influence" / "facility_river_influence_ranked.csv"
@@ -345,9 +346,11 @@ def _short_time(stamp: str, at: str | None) -> str:
 
 # ---- assessment ---------------------------------------------------------------------------------------
 def facility_risk(at: str | None = None, region: str | None = None, driver: str | None = None, limit: int = 300,
-                  rain_mode: str | None = None) -> dict[str, Any]:
+                  rain_mode: str | None = None, sim: str | None = None) -> dict[str, Any]:
     """Rank facilities by the linked flood driver and apply only time-valid official warning floors."""
     status = nw.facility_status(at, region, None, 2000, rain_mode)
+    if sim is not None and sim not in rs.PRESETS:
+        raise ValueError(f"unknown rain simulation: {sim}")
     if rain_mode == "live":
         rain_at, totals = _live_totals()
         rain_at, totals, basis = _with_kma(rain_at, totals, "실시간 10분·시간별 강우 누적(시간별 자료는 로컬 캐시에 저장)")
@@ -367,6 +370,25 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
         warning_feed = kww.current()
         warning_mode = "live"
     weather_alerts = warning_feed.get("active", []) if warning_feed.get("available") else []
+    simulation = None
+    if sim:
+        # Test scenario: synthetic storm over every known rain gauge, river stages lifted from it, no official feeds.
+        preset = rs.PRESETS[sim]
+        simulation = rs.describe(sim)
+        all_codes = set(totals) | set(nw.rain_gauges()) | {f"kma:{stn}" for stn in kma_aws.stations()}
+        gauges = {code: _gauge(code) for code in all_codes}
+        totals = {code: rs.rain_at(preset, g.lon, g.lat) for code, g in gauges.items() if g is not None}
+        basis = f"가상 강우(테스트) · {preset['label']} · 중심 1시간 {preset['peak_1h_mm']:.0f} mm"
+        official, weather_alerts = {}, []
+        warning_feed, warning_mode = {"available": False, "fetched_at": None, "active": [], "error": None}, "simulation"
+        stations = nw.stations()
+        for item in status["facilities"]:
+            station = stations.get(item.get("station_code") or "")
+            if station is None:
+                continue
+            stage = rs.lifted_stage(item.get("stage"), rs.rain_at(preset, station.lon, station.lat)["rain_3h_mm"])
+            if stage != item.get("stage"):
+                item.update(stage=stage, stage_label=f"{rs.STAGE_KO[stage]}(가상)", minutes_to_planned_flood=None)
     codes = set(totals)
     rows = []
     for item in status["facilities"]:
@@ -461,6 +483,16 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
         if gauge is None:
             continue
         rain_rows.append({"code": code, "name": gauge.name, "region": gauge.region, "lon": gauge.lon, "lat": gauge.lat, **values})
+    if simulation:
+        return {"mode": "simulation", "simulation": simulation, "at": status["at"], "observed_at": status.get("observed_at"),
+                "rain_at": status["at"], "rain_basis": basis,
+                "weather_warning_feed": {"mode": "simulation", "available": False, "fetched_at": None, "active_areas": 0, "error": None,
+                                         "source": "가상 강우 테스트에서는 특보를 쓰지 않음"},
+                "filter": {"region": region, "driver": driver}, "counts": counts, "facilities": rows[:limit], "rain_gauges": rain_rows,
+                "thresholds": {"rain_3h_advisory_mm": RAIN_3H_ADVISORY_MM, "rain_3h_warning_mm": RAIN_3H_WARNING_MM,
+                               "rain_12h_advisory_mm": RAIN_12H_ADVISORY_MM, "rain_12h_warning_mm": RAIN_12H_WARNING_MM,
+                               "rain_1h_strong_mm": RAIN_1H_STRONG_MM},
+                "limitations": [rs.LIMITATION, *LIMITATIONS]}
     return {"mode": status["mode"], "at": status["at"], "observed_at": status.get("observed_at"),
             "rain_at": rain_at.isoformat() if rain_at else None, "rain_basis": basis,
             "weather_warning_feed": {"mode": warning_mode, "available": bool(warning_feed.get("available")),

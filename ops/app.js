@@ -32,7 +32,9 @@ function renderTabs(active) {
 
 function renderStatus(active) {
   const pills = [];
-  if (active === "watch" && watchStatus) {
+  if (active === "watch" && watchStatus?.mode === "simulation") {
+    pills.push(`<span class="op-pill hot"><i></i>가상 강우 테스트 · ${esc(watchStatus.simulation?.label ?? "")} · 실제 관측 아님</span>`);
+  } else if (active === "watch" && watchStatus) {
     const replay = watchStatus.mode === "replay";
     pills.push(`<span class="op-pill${replay ? " replay" : ""}"><i></i>${replay ? "수위 재생" : "수위 실시간"} · ${esc(watchStatus.stations)}곳</span>`);
     const rain = watchStatus.rain;

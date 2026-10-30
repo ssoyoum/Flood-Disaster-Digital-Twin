@@ -931,13 +931,14 @@ def watch_facility_risk(
     driver: Literal["river", "pluvial"] | None = None,
     limit: int = Query(default=300, ge=1, le=2000),
     rain_mode: Literal["live", "replay"] | None = Query(default=None, description="Use current live rainfall independently from the selected river replay time"),
+    sim: Literal["central", "chungcheong", "south"] | None = Query(default=None, description="Test only: synthetic heavy-rain scenario instead of observed rain and official feeds"),
 ):
     """Every facility ranked by the driver that floods it: river stage for river-type, local rain totals for pluvial."""
 
     from . import facility_risk  # kept local so this route stays a self-contained addition
 
     try:
-        return facility_risk.facility_risk(at, national_watch.match_region(region) if region else None, driver, limit, rain_mode)
+        return facility_risk.facility_risk(at, national_watch.match_region(region) if region else None, driver, limit, rain_mode, sim)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
