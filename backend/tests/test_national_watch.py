@@ -39,9 +39,9 @@ def test_replay_overview_counts_stages_and_links_facilities_by_tier():
 
 
 def test_overview_region_filter_uses_station_regions(monkeypatch):
-    # The committed replay stations can all belong to Chungbuk. Give one stored
-    # station a second region so a filter regression is detectable in any checkout.
-    catalogue = dict(nw.stations())
+    # Control both regions so locally expanded replay archives do not change
+    # the expected population, while a broken region filter still fails.
+    catalogue = {code: replace(station, region="충북") for code, station in nw.stations().items()}
     other = next(code for code in nw.stored_station_codes() if code != "3011665")
     catalogue[other] = replace(catalogue[other], region="서울")
     monkeypatch.setattr(nw, "stations", lambda: catalogue)
