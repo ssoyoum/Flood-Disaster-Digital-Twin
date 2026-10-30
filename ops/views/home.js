@@ -73,7 +73,7 @@ function kpi({ label, value, unit, color, chart, caption }) {
 
 export async function renderHome(view) {
   const [risk, history, registry] = await Promise.all([
-    cached("/api/watch/facility-risk?limit=2000").catch(() => null),
+    cached("/api/watch/facility-risk?limit=10000").catch(() => null),
     cached("/api/watch/flood-forecast-history").catch(() => null),
     cached("/api/twin/registry").catch(() => null),
   ]);

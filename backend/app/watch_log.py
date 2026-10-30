@@ -33,7 +33,7 @@ def log_dir() -> Path:
 def record_once() -> dict[str, Any] | None:
     from . import facility_risk
 
-    risk = facility_risk.facility_risk(limit=2000)
+    risk = facility_risk.facility_risk(limit=10000)
     if risk.get("mode") != "live":
         return None
     line = {"at": risk["at"], "observed_at": risk.get("observed_at"), "rain_at": risk.get("rain_at"), "total": risk["counts"]["total"],

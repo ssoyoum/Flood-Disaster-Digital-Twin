@@ -27,7 +27,7 @@
     data-twin-href  운영 시설 링크. 기본 #twin (앱 라우트)
 
   ▣ 읽는 API
-    GET  /api/watch/facility-risk?at=&rain_mode=live&limit=2000
+    GET  /api/watch/facility-risk?at=&rain_mode=live&limit=10000
     GET  /api/agent/examples?event_id=osong-2023&board=watch
     POST /api/agent/ask   { event_id, message, history, board: "watch", observation_at }
 
@@ -948,7 +948,7 @@ body.wx-in-shell .demo-top { display: none; }
   async function load() {
     const viewParams = new URLSearchParams();
     if (st.at) { viewParams.set("at", st.at); viewParams.set("rain_mode", "live"); }
-    const overviewParams = new URLSearchParams(viewParams); overviewParams.set("limit", "2000");
+    const overviewParams = new URLSearchParams(viewParams); overviewParams.set("limit", "10000");
     const changeParams = new URLSearchParams();
     if (st.at) changeParams.set("at", st.at);
     changeParams.set("since_min", "60");
@@ -1173,7 +1173,7 @@ body.wx-in-shell .demo-top { display: none; }
     const sim = st.at.startsWith("sim:") ? st.at.slice(4) : null;
     const at = sim ? "" : st.at;
     const rainReplay = Boolean(at && st.rainReplay);
-    const query = new URLSearchParams({ limit: "2000", rain_mode: rainReplay ? "replay" : "live" });
+    const query = new URLSearchParams({ limit: "10000", rain_mode: rainReplay ? "replay" : "live" });
     if (at) query.set("at", at);
     if (sim) query.set("sim", sim);
     const data = adaptFacilityRisk(await get(`/api/watch/facility-risk?${query}`)); st.overview = data; st.changes = null;

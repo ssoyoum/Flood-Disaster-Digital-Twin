@@ -110,7 +110,7 @@ def driver_of(facility: dict[str, Any]) -> tuple[str, str]:
     if facility["tier"] == "operational":
         return "river", "운영 등록(시설별 규칙)"
     if facility["group"] == "riverside":
-        return "river", {"riverside_camp": "하천변 야영장", "low_bridge": "세월교·잠수교"}.get(facility.get("kind"), "하천변 출입구")
+        return "river", {"riverside_camp": "하천변 야영장", "low_bridge": "세월교·잠수교", "riverside_sports": "둔치 체육시설"}.get(facility.get("kind"), "하천변 출입구")
     evidence = river_type_underpasses().get(facility["facility_id"])
     duplicate_note = duplicates_of_river_type().get(facility["facility_id"], "")
     if evidence is None and any(name in duplicate_note for name in operational_names()):
@@ -348,7 +348,7 @@ def _short_time(stamp: str, at: str | None) -> str:
 def facility_risk(at: str | None = None, region: str | None = None, driver: str | None = None, limit: int = 300,
                   rain_mode: str | None = None, sim: str | None = None) -> dict[str, Any]:
     """Rank facilities by the linked flood driver and apply only time-valid official warning floors."""
-    status = nw.facility_status(at, region, None, 2000, rain_mode)
+    status = nw.facility_status(at, region, None, 10000, rain_mode)
     if sim is not None and sim not in rs.PRESETS:
         raise ValueError(f"unknown rain simulation: {sim}")
     if rain_mode == "live":

@@ -1,0 +1,1405 @@
+facility_id,name,kind,kind_ko,sido,lon,lat,river_name,river_class,distance_to_river_m,access,source,osm_id
+osm:node/11303906240,가곡천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.272344,37.141509,가곡천,local,8,,OpenStreetMap (ODbL),node/11303906240
+osm:node/11573945850,감률천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.413169,36.814048,감률천,local,0,,OpenStreetMap (ODbL),node/11573945850
+osm:node/11573945756,감률천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.420333,36.814607,감률천,local,0,,OpenStreetMap (ODbL),node/11573945756
+osm:node/11573946228,감률천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.383913,36.817291,감률천,local,2,,OpenStreetMap (ODbL),node/11573946228
+osm:node/11328562167,강촌천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,127.639813,37.795485,강촌천,local,0,,OpenStreetMap (ODbL),node/11328562167
+osm:node/12298733325,건지천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,127.220983,38.138563,건지천,local,0,,OpenStreetMap (ODbL),node/12298733325
+osm:way/137378322,계천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.018651,37.5452,계천,local,0,,OpenStreetMap (ODbL),way/137378322
+osm:node/4616710658,광천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.242319,36.938058,광천,local,0,,OpenStreetMap (ODbL),node/4616710658
+osm:node/4616710694,광천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.261139,36.938752,광천,local,0,,OpenStreetMap (ODbL),node/4616710694
+osm:node/12958845537,궁촌천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,127.835056,37.246069,궁촌천,local,0,,OpenStreetMap (ODbL),node/12958845537
+osm:node/12958845487,궁촌천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,127.844226,37.237488,궁촌천,local,0,,OpenStreetMap (ODbL),node/12958845487
+osm:node/11304532269,나곡천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.358875,37.133631,나곡천,local,0,,OpenStreetMap (ODbL),node/11304532269
+osm:node/11463457726,남대천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.322969,37.039839,남대천,local,0,,OpenStreetMap (ODbL),node/11463457726
+osm:node/11464665208,남대천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.351872,37.024844,남대천,local,0,,OpenStreetMap (ODbL),node/11464665208
+osm:node/11635777629,남대천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.380956,36.732154,남대천,local,0,,OpenStreetMap (ODbL),node/11635777629
+osm:node/11635777432,남대천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.405541,36.71746,남대천,local,0,,OpenStreetMap (ODbL),node/11635777432
+osm:node/5554288165,남대천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.358762,37.023951,남대천,local,5,,OpenStreetMap (ODbL),node/5554288165
+osm:node/7072207857,내린천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.438544,37.827939,내린천,local,0,,OpenStreetMap (ODbL),node/7072207857
+osm:node/10996893302,내린천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.415736,37.831273,내린천,local,0,,OpenStreetMap (ODbL),node/10996893302
+osm:node/11572027299,내린천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.456839,37.818363,내린천,local,0,,OpenStreetMap (ODbL),node/11572027299
+osm:node/4632175638,내린천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.482217,37.794352,내린천,local,0,,OpenStreetMap (ODbL),node/4632175638
+osm:node/11403806093,마읍천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.237017,37.330088,마읍천,local,0,,OpenStreetMap (ODbL),node/11403806093
+osm:node/11547232178,매화천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.369338,36.885281,매화천,local,0,,OpenStreetMap (ODbL),node/11547232178
+osm:node/11505988596,매화천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.378596,36.931921,매화천,local,0,,OpenStreetMap (ODbL),node/11505988596
+osm:node/11772845918,매화천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.362255,36.887841,매화천,local,0,,OpenStreetMap (ODbL),node/11772845918
+osm:node/8843882764,면온천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.36468,37.559346,면온천,local,0,,OpenStreetMap (ODbL),node/8843882764
+osm:node/3878750527,박금천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.358558,37.031927,박금천,local,0,,OpenStreetMap (ODbL),node/3878750527
+osm:node/11458692452,박금천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.349474,37.051876,박금천,local,0,,OpenStreetMap (ODbL),node/11458692452
+osm:node/11573945682,방율천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.429134,36.816676,방율천,local,0,,OpenStreetMap (ODbL),node/11573945682
+osm:node/11565073171,방율천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.417765,36.823731,방율천,local,0,,OpenStreetMap (ODbL),node/11565073171
+osm:node/11444288720,부구천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.350612,37.095047,부구천,local,0,,OpenStreetMap (ODbL),node/11444288720
+osm:node/11369375870,부구천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.364411,37.099563,부구천,local,0,,OpenStreetMap (ODbL),node/11369375870
+osm:node/11445808849,부구천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.310345,37.080907,부구천,local,1,,OpenStreetMap (ODbL),node/11445808849
+osm:way/1305327900,부평천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,127.748035,37.267504,부평천,local,0,,OpenStreetMap (ODbL),way/1305327900
+osm:node/13746972084,산북천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.402373,38.447595,산북천,local,24,,OpenStreetMap (ODbL),node/13746972084
+osm:node/5135038860,산사천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.390096,36.980877,산사천,local,0,,OpenStreetMap (ODbL),node/5135038860
+osm:node/11472400220,산사천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.377896,36.988162,산사천,local,0,,OpenStreetMap (ODbL),node/11472400220
+osm:node/11696468166,삼율천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.434349,36.689884,삼율천,local,0,,OpenStreetMap (ODbL),node/11696468166
+osm:node/8939073147,상안천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.212172,37.417023,상안천,local,0,,OpenStreetMap (ODbL),node/8939073147
+osm:node/1414319453,생운천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.03623,37.452461,생운천,local,0,,OpenStreetMap (ODbL),node/1414319453
+osm:way/127870851,생운천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.017493,37.478822,생운천,local,4,,OpenStreetMap (ODbL),way/127870851
+osm:node/8338802917,서곡천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,127.865441,37.333793,서곡천,local,0,,OpenStreetMap (ODbL),node/8338802917
+osm:node/11075260042,서천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.033552,38.11888,서천,local,0,,OpenStreetMap (ODbL),node/11075260042
+osm:node/11073681175,서천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.025716,38.109128,서천,local,0,,OpenStreetMap (ODbL),node/11073681175
+osm:node/11071502051,서천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.022363,38.103855,서천,local,0,,OpenStreetMap (ODbL),node/11071502051
+osm:node/8948388669,석문천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.240465,37.530992,석문천,local,0,,OpenStreetMap (ODbL),node/8948388669
+osm:node/11774093922,송천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.299236,36.632196,송천,local,0,,OpenStreetMap (ODbL),node/11774093922
+osm:node/12298873501,송천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.723198,37.476801,송천,local,0,,OpenStreetMap (ODbL),node/12298873501
+osm:node/9017637447,송천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.709619,37.665526,송천,local,31,,OpenStreetMap (ODbL),node/9017637447
+osm:node/12645006142,송현천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.850563,37.515586,송현천,local,0,,OpenStreetMap (ODbL),node/12645006142
+osm:node/11802015491,신암천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.24274,36.846651,신암천,local,0,,OpenStreetMap (ODbL),node/11802015491
+osm:node/11802015335,신암천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.214424,36.848775,신암천,local,0,,OpenStreetMap (ODbL),node/11802015335
+osm:node/11802015051,신암천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.188091,36.854402,신암천,local,0,,OpenStreetMap (ODbL),node/11802015051
+osm:node/11802015082,신암천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.200074,36.852809,신암천,local,4,,OpenStreetMap (ODbL),node/11802015082
+osm:node/13715226669,쌍천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.59624,38.160044,쌍천,local,0,,OpenStreetMap (ODbL),node/13715226669
+osm:node/10983562473,양구서천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,127.948698,38.150412,양구서천,national,0,,OpenStreetMap (ODbL),node/10983562473
+osm:node/9770066472,어천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.716138,37.366962,어천,local,0,,OpenStreetMap (ODbL),node/9770066472
+osm:node/11657880043,온정천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.332471,36.679612,온정천,local,0,,OpenStreetMap (ODbL),node/11657880043
+osm:way/1559426369,와수천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,127.428788,38.207902,와수천,local,1,,OpenStreetMap (ODbL),way/1559426369
+osm:node/11463457997,외두천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.310887,37.03849,외두천,local,0,,OpenStreetMap (ODbL),node/11463457997
+osm:node/11463457742,외두천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.320306,37.038766,외두천,local,0,,OpenStreetMap (ODbL),node/11463457742
+osm:node/12129298964,용두천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,127.732412,37.547176,용두천,local,0,,OpenStreetMap (ODbL),node/12129298964
+osm:node/10245706047,용촌천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.481092,38.208565,용촌천,local,0,,OpenStreetMap (ODbL),node/10245706047
+osm:node/7631031619,용탄천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.56433,37.426025,용탄천,local,0,,OpenStreetMap (ODbL),node/7631031619
+osm:node/11049018547,월명천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,127.93467,38.103786,월명천,local,0,,OpenStreetMap (ODbL),node/11049018547
+osm:node/9157526013,유동천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.132397,37.566482,유동천,local,5,,OpenStreetMap (ODbL),node/9157526013
+osm:node/9157526012,유동천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.139494,37.576946,유동천,local,20,,OpenStreetMap (ODbL),node/9157526012
+osm:way/130275992,일리천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,127.89344,37.443056,일리천,local,0,,OpenStreetMap (ODbL),way/130275992
+osm:node/13746972077,자산천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.412741,38.443198,자산천,local,6,,OpenStreetMap (ODbL),node/13746972077
+osm:node/13751173089,자산천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.433993,38.44013,자산천,local,31,,OpenStreetMap (ODbL),node/13751173089
+osm:node/11815233904,장수포천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.259609,36.822339,장수포천,local,0,,OpenStreetMap (ODbL),node/11815233904
+osm:node/11817813663,장수포천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.274848,36.850014,장수포천,local,0,,OpenStreetMap (ODbL),node/11817813663
+osm:node/11584814507,척산천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.390537,36.791505,척산천,local,0,,OpenStreetMap (ODbL),node/11584814507
+osm:node/11584806346,척산천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.418336,36.805217,척산천,local,0,,OpenStreetMap (ODbL),node/11584806346
+osm:node/11584806286,척산천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.42522,36.804313,척산천,local,0,,OpenStreetMap (ODbL),node/11584806286
+osm:node/11579860887,척산천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.433014,36.804042,척산천,local,0,,OpenStreetMap (ODbL),node/11579860887
+osm:node/13736290649,초계천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.46059,38.401769,초계천,local,7,,OpenStreetMap (ODbL),node/13736290649
+osm:node/13097817674,추곡천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,127.621428,37.738003,추곡천,local,0,,OpenStreetMap (ODbL),node/13097817674
+osm:node/13097817667,추곡천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,127.616698,37.733045,추곡천,local,0,,OpenStreetMap (ODbL),node/13097817667
+osm:node/8947637404,하수남천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.058405,37.434248,하수남천,local,0,,OpenStreetMap (ODbL),node/8947637404
+osm:node/8948375452,하수남천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.052102,37.422647,하수남천,local,1,,OpenStreetMap (ODbL),node/8948375452
+osm:node/14055569815,해송천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.716893,37.955888,해송천,local,1,,OpenStreetMap (ODbL),node/14055569815
+osm:node/11292436775,호산천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.283572,37.194645,호산천,local,0,,OpenStreetMap (ODbL),node/11292436775
+osm:node/11608471512,황보천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.451771,36.753128,황보천,local,0,,OpenStreetMap (ODbL),node/11608471512
+osm:node/11593866808,황보천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.4582,36.751921,황보천,local,0,,OpenStreetMap (ODbL),node/11593866808
+osm:node/12517783344,황지천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.019171,37.098005,황지천,local,0,,OpenStreetMap (ODbL),node/12517783344
+osm:node/11800154979,회룡천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,129.144051,36.916034,회룡천,local,0,,OpenStreetMap (ODbL),node/11800154979
+osm:node/8638062944,흥양천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,127.941964,37.383141,흥양천,local,0,,OpenStreetMap (ODbL),node/8638062944
+osm:node/11072369652,흥정천 세월교(이름 없음),low_bridge,세월교·잠수교,강원,128.373982,37.611192,흥정천,local,0,,OpenStreetMap (ODbL),node/11072369652
+osm:way/472328668,강릉남대천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,128.902871,37.754252,강릉남대천,local,0,,OpenStreetMap (ODbL),way/472328668
+osm:way/1291176118,강릉남대천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,128.866626,37.74476,강릉남대천,local,5,,OpenStreetMap (ODbL),way/1291176118
+osm:way/1241867920,강릉남대천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,128.875725,37.744876,강릉남대천,local,22,,OpenStreetMap (ODbL),way/1241867920
+osm:way/469251448,계방천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,128.466712,37.827657,계방천,local,21,,OpenStreetMap (ODbL),way/469251448
+osm:node/4636756305,계방천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,128.462221,37.850349,계방천,local,1796,,OpenStreetMap (ODbL),node/4636756305
+osm:node/4636567786,계방천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,128.464839,37.865497,계방천,local,2778,,OpenStreetMap (ODbL),node/4636567786
+osm:way/1231172334,금산공영주차장,riverside_parking,둔치·하천변 주차장,강원,129.40396,36.990716,남대천,local,229,,OpenStreetMap (ODbL),way/1231172334
+osm:way/1232071145,남대천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,129.402396,36.989426,남대천,local,31,,OpenStreetMap (ODbL),way/1232071145
+osm:way/1248869523,남대천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,129.469592,36.73926,남대천,local,189,,OpenStreetMap (ODbL),way/1248869523
+osm:way/470577465,내린천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,128.454085,37.82328,내린천,local,26,,OpenStreetMap (ODbL),way/470577465
+osm:way/1539621860,옥동천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,128.610864,37.121647,옥동천,local,35,,OpenStreetMap (ODbL),way/1539621860
+osm:way/708006843,원주천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,127.955416,37.346536,원주천,national,0,,OpenStreetMap (ODbL),way/708006843
+osm:way/1230319448,원주천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,127.950206,37.365745,원주천,national,0,,OpenStreetMap (ODbL),way/1230319448
+osm:way/1145699927,원주천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,127.942936,37.374401,원주천,national,413,,OpenStreetMap (ODbL),way/1145699927
+osm:way/802197525,원주천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,127.992661,37.326588,원주천,national,2058,,OpenStreetMap (ODbL),way/802197525
+osm:way/1422996272,일리천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,127.895829,37.426473,일리천,local,10,,OpenStreetMap (ODbL),way/1422996272
+osm:way/1158708621,일리천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,127.889138,37.436069,일리천,local,19,,OpenStreetMap (ODbL),way/1158708621
+osm:way/1217842001,임원천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,129.342046,37.228751,임원천,local,23,,OpenStreetMap (ODbL),way/1217842001
+osm:way/1309213181,자운천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,128.391527,37.774886,자운천,local,22,,OpenStreetMap (ODbL),way/1309213181
+osm:way/1314271547,전천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,129.122158,37.483786,전천,local,27,,OpenStreetMap (ODbL),way/1314271547
+osm:way/471491641,정동진천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,129.036879,37.686725,정동진천,local,21,,OpenStreetMap (ODbL),way/471491641
+osm:way/1549211410,조항천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,128.393564,37.761511,조항천,local,25,,OpenStreetMap (ODbL),way/1549211410
+osm:way/472328667,중앙시장 제1공영주차장,riverside_parking,둔치·하천변 주차장,강원,128.898752,37.751687,강릉남대천,local,23,yes,OpenStreetMap (ODbL),way/472328667
+osm:way/1480353448,청초천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,128.5824,38.192723,청초천,local,24,,OpenStreetMap (ODbL),way/1480353448
+osm:way/1216410946,추천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,129.30311,37.289403,추천,local,2840,,OpenStreetMap (ODbL),way/1216410946
+osm:way/1177182374,평창강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,128.411265,37.376972,평창강,national,0,,OpenStreetMap (ODbL),way/1177182374
+osm:way/1323101234,평창강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,128.394417,37.365813,평창강,national,0,,OpenStreetMap (ODbL),way/1323101234
+osm:way/839684849,한강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,128.666917,37.380505,한강,local,12,,OpenStreetMap (ODbL),way/839684849
+osm:node/13500738479,홍천강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,강원,127.880787,37.687383,홍천강,national,0,,OpenStreetMap (ODbL),node/13500738479
+osm:relation/13656100,강릉남대천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,강원,128.927752,37.77012,강릉남대천,local,0,,OpenStreetMap (ODbL),relation/13656100
+osm:way/1230519720,강릉남대천 야구장(이름 없음),riverside_sports,둔치 체육시설,강원,128.933325,37.770578,강릉남대천,local,0,,OpenStreetMap (ODbL),way/1230519720
+osm:way/1019938819,강릉남대천 축구장(이름 없음),riverside_sports,둔치 체육시설,강원,128.929181,37.770342,강릉남대천,local,0,,OpenStreetMap (ODbL),way/1019938819
+osm:node/12040274722,경포정,riverside_sports,둔치 체육시설,강원,128.980657,37.726628,군선천,local,64,,OpenStreetMap (ODbL),node/12040274722
+osm:way/587255755,계성천 축구장(이름 없음),riverside_sports,둔치 체육시설,강원,127.677639,38.054842,계성천,local,46,,OpenStreetMap (ODbL),way/587255755
+osm:way/1002283708,광원배드맨턴 센터,riverside_sports,둔치 체육시설,강원,128.445516,37.829337,내린천,local,20,,OpenStreetMap (ODbL),way/1002283708
+osm:way/1360054132,구운천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,강원,127.669893,38.131473,구운천,local,36,,OpenStreetMap (ODbL),way/1360054132
+osm:way/1214481257,근덕풋살장,riverside_sports,둔치 체육시설,강원,129.2305,37.376807,마읍천,local,44,,OpenStreetMap (ODbL),way/1214481257
+osm:way/528641841,남대천 농구장(이름 없음),riverside_sports,둔치 체육시설,강원,129.406418,36.994232,남대천,local,632,,OpenStreetMap (ODbL),way/528641841
+osm:way/528641842,남대천 축구장(이름 없음),riverside_sports,둔치 체육시설,강원,129.405259,36.994556,남대천,local,575,,OpenStreetMap (ODbL),way/528641842
+osm:way/661123698,남대천 테니스장(이름 없음),riverside_sports,둔치 체육시설,강원,129.402449,36.999544,남대천,local,730,,OpenStreetMap (ODbL),way/661123698
+osm:way/470126880,내면테니스경기장,riverside_sports,둔치 체육시설,강원,128.393093,37.775416,자운천,local,52,,OpenStreetMap (ODbL),way/470126880
+osm:way/1314535387,만천천 다목적 운동장(이름 없음),riverside_sports,둔치 체육시설,강원,127.757815,37.883958,만천천,local,59,,OpenStreetMap (ODbL),way/1314535387
+osm:way/1232442396,부구천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,강원,129.374576,37.100536,부구천,local,20,,OpenStreetMap (ODbL),way/1232442396
+osm:way/481182673,북한강 축구장(이름 없음),riverside_sports,둔치 체육시설,강원,127.692608,38.095294,북한강,national,0,,OpenStreetMap (ODbL),way/481182673
+osm:way/481182672,북한강 테니스장(이름 없음),riverside_sports,둔치 체육시설,강원,127.692257,38.094676,북한강,national,0,,OpenStreetMap (ODbL),way/481182672
+osm:way/1314270554,삼척시민 테니스장,riverside_sports,둔치 체육시설,강원,129.169371,37.436308,삼척오십천,local,14,,OpenStreetMap (ODbL),way/1314270554
+osm:way/469303076,섬강 테니스장(이름 없음),riverside_sports,둔치 체육시설,강원,127.984275,37.496686,섬강,national,46,,OpenStreetMap (ODbL),way/469303076
+osm:way/573513312,운동,riverside_sports,둔치 체육시설,강원,128.198582,38.112008,인북천,local,24,,OpenStreetMap (ODbL),way/573513312
+osm:way/835504737,원주천 테니스장(이름 없음),riverside_sports,둔치 체육시설,강원,127.977239,37.326754,원주천,national,855,,OpenStreetMap (ODbL),way/835504737
+osm:way/479978914,육림수영장,riverside_sports,둔치 체육시설,강원,127.719405,37.916622,북한강,national,75,,OpenStreetMap (ODbL),way/479978914
+osm:node/3793858944,전천 농구장(이름 없음),riverside_sports,둔치 체육시설,강원,129.11203,37.482991,전천,local,30,,OpenStreetMap (ODbL),node/3793858944
+osm:node/7798021291,전천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,강원,129.112123,37.482942,전천,local,24,,OpenStreetMap (ODbL),node/7798021291
+osm:way/839539173,족구장,riverside_sports,둔치 체육시설,강원,128.66951,37.381628,한강,local,39,,OpenStreetMap (ODbL),way/839539173
+osm:way/768795392,주수천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,강원,129.035659,37.608547,주수천,local,20,,OpenStreetMap (ODbL),way/768795392
+osm:node/12040274802,초록정,riverside_sports,둔치 체육시설,강원,129.116042,37.483619,전천,local,29,,OpenStreetMap (ODbL),node/12040274802
+osm:way/1548730885,평창강 테니스장(이름 없음),riverside_sports,둔치 체육시설,강원,128.409779,37.377218,평창강,national,0,,OpenStreetMap (ODbL),way/1548730885
+osm:way/1548730886,평창강 풋살장(이름 없음),riverside_sports,둔치 체육시설,강원,128.409637,37.377105,평창강,national,0,,OpenStreetMap (ODbL),way/1548730886
+osm:way/839539174,풋살장,riverside_sports,둔치 체육시설,강원,128.669589,37.381328,한강,local,44,,OpenStreetMap (ODbL),way/839539174
+osm:way/839777316,한강 축구장(이름 없음),riverside_sports,둔치 체육시설,강원,128.654278,37.379791,한강,local,24,,OpenStreetMap (ODbL),way/839777316
+osm:way/1383086391,흥양천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,강원,127.96176,37.384098,흥양천,local,14,,OpenStreetMap (ODbL),way/1383086391
+osm:way/1383086388,흥양천 축구장(이름 없음),riverside_sports,둔치 체육시설,강원,127.963885,37.384574,흥양천,local,17,,OpenStreetMap (ODbL),way/1383086388
+osm:node/7631453144,경반천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.456767,37.840336,경반천,local,0,,OpenStreetMap (ODbL),node/7631453144
+osm:node/7631453142,경반천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.449695,37.845506,경반천,local,0,,OpenStreetMap (ODbL),node/7631453142
+osm:node/11152076863,경반천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.464229,37.836408,경반천,local,0,,OpenStreetMap (ODbL),node/11152076863
+osm:node/9123863298,구수천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.266941,36.963325,구수천,local,0,,OpenStreetMap (ODbL),node/9123863298
+osm:node/9181617659,금어천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.218978,37.266059,금어천,local,0,,OpenStreetMap (ODbL),node/9181617659
+osm:node/12693529876,금학천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.166438,37.246169,금학천,local,0,,OpenStreetMap (ODbL),node/12693529876
+osm:way/1422270487,덕풍천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.201742,37.530904,덕풍천,local,0,,OpenStreetMap (ODbL),way/1422270487
+osm:node/11409137279,동두천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.084092,37.912737,동두천,local,0,,OpenStreetMap (ODbL),node/11409137279
+osm:node/11409137150,동두천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.08296,37.918408,동두천,local,9,,OpenStreetMap (ODbL),node/11409137150
+osm:node/13375128215,목감천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,126.842491,37.467586,목감천,national,0,,OpenStreetMap (ODbL),node/13375128215
+osm:node/10125287373,목현천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.224879,37.434526,목현천,local,1,,OpenStreetMap (ODbL),node/10125287373
+osm:node/10984349725,백석천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.032369,37.742629,백석천,local,0,,OpenStreetMap (ODbL),node/10984349725
+osm:node/10984349713,백석천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.040852,37.733165,백석천,local,0,,OpenStreetMap (ODbL),node/10984349713
+osm:way/967121078,복하천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.462799,37.268898,복하천,national,0,,OpenStreetMap (ODbL),way/967121078
+osm:node/11100926817,부용천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.058324,37.746845,부용천,local,0,,OpenStreetMap (ODbL),node/11100926817
+osm:way/1117299195,불광천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,126.909769,37.583362,불광천,local,0,,OpenStreetMap (ODbL),way/1117299195
+osm:node/11898396502,비암천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,126.920743,37.803743,비암천,local,0,,OpenStreetMap (ODbL),node/11898396502
+osm:node/11486663989,서사천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.558353,37.830304,서사천,local,0,,OpenStreetMap (ODbL),node/11486663989
+osm:node/11766122417,서호천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,126.985457,37.288471,서호천,local,0,,OpenStreetMap (ODbL),node/11766122417
+osm:node/8992859492,석곡천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.734745,37.44573,석곡천,local,0,,OpenStreetMap (ODbL),node/8992859492
+osm:node/12945624939,설마천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,126.943102,37.943234,설마천,local,23,,OpenStreetMap (ODbL),node/12945624939
+osm:node/7729756144,성은천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.138116,37.106864,성은천,local,0,,OpenStreetMap (ODbL),node/7729756144
+osm:way/967595103,송말천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.528131,37.328959,송말천,local,0,,OpenStreetMap (ODbL),way/967595103
+osm:node/9123865534,시장천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.222512,36.901655,시장천,local,0,,OpenStreetMap (ODbL),node/9123865534
+osm:node/10185129205,신릉천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.230576,36.964957,신릉천,local,0,,OpenStreetMap (ODbL),node/10185129205
+osm:node/7558111470,신천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,126.990943,37.803357,신천,local,0,,OpenStreetMap (ODbL),node/7558111470
+osm:way/818449255,양연로1503번길,low_bridge,세월교·잠수교,경기,127.058677,38.017763,한탄강,local,0,,OpenStreetMap (ODbL),way/818449255
+osm:node/9124306451,양촌천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.255544,36.945077,양촌천,local,0,,OpenStreetMap (ODbL),node/9124306451
+osm:node/9123865540,양촌천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.247706,36.94024,양촌천,local,1,,OpenStreetMap (ODbL),node/9123865540
+osm:node/7853789389,여천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.065463,37.277567,여천,local,0,,OpenStreetMap (ODbL),node/7853789389
+osm:way/1566410461,역촌길,low_bridge,세월교·잠수교,경기,127.348154,37.79822,상동천,local,0,,OpenStreetMap (ODbL),way/1566410461
+osm:node/9218787496,연수천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.589484,37.487291,연수천,local,0,,OpenStreetMap (ODbL),node/9218787496
+osm:node/8169621616,오산천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.128883,37.267996,오산천,local,0,,OpenStreetMap (ODbL),node/8169621616
+osm:node/13048321033,오산천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.147771,37.275138,오산천,local,0,,OpenStreetMap (ODbL),node/13048321033
+osm:node/13754212840,오산천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.062588,37.140652,오산천,national,0,,OpenStreetMap (ODbL),node/13754212840
+osm:node/9213196233,옥정천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.355047,36.980509,옥정천,local,0,,OpenStreetMap (ODbL),node/9213196233
+osm:node/7607061262,왕곡천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,126.984099,37.345288,왕곡천,local,0,,OpenStreetMap (ODbL),node/7607061262
+osm:node/830784756,용덕사천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.216995,37.18636,용덕사천,local,0,,OpenStreetMap (ODbL),node/830784756
+osm:node/11135975208,용문천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.585172,37.551647,용문천,local,1,,OpenStreetMap (ODbL),node/11135975208
+osm:way/1294914087,운중천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.119248,37.398973,운중천,local,0,,OpenStreetMap (ODbL),way/1294914087
+osm:node/7853749408,원천리천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.050496,37.262812,원천리천,local,0,,OpenStreetMap (ODbL),node/7853749408
+osm:node/11483875371,원천리천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.042588,37.251148,원천리천,local,0,,OpenStreetMap (ODbL),node/11483875371
+osm:node/12864474216,월산천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.353255,37.659291,월산천,local,0,,OpenStreetMap (ODbL),node/12864474216
+osm:node/9663747267,정평천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.093745,37.319119,정평천,local,0,,OpenStreetMap (ODbL),node/9663747267
+osm:node/7532919268,중랑천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.054071,37.74074,중랑천,local,0,,OpenStreetMap (ODbL),node/7532919268
+osm:node/7532971301,중랑천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.050061,37.702389,중랑천,local,0,,OpenStreetMap (ODbL),node/7532971301
+osm:node/7532971295,중랑천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.050659,37.71524,중랑천,local,0,,OpenStreetMap (ODbL),node/7532971295
+osm:node/7532971290,중랑천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.051987,37.726008,중랑천,local,0,,OpenStreetMap (ODbL),node/7532971290
+osm:node/7532919276,중랑천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.053594,37.736111,중랑천,local,0,,OpenStreetMap (ODbL),node/7532919276
+osm:node/7532919279,중랑천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.05407,37.731042,중랑천,local,0,,OpenStreetMap (ODbL),node/7532919279
+osm:node/7782319859,차탄천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.058313,38.048372,차탄천,local,0,,OpenStreetMap (ODbL),node/7782319859
+osm:node/7782319781,차탄천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.059259,38.059268,차탄천,local,0,,OpenStreetMap (ODbL),node/7782319781
+osm:node/10841784145,창릉천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,126.891558,37.649899,창릉천,local,0,,OpenStreetMap (ODbL),node/10841784145
+osm:node/13812495329,청계천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.002199,37.392875,청계천,local,0,,OpenStreetMap (ODbL),node/13812495329
+osm:node/11102599594,청담천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.075951,37.818092,청담천,local,0,,OpenStreetMap (ODbL),node/11102599594
+osm:node/9123865535,청룡천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.252388,36.924884,청룡천,local,0,,OpenStreetMap (ODbL),node/9123865535
+osm:node/9123865529,초성천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.255461,36.941786,초성천,local,0,,OpenStreetMap (ODbL),node/9123865529
+osm:node/9123847992,초성천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.267978,36.945892,초성천,local,0,,OpenStreetMap (ODbL),node/9123847992
+osm:node/13533303809,탄천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.104362,37.307978,탄천,local,0,,OpenStreetMap (ODbL),node/13533303809
+osm:node/10964960976,포천천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,127.198971,37.889297,포천천,local,0,,OpenStreetMap (ODbL),node/10964960976
+osm:node/7614493455,학의천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,126.97416,37.398132,학의천,local,0,,OpenStreetMap (ODbL),node/7614493455
+osm:node/10878066262,향동천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,126.885834,37.594109,향동천,local,0,,OpenStreetMap (ODbL),node/10878066262
+osm:node/10878043598,향동천 세월교(이름 없음),low_bridge,세월교·잠수교,경기,126.892758,37.600467,향동천,local,21,,OpenStreetMap (ODbL),node/10878043598
+osm:way/1139171939,검단천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.576465,37.619499,검단천,local,3092,,OpenStreetMap (ODbL),way/1139171939
+osm:way/998697372,곡산역 주차장,riverside_parking,둔치·하천변 주차장,경기,126.801895,37.646326,도촌천,local,75,yes,OpenStreetMap (ODbL),way/998697372
+osm:way/1125565146,곤지암 공용주차장,riverside_parking,둔치·하천변 주차장,경기,127.340717,37.350683,곤지암천,local,27,,OpenStreetMap (ODbL),way/1125565146
+osm:way/1385492903,공릉천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.914692,37.678793,공릉천,local,19,,OpenStreetMap (ODbL),way/1385492903
+osm:way/228681314,굴포천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.759405,37.530189,굴포천,national,18,,OpenStreetMap (ODbL),way/228681314
+osm:way/1420450836,굴포천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.761133,37.536349,굴포천,national,30,,OpenStreetMap (ODbL),way/1420450836
+osm:way/1408771103,금촌역 선로하부 공영주차장,riverside_parking,둔치·하천변 주차장,경기,126.776959,37.76727,금촌천,local,0,,OpenStreetMap (ODbL),way/1408771103
+osm:way/402347502,금촌역 주차장,riverside_parking,둔치·하천변 주차장,경기,126.772905,37.765329,금촌천,local,0,yes,OpenStreetMap (ODbL),way/402347502
+osm:way/314768056,노상주차장,riverside_parking,둔치·하천변 주차장,경기,126.724641,37.352454,신길천,local,3666,,OpenStreetMap (ODbL),way/314768056
+osm:way/1288763339,당정천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.946128,37.369504,당정천,local,26,,OpenStreetMap (ODbL),way/1288763339
+osm:way/1050586366,덕교천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.405736,37.64489,덕교천,local,4264,,OpenStreetMap (ODbL),way/1050586366
+osm:way/472435611,덕풍천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.214016,37.537628,덕풍천,local,31,,OpenStreetMap (ODbL),way/472435611
+osm:way/1160629373,둔포천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.036804,36.924669,둔포천,local,0,,OpenStreetMap (ODbL),way/1160629373
+osm:way/753058978,목현천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.255689,37.414015,목현천,local,11,,OpenStreetMap (ODbL),way/753058978
+osm:way/1463270201,목현천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.247034,37.419427,목현천,local,35,,OpenStreetMap (ODbL),way/1463270201
+osm:way/1227137054,문산천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.781448,37.854948,문산천,national,36,yes,OpenStreetMap (ODbL),way/1227137054
+osm:way/1539618094,반월천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.832865,37.277944,반월천,local,1901,,OpenStreetMap (ODbL),way/1539618094
+osm:way/862517274,봉선사천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.169182,37.761724,봉선사천,local,3,,OpenStreetMap (ODbL),way/862517274
+osm:way/584708259,북한강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.313096,37.557448,북한강,national,20,,OpenStreetMap (ODbL),way/584708259
+osm:node/6102116486,분당 중앙공원 B 주차장,riverside_parking,둔치·하천변 주차장,경기,127.121521,37.375983,분당천,local,19,,OpenStreetMap (ODbL),node/6102116486
+osm:way/1158936516,불광천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.905673,37.579131,불광천,local,2,,OpenStreetMap (ODbL),way/1158936516
+osm:way/1305372434,산곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.221817,37.522793,산곡천,local,7,,OpenStreetMap (ODbL),way/1305372434
+osm:way/1073941617,삼동암천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.518511,37.682646,삼동암천,local,700,,OpenStreetMap (ODbL),way/1073941617
+osm:way/1381981000,성복천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.079856,37.314256,성복천,local,27,,OpenStreetMap (ODbL),way/1381981000
+osm:way/510252348,성은천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.145496,37.091664,성은천,local,30,,OpenStreetMap (ODbL),way/510252348
+osm:way/1419897495,승기천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.474841,37.276046,승기천,local,21713,,OpenStreetMap (ODbL),way/1419897495
+osm:way/1419119779,승기천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.476151,37.257217,승기천,local,22903,,OpenStreetMap (ODbL),way/1419119779
+osm:way/1426414651,승기천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.474875,37.252236,승기천,local,23347,,OpenStreetMap (ODbL),way/1426414651
+osm:way/1425735696,승기천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.464638,37.254481,승기천,local,23883,,OpenStreetMap (ODbL),way/1425735696
+osm:way/1424701381,승기천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.448781,37.271077,승기천,local,23929,,OpenStreetMap (ODbL),way/1424701381
+osm:way/1424921863,승기천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.452424,37.260985,승기천,local,24303,,OpenStreetMap (ODbL),way/1424921863
+osm:way/1428168898,승기천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.45579,37.248849,승기천,local,24887,,OpenStreetMap (ODbL),way/1428168898
+osm:way/1429939611,승기천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.452526,37.242551,승기천,local,25554,,OpenStreetMap (ODbL),way/1429939611
+osm:way/720874893,신천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.99494,37.786457,신천,local,18,yes,OpenStreetMap (ODbL),way/720874893
+osm:way/709157126,신천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.994942,37.798942,신천,local,30,,OpenStreetMap (ODbL),way/709157126
+osm:way/787872275,신천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.984697,37.815286,신천,local,35,yes,OpenStreetMap (ODbL),way/787872275
+osm:way/1146080481,아라천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.787511,37.600671,아라천,national,0,,OpenStreetMap (ODbL),way/1146080481
+osm:way/889215796,아라천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.660768,37.571413,아라천,national,17,,OpenStreetMap (ODbL),way/889215796
+osm:way/584240712,안양 장례식장 전용 주차장,riverside_parking,둔치·하천변 주차장,경기,126.941069,37.379724,안양천,local,9,,OpenStreetMap (ODbL),way/584240712
+osm:way/1560915858,안양천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.90566,37.406053,안양천,national,0,,OpenStreetMap (ODbL),way/1560915858
+osm:way/1422934866,안양천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.894553,37.407365,안양천,national,0,,OpenStreetMap (ODbL),way/1422934866
+osm:way/1316394715,안양천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.948162,37.368809,안양천,local,17,,OpenStreetMap (ODbL),way/1316394715
+osm:way/426662523,야탑천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.150125,37.405533,야탑천,local,43,,OpenStreetMap (ODbL),way/426662523
+osm:way/429336632,여수천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.150992,37.41582,여수천,local,119,,OpenStreetMap (ODbL),way/429336632
+osm:way/779527795,오산천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.131236,37.267319,오산천,local,22,,OpenStreetMap (ODbL),way/779527795
+osm:way/766500208,오산천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.104867,37.280983,오산천,local,1037,,OpenStreetMap (ODbL),way/766500208
+osm:way/488597574,왕송호수 공영주차장,riverside_parking,둔치·하천변 주차장,경기,126.945841,37.31791,황구지천,local,463,,OpenStreetMap (ODbL),way/488597574
+osm:way/873443482,왕숙천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.142717,37.619979,왕숙천,local,17,,OpenStreetMap (ODbL),way/873443482
+osm:way/941663064,왕숙천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.163428,37.693851,왕숙천,local,23,,OpenStreetMap (ODbL),way/941663064
+osm:way/782902094,왕숙천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.194348,37.725101,왕숙천,local,35,,OpenStreetMap (ODbL),way/782902094
+osm:way/1427947078,외1리공영주차장,riverside_parking,둔치·하천변 주차장,경기,126.45778,37.237751,승기천,local,25546,,OpenStreetMap (ODbL),way/1427947078
+osm:way/879123369,이포보주차장,riverside_parking,둔치·하천변 주차장,경기,127.53646,37.40181,한강,national,12,yes,OpenStreetMap (ODbL),way/879123369
+osm:way/914130352,정평천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.083352,37.320692,정평천,local,28,,OpenStreetMap (ODbL),way/914130352
+osm:node/8568150083,정평천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.068437,37.327285,정평천,local,29,,OpenStreetMap (ODbL),node/8568150083
+osm:way/706914104,중랑천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.045639,37.754199,중랑천,local,17,,OpenStreetMap (ODbL),way/706914104
+osm:way/707563008,중랑천유료주차장,riverside_parking,둔치·하천변 주차장,경기,127.053437,37.740333,중랑천,local,5,,OpenStreetMap (ODbL),way/707563008
+osm:way/542219806,진건천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.212848,37.693619,진건천,local,6,,OpenStreetMap (ODbL),way/542219806
+osm:way/1533869710,창릉천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.835145,37.597852,창릉천,local,36,,OpenStreetMap (ODbL),way/1533869710
+osm:way/1151200830,포내천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.550897,37.713247,포내천,local,11,,OpenStreetMap (ODbL),way/1151200830
+osm:way/879123371,한강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.536285,37.404306,한강,national,14,yes,OpenStreetMap (ODbL),way/879123371
+osm:way/1268363483,한강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.240877,37.541929,한강,national,14,,OpenStreetMap (ODbL),way/1268363483
+osm:way/1087826028,한강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.175571,37.586702,한강,national,31,,OpenStreetMap (ODbL),way/1087826028
+osm:way/740551286,화정천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,126.817894,37.345235,화정천,local,30,,OpenStreetMap (ODbL),way/740551286
+osm:way/1422116553,황구지천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.01893,37.195233,황구지천,national,37,,OpenStreetMap (ODbL),way/1422116553
+osm:node/3732966913,흑천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경기,127.555053,37.461693,흑천,local,34,,OpenStreetMap (ODbL),node/3732966913
+osm:way/437195951,1,riverside_sports,둔치 체육시설,경기,127.114762,37.38119,탄천,local,0,,OpenStreetMap (ODbL),way/437195951
+osm:way/437236115,2,riverside_sports,둔치 체육시설,경기,127.114445,37.380905,탄천,local,0,,OpenStreetMap (ODbL),way/437236115
+osm:way/437236118,3,riverside_sports,둔치 체육시설,경기,127.113554,37.38025,탄천,local,0,,OpenStreetMap (ODbL),way/437236118
+osm:way/437236122,4,riverside_sports,둔치 체육시설,경기,127.113642,37.380493,탄천,local,0,,OpenStreetMap (ODbL),way/437236122
+osm:way/437236124,5,riverside_sports,둔치 체육시설,경기,127.114197,37.380941,탄천,local,0,,OpenStreetMap (ODbL),way/437236124
+osm:way/437236127,6,riverside_sports,둔치 체육시설,경기,127.114741,37.381371,탄천,local,0,,OpenStreetMap (ODbL),way/437236127
+osm:way/437236129,7,riverside_sports,둔치 체육시설,경기,127.115081,37.381631,탄천,local,0,,OpenStreetMap (ODbL),way/437236129
+osm:way/437236131,8,riverside_sports,둔치 체육시설,경기,127.115696,37.382072,탄천,local,0,,OpenStreetMap (ODbL),way/437236131
+osm:way/437236133,9,riverside_sports,둔치 체육시설,경기,127.115361,37.381597,탄천,local,0,,OpenStreetMap (ODbL),way/437236133
+osm:way/1226190850,가마지천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.646271,37.66235,가마지천,local,529,,OpenStreetMap (ODbL),way/1226190850
+osm:way/1213765990,거물대천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.599714,37.681201,거물대천,local,654,,OpenStreetMap (ODbL),way/1213765990
+osm:way/1126873222,거물대천 풋살장(이름 없음),riverside_sports,둔치 체육시설,경기,126.599702,37.681164,거물대천,local,649,,OpenStreetMap (ODbL),way/1126873222
+osm:way/1072584008,게이트볼장,riverside_sports,둔치 체육시설,경기,127.312288,37.557866,북한강,national,45,,OpenStreetMap (ODbL),way/1072584008
+osm:way/1076495753,게이트볼장,riverside_sports,둔치 체육시설,경기,127.163798,37.591475,왕숙천,local,50,,OpenStreetMap (ODbL),way/1076495753
+osm:way/469279322,경안천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.262849,37.411654,경안천,national,33,,OpenStreetMap (ODbL),way/469279322
+osm:way/469279321,경안천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.263095,37.412389,경안천,national,39,,OpenStreetMap (ODbL),way/469279321
+osm:way/310235217,계산천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.744891,37.534623,계산천,local,381,,OpenStreetMap (ODbL),way/310235217
+osm:way/297127561,계산천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,126.744299,37.532903,계산천,local,574,,OpenStreetMap (ODbL),way/297127561
+osm:node/12213690752,계양천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.712928,37.627944,계양천,local,35,yes,OpenStreetMap (ODbL),node/12213690752
+osm:way/1215993711,계양천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.72932,37.613182,계양천,local,926,,OpenStreetMap (ODbL),way/1215993711
+osm:way/1180474700,계양천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.72049,37.624475,계양천,local,45,,OpenStreetMap (ODbL),way/1180474700
+osm:way/1180474701,계양천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,126.720439,37.624509,계양천,local,41,,OpenStreetMap (ODbL),way/1180474701
+osm:way/278939432,공설운동장,riverside_sports,둔치 체육시설,경기,127.252015,37.415301,벌원천,local,50,,OpenStreetMap (ODbL),way/278939432
+osm:way/1163044529,나진포천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.706825,37.639214,나진포천,local,41,,OpenStreetMap (ODbL),way/1163044529
+osm:way/1163044528,나진포천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.706825,37.639216,나진포천,local,41,,OpenStreetMap (ODbL),way/1163044528
+osm:way/1163044531,나진포천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,126.706866,37.63879,나진포천,local,72,,OpenStreetMap (ODbL),way/1163044531
+osm:node/12040274701,난지국궁장,riverside_sports,둔치 체육시설,경기,126.86365,37.574179,한강,national,77,,OpenStreetMap (ODbL),node/12040274701
+osm:way/1083171430,내곡리 축구장,riverside_sports,둔치 체육시설,경기,127.16356,37.677265,왕숙천,local,34,,OpenStreetMap (ODbL),way/1083171430
+osm:way/997745915,농구장,riverside_sports,둔치 체육시설,경기,126.92724,37.40194,안양천,local,0,no,OpenStreetMap (ODbL),way/997745915
+osm:way/1103371067,농구장,riverside_sports,둔치 체육시설,경기,127.184782,37.715385,왕숙천,local,22,,OpenStreetMap (ODbL),way/1103371067
+osm:way/366288501,농구장,riverside_sports,둔치 체육시설,경기,127.066319,37.329134,정평천,local,39,,OpenStreetMap (ODbL),way/366288501
+osm:way/780868549,농구장,riverside_sports,둔치 체육시설,경기,127.19592,37.732625,왕숙천,local,43,,OpenStreetMap (ODbL),way/780868549
+osm:way/382367686,농구장,riverside_sports,둔치 체육시설,경기,127.110514,37.399301,운중천,local,59,,OpenStreetMap (ODbL),way/382367686
+osm:way/758638763,덕풍천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.215949,37.537526,덕풍천,local,67,,OpenStreetMap (ODbL),way/758638763
+osm:way/556647935,덕풍천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.217632,37.545293,덕풍천,local,57,,OpenStreetMap (ODbL),way/556647935
+osm:way/640032682,도촌천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.815823,37.677292,도촌천,local,1065,,OpenStreetMap (ODbL),way/640032682
+osm:way/278939431,목현천 축구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.248566,37.41971,목현천,local,51,,OpenStreetMap (ODbL),way/278939431
+osm:node/12040274756,무림정,riverside_sports,둔치 체육시설,경기,127.165308,37.698302,왕숙천,local,33,,OpenStreetMap (ODbL),node/12040274756
+osm:relation/14616091,바람아래 육상트랙,riverside_sports,둔치 체육시설,경기,127.163497,37.590295,왕숙천,local,53,,OpenStreetMap (ODbL),relation/14616091
+osm:way/782902095,배드민턴 코트,riverside_sports,둔치 체육시설,경기,127.194759,37.725699,왕숙천,local,34,,OpenStreetMap (ODbL),way/782902095
+osm:way/907203099,배드민턴장,riverside_sports,둔치 체육시설,경기,127.066485,37.329361,정평천,local,52,,OpenStreetMap (ODbL),way/907203099
+osm:way/278939437,벌원천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.253074,37.414895,벌원천,local,27,,OpenStreetMap (ODbL),way/278939437
+osm:way/278939434,벌원천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.253488,37.414678,벌원천,local,12,,OpenStreetMap (ODbL),way/278939434
+osm:way/382367687,베드민턴,riverside_sports,둔치 체육시설,경기,127.110775,37.399321,운중천,local,56,,OpenStreetMap (ODbL),way/382367687
+osm:way/1218447684,별내 테니스장,riverside_sports,둔치 체육시설,경기,127.12792,37.697616,용암천,local,50,,OpenStreetMap (ODbL),way/1218447684
+osm:way/1219698104,봉성포천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.642257,37.68315,봉성포천,local,42,,OpenStreetMap (ODbL),way/1219698104
+osm:way/1219698103,봉성포천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.642261,37.683147,봉성포천,local,41,,OpenStreetMap (ODbL),way/1219698103
+osm:way/1204078833,봉성포천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.616172,37.663537,봉성포천,local,359,,OpenStreetMap (ODbL),way/1204078833
+osm:way/1178696740,부용천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.074772,37.754013,부용천,local,56,,OpenStreetMap (ODbL),way/1178696740
+osm:way/1178696743,부용천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.078455,37.754677,부용천,local,7,,OpenStreetMap (ODbL),way/1178696743
+osm:way/1178572432,부용천 배구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.076725,37.753314,부용천,local,50,,OpenStreetMap (ODbL),way/1178572432
+osm:way/1179887468,부용천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,경기,127.075115,37.75411,부용천,local,42,,OpenStreetMap (ODbL),way/1179887468
+osm:way/438967505,분당중앙공원 롤러스케이트장,riverside_sports,둔치 체육시설,경기,127.118429,37.380704,분당천,local,36,,OpenStreetMap (ODbL),way/438967505
+osm:way/988255514,분당천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.135909,37.376166,분당천,local,37,,OpenStreetMap (ODbL),way/988255514
+osm:way/988255515,분당천 다목적 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.136362,37.376399,분당천,local,71,,OpenStreetMap (ODbL),way/988255515
+osm:way/486109989,분당천 축구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.143902,37.372169,분당천,local,82,,OpenStreetMap (ODbL),way/486109989
+osm:way/487681084,분당천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.139961,37.373441,분당천,local,71,,OpenStreetMap (ODbL),way/487681084
+osm:way/706565940,사릉천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,경기,127.230519,37.651663,사릉천,local,24,,OpenStreetMap (ODbL),way/706565940
+osm:way/706565938,사릉천 축구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.231168,37.651769,사릉천,local,34,,OpenStreetMap (ODbL),way/706565938
+osm:way/1056869958,삼패야구장,riverside_sports,둔치 체육시설,경기,127.184468,37.59317,홍릉천,local,60,,OpenStreetMap (ODbL),way/1056869958
+osm:way/1056869957,삼패지구 스케이트장,riverside_sports,둔치 체육시설,경기,127.188155,37.592748,한강,national,52,,OpenStreetMap (ODbL),way/1056869957
+osm:way/515427919,삼패지구 풋살구장,riverside_sports,둔치 체육시설,경기,127.189286,37.592541,한강,national,41,,OpenStreetMap (ODbL),way/515427919
+osm:way/1219698097,서암천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.641397,37.684286,서암천,local,0,,OpenStreetMap (ODbL),way/1219698097
+osm:way/1219698101,서암천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,126.641504,37.684304,서암천,local,0,,OpenStreetMap (ODbL),way/1219698101
+osm:way/312881223,서운근린공원 풋살장,riverside_sports,둔치 체육시설,경기,126.74138,37.528051,계산천,local,1151,,OpenStreetMap (ODbL),way/312881223
+osm:way/917682512,서정리천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.050188,37.051719,서정리천,local,177,,OpenStreetMap (ODbL),way/917682512
+osm:way/917682513,서정리천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.05028,37.051414,서정리천,local,153,,OpenStreetMap (ODbL),way/917682513
+osm:way/1225327507,석모천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.655211,37.657264,석모천,local,207,,OpenStreetMap (ODbL),way/1225327507
+osm:way/469067115,성복천 축구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.067696,37.316978,성복천,local,58,,OpenStreetMap (ODbL),way/469067115
+osm:way/762740272,수원천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.018586,37.284043,수원천,local,42,,OpenStreetMap (ODbL),way/762740272
+osm:way/1426247982,승기천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,126.460661,37.254825,승기천,local,24135,,OpenStreetMap (ODbL),way/1426247982
+osm:way/1034992275,신길야구장,riverside_sports,둔치 체육시설,경기,126.760814,37.339553,신길천,local,1230,,OpenStreetMap (ODbL),way/1034992275
+osm:way/715181147,신길천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.732549,37.308108,신길천,local,1374,,OpenStreetMap (ODbL),way/715181147
+osm:way/747216989,신길천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.70647,37.317822,신길천,local,3704,,OpenStreetMap (ODbL),way/747216989
+osm:way/715181148,신길천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,126.732158,37.30767,신길천,local,1389,,OpenStreetMap (ODbL),way/715181148
+osm:way/545670591,씨름장,riverside_sports,둔치 체육시설,경기,126.7548,37.337132,신길천,local,1184,,OpenStreetMap (ODbL),way/545670591
+osm:way/762789512,아라천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.732254,37.574246,아라천,national,55,,OpenStreetMap (ODbL),way/762789512
+osm:way/762789513,아라천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,126.733767,37.57433,아라천,national,52,,OpenStreetMap (ODbL),way/762789513
+osm:way/418091639,안산시신촌운동장,riverside_sports,둔치 체육시설,경기,126.818932,37.34096,화정천,local,63,,OpenStreetMap (ODbL),way/418091639
+osm:way/471350106,안산천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.833785,37.304475,안산천,local,54,,OpenStreetMap (ODbL),way/471350106
+osm:way/1565132310,안성천 육상 트랙(이름 없음),riverside_sports,둔치 체육시설,경기,127.078847,36.985398,안성천,national,0,,OpenStreetMap (ODbL),way/1565132310
+osm:way/511209425,안양천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.888829,37.460112,안양천,national,12,,OpenStreetMap (ODbL),way/511209425
+osm:way/558469806,안양천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.900861,37.438057,안양천,national,13,,OpenStreetMap (ODbL),way/558469806
+osm:way/504228369,안양천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.894371,37.453375,안양천,national,15,,OpenStreetMap (ODbL),way/504228369
+osm:way/851984482,알동산 족구장,riverside_sports,둔치 체육시설,경기,127.167002,37.701157,왕숙천,local,46,,OpenStreetMap (ODbL),way/851984482
+osm:way/426647076,야탑천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.137342,37.408479,야탑천,local,43,,OpenStreetMap (ODbL),way/426647076
+osm:way/428082073,야탑천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.128171,37.408002,야탑천,local,29,,OpenStreetMap (ODbL),way/428082073
+osm:way/519829609,양재천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.997146,37.433118,양재천,local,48,,OpenStreetMap (ODbL),way/519829609
+osm:way/790958290,양재천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,126.996282,37.43527,양재천,local,57,,OpenStreetMap (ODbL),way/790958290
+osm:way/1494897733,여수천 다목적 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.154503,37.416419,여수천,local,244,,OpenStreetMap (ODbL),way/1494897733
+osm:way/429173892,여수천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.145958,37.413585,여수천,local,51,,OpenStreetMap (ODbL),way/429173892
+osm:way/427858260,여수천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.136897,37.415471,여수천,local,25,,OpenStreetMap (ODbL),way/427858260
+osm:way/428921852,여수천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.130306,37.414774,여수천,local,40,,OpenStreetMap (ODbL),way/428921852
+osm:way/428640081,여수천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.143198,37.414285,여수천,local,52,,OpenStreetMap (ODbL),way/428640081
+osm:way/1466037378,영덕천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.071469,37.279371,영덕천,local,17,,OpenStreetMap (ODbL),way/1466037378
+osm:way/1466037368,영덕천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.070684,37.27889,영덕천,local,40,,OpenStreetMap (ODbL),way/1466037368
+osm:way/830663362,오류천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.820459,37.482377,오류천,local,1672,,OpenStreetMap (ODbL),way/830663362
+osm:way/768822768,오류천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.804276,37.514258,오류천,local,2468,,OpenStreetMap (ODbL),way/768822768
+osm:way/768822767,오류천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,경기,126.804223,37.51454,오류천,local,2485,,OpenStreetMap (ODbL),way/768822767
+osm:way/474631551,오산천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.129767,37.267191,오산천,local,51,,OpenStreetMap (ODbL),way/474631551
+osm:way/170527541,오산천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.100484,37.268269,오산천,local,37,,OpenStreetMap (ODbL),way/170527541
+osm:way/1287015834,오산천 축구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.038701,37.100468,오산천,national,72,,OpenStreetMap (ODbL),way/1287015834
+osm:way/491463045,오산천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.10191,37.264007,오산천,local,40,,OpenStreetMap (ODbL),way/491463045
+osm:way/916479705,오산천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.069755,37.155645,오산천,national,53,,OpenStreetMap (ODbL),way/916479705
+osm:way/1423560514,오산천 풋살장(이름 없음),riverside_sports,둔치 체육시설,경기,127.129581,37.267254,오산천,local,50,,OpenStreetMap (ODbL),way/1423560514
+osm:way/1058902583,왕숙천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.160896,37.594501,왕숙천,local,18,,OpenStreetMap (ODbL),way/1058902583
+osm:way/1103161495,왕숙천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.184785,37.715383,왕숙천,local,22,,OpenStreetMap (ODbL),way/1103161495
+osm:way/1058902591,왕숙천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.15449,37.595989,왕숙천,local,25,,OpenStreetMap (ODbL),way/1058902591
+osm:way/895511030,왕숙천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.148082,37.630288,왕숙천,local,37,,OpenStreetMap (ODbL),way/895511030
+osm:way/578807260,왕숙천 도농 농구장,riverside_sports,둔치 체육시설,경기,127.150411,37.603204,왕숙천,local,35,,OpenStreetMap (ODbL),way/578807260
+osm:way/578807259,왕숙천 도농 스케이트 공원,riverside_sports,둔치 체육시설,경기,127.150313,37.603599,왕숙천,local,41,,OpenStreetMap (ODbL),way/578807259
+osm:way/578807277,왕숙천 도농 파크골프장,riverside_sports,둔치 체육시설,경기,127.151366,37.601231,왕숙천,local,44,,OpenStreetMap (ODbL),way/578807277
+osm:way/1061065509,왕숙천 둔치 운동장,riverside_sports,둔치 체육시설,경기,127.152725,37.597025,왕숙천,local,36,,OpenStreetMap (ODbL),way/1061065509
+osm:way/1058902585,왕숙천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.160444,37.594663,왕숙천,local,12,,OpenStreetMap (ODbL),way/1058902585
+osm:way/1103201364,왕숙천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.184631,37.715174,왕숙천,local,21,,OpenStreetMap (ODbL),way/1103201364
+osm:way/1074706267,왕숙천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.143483,37.628252,왕숙천,local,27,,OpenStreetMap (ODbL),way/1074706267
+osm:way/863016972,왕숙천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.149474,37.601734,왕숙천,local,29,,OpenStreetMap (ODbL),way/863016972
+osm:way/1061065510,왕숙천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.153105,37.596666,왕숙천,local,35,,OpenStreetMap (ODbL),way/1061065510
+osm:way/1069521432,용암천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.144729,37.644898,용암천,local,37,,OpenStreetMap (ODbL),way/1069521432
+osm:way/1218447689,용암천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.128294,37.69752,용암천,local,34,,OpenStreetMap (ODbL),way/1218447689
+osm:way/1068425999,운동장,riverside_sports,둔치 체육시설,경기,127.159186,37.672909,왕숙천,local,35,,OpenStreetMap (ODbL),way/1068425999
+osm:way/494851337,운중천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.073243,37.390599,운중천,local,51,,OpenStreetMap (ODbL),way/494851337
+osm:way/455079592,운중천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.104873,37.395492,운중천,local,34,,OpenStreetMap (ODbL),way/455079592
+osm:way/1548066400,운중천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,경기,127.103903,37.396422,운중천,local,44,,OpenStreetMap (ODbL),way/1548066400
+osm:way/382367688,운중천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.110863,37.399323,운중천,local,54,,OpenStreetMap (ODbL),way/382367688
+osm:node/2952534014,의정부시 스포츠센터,riverside_sports,둔치 체육시설,경기,127.051445,37.713491,중랑천,local,44,,OpenStreetMap (ODbL),node/2952534014
+osm:way/1082035800,인라인광장,riverside_sports,둔치 체육시설,경기,127.134945,37.574186,한강,national,43,,OpenStreetMap (ODbL),way/1082035800
+osm:node/4655421107,입구,riverside_sports,둔치 체육시설,경기,126.834198,37.30387,안산천,local,0,,OpenStreetMap (ODbL),node/4655421107
+osm:way/1146080484,전호야구장,riverside_sports,둔치 체육시설,경기,126.792014,37.605044,한강,national,145,,OpenStreetMap (ODbL),way/1146080484
+osm:way/467157906,정자 탄천 농구장,riverside_sports,둔치 체육시설,경기,127.109385,37.368952,탄천,local,22,,OpenStreetMap (ODbL),way/467157906
+osm:way/474081993,정평천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.09356,37.318119,정평천,local,79,,OpenStreetMap (ODbL),way/474081993
+osm:way/998089072,정평천 다목적 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.080597,37.322062,정평천,local,51,,OpenStreetMap (ODbL),way/998089072
+osm:way/1051693679,정평천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.090851,37.319498,정평천,local,29,,OpenStreetMap (ODbL),way/1051693679
+osm:way/488687110,정평천 축구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.088881,37.320532,정평천,local,64,,OpenStreetMap (ODbL),way/488687110
+osm:way/688302068,조종천 배드민턴 코트,riverside_sports,둔치 체육시설,경기,127.416922,37.733747,조종천,local,0,,OpenStreetMap (ODbL),way/688302068
+osm:way/1059867959,족구장,riverside_sports,둔치 체육시설,경기,127.199523,37.747229,왕숙천,local,24,,OpenStreetMap (ODbL),way/1059867959
+osm:way/1068258067,족구장,riverside_sports,둔치 체육시설,경기,127.159928,37.673222,왕숙천,local,24,,OpenStreetMap (ODbL),way/1068258067
+osm:way/1103161494,족구장,riverside_sports,둔치 체육시설,경기,127.184593,37.715194,왕숙천,local,25,,OpenStreetMap (ODbL),way/1103161494
+osm:way/1217109647,족구장,riverside_sports,둔치 체육시설,경기,127.142237,37.622346,왕숙천,local,29,,OpenStreetMap (ODbL),way/1217109647
+osm:way/864687021,족구장,riverside_sports,둔치 체육시설,경기,127.530226,37.433292,한강,national,33,yes,OpenStreetMap (ODbL),way/864687021
+osm:way/907203100,족구장,riverside_sports,둔치 체육시설,경기,127.066651,37.329249,정평천,local,69,,OpenStreetMap (ODbL),way/907203100
+osm:way/1554685570,준실내테니스,riverside_sports,둔치 체육시설,경기,126.975823,37.165921,갈천,local,651,,OpenStreetMap (ODbL),way/1554685570
+osm:way/1118341217,중랑천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.052797,37.727622,중랑천,local,0,,OpenStreetMap (ODbL),way/1118341217
+osm:way/708187058,중랑천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.054479,37.740145,중랑천,local,0,,OpenStreetMap (ODbL),way/708187058
+osm:way/915530758,중랑천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.049442,37.691232,중랑천,national,0,,OpenStreetMap (ODbL),way/915530758
+osm:way/472036998,중랑천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.051393,37.725794,중랑천,local,25,,OpenStreetMap (ODbL),way/472036998
+osm:way/1182927303,중랑천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,경기,127.051833,37.728848,중랑천,local,14,,OpenStreetMap (ODbL),way/1182927303
+osm:way/915530759,중랑천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.049534,37.690817,중랑천,national,0,,OpenStreetMap (ODbL),way/915530759
+osm:way/472125991,중랑천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.051819,37.727964,중랑천,local,0,,OpenStreetMap (ODbL),way/472125991
+osm:way/472044885,중랑천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.050888,37.723233,중랑천,local,21,,OpenStreetMap (ODbL),way/472044885
+osm:way/1429520019,중랑천 풋살장(이름 없음),riverside_sports,둔치 체육시설,경기,127.051562,37.728502,중랑천,local,16,,OpenStreetMap (ODbL),way/1429520019
+osm:way/1203412225,진건천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.200276,37.69768,진건천,local,19,,OpenStreetMap (ODbL),way/1203412225
+osm:way/1203412224,진건천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.200957,37.697507,진건천,local,21,,OpenStreetMap (ODbL),way/1203412224
+osm:way/546028106,창릉천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.921964,37.645377,창릉천,local,20,,OpenStreetMap (ODbL),way/546028106
+osm:way/550237448,창릉천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.874608,37.631673,창릉천,local,40,,OpenStreetMap (ODbL),way/550237448
+osm:way/550245332,창릉천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.879937,37.643188,창릉천,local,46,yes,OpenStreetMap (ODbL),way/550245332
+osm:way/546028103,창릉천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.919985,37.645144,창릉천,local,16,,OpenStreetMap (ODbL),way/546028103
+osm:way/550245328,창릉천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,경기,126.874754,37.631467,창릉천,local,34,,OpenStreetMap (ODbL),way/550245328
+osm:way/781160725,창릉천 축구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.935486,37.651477,창릉천,local,29,,OpenStreetMap (ODbL),way/781160725
+osm:way/660065197,청평 테니스클럽,riverside_sports,둔치 체육시설,경기,127.418661,37.733799,조종천,local,50,,OpenStreetMap (ODbL),way/660065197
+osm:way/860991817,크낙새 축구장,riverside_sports,둔치 체육시설,경기,127.197454,37.746084,왕숙천,local,58,,OpenStreetMap (ODbL),way/860991817
+osm:way/1190301053,탄천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.122814,37.412349,탄천,local,0,,OpenStreetMap (ODbL),way/1190301053
+osm:way/432047544,탄천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.123984,37.400138,탄천,local,0,,OpenStreetMap (ODbL),way/432047544
+osm:way/436430137,탄천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.122179,37.392023,탄천,local,0,,OpenStreetMap (ODbL),way/436430137
+osm:way/1549093011,탄천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.118991,37.441339,탄천,local,23,,OpenStreetMap (ODbL),way/1549093011
+osm:way/232374949,탄천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.113372,37.330145,탄천,local,69,,OpenStreetMap (ODbL),way/232374949
+osm:way/966982712,탄천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.124102,37.399858,탄천,local,0,,OpenStreetMap (ODbL),way/966982712
+osm:way/431574646,탄천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.122971,37.412128,탄천,local,0,,OpenStreetMap (ODbL),way/431574646
+osm:way/1549550386,탄천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.118446,37.443044,탄천,local,23,,OpenStreetMap (ODbL),way/1549550386
+osm:way/1291681653,탄천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.116745,37.382529,탄천,local,32,,OpenStreetMap (ODbL),way/1291681653
+osm:way/232374950,탄천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,경기,127.11327,37.329823,탄천,local,77,,OpenStreetMap (ODbL),way/232374950
+osm:way/1451971622,탄천 축구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.119816,37.439567,탄천,local,41,,OpenStreetMap (ODbL),way/1451971622
+osm:node/11264692170,테니스마일,riverside_sports,둔치 체육시설,경기,127.070188,37.750022,부용천,local,45,,OpenStreetMap (ODbL),node/11264692170
+osm:way/1069622518,파크골프장,riverside_sports,둔치 체육시설,경기,127.142194,37.624339,왕숙천,local,31,,OpenStreetMap (ODbL),way/1069622518
+osm:way/1069521433,풋살장,riverside_sports,둔치 체육시설,경기,127.143817,37.64542,용암천,local,51,,OpenStreetMap (ODbL),way/1069521433
+osm:way/840640887,학의천 축구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.988484,37.388157,학의천,local,69,,OpenStreetMap (ODbL),way/840640887
+osm:way/1565024567,한강 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.169785,37.585154,한강,national,42,,OpenStreetMap (ODbL),way/1565024567
+osm:way/1086291094,한강 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.485481,37.493684,한강,national,44,,OpenStreetMap (ODbL),way/1086291094
+osm:way/1146847936,한강 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.852343,37.569049,한강,national,71,,OpenStreetMap (ODbL),way/1146847936
+osm:way/1042800514,한강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.479085,37.496569,한강,national,0,,OpenStreetMap (ODbL),way/1042800514
+osm:node/12045047650,한강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.487831,37.484834,한강,national,21,,OpenStreetMap (ODbL),node/12045047650
+osm:way/1086291092,한강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.485587,37.493766,한강,national,57,,OpenStreetMap (ODbL),way/1086291092
+osm:way/1446819437,한강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,127.284542,37.527863,한강,national,59,,OpenStreetMap (ODbL),way/1446819437
+osm:way/778500076,한강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.863481,37.574189,한강,national,63,,OpenStreetMap (ODbL),way/778500076
+osm:way/1182173316,한강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경기,126.792225,37.60541,한강,national,102,,OpenStreetMap (ODbL),way/1182173316
+osm:way/1146847934,한강 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,경기,126.854494,37.567785,한강,national,72,,OpenStreetMap (ODbL),way/1146847934
+osm:way/652807266,한강 야구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.737589,37.650535,한강,national,143,,OpenStreetMap (ODbL),way/652807266
+osm:way/814616517,한강 축구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.300669,37.496257,한강,national,60,,OpenStreetMap (ODbL),way/814616517
+osm:way/1446819438,한강 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,127.283634,37.527493,한강,national,34,,OpenStreetMap (ODbL),way/1446819438
+osm:way/1146847935,한강 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,126.853707,37.568248,한강,national,71,,OpenStreetMap (ODbL),way/1146847935
+osm:way/1278979644,한탄강 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,127.056888,38.010028,한탄강,local,60,,OpenStreetMap (ODbL),way/1278979644
+osm:way/1057528556,화정천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.817099,37.329861,화정천,local,37,,OpenStreetMap (ODbL),way/1057528556
+osm:way/506177543,화정천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.821529,37.30876,화정천,local,49,,OpenStreetMap (ODbL),way/506177543
+osm:way/475296954,화정천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,126.816127,37.336523,화정천,local,40,,OpenStreetMap (ODbL),way/475296954
+osm:way/503754000,화정천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경기,126.816198,37.331893,화정천,local,48,,OpenStreetMap (ODbL),way/503754000
+osm:way/822829322,황구지천 농구장(이름 없음),riverside_sports,둔치 체육시설,경기,126.946528,37.324418,황구지천,local,1185,,OpenStreetMap (ODbL),way/822829322
+osm:node/10076348617,가야천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.099656,35.790987,가야천,local,0,,OpenStreetMap (ODbL),node/10076348617
+osm:node/12956846295,가연천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.534237,35.338949,가연천,local,0,,OpenStreetMap (ODbL),node/12956846295
+osm:node/12956846273,가연천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.541446,35.340975,가연천,local,0,,OpenStreetMap (ODbL),node/12956846273
+osm:way/1317048820,가천천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.985001,35.75303,가천천,local,0,,OpenStreetMap (ODbL),way/1317048820
+osm:node/9460294307,갈전천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.973665,35.312303,갈전천,local,0,,OpenStreetMap (ODbL),node/9460294307
+osm:node/4004664290,강누천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.96227,35.301658,강누천,local,0,,OpenStreetMap (ODbL),node/4004664290
+osm:node/9357033496,강청천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.677767,35.348237,강청천,local,0,,OpenStreetMap (ODbL),node/9357033496
+osm:node/8937155699,거창위천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.901443,35.682869,거창위천,local,0,,OpenStreetMap (ODbL),node/8937155699
+osm:node/8936687905,거창위천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.919444,35.686504,거창위천,local,0,,OpenStreetMap (ODbL),node/8936687905
+osm:node/8936687899,거창위천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.912963,35.684156,거창위천,local,0,,OpenStreetMap (ODbL),node/8936687899
+osm:node/10801415642,거창위천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.89303,35.685355,거창위천,local,0,,OpenStreetMap (ODbL),node/10801415642
+osm:way/407193669,계수천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.909033,35.849468,계수천,local,0,,OpenStreetMap (ODbL),way/407193669
+osm:node/7036294343,광려천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.519826,35.259395,광려천,local,0,,OpenStreetMap (ODbL),node/7036294343
+osm:node/7036294342,광려천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.522732,35.267741,광려천,local,0,,OpenStreetMap (ODbL),node/7036294342
+osm:node/7036294341,광려천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.505144,35.23354,광려천,local,0,,OpenStreetMap (ODbL),node/7036294341
+osm:node/13433571518,광정천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.411927,35.248111,광정천,local,0,,OpenStreetMap (ODbL),node/13433571518
+osm:node/13059572246,나불천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.042691,35.269394,나불천,local,0,,OpenStreetMap (ODbL),node/13059572246
+osm:node/11158301294,남강 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.037648,35.161035,남강,national,0,,OpenStreetMap (ODbL),node/11158301294
+osm:node/11186488068,남사천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.952066,35.275421,남사천,local,0,,OpenStreetMap (ODbL),node/11186488068
+osm:node/13449903007,남사천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.900722,35.310379,남사천,local,3,,OpenStreetMap (ODbL),node/13449903007
+osm:node/10907646318,남천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.708555,35.183841,남천,local,0,,OpenStreetMap (ODbL),node/10907646318
+osm:node/10883180332,단장천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.990202,35.487761,단장천,local,0,,OpenStreetMap (ODbL),node/10883180332
+osm:node/11041627932,단장천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,129.008871,35.555296,단장천,local,0,,OpenStreetMap (ODbL),node/11041627932
+osm:node/10289141870,대리천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,129.003641,35.203421,대리천,local,0,,OpenStreetMap (ODbL),node/10289141870
+osm:node/13179759214,대비천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.66552,35.232636,대비천,local,0,,OpenStreetMap (ODbL),node/13179759214
+osm:node/13179759212,대비천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.659198,35.233396,대비천,local,3,,OpenStreetMap (ODbL),node/13179759212
+osm:node/10970023621,대청천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.792951,35.186578,대청천,local,0,,OpenStreetMap (ODbL),node/10970023621
+osm:node/11135785806,명호천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.797149,35.139201,명호천,local,0,,OpenStreetMap (ODbL),node/11135785806
+osm:node/13243247524,무안천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.639889,35.466561,무안천,local,0,,OpenStreetMap (ODbL),node/13243247524
+osm:node/9861454957,문산천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.161498,35.166709,문산천,local,17,,OpenStreetMap (ODbL),node/9861454957
+osm:node/5252004955,삼천포천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.108245,34.969005,삼천포천,local,0,,OpenStreetMap (ODbL),node/5252004955
+osm:node/13059932519,삼천포천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.110019,34.974098,삼천포천,local,0,,OpenStreetMap (ODbL),node/13059932519
+osm:node/12797991973,삼호천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.556105,35.235506,삼호천,local,3,,OpenStreetMap (ODbL),node/12797991973
+osm:node/12956774306,석천천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.212261,35.292007,석천천,local,0,,OpenStreetMap (ODbL),node/12956774306
+osm:node/12560578752,수영강 세월교(이름 없음),low_bridge,세월교·잠수교,경남,129.128173,35.346421,수영강,national,0,,OpenStreetMap (ODbL),node/12560578752
+osm:node/12709916043,수영강 세월교(이름 없음),low_bridge,세월교·잠수교,경남,129.103798,35.286769,수영강,national,0,,OpenStreetMap (ODbL),node/12709916043
+osm:node/12709916040,수영강 세월교(이름 없음),low_bridge,세월교·잠수교,경남,129.101831,35.291551,수영강,national,0,,OpenStreetMap (ODbL),node/12709916040
+osm:node/10935533329,시천천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.754925,35.297759,시천천,local,0,,OpenStreetMap (ODbL),node/10935533329
+osm:node/13207956068,신반천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.227038,35.486915,신반천,local,0,,OpenStreetMap (ODbL),node/13207956068
+osm:node/11548269962,신이천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.721754,35.154052,신이천,local,0,,OpenStreetMap (ODbL),node/11548269962
+osm:node/11013487032,신천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.597409,35.286287,신천,local,5,,OpenStreetMap (ODbL),node/11013487032
+osm:node/13953193561,아천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.170164,35.545496,아천,local,0,,OpenStreetMap (ODbL),node/13953193561
+osm:node/13953193560,아천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.166504,35.55266,아천,local,0,,OpenStreetMap (ODbL),node/13953193560
+osm:node/6649075947,양산천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,129.024123,35.339815,양산천,national,4,,OpenStreetMap (ODbL),node/6649075947
+osm:node/11927804658,외곡천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.142338,35.624411,외곡천,local,0,,OpenStreetMap (ODbL),node/11927804658
+osm:node/12810680078,용정천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.061285,35.024603,용정천,local,0,,OpenStreetMap (ODbL),node/12810680078
+osm:node/12834938222,운곡천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.532769,35.317293,운곡천,local,0,,OpenStreetMap (ODbL),node/12834938222
+osm:node/8282709027,원동천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.91724,35.365104,원동천,local,0,,OpenStreetMap (ODbL),node/8282709027
+osm:node/4496935809,원동천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.918418,35.380866,원동천,local,0,,OpenStreetMap (ODbL),node/4496935809
+osm:node/12790576619,유산천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,129.029285,35.371988,유산천,local,0,,OpenStreetMap (ODbL),node/12790576619
+osm:node/13226981090,장안천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.326403,35.183885,장안천,local,0,,OpenStreetMap (ODbL),node/13226981090
+osm:node/12699199222,정자천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.200394,35.141093,정자천,local,0,,OpenStreetMap (ODbL),node/12699199222
+osm:node/13063852120,주진천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,129.140058,35.390785,주진천,local,1,,OpenStreetMap (ODbL),node/13063852120
+osm:way/240374706,지우천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.75768,35.694448,지우천,local,0,,OpenStreetMap (ODbL),way/240374706
+osm:node/12311213097,창원천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.680151,35.242301,창원천,local,0,,OpenStreetMap (ODbL),node/12311213097
+osm:node/9292173422,토평천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.439023,35.555518,토평천,local,0,,OpenStreetMap (ODbL),node/9292173422
+osm:node/11158269063,판문천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.0492,35.163932,판문천,local,0,,OpenStreetMap (ODbL),node/11158269063
+osm:node/11169813693,하촌천 세월교(이름 없음),low_bridge,세월교·잠수교,경남,128.124025,35.215385,하촌천,local,0,,OpenStreetMap (ODbL),node/11169813693
+osm:node/8955079014,황강 세월교(이름 없음),low_bridge,세월교·잠수교,경남,127.926732,35.691357,황강,local,0,,OpenStreetMap (ODbL),node/8955079014
+osm:node/12987033103,회야강 세월교(이름 없음),low_bridge,세월교·잠수교,경남,129.157029,35.38095,회야강,local,0,,OpenStreetMap (ODbL),node/12987033103
+osm:way/1420112950,가좌천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,128.119564,35.153072,가좌천,local,1191,,OpenStreetMap (ODbL),way/1420112950
+osm:way/56236223,거창위천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,127.913914,35.685109,거창위천,local,17,,OpenStreetMap (ODbL),way/56236223
+osm:way/1161307590,거창위천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,127.889159,35.687929,거창위천,local,21,,OpenStreetMap (ODbL),way/1161307590
+osm:way/432769817,광양매화마을 주차장,riverside_parking,둔치·하천변 주차장,경남,127.718398,35.079189,섬진강,national,21,yes,OpenStreetMap (ODbL),way/432769817
+osm:relation/16290700,다목적마당Ⅰ,riverside_parking,둔치·하천변 주차장,경남,128.128991,35.215446,남강,national,23,,OpenStreetMap (ODbL),relation/16290700
+osm:way/1358965393,덕천강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,127.838917,35.276637,덕천강,local,16,,OpenStreetMap (ODbL),way/1358965393
+osm:way/1468425965,밀양강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,128.749672,35.49051,밀양강,national,1,,OpenStreetMap (ODbL),way/1468425965
+osm:way/885708152,밀양강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,128.758573,35.482617,밀양강,national,76,,OpenStreetMap (ODbL),way/885708152
+osm:way/881177979,밀양강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,128.74821,35.480349,밀양강,national,317,,OpenStreetMap (ODbL),way/881177979
+osm:way/1416492305,백운천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,127.738882,35.510823,백운천,local,23,,OpenStreetMap (ODbL),way/1416492305
+osm:way/543249164,삼천포천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,128.076979,34.935261,삼천포천,local,0,,OpenStreetMap (ODbL),way/543249164
+osm:way/546102827,삼천포천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,128.07714,34.940065,삼천포천,local,14,private,OpenStreetMap (ODbL),way/546102827
+osm:way/1421321783,삼천포천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,128.107914,34.968922,삼천포천,local,26,,OpenStreetMap (ODbL),way/1421321783
+osm:node/4167604187,서낙동강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,128.902614,35.119734,서낙동강,national,24,,OpenStreetMap (ODbL),node/4167604187
+osm:way/1257630736,섬진강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,127.76578,35.058105,섬진강,national,5,,OpenStreetMap (ODbL),way/1257630736
+osm:way/1309991786,섬진강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,127.753216,35.058379,섬진강,national,22,,OpenStreetMap (ODbL),way/1309991786
+osm:way/1360498218,섬진강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,127.766696,35.046099,섬진강,national,29,,OpenStreetMap (ODbL),way/1360498218
+osm:way/806717353,신등천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,128.002319,35.336133,신등천,local,24,,OpenStreetMap (ODbL),way/806717353
+osm:way/1309159965,악양천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,127.711196,35.161977,악양천,local,11,,OpenStreetMap (ODbL),way/1309159965
+osm:node/8283160078,양산천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,129.00349,35.304471,양산천,national,1133,,OpenStreetMap (ODbL),node/8283160078
+osm:way/810243956,양천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,127.970876,35.300835,양천,local,0,,OpenStreetMap (ODbL),way/810243956
+osm:way/1279898740,영지천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,127.994883,34.831199,영지천,local,1856,,OpenStreetMap (ODbL),way/1279898740
+osm:way/1172391997,우산천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,128.559572,35.140693,우산천,local,24,,OpenStreetMap (ODbL),way/1172391997
+osm:way/1572084872,임천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,127.762526,35.438558,임천,local,23,,OpenStreetMap (ODbL),way/1572084872
+osm:node/8651257548,주차장,riverside_parking,둔치·하천변 주차장,경남,128.090393,34.957237,삼천포천,local,22,,OpenStreetMap (ODbL),node/8651257548
+osm:way/322460302,진동천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,128.48403,35.10999,진동천,local,18,,OpenStreetMap (ODbL),way/322460302
+osm:way/566754327,함안천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,128.421065,35.27317,함안천,national,15,,OpenStreetMap (ODbL),way/566754327
+osm:way/1513501689,황강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,128.166511,35.560433,황강,national,27,,OpenStreetMap (ODbL),way/1513501689
+osm:way/1422492799,회야강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,129.156324,35.383858,회야강,local,20,,OpenStreetMap (ODbL),way/1422492799
+osm:way/1482963268,회야강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,129.157694,35.389563,회야강,local,20,,OpenStreetMap (ODbL),way/1482963268
+osm:way/981154398,회원천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,128.581459,35.208577,회원천,local,20,,OpenStreetMap (ODbL),way/981154398
+osm:way/1386553516,횡천강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경남,127.788555,35.159314,횡천강,local,22,,OpenStreetMap (ODbL),way/1386553516
+osm:way/659651669,게이트볼장,riverside_sports,둔치 체육시설,경남,129.025577,35.32866,다방천,local,38,,OpenStreetMap (ODbL),way/659651669
+osm:node/11172619297,게이트볼장,riverside_sports,둔치 체육시설,경남,128.130682,35.209068,남강,national,70,,OpenStreetMap (ODbL),node/11172619297
+osm:way/1021649460,경상 국립 대학교 GNU 스포츠 콤플렉스,riverside_sports,둔치 체육시설,경남,128.105868,35.155055,가좌천,local,36,,OpenStreetMap (ODbL),way/1021649460
+osm:way/471687997,곤양천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경남,127.962417,35.059633,곤양천,local,83,,OpenStreetMap (ODbL),way/471687997
+osm:way/841969680,구만천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경남,128.36362,35.054456,구만천,local,26,,OpenStreetMap (ODbL),way/841969680
+osm:way/961047913,낙동강 테니스장(이름 없음),riverside_sports,둔치 체육시설,경남,129.002717,35.218667,낙동강,national,0,,OpenStreetMap (ODbL),way/961047913
+osm:way/554201825,낙동강 테니스장(이름 없음),riverside_sports,둔치 체육시설,경남,128.948435,35.110208,낙동강,national,84,,OpenStreetMap (ODbL),way/554201825
+osm:way/1205462349,남강 농구장(이름 없음),riverside_sports,둔치 체육시설,경남,128.129335,35.223003,남강,national,0,,OpenStreetMap (ODbL),way/1205462349
+osm:way/1205462348,남강 풋살장(이름 없음),riverside_sports,둔치 체육시설,경남,128.129422,35.222508,남강,national,0,,OpenStreetMap (ODbL),way/1205462348
+osm:way/1036848303,남천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경남,128.653126,35.220227,남천,local,46,,OpenStreetMap (ODbL),way/1036848303
+osm:way/472059078,농구장,riverside_sports,둔치 체육시설,경남,129.022368,35.333576,양산천,national,0,,OpenStreetMap (ODbL),way/472059078
+osm:way/664413788,농구장,riverside_sports,둔치 체육시설,경남,129.184534,35.320921,좌광천,local,43,,OpenStreetMap (ODbL),way/664413788
+osm:way/693590069,농구코트,riverside_sports,둔치 체육시설,경남,128.582955,35.318832,무곡천,local,1552,,OpenStreetMap (ODbL),way/693590069
+osm:way/695009337,다목적구장,riverside_sports,둔치 체육시설,경남,128.581212,35.3176,무곡천,local,1759,,OpenStreetMap (ODbL),way/695009337
+osm:node/12040274681,대덕정,riverside_sports,둔치 체육시설,경남,128.088491,34.955707,삼천포천,local,34,,OpenStreetMap (ODbL),node/12040274681
+osm:way/756226822,덕천강 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,경남,127.832761,35.305187,덕천강,local,36,,OpenStreetMap (ODbL),way/756226822
+osm:way/756226821,덕천강 축구장(이름 없음),riverside_sports,둔치 체육시설,경남,127.832937,35.305448,덕천강,local,46,,OpenStreetMap (ODbL),way/756226821
+osm:way/550543779,둔덕천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경남,128.504611,34.836323,둔덕천,local,503,,OpenStreetMap (ODbL),way/550543779
+osm:node/12040274910,몽학정,riverside_sports,둔치 체육시설,경남,127.970165,35.259888,남강,national,34,,OpenStreetMap (ODbL),node/12040274910
+osm:way/881190084,밀양강 농구장(이름 없음),riverside_sports,둔치 체육시설,경남,128.75934,35.488317,밀양강,national,24,,OpenStreetMap (ODbL),way/881190084
+osm:way/881178005,밀양강 농구장(이름 없음),riverside_sports,둔치 체육시설,경남,128.755256,35.482826,밀양강,national,359,,OpenStreetMap (ODbL),way/881178005
+osm:way/881188671,밀양강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경남,128.757377,35.48843,밀양강,national,148,,OpenStreetMap (ODbL),way/881188671
+osm:way/885708151,밀양강 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,경남,128.761918,35.485158,밀양강,national,13,,OpenStreetMap (ODbL),way/885708151
+osm:way/881177968,밀양강 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,경남,128.750105,35.48036,밀양강,national,312,,OpenStreetMap (ODbL),way/881177968
+osm:way/881178003,밀양강 야구장(이름 없음),riverside_sports,둔치 체육시설,경남,128.755756,35.482711,밀양강,national,312,,OpenStreetMap (ODbL),way/881178003
+osm:way/878869190,밀양강 축구장(이름 없음),riverside_sports,둔치 체육시설,경남,128.758044,35.482644,밀양강,national,118,,OpenStreetMap (ODbL),way/878869190
+osm:way/472955893,밀양강 축구장(이름 없음),riverside_sports,둔치 체육시설,경남,128.756288,35.488765,밀양강,national,148,,OpenStreetMap (ODbL),way/472955893
+osm:way/881177986,밀양강 축구장(이름 없음),riverside_sports,둔치 체육시설,경남,128.749234,35.479938,밀양강,national,268,,OpenStreetMap (ODbL),way/881177986
+osm:way/1085494772,밀양강 풋살장(이름 없음),riverside_sports,둔치 체육시설,경남,128.745855,35.478152,밀양강,national,50,,OpenStreetMap (ODbL),way/1085494772
+osm:node/8195732918,밀양문화체육회관,riverside_sports,둔치 체육시설,경남,128.757365,35.488425,밀양강,national,149,,OpenStreetMap (ODbL),node/8195732918
+osm:way/473325144,배드민턴장,riverside_sports,둔치 체육시설,경남,128.133364,35.182211,남강,national,57,,OpenStreetMap (ODbL),way/473325144
+osm:way/664834273,배드민턴장,riverside_sports,둔치 체육시설,경남,129.174111,35.324081,좌광천,local,59,,OpenStreetMap (ODbL),way/664834273
+osm:way/664427043,배드민턴장,riverside_sports,둔치 체육시설,경남,129.195832,35.319942,좌광천,local,65,,OpenStreetMap (ODbL),way/664427043
+osm:way/695012810,배드민턴장,riverside_sports,둔치 체육시설,경남,128.581891,35.318349,무곡천,local,1655,,OpenStreetMap (ODbL),way/695012810
+osm:way/469683202,북부천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경남,129.040189,35.351919,북부천,local,59,,OpenStreetMap (ODbL),way/469683202
+osm:way/472955899,삼문동공설운동장,riverside_sports,둔치 체육시설,경남,128.757868,35.486832,밀양강,national,231,,OpenStreetMap (ODbL),way/472955899
+osm:node/12045047633,삼천포천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경남,128.088464,34.955737,삼천포천,local,38,,OpenStreetMap (ODbL),node/12045047633
+osm:way/584687588,서낙동강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경남,128.991863,35.22923,서낙동강,national,56,,OpenStreetMap (ODbL),way/584687588
+osm:way/469892996,섬진강 농구장(이름 없음),riverside_sports,둔치 체육시설,경남,127.749672,35.059208,섬진강,national,28,,OpenStreetMap (ODbL),way/469892996
+osm:way/1309991781,섬진강 야구장(이름 없음),riverside_sports,둔치 체육시설,경남,127.75492,35.058416,섬진강,national,47,,OpenStreetMap (ODbL),way/1309991781
+osm:way/469892999,섬진강 테니스장(이름 없음),riverside_sports,둔치 체육시설,경남,127.751753,35.058678,섬진강,national,30,,OpenStreetMap (ODbL),way/469892999
+osm:way/664329000,양산인라인스케이트장,riverside_sports,둔치 체육시설,경남,129.033464,35.348699,북부천,local,0,,OpenStreetMap (ODbL),way/664329000
+osm:way/803023847,양천 농구장(이름 없음),riverside_sports,둔치 체육시설,경남,127.969232,35.300345,양천,local,22,,OpenStreetMap (ODbL),way/803023847
+osm:way/931998910,양천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경남,127.978709,35.297016,양천,local,27,,OpenStreetMap (ODbL),way/931998910
+osm:way/1169661930,우산천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경남,128.558606,35.143458,우산천,local,51,,OpenStreetMap (ODbL),way/1169661930
+osm:way/664427080,운동장,riverside_sports,둔치 체육시설,경남,129.175336,35.325027,좌광천,local,56,,OpenStreetMap (ODbL),way/664427080
+osm:way/491190862,죽천천 축구장(이름 없음),riverside_sports,둔치 체육시설,경남,128.072221,35.046291,죽천천,local,20,,OpenStreetMap (ODbL),way/491190862
+osm:way/1313036030,죽천천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경남,128.072713,35.046455,죽천천,local,25,,OpenStreetMap (ODbL),way/1313036030
+osm:way/1341342299,진동천 축구장(이름 없음),riverside_sports,둔치 체육시설,경남,128.482338,35.115336,진동천,local,45,,OpenStreetMap (ODbL),way/1341342299
+osm:way/1205565579,파크 골프장,riverside_sports,둔치 체육시설,경남,128.131893,35.205039,남강,national,39,,OpenStreetMap (ODbL),way/1205565579
+osm:way/473325143,풋살경기장,riverside_sports,둔치 체육시설,경남,128.133396,35.182517,남강,national,64,,OpenStreetMap (ODbL),way/473325143
+osm:way/566754330,함안천 농구장(이름 없음),riverside_sports,둔치 체육시설,경남,128.421032,35.273901,함안천,national,23,,OpenStreetMap (ODbL),way/566754330
+osm:way/566754331,함안천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경남,128.420914,35.274409,함안천,national,22,,OpenStreetMap (ODbL),way/566754331
+osm:way/842079771,함안천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경남,128.397825,35.333995,함안천,national,63,,OpenStreetMap (ODbL),way/842079771
+osm:way/566754329,함안천 풋살장(이름 없음),riverside_sports,둔치 체육시설,경남,128.421061,35.273683,함안천,national,23,,OpenStreetMap (ODbL),way/566754329
+osm:node/12040274761,합천궁도장,riverside_sports,둔치 체육시설,경남,128.166715,35.560597,황강,national,33,,OpenStreetMap (ODbL),node/12040274761
+osm:way/1513501702,황강 농구장(이름 없음),riverside_sports,둔치 체육시설,경남,128.159867,35.558864,황강,national,24,,OpenStreetMap (ODbL),way/1513501702
+osm:way/1513501704,황강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경남,128.167367,35.561037,황강,national,32,,OpenStreetMap (ODbL),way/1513501704
+osm:way/1422492798,회야강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경남,129.156993,35.383785,회야강,local,75,,OpenStreetMap (ODbL),way/1422492798
+osm:way/1429500188,회야강 배구장(이름 없음),riverside_sports,둔치 체육시설,경남,129.156837,35.386019,회야강,local,25,,OpenStreetMap (ODbL),way/1429500188
+osm:way/1429500187,회야강 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,경남,129.157015,35.386062,회야강,local,38,,OpenStreetMap (ODbL),way/1429500187
+osm:way/1422492795,회야강 풋살장(이름 없음),riverside_sports,둔치 체육시설,경남,129.15656,35.383748,회야강,local,35,,OpenStreetMap (ODbL),way/1422492795
+osm:node/12040274707,횡강정,riverside_sports,둔치 체육시설,경남,127.808657,35.109651,횡천강,local,24,,OpenStreetMap (ODbL),node/12040274707
+osm:way/404784880,횡천강 축구장(이름 없음),riverside_sports,둔치 체육시설,경남,127.789626,35.15859,횡천강,local,47,,OpenStreetMap (ODbL),way/404784880
+osm:way/1327433009,가암천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.828993,36.164201,가암천,local,0,,OpenStreetMap (ODbL),way/1327433009
+osm:node/12188871477,가천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.232851,36.32146,가천,local,0,,OpenStreetMap (ODbL),node/12188871477
+osm:node/12200933475,가천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.207733,36.317627,가천,local,0,,OpenStreetMap (ODbL),node/12200933475
+osm:node/12192409994,가천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.222697,36.317076,가천,local,0,,OpenStreetMap (ODbL),node/12192409994
+osm:node/12190680994,경암천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.190575,36.273968,경암천,local,0,,OpenStreetMap (ODbL),node/12190680994
+osm:node/12198356952,경암천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.171342,36.277428,경암천,local,0,,OpenStreetMap (ODbL),node/12198356952
+osm:node/12029704629,관동천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.312839,36.459806,관동천,local,0,,OpenStreetMap (ODbL),node/12029704629
+osm:node/12029704715,관동천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.311441,36.465731,관동천,local,0,,OpenStreetMap (ODbL),node/12029704715
+osm:node/12198526619,금곡천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.457327,36.674447,금곡천,local,0,,OpenStreetMap (ODbL),node/12198526619
+osm:node/13506049005,기계천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.244709,36.040511,기계천,local,0,,OpenStreetMap (ODbL),node/13506049005
+osm:node/13810129784,나산천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.456304,35.720741,나산천,local,0,,OpenStreetMap (ODbL),node/13810129784
+osm:node/12709398066,낙동강 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.075385,36.95497,낙동강,local,0,,OpenStreetMap (ODbL),node/12709398066
+osm:node/11825276835,남천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.375124,36.536086,남천,local,0,,OpenStreetMap (ODbL),node/11825276835
+osm:node/13599814514,노부천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.174555,36.296962,노부천,local,0,,OpenStreetMap (ODbL),node/13599814514
+osm:node/13594788960,달곡천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.826111,36.392399,달곡천,local,0,,OpenStreetMap (ODbL),node/13594788960
+osm:node/9144098726,달천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,127.831665,36.540629,달천,local,0,,OpenStreetMap (ODbL),node/9144098726
+osm:node/12709642243,대곡천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.697998,35.719014,대곡천,local,0,,OpenStreetMap (ODbL),node/12709642243
+osm:node/12709642242,대곡천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.695187,35.702887,대곡천,local,0,,OpenStreetMap (ODbL),node/12709642242
+osm:node/12709619564,대곡천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.688762,35.694905,대곡천,local,0,,OpenStreetMap (ODbL),node/12709619564
+osm:node/12031801724,대서천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.300411,36.406456,대서천,local,0,,OpenStreetMap (ODbL),node/12031801724
+osm:node/10973244179,대안천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.39915,35.641484,대안천,local,0,,OpenStreetMap (ODbL),node/10973244179
+osm:node/10973244158,대안천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.413488,35.642327,대안천,local,0,,OpenStreetMap (ODbL),node/10973244158
+osm:node/10973244139,대안천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.420086,35.645075,대안천,local,0,,OpenStreetMap (ODbL),node/10973244139
+osm:node/13279237212,대조천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.261537,35.844595,대조천,local,0,,OpenStreetMap (ODbL),node/13279237212
+osm:node/13279236919,대조천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.298381,35.843599,대조천,local,0,,OpenStreetMap (ODbL),node/13279236919
+osm:node/13279236918,대조천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.286079,35.836835,대조천,local,0,,OpenStreetMap (ODbL),node/13279236918
+osm:node/13330062809,대천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.266535,36.237223,대천,local,0,,OpenStreetMap (ODbL),node/13330062809
+osm:node/9198896980,동천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.007602,35.592433,동천,local,2,,OpenStreetMap (ODbL),node/9198896980
+osm:node/11031792695,동천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.01401,35.599795,동천,local,12,,OpenStreetMap (ODbL),node/11031792695
+osm:node/13694609075,문상천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.174783,36.757059,문상천,local,0,,OpenStreetMap (ODbL),node/13694609075
+osm:node/14016501478,문상천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.174354,36.764707,문상천,local,0,,OpenStreetMap (ODbL),node/14016501478
+osm:node/14016501358,문상천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.1743,36.776503,문상천,local,0,,OpenStreetMap (ODbL),node/14016501358
+osm:node/11679556145,반변천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.134248,36.809117,반변천,local,0,,OpenStreetMap (ODbL),node/11679556145
+osm:node/11887269489,반변천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.127201,36.656099,반변천,local,0,,OpenStreetMap (ODbL),node/11887269489
+osm:node/13694609185,반변천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.149178,36.779882,반변천,local,0,,OpenStreetMap (ODbL),node/13694609185
+osm:node/11823856997,본돈천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.276379,36.787721,본돈천,local,0,,OpenStreetMap (ODbL),node/11823856997
+osm:node/12377528653,북천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.037359,36.397327,북천,local,0,,OpenStreetMap (ODbL),node/12377528653
+osm:way/229676625,북천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.282235,35.839304,북천,local,0,,OpenStreetMap (ODbL),way/229676625
+osm:way/839984568,빙계계곡오토캠핑장,low_bridge,세월교·잠수교,경북,128.759519,36.229177,쌍계천,local,0,,OpenStreetMap (ODbL),way/839984568
+osm:node/12533043866,소가천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.200823,35.797061,소가천,local,0,,OpenStreetMap (ODbL),node/12533043866
+osm:node/11783649274,송천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.25804,36.645015,송천,local,0,,OpenStreetMap (ODbL),node/11783649274
+osm:node/11764450661,송천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.33372,36.56606,송천,local,0,,OpenStreetMap (ODbL),node/11764450661
+osm:node/11758924883,송천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.323159,36.601094,송천,local,0,,OpenStreetMap (ODbL),node/11758924883
+osm:node/11064198467,신광천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.368104,35.926118,신광천,local,0,,OpenStreetMap (ODbL),node/11064198467
+osm:node/13481111859,신당천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.260631,35.893372,신당천,local,0,,OpenStreetMap (ODbL),node/13481111859
+osm:node/10973244127,신명천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.427512,35.646613,신명천,local,0,,OpenStreetMap (ODbL),node/10973244127
+osm:node/11835362617,신안천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.279179,36.477603,신안천,local,0,,OpenStreetMap (ODbL),node/11835362617
+osm:node/11835362081,신안천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.278523,36.490251,신안천,local,5,,OpenStreetMap (ODbL),node/11835362081
+osm:node/13694608957,신원천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.25442,36.762747,신원천,local,0,,OpenStreetMap (ODbL),node/13694608957
+osm:node/13694608956,신원천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.262781,36.765644,신원천,local,5,,OpenStreetMap (ODbL),node/13694608956
+osm:node/8896876919,신천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.651208,35.751638,신천,local,0,,OpenStreetMap (ODbL),node/8896876919
+osm:node/7838335387,쌍계천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.759524,36.229164,쌍계천,local,0,,OpenStreetMap (ODbL),node/7838335387
+osm:node/11079878277,쌍계천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.801728,36.236526,쌍계천,local,0,,OpenStreetMap (ODbL),node/11079878277
+osm:node/13375174121,쌍계천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.642585,36.266669,쌍계천,local,0,,OpenStreetMap (ODbL),node/13375174121
+osm:node/11737948274,아곡천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.396225,36.576977,아곡천,local,0,,OpenStreetMap (ODbL),node/11737948274
+osm:node/11363386396,연봉천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.223673,36.161848,연봉천,local,0,,OpenStreetMap (ODbL),node/11363386396
+osm:node/9984524335,영강 세월교(이름 없음),low_bridge,세월교·잠수교,경북,127.936918,36.570608,영강,local,0,,OpenStreetMap (ODbL),node/9984524335
+osm:node/12030979608,영덕오십천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.300543,36.436638,영덕오십천,local,0,,OpenStreetMap (ODbL),node/12030979608
+osm:node/12050419770,영덕오십천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.236151,36.447846,영덕오십천,local,0,,OpenStreetMap (ODbL),node/12050419770
+osm:node/12048662636,영덕오십천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.261201,36.446962,영덕오십천,local,0,,OpenStreetMap (ODbL),node/12048662636
+osm:node/12048662513,영덕오십천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.27027,36.44662,영덕오십천,local,0,,OpenStreetMap (ODbL),node/12048662513
+osm:node/12120706943,영덕오십천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.197257,36.472333,영덕오십천,local,0,,OpenStreetMap (ODbL),node/12120706943
+osm:node/13375729082,옥곡천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.758129,36.400027,옥곡천,local,0,,OpenStreetMap (ODbL),node/13375729082
+osm:node/12048311042,용덕천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.273292,36.422669,용덕천,local,0,,OpenStreetMap (ODbL),node/12048311042
+osm:node/12056625921,용덕천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.241295,36.429959,용덕천,local,2,,OpenStreetMap (ODbL),node/12056625921
+osm:node/12213389667,용전천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.121079,36.299331,용전천,local,0,,OpenStreetMap (ODbL),node/12213389667
+osm:node/12203510852,용전천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.12838,36.280785,용전천,local,0,,OpenStreetMap (ODbL),node/12203510852
+osm:node/12198357188,용전천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.166175,36.265907,용전천,local,0,,OpenStreetMap (ODbL),node/12198357188
+osm:node/11055973952,운문천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.960611,35.65818,운문천,local,0,,OpenStreetMap (ODbL),node/11055973952
+osm:node/11777716535,울령천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.316559,36.593749,울령천,local,5,,OpenStreetMap (ODbL),node/11777716535
+osm:node/10838410304,원동천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.291814,35.741809,원동천,local,0,,OpenStreetMap (ODbL),node/10838410304
+osm:node/7676383880,율곡천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.177376,36.12227,율곡천,local,27,,OpenStreetMap (ODbL),node/7676383880
+osm:node/9104677354,이계천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.418267,36.105395,이계천,local,0,,OpenStreetMap (ODbL),node/9104677354
+osm:node/13386094653,이소천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,127.942378,36.441124,이소천,local,0,,OpenStreetMap (ODbL),node/13386094653
+osm:node/10100805355,이안천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.095752,36.517982,이안천,local,0,,OpenStreetMap (ODbL),node/10100805355
+osm:node/13357424745,이언천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.499594,35.889562,이언천,local,0,,OpenStreetMap (ODbL),node/13357424745
+osm:node/9769866609,이천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.279089,35.914677,이천,local,0,,OpenStreetMap (ODbL),node/9769866609
+osm:way/1437037219,임고천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.045688,36.04577,임고천,local,0,,OpenStreetMap (ODbL),way/1437037219
+osm:way/1437037081,임고천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.011111,36.029564,임고천,local,0,,OpenStreetMap (ODbL),way/1437037081
+osm:node/9289314879,자호천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.080528,36.145786,자호천,local,0,,OpenStreetMap (ODbL),node/9289314879
+osm:node/12066426498,장사천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.352566,36.307737,장사천,local,0,,OpenStreetMap (ODbL),node/12066426498
+osm:node/11827283751,장수포천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.229618,36.787823,장수포천,local,0,,OpenStreetMap (ODbL),node/11827283751
+osm:node/11815233978,장수포천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.255995,36.812593,장수포천,local,0,,OpenStreetMap (ODbL),node/11815233978
+osm:node/11878872903,장파천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.155617,36.717766,장파천,local,0,,OpenStreetMap (ODbL),node/11878872903
+osm:node/11860525226,장파천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.186602,36.709154,장파천,local,0,,OpenStreetMap (ODbL),node/11860525226
+osm:node/12198094911,주산천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.164909,36.356906,주산천,local,0,,OpenStreetMap (ODbL),node/12198094911
+osm:node/12118192517,지경천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.334058,36.275016,지경천,local,0,,OpenStreetMap (ODbL),node/12118192517
+osm:node/10613629855,천내천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.526623,35.78588,천내천,local,0,,OpenStreetMap (ODbL),node/10613629855
+osm:node/11842156104,축산천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.401579,36.509682,축산천,local,0,,OpenStreetMap (ODbL),node/11842156104
+osm:node/11933582876,축산천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.376851,36.463764,축산천,local,0,,OpenStreetMap (ODbL),node/11933582876
+osm:node/12616949173,하화천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.697529,36.404413,하화천,local,0,,OpenStreetMap (ODbL),node/12616949173
+osm:node/7532377283,한천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.443155,36.702308,한천,local,0,,OpenStreetMap (ODbL),node/7532377283
+osm:node/12198603991,한천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,128.462515,36.659104,한천,local,0,no,OpenStreetMap (ODbL),node/12198603991
+osm:node/10258418991,화매천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.208087,36.520872,화매천,local,0,,OpenStreetMap (ODbL),node/10258418991
+osm:node/11881635449,화원천 세월교(이름 없음),low_bridge,세월교·잠수교,경북,129.169873,36.64544,화원천,local,0,,OpenStreetMap (ODbL),node/11881635449
+osm:way/849977536,구미천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.301485,36.132677,구미천,local,21,,OpenStreetMap (ODbL),way/849977536
+osm:way/1265830615,금오천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.329796,36.124036,금오천,local,23,,OpenStreetMap (ODbL),way/1265830615
+osm:way/1556584761,금천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.260348,36.610651,금천,local,14,,OpenStreetMap (ODbL),way/1556584761
+osm:way/1313377750,금호강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.875075,35.931126,금호강,national,8,,OpenStreetMap (ODbL),way/1313377750
+osm:way/1368603707,낙동강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.519719,36.541227,낙동강,national,29,,OpenStreetMap (ODbL),way/1368603707
+osm:way/1250120629,낙동강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.399295,36.101336,낙동강,national,34,,OpenStreetMap (ODbL),way/1250120629
+osm:way/1348837891,남원천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.523167,36.867782,남원천,local,24,,OpenStreetMap (ODbL),way/1348837891
+osm:way/539984840,남천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.225568,35.829914,남천,local,18,yes,OpenStreetMap (ODbL),way/539984840
+osm:way/471954509,내성천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.7385,36.889908,내성천,local,22,,OpenStreetMap (ODbL),way/471954509
+osm:way/1358611315,대화천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.546705,35.985177,대화천,local,6739,,OpenStreetMap (ODbL),way/1358611315
+osm:way/1243090080,동창천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.918636,35.717124,동창천,local,16,,OpenStreetMap (ODbL),way/1243090080
+osm:way/1243090082,동창천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.919637,35.711282,동창천,local,30,,OpenStreetMap (ODbL),way/1243090082
+osm:way/1149696488,동천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.336628,35.663207,동천,local,0,,OpenStreetMap (ODbL),way/1149696488
+osm:way/1065750893,매곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.359197,35.646951,매곡천,local,20,,OpenStreetMap (ODbL),way/1065750893
+osm:way/1065868539,매곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.349965,35.634878,매곡천,local,21,,OpenStreetMap (ODbL),way/1065868539
+osm:way/1066879932,매곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.360003,35.637916,매곡천,local,540,,OpenStreetMap (ODbL),way/1066879932
+osm:way/552306893,반변천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.74718,36.551848,반변천,national,28,,OpenStreetMap (ODbL),way/552306893
+osm:way/967284194,봉곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.311223,36.139154,봉곡천,local,8,,OpenStreetMap (ODbL),way/967284194
+osm:way/1481322504,북천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.243856,35.840105,북천,local,0,,OpenStreetMap (ODbL),way/1481322504
+osm:way/1382932552,북천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.162898,36.427146,북천,local,0,,OpenStreetMap (ODbL),way/1382932552
+osm:way/1303655007,상안천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.315142,35.630813,상안천,local,17,,OpenStreetMap (ODbL),way/1303655007
+osm:way/1255462949,신흥천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.029212,36.435437,신흥천,local,32,,OpenStreetMap (ODbL),way/1255462949
+osm:way/1294893265,영덕오십천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.388861,36.359639,영덕오십천,local,2,,OpenStreetMap (ODbL),way/1294893265
+osm:way/1295018837,영덕오십천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.382227,36.359529,영덕오십천,local,15,,OpenStreetMap (ODbL),way/1295018837
+osm:way/1556400597,위천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.585618,36.176493,위천,local,41,,OpenStreetMap (ODbL),way/1556400597
+osm:way/1250120630,이계천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.39956,36.102491,이계천,local,33,,OpenStreetMap (ODbL),way/1250120630
+osm:way/1300222106,장사천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.375175,36.290054,장사천,local,7,,OpenStreetMap (ODbL),way/1300222106
+osm:node/8757716232,주차장,riverside_parking,둔치·하천변 주차장,경북,129.38179,35.928696,신광천,local,25,,OpenStreetMap (ODbL),node/8757716232
+osm:way/1312166885,천곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.338551,35.632781,천곡천,local,14,,OpenStreetMap (ODbL),way/1312166885
+osm:way/1523242369,청도천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.741777,35.652704,청도천,local,0,,OpenStreetMap (ODbL),way/1523242369
+osm:way/1331043374,칠성천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.371535,36.037962,칠성천,local,9,,OpenStreetMap (ODbL),way/1331043374
+osm:way/1330340459,칠성천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.374735,36.051861,칠성천,local,256,,OpenStreetMap (ODbL),way/1330340459
+osm:way/1454675371,한천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.44747,36.642728,한천,local,0,,OpenStreetMap (ODbL),way/1454675371
+osm:way/469216255,한천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.457161,36.655123,한천,local,11,,OpenStreetMap (ODbL),way/469216255
+osm:way/1317806407,한천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,128.449701,36.651299,한천,local,16,,OpenStreetMap (ODbL),way/1317806407
+osm:way/1018183432,형산강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.348531,36.003323,형산강,national,22,,OpenStreetMap (ODbL),way/1018183432
+osm:way/891050718,형산강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.372871,36.007804,형산강,national,30,,OpenStreetMap (ODbL),way/891050718
+osm:way/1335940802,형산강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,경북,129.376828,36.022212,형산강,national,38,,OpenStreetMap (ODbL),way/1335940802
+osm:way/1054149214,광평천 축구장(이름 없음),riverside_sports,둔치 체육시설,경북,128.371578,36.091064,광평천,local,49,,OpenStreetMap (ODbL),way/1054149214
+osm:way/490271714,구미시 금오 테니스장,riverside_sports,둔치 체육시설,경북,128.324815,36.122529,금오천,local,66,permissive,OpenStreetMap (ODbL),way/490271714
+osm:way/967284259,구미천 축구장(이름 없음),riverside_sports,둔치 체육시설,경북,128.321187,36.131554,구미천,local,12,,OpenStreetMap (ODbL),way/967284259
+osm:way/1120918700,금오천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경북,128.334754,36.124172,금오천,local,55,,OpenStreetMap (ODbL),way/1120918700
+osm:way/490271716,금오천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경북,128.326199,36.122901,금오천,local,64,,OpenStreetMap (ODbL),way/490271716
+osm:way/566307980,금호강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경북,128.471043,35.856175,금호강,national,31,,OpenStreetMap (ODbL),way/566307980
+osm:way/825755119,금호강 야구장(이름 없음),riverside_sports,둔치 체육시설,경북,128.50716,35.890634,금호강,national,76,,OpenStreetMap (ODbL),way/825755119
+osm:way/887845058,낙동강 농구장(이름 없음),riverside_sports,둔치 체육시설,경북,128.476402,35.810128,낙동강,national,41,,OpenStreetMap (ODbL),way/887845058
+osm:way/552306887,낙동강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경북,128.74269,36.560259,낙동강,national,0,,OpenStreetMap (ODbL),way/552306887
+osm:way/1473362802,낙동강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경북,128.771685,36.586224,낙동강,national,35,,OpenStreetMap (ODbL),way/1473362802
+osm:way/887845094,낙동강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경북,128.480545,35.81285,낙동강,national,53,,OpenStreetMap (ODbL),way/887845094
+osm:way/471697767,낙동강 축구장(이름 없음),riverside_sports,둔치 체육시설,경북,128.301179,36.360287,낙동강,national,0,,OpenStreetMap (ODbL),way/471697767
+osm:way/471954510,농구장,riverside_sports,둔치 체육시설,경북,128.735747,36.887849,내성천,local,19,,OpenStreetMap (ODbL),way/471954510
+osm:way/891699949,농구장,riverside_sports,둔치 체육시설,경북,128.828649,35.911491,청통천,local,38,,OpenStreetMap (ODbL),way/891699949
+osm:way/1063117522,농구장,riverside_sports,둔치 체육시설,경북,129.35862,35.644237,매곡천,local,45,,OpenStreetMap (ODbL),way/1063117522
+osm:way/251734412,대창천 농구장(이름 없음),riverside_sports,둔치 체육시설,경북,128.845846,35.907444,대창천,local,44,,OpenStreetMap (ODbL),way/251734412
+osm:way/1185977453,대창천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경북,128.846474,35.907003,대창천,local,68,,OpenStreetMap (ODbL),way/1185977453
+osm:way/552306889,반변천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경북,128.744461,36.556214,반변천,national,0,,OpenStreetMap (ODbL),way/552306889
+osm:way/552306888,반변천 축구장(이름 없음),riverside_sports,둔치 체육시설,경북,128.745423,36.555888,반변천,national,0,,OpenStreetMap (ODbL),way/552306888
+osm:way/471697768,배드민턴장,riverside_sports,둔치 체육시설,경북,128.300548,36.359887,낙동강,national,0,,OpenStreetMap (ODbL),way/471697768
+osm:way/1549351180,북천 농구장(이름 없음),riverside_sports,둔치 체육시설,경북,129.221699,35.8502,북천,local,25,,OpenStreetMap (ODbL),way/1549351180
+osm:way/1481322501,북천 축구장(이름 없음),riverside_sports,둔치 체육시설,경북,129.242475,35.840139,북천,local,0,,OpenStreetMap (ODbL),way/1481322501
+osm:way/1333665969,북천 축구장(이름 없음),riverside_sports,둔치 체육시설,경북,129.234935,35.842501,북천,local,0,,OpenStreetMap (ODbL),way/1333665969
+osm:way/468928289,서천 농구장(이름 없음),riverside_sports,둔치 체육시설,경북,128.614671,36.815483,서천,local,28,,OpenStreetMap (ODbL),way/468928289
+osm:way/1564310776,신안천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경북,128.568626,36.238628,신안천,local,65,,OpenStreetMap (ODbL),way/1564310776
+osm:way/1257721374,야구장,riverside_sports,둔치 체육시설,경북,128.462816,35.872879,금호강,national,48,,OpenStreetMap (ODbL),way/1257721374
+osm:way/1292563198,영덕오십천 농구장(이름 없음),riverside_sports,둔치 체육시설,경북,129.361634,36.41925,영덕오십천,local,10,,OpenStreetMap (ODbL),way/1292563198
+osm:way/1187068994,영덕오십천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경북,129.365335,36.415954,영덕오십천,local,46,,OpenStreetMap (ODbL),way/1187068994
+osm:way/1318055009,예천군민탁구장,riverside_sports,둔치 체육시설,경북,128.460776,36.654693,한천,local,40,,OpenStreetMap (ODbL),way/1318055009
+osm:way/1318055004,예천실내테니스장,riverside_sports,둔치 체육시설,경북,128.462296,36.65597,한천,local,45,,OpenStreetMap (ODbL),way/1318055004
+osm:way/756254060,오목천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경북,128.874349,35.79255,오목천,local,47,,OpenStreetMap (ODbL),way/756254060
+osm:node/2478533162,외동 게이트볼장,riverside_sports,둔치 체육시설,경북,129.324524,35.712137,입실천,local,12,,OpenStreetMap (ODbL),node/2478533162
+osm:way/510594452,운동장,riverside_sports,둔치 체육시설,경북,129.373736,36.015076,형산강,national,46,,OpenStreetMap (ODbL),way/510594452
+osm:way/1063117521,운동장,riverside_sports,둔치 체육시설,경북,129.358973,35.644403,매곡천,local,60,,OpenStreetMap (ODbL),way/1063117521
+osm:way/891890154,위천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경북,128.56226,36.238135,위천,local,42,,OpenStreetMap (ODbL),way/891890154
+osm:way/891890153,위천 축구장(이름 없음),riverside_sports,둔치 체육시설,경북,128.561939,36.240105,위천,local,57,,OpenStreetMap (ODbL),way/891890153
+osm:way/1160695673,인라인 스케이트장,riverside_sports,둔치 체육시설,경북,128.452911,36.65322,한천,local,34,,OpenStreetMap (ODbL),way/1160695673
+osm:way/468928290,인라인스케이트장,riverside_sports,둔치 체육시설,경북,128.614166,36.812492,서천,local,31,,OpenStreetMap (ODbL),way/468928290
+osm:way/1187066080,인라인스케이트장,riverside_sports,둔치 체육시설,경북,128.951209,35.969524,금호강,national,32,,OpenStreetMap (ODbL),way/1187066080
+osm:way/552261700,인라인스케이트장,riverside_sports,둔치 체육시설,경북,128.71907,36.557223,낙동강,national,54,,OpenStreetMap (ODbL),way/552261700
+osm:way/1065750938,족구장,riverside_sports,둔치 체육시설,경북,129.36038,35.645954,매곡천,local,75,,OpenStreetMap (ODbL),way/1065750938
+osm:way/696461355,족구장,riverside_sports,둔치 체육시설,경북,128.145672,35.92907,대가천,local,634,,OpenStreetMap (ODbL),way/696461355
+osm:way/1312166873,천곡천 축구장(이름 없음),riverside_sports,둔치 체육시설,경북,129.341614,35.631092,천곡천,local,41,,OpenStreetMap (ODbL),way/1312166873
+osm:way/1168336115,천곡천 축구장(이름 없음),riverside_sports,둔치 체육시설,경북,129.334557,35.633824,천곡천,local,54,,OpenStreetMap (ODbL),way/1168336115
+osm:way/459093717,청도천 농구장(이름 없음),riverside_sports,둔치 체육시설,경북,128.748198,35.640385,청도천,local,66,,OpenStreetMap (ODbL),way/459093717
+osm:way/453042747,청도천 축구장(이름 없음),riverside_sports,둔치 체육시설,경북,128.748289,35.640831,청도천,local,46,,OpenStreetMap (ODbL),way/453042747
+osm:relation/6954302,테니스장,riverside_sports,둔치 체육시설,경북,128.730536,36.88843,내성천,local,20,,OpenStreetMap (ODbL),relation/6954302
+osm:way/821383126,테니스장,riverside_sports,둔치 체육시설,경북,129.2041,35.993984,칠평천,local,44,,OpenStreetMap (ODbL),way/821383126
+osm:way/1317555433,한천 농구장(이름 없음),riverside_sports,둔치 체육시설,경북,128.462277,36.663393,한천,local,0,,OpenStreetMap (ODbL),way/1317555433
+osm:way/1318055008,한천 농구장(이름 없음),riverside_sports,둔치 체육시설,경북,128.46128,36.655048,한천,local,36,,OpenStreetMap (ODbL),way/1318055008
+osm:way/1317806409,한천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,경북,128.449505,36.650104,한천,local,19,,OpenStreetMap (ODbL),way/1317806409
+osm:way/1318055003,한천 테니스장(이름 없음),riverside_sports,둔치 체육시설,경북,128.461748,36.655468,한천,local,35,,OpenStreetMap (ODbL),way/1318055003
+osm:way/1006869082,형산강 농구장(이름 없음),riverside_sports,둔치 체육시설,경북,129.347951,36.000399,형산강,national,19,,OpenStreetMap (ODbL),way/1006869082
+osm:way/1233824509,석곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,광주,126.952582,35.197192,석곡천,local,23,customers,OpenStreetMap (ODbL),way/1233824509
+osm:way/1254583061,석곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,광주,126.950172,35.215564,석곡천,local,23,,OpenStreetMap (ODbL),way/1254583061
+osm:way/1254607138,석곡천 테니스장(이름 없음),riverside_sports,둔치 체육시설,광주,126.949183,35.216697,석곡천,local,79,,OpenStreetMap (ODbL),way/1254607138
+osm:way/565081129,영산강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,광주,126.861601,35.221579,영산강,national,0,,OpenStreetMap (ODbL),way/565081129
+osm:node/12045047667,영산강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,광주,126.867841,35.232994,영산강,national,14,,OpenStreetMap (ODbL),node/12045047667
+osm:way/740279590,영산강 야구장(이름 없음),riverside_sports,둔치 체육시설,광주,126.860904,35.216735,영산강,national,0,,OpenStreetMap (ODbL),way/740279590
+osm:way/1180374157,증암천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,광주,126.987171,35.202182,증암천,local,53,,OpenStreetMap (ODbL),way/1180374157
+osm:node/10111175843,달서천 세월교(이름 없음),low_bridge,세월교·잠수교,대구,128.551594,35.882658,달서천,local,0,,OpenStreetMap (ODbL),node/10111175843
+osm:node/13230502321,동화천 세월교(이름 없음),low_bridge,세월교·잠수교,대구,128.643331,35.942477,동화천,local,0,,OpenStreetMap (ODbL),node/13230502321
+osm:node/9152149173,불로천 세월교(이름 없음),low_bridge,세월교·잠수교,대구,128.63734,35.909962,불로천,local,0,,OpenStreetMap (ODbL),node/9152149173
+osm:node/13266023584,팔거천 세월교(이름 없음),low_bridge,세월교·잠수교,대구,128.55534,35.934436,팔거천,local,0,,OpenStreetMap (ODbL),node/13266023584
+osm:node/13266023583,팔거천 세월교(이름 없음),low_bridge,세월교·잠수교,대구,128.554176,35.94342,팔거천,local,0,,OpenStreetMap (ODbL),node/13266023583
+osm:relation/19577919,금호강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,대구,128.654417,35.88004,금호강,national,19,,OpenStreetMap (ODbL),relation/19577919
+osm:way/1408539743,금호강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,대구,128.637235,35.889519,금호강,national,20,,OpenStreetMap (ODbL),way/1408539743
+osm:way/1079227179,금호강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,대구,128.604385,35.9111,금호강,national,31,,OpenStreetMap (ODbL),way/1079227179
+osm:way/1288190748,금호강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,대구,128.578147,35.904147,금호강,national,36,,OpenStreetMap (ODbL),way/1288190748
+osm:way/888387606,신천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,대구,128.602437,35.879716,신천,local,24,,OpenStreetMap (ODbL),way/888387606
+osm:way/1083915215,신천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,대구,128.607793,35.849323,신천,local,26,,OpenStreetMap (ODbL),way/1083915215
+osm:way/1126182882,진천천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,대구,128.511308,35.811257,진천천,local,35,customers,OpenStreetMap (ODbL),way/1126182882
+osm:way/810510960,팔거천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,대구,128.554886,35.982846,팔거천,local,1,,OpenStreetMap (ODbL),way/810510960
+osm:way/1083925139,게이트볼장,riverside_sports,둔치 체육시설,대구,128.607748,35.854531,신천,local,23,,OpenStreetMap (ODbL),way/1083925139
+osm:way/671111021,금호강 골프 연습장(이름 없음),riverside_sports,둔치 체육시설,대구,128.632436,35.925841,금호강,national,15,,OpenStreetMap (ODbL),way/671111021
+osm:way/1429444735,금호강 농구장(이름 없음),riverside_sports,둔치 체육시설,대구,128.634667,35.893846,금호강,national,39,,OpenStreetMap (ODbL),way/1429444735
+osm:way/332522397,금호강 농구장(이름 없음),riverside_sports,둔치 체육시설,대구,128.654428,35.88294,금호강,national,45,,OpenStreetMap (ODbL),way/332522397
+osm:way/885832323,금호강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대구,128.563515,35.902503,금호강,national,0,,OpenStreetMap (ODbL),way/885832323
+osm:way/309605921,금호강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대구,128.667539,35.874158,금호강,national,0,,OpenStreetMap (ODbL),way/309605921
+osm:way/1079227178,금호강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대구,128.603964,35.910135,금호강,national,30,,OpenStreetMap (ODbL),way/1079227178
+osm:relation/19596683,금호강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대구,128.634663,35.893834,금호강,national,37,,OpenStreetMap (ODbL),relation/19596683
+osm:way/825722981,금호강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대구,128.614423,35.920655,금호강,national,42,,OpenStreetMap (ODbL),way/825722981
+osm:way/671111013,금호강 야구장(이름 없음),riverside_sports,둔치 체육시설,대구,128.631529,35.928236,금호강,national,35,,OpenStreetMap (ODbL),way/671111013
+osm:way/825722977,금호강 야구장(이름 없음),riverside_sports,둔치 체육시설,대구,128.623409,35.926139,금호강,national,52,,OpenStreetMap (ODbL),way/825722977
+osm:way/990440944,금호강 야구장(이름 없음),riverside_sports,둔치 체육시설,대구,128.633237,35.909176,금호강,national,78,,OpenStreetMap (ODbL),way/990440944
+osm:way/1428176910,금호강 축구장(이름 없음),riverside_sports,둔치 체육시설,대구,128.633209,35.89482,금호강,national,39,,OpenStreetMap (ODbL),way/1428176910
+osm:way/671111011,금호강 축구장(이름 없음),riverside_sports,둔치 체육시설,대구,128.630799,35.929102,금호강,national,40,,OpenStreetMap (ODbL),way/671111011
+osm:way/1273233823,금호강 축구장(이름 없음),riverside_sports,둔치 체육시설,대구,128.567435,35.902478,금호강,national,60,,OpenStreetMap (ODbL),way/1273233823
+osm:way/1429129554,금호강 테니스장(이름 없음),riverside_sports,둔치 체육시설,대구,128.633676,35.894384,금호강,national,28,,OpenStreetMap (ODbL),way/1429129554
+osm:way/469281110,불로천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대구,128.637664,35.90953,불로천,local,33,,OpenStreetMap (ODbL),way/469281110
+osm:way/1024857906,불로천 축구장(이름 없음),riverside_sports,둔치 체육시설,대구,128.639024,35.909453,불로천,local,41,,OpenStreetMap (ODbL),way/1024857906
+osm:way/332522398,스케이트장,riverside_sports,둔치 체육시설,대구,128.654807,35.882745,금호강,national,50,,OpenStreetMap (ODbL),way/332522398
+osm:way/821871715,신천 농구장(이름 없음),riverside_sports,둔치 체육시설,대구,128.599768,35.888204,신천,local,24,,OpenStreetMap (ODbL),way/821871715
+osm:way/1426305180,신천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대구,128.612699,35.864226,신천,local,20,,OpenStreetMap (ODbL),way/1426305180
+osm:way/384173072,신천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대구,128.612898,35.870592,신천,local,21,,OpenStreetMap (ODbL),way/384173072
+osm:way/821873209,신천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대구,128.600121,35.88783,신천,local,27,,OpenStreetMap (ODbL),way/821873209
+osm:way/472467928,팔거천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대구,128.545637,35.897974,팔거천,local,51,,OpenStreetMap (ODbL),way/472467928
+osm:way/474350432,팔거천 테니스장(이름 없음),riverside_sports,둔치 체육시설,대구,128.555927,35.933457,팔거천,local,34,,OpenStreetMap (ODbL),way/474350432
+osm:way/1376116187,금천 세월교(이름 없음),low_bridge,세월교·잠수교,대전,127.299316,36.439336,금천,local,3,,OpenStreetMap (ODbL),way/1376116187
+osm:node/13413202734,내동천 세월교(이름 없음),low_bridge,세월교·잠수교,대전,127.293082,36.453378,내동천,local,12,,OpenStreetMap (ODbL),node/13413202734
+osm:way/1296402030,반석천 세월교(이름 없음),low_bridge,세월교·잠수교,대전,127.330914,36.369695,반석천,local,0,,OpenStreetMap (ODbL),way/1296402030
+osm:way/1282841537,방아미로66번길,low_bridge,세월교·잠수교,대전,127.387863,36.270076,유등천,national,0,,OpenStreetMap (ODbL),way/1282841537
+osm:way/131836770,용수천 세월교(이름 없음),low_bridge,세월교·잠수교,대전,127.258971,36.407844,용수천,local,0,,OpenStreetMap (ODbL),way/131836770
+osm:way/103395069,유등천 세월교(이름 없음),low_bridge,세월교·잠수교,대전,127.372222,36.249847,유등천,local,0,,OpenStreetMap (ODbL),way/103395069
+osm:way/33906944,유등천 세월교(이름 없음),low_bridge,세월교·잠수교,대전,127.383356,36.267851,유등천,local,0,,OpenStreetMap (ODbL),way/33906944
+osm:way/33906943,유등천 세월교(이름 없음),low_bridge,세월교·잠수교,대전,127.384303,36.261551,유등천,local,0,,OpenStreetMap (ODbL),way/33906943
+osm:way/133338087,유등천 세월교(이름 없음),low_bridge,세월교·잠수교,대전,127.385629,36.284634,유등천,national,0,,OpenStreetMap (ODbL),way/133338087
+osm:way/1258017757,유등천 세월교(이름 없음),low_bridge,세월교·잠수교,대전,127.381269,36.256657,유등천,local,0,,OpenStreetMap (ODbL),way/1258017757
+osm:way/1126385197,정생천 세월교(이름 없음),low_bridge,세월교·잠수교,대전,127.399481,36.26557,정생천,local,0,agricultural,OpenStreetMap (ODbL),way/1126385197
+osm:node/11662187532,탄동천 세월교(이름 없음),low_bridge,세월교·잠수교,대전,127.369288,36.375466,탄동천,local,0,,OpenStreetMap (ODbL),node/11662187532
+osm:node/11662187518,탄동천 세월교(이름 없음),low_bridge,세월교·잠수교,대전,127.377021,36.375867,탄동천,local,0,,OpenStreetMap (ODbL),node/11662187518
+osm:way/164146528,갑천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,대전,127.359942,36.304822,갑천,national,0,,OpenStreetMap (ODbL),way/164146528
+osm:way/28724151,유등천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,대전,127.382951,36.284724,유등천,national,0,,OpenStreetMap (ODbL),way/28724151
+osm:way/1313776423,유성천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,대전,127.331725,36.356893,유성천,local,28,,OpenStreetMap (ODbL),way/1313776423
+osm:node/11950070110,진잠천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,대전,127.341066,36.341283,진잠천,local,34,,OpenStreetMap (ODbL),node/11950070110
+osm:way/472052830,갑천 농구장(이름 없음),riverside_sports,둔치 체육시설,대전,127.411168,36.400013,갑천,national,0,,OpenStreetMap (ODbL),way/472052830
+osm:way/1226709446,갑천 농구장(이름 없음),riverside_sports,둔치 체육시설,대전,127.363065,36.3007,갑천,national,17,,OpenStreetMap (ODbL),way/1226709446
+osm:way/1517560364,갑천 농구장(이름 없음),riverside_sports,둔치 체육시설,대전,127.378137,36.371536,갑천,national,37,,OpenStreetMap (ODbL),way/1517560364
+osm:way/472454498,갑천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대전,127.35915,36.290458,갑천,national,0,,OpenStreetMap (ODbL),way/472454498
+osm:way/128270533,갑천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대전,127.390917,36.373832,갑천,national,24,,OpenStreetMap (ODbL),way/128270533
+osm:way/1517560366,갑천 배구장(이름 없음),riverside_sports,둔치 체육시설,대전,127.377887,36.37124,갑천,national,61,,OpenStreetMap (ODbL),way/1517560366
+osm:way/1226709450,갑천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,대전,127.363028,36.301175,갑천,national,12,,OpenStreetMap (ODbL),way/1226709450
+osm:way/1517560362,갑천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,대전,127.377082,36.371355,갑천,national,20,,OpenStreetMap (ODbL),way/1517560362
+osm:way/472052836,갑천 테니스장(이름 없음),riverside_sports,둔치 체육시설,대전,127.411087,36.399476,갑천,national,0,,OpenStreetMap (ODbL),way/472052836
+osm:way/1517560363,갑천 테니스장(이름 없음),riverside_sports,둔치 체육시설,대전,127.377723,36.371449,갑천,national,34,,OpenStreetMap (ODbL),way/1517560363
+osm:way/768390772,대동천 축구장(이름 없음),riverside_sports,둔치 체육시설,대전,127.423862,36.336589,대동천,local,64,,OpenStreetMap (ODbL),way/768390772
+osm:node/12040274786,보문정,riverside_sports,둔치 체육시설,대전,127.384895,36.28371,유등천,national,37,,OpenStreetMap (ODbL),node/12040274786
+osm:way/164146520,유등천 농구장(이름 없음),riverside_sports,둔치 체육시설,대전,127.385012,36.316451,유등천,national,17,,OpenStreetMap (ODbL),way/164146520
+osm:way/61154770,유등천 다목적 운동장(이름 없음),riverside_sports,둔치 체육시설,대전,127.404465,36.35229,유등천,national,37,,OpenStreetMap (ODbL),way/61154770
+osm:way/61154788,유등천 다목적 운동장(이름 없음),riverside_sports,둔치 체육시설,대전,127.402541,36.346236,유등천,national,40,,OpenStreetMap (ODbL),way/61154788
+osm:way/471834533,유등천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대전,127.388179,36.323968,유등천,national,37,,OpenStreetMap (ODbL),way/471834533
+osm:way/97823172,유등천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대전,127.383947,36.283656,유등천,national,43,,OpenStreetMap (ODbL),way/97823172
+osm:way/164146525,유등천 배구장(이름 없음),riverside_sports,둔치 체육시설,대전,127.384966,36.316749,유등천,national,14,,OpenStreetMap (ODbL),way/164146525
+osm:way/164146522,유등천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,대전,127.384908,36.316967,유등천,national,14,,OpenStreetMap (ODbL),way/164146522
+osm:way/779800262,유등천 야구장(이름 없음),riverside_sports,둔치 체육시설,대전,127.39649,36.366838,유등천,national,54,,OpenStreetMap (ODbL),way/779800262
+osm:way/1154623325,유등천 테니스장(이름 없음),riverside_sports,둔치 체육시설,대전,127.38765,36.325499,유등천,national,31,,OpenStreetMap (ODbL),way/1154623325
+osm:way/124480108,진잠천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대전,127.341875,36.34165,진잠천,local,47,,OpenStreetMap (ODbL),way/124480108
+osm:way/1288143797,진잠천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,대전,127.334362,36.335278,진잠천,local,63,,OpenStreetMap (ODbL),way/1288143797
+osm:way/1288143796,진잠천 풋살장(이름 없음),riverside_sports,둔치 체육시설,대전,127.334358,36.335278,진잠천,local,64,,OpenStreetMap (ODbL),way/1288143796
+osm:node/9195974317,대천천 세월교(이름 없음),low_bridge,세월교·잠수교,부산,129.045509,35.251752,대천천,local,0,,OpenStreetMap (ODbL),node/9195974317
+osm:node/11199385782,춘천 세월교(이름 없음),low_bridge,세월교·잠수교,부산,129.162802,35.18703,춘천,local,0,,OpenStreetMap (ODbL),node/11199385782
+osm:way/390404843,황령대로,low_bridge,세월교·잠수교,부산,129.098901,35.144747,남천,local,12,,OpenStreetMap (ODbL),way/390404843
+osm:way/1083378975,황령대로,low_bridge,세월교·잠수교,부산,129.092107,35.148739,남천,local,27,,OpenStreetMap (ODbL),way/1083378975
+osm:way/1565020516,동천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,부산,129.058316,35.150829,동천,local,23,,OpenStreetMap (ODbL),way/1565020516
+osm:way/1230901243,동천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,부산,129.066894,35.129283,동천,local,23,,OpenStreetMap (ODbL),way/1230901243
+osm:node/5537749012,동천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,부산,129.065658,35.138288,동천,local,25,,OpenStreetMap (ODbL),node/5537749012
+osm:way/659361441,성동교회 주차장,riverside_parking,둔치·하천변 주차장,부산,129.06458,35.142344,동천,local,33,customers,OpenStreetMap (ODbL),way/659361441
+osm:node/7552915672,온천장역북측공영주차장,riverside_parking,둔치·하천변 주차장,부산,129.086958,35.221126,온천천,local,2,,OpenStreetMap (ODbL),node/7552915672
+osm:way/472166389,온천천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,부산,129.080756,35.234096,온천천,local,750,,OpenStreetMap (ODbL),way/472166389
+osm:way/468972161,온천천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,부산,129.076193,35.183766,온천천,local,1475,,OpenStreetMap (ODbL),way/468972161
+osm:way/757044095,남천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,부산,129.1004,35.128729,남천,local,1241,,OpenStreetMap (ODbL),way/757044095
+osm:way/463039195,농구장,riverside_sports,둔치 체육시설,부산,129.075638,35.076003,보수천,local,4989,yes,OpenStreetMap (ODbL),way/463039195
+osm:way/758996937,대천천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,부산,129.017596,35.241908,대천천,local,40,,OpenStreetMap (ODbL),way/758996937
+osm:way/757370777,동천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,부산,129.065761,35.140747,동천,local,36,,OpenStreetMap (ODbL),way/757370777
+osm:way/458098228,보수천 농구장(이름 없음),riverside_sports,둔치 체육시설,부산,129.076606,35.073622,보수천,local,5188,,OpenStreetMap (ODbL),way/458098228
+osm:way/243644932,보수천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,부산,129.076105,35.080872,보수천,local,4817,,OpenStreetMap (ODbL),way/243644932
+osm:way/757683996,부산천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,부산,129.046263,35.131387,부산천,local,58,,OpenStreetMap (ODbL),way/757683996
+osm:way/452862235,온천천 농구장(이름 없음),riverside_sports,둔치 체육시설,부산,129.08354,35.195794,온천천,local,0,,OpenStreetMap (ODbL),way/452862235
+osm:way/472121801,온천천 농구장(이름 없음),riverside_sports,둔치 체육시설,부산,129.089202,35.234902,온천천,local,0,,OpenStreetMap (ODbL),way/472121801
+osm:way/472122594,온천천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,부산,129.088673,35.236291,온천천,local,0,,OpenStreetMap (ODbL),way/472122594
+osm:way/468453991,온천천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,부산,129.08723,35.193906,온천천,local,9,,OpenStreetMap (ODbL),way/468453991
+osm:way/757371864,온천천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,부산,129.109241,35.191142,온천천,local,53,,OpenStreetMap (ODbL),way/757371864
+osm:way/757035212,온천천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,부산,129.094402,35.193761,온천천,local,64,,OpenStreetMap (ODbL),way/757035212
+osm:way/953412476,온천천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,부산,129.100879,35.191141,온천천,local,8,,OpenStreetMap (ODbL),way/953412476
+osm:way/472121799,온천천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,부산,129.089124,35.232514,온천천,local,18,,OpenStreetMap (ODbL),way/472121799
+osm:way/785901252,온천천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,부산,129.112146,35.188877,온천천,local,50,,OpenStreetMap (ODbL),way/785901252
+osm:way/1357158128,온천천 테니스장(이름 없음),riverside_sports,둔치 체육시설,부산,129.088054,35.22604,온천천,local,41,,OpenStreetMap (ODbL),way/1357158128
+osm:way/953412830,인라인장,riverside_sports,둔치 체육시설,부산,129.098065,35.191869,온천천,local,8,,OpenStreetMap (ODbL),way/953412830
+osm:way/1562491923,초량천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,부산,129.047238,35.114233,초량천,local,336,,OpenStreetMap (ODbL),way/1562491923
+osm:node/10609259044,도림천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,126.948879,37.46206,도림천,local,0,,OpenStreetMap (ODbL),node/10609259044
+osm:node/7804711164,도봉천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,127.034183,37.677312,도봉천,local,0,,OpenStreetMap (ODbL),node/7804711164
+osm:way/380861460,보국문로,low_bridge,세월교·잠수교,서울,127.00805,37.612046,정릉천,local,3,,OpenStreetMap (ODbL),way/380861460
+osm:node/5130444446,시흥천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,126.914377,37.451979,시흥천,local,1,,OpenStreetMap (ODbL),node/5130444446
+osm:node/8178191337,양재천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,127.039166,37.474624,양재천,local,0,,OpenStreetMap (ODbL),node/8178191337
+osm:node/13357662283,양재천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,127.022589,37.45709,양재천,local,0,,OpenStreetMap (ODbL),node/13357662283
+osm:node/8178191348,여의천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,127.047759,37.460436,여의천,local,0,,OpenStreetMap (ODbL),node/8178191348
+osm:node/13251434126,우이천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,127.029628,37.643641,우이천,local,0,,OpenStreetMap (ODbL),node/13251434126
+osm:node/13251431278,우이천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,127.042774,37.630495,우이천,local,0,,OpenStreetMap (ODbL),node/13251431278
+osm:node/13780969303,중랑천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,127.031038,37.545266,중랑천,national,0,,OpenStreetMap (ODbL),node/13780969303
+osm:node/9768620490,청계천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,127.006268,37.569642,청계천,local,0,,OpenStreetMap (ODbL),node/9768620490
+osm:node/9768620489,청계천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,127.015343,37.569741,청계천,local,0,,OpenStreetMap (ODbL),node/9768620489
+osm:node/9768620488,청계천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,126.993078,37.568371,청계천,local,0,,OpenStreetMap (ODbL),node/9768620488
+osm:node/9768620483,청계천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,127.025239,37.571151,청계천,local,0,,OpenStreetMap (ODbL),node/9768620483
+osm:node/9768620474,청계천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,126.983442,37.568811,청계천,local,0,,OpenStreetMap (ODbL),node/9768620474
+osm:node/9371816663,초이천 세월교(이름 없음),low_bridge,세월교·잠수교,서울,127.174208,37.544513,초이천,local,0,,OpenStreetMap (ODbL),node/9371816663
+osm:node/13823331342,묵동천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,127.081841,37.6308,묵동천,local,1200,,OpenStreetMap (ODbL),node/13823331342
+osm:way/617416463,반포천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,126.979451,37.506077,반포천,local,16,,OpenStreetMap (ODbL),way/617416463
+osm:node/7018932193,세운상가 공영주차장,riverside_parking,둔치·하천변 주차장,서울,126.995116,37.5689,청계천,local,27,,OpenStreetMap (ODbL),node/7018932193
+osm:way/1415681153,우이천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,127.069066,37.615063,우이천,local,21,,OpenStreetMap (ODbL),way/1415681153
+osm:way/967829598,우이천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,127.014889,37.653686,우이천,local,29,,OpenStreetMap (ODbL),way/967829598
+osm:way/1531355163,정릉천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,127.034666,37.572838,정릉천,local,5,,OpenStreetMap (ODbL),way/1531355163
+osm:way/1528997484,정릉천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,127.038092,37.590508,정릉천,local,18,,OpenStreetMap (ODbL),way/1528997484
+osm:way/750640271,정릉천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,127.039784,37.601884,정릉천,local,22,,OpenStreetMap (ODbL),way/750640271
+osm:node/5547151708,중랑천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,127.078323,37.630842,중랑천,national,992,,OpenStreetMap (ODbL),node/5547151708
+osm:way/760259689,청계천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,127.010794,37.569966,청계천,local,7,,OpenStreetMap (ODbL),way/760259689
+osm:way/1531355159,청계천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,127.034035,37.57082,청계천,local,10,,OpenStreetMap (ODbL),way/1531355159
+osm:way/1124654279,청계천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,126.999703,37.569502,청계천,local,18,,OpenStreetMap (ODbL),way/1124654279
+osm:way/566072942,폐쇄주차장,riverside_parking,둔치·하천변 주차장,서울,126.869296,37.4994,안양천,national,0,,OpenStreetMap (ODbL),way/566072942
+osm:way/1279933075,한강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,126.957536,37.517483,한강,national,0,,OpenStreetMap (ODbL),way/1279933075
+osm:way/892361578,한강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,126.901937,37.542303,한강,national,0,,OpenStreetMap (ODbL),way/892361578
+osm:way/320797970,한강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,126.984855,37.506562,한강,national,25,unknown,OpenStreetMap (ODbL),way/320797970
+osm:way/591814033,한강마리나 주차장,riverside_parking,둔치·하천변 주차장,서울,126.91107,37.5343,한강,national,35,,OpenStreetMap (ODbL),way/591814033
+osm:way/470695078,한체대 주차장,riverside_parking,둔치·하천변 주차장,서울,127.13057,37.517779,성내천,local,19,,OpenStreetMap (ODbL),way/470695078
+osm:way/1448085013,홍제천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,126.937101,37.582085,홍제천,local,11,,OpenStreetMap (ODbL),way/1448085013
+osm:way/1529606446,홍제천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,126.951149,37.596246,홍제천,local,15,,OpenStreetMap (ODbL),way/1529606446
+osm:way/1147354650,홍제천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,서울,126.92443,37.573451,홍제천,local,29,,OpenStreetMap (ODbL),way/1147354650
+osm:way/954120831,광나루야구장,riverside_sports,둔치 체육시설,서울,127.113148,37.538564,한강,national,33,,OpenStreetMap (ODbL),way/954120831
+osm:way/1555880946,광운고 농구장,riverside_sports,둔치 체육시설,서울,127.056159,37.619693,우이천,local,64,,OpenStreetMap (ODbL),way/1555880946
+osm:way/804481348,광운고 풋살구장 B면,riverside_sports,둔치 체육시설,서울,127.055905,37.619874,우이천,local,65,,OpenStreetMap (ODbL),way/804481348
+osm:way/255761644,국궁연습장,riverside_sports,둔치 체육시설,서울,126.879575,37.526125,안양천,national,0,,OpenStreetMap (ODbL),way/255761644
+osm:way/870798731,농구장,riverside_sports,둔치 체육시설,서울,127.017335,37.526055,한강,national,60,,OpenStreetMap (ODbL),way/870798731
+osm:way/678882102,도림천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,126.894271,37.499544,도림천,local,59,,OpenStreetMap (ODbL),way/678882102
+osm:way/619446283,도림천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,126.936871,37.471518,도림천,local,61,,OpenStreetMap (ODbL),way/619446283
+osm:way/708949566,도봉천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.049648,37.67987,도봉천,local,0,yes,OpenStreetMap (ODbL),way/708949566
+osm:way/708949568,도봉천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.04874,37.680158,도봉천,local,0,yes,OpenStreetMap (ODbL),way/708949568
+osm:way/774607083,리틀야구장,riverside_sports,둔치 체육시설,서울,126.87119,37.499963,안양천,national,0,,OpenStreetMap (ODbL),way/774607083
+osm:way/647624203,목감천 농구장,riverside_sports,둔치 체육시설,서울,126.860456,37.489275,목감천,national,0,,OpenStreetMap (ODbL),way/647624203
+osm:way/473240189,불광천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,126.900436,37.565468,불광천,local,49,,OpenStreetMap (ODbL),way/473240189
+osm:node/12040274876,살곶이정,riverside_sports,둔치 체육시설,서울,127.06965,37.558166,중랑천,national,0,,OpenStreetMap (ODbL),node/12040274876
+osm:way/674176305,살곶이체육공원 야구장,riverside_sports,둔치 체육시설,서울,127.050354,37.555138,청계천,local,76,,OpenStreetMap (ODbL),way/674176305
+osm:node/5823541341,서울시 윈드서핑장,riverside_sports,둔치 체육시설,서울,127.079273,37.527093,한강,national,45,,OpenStreetMap (ODbL),node/5823541341
+osm:way/1150666668,서울중랑워터파크,riverside_sports,둔치 체육시설,서울,127.077205,37.582026,중랑천,national,22,,OpenStreetMap (ODbL),way/1150666668
+osm:way/278615352,서초구민체육센터,riverside_sports,둔치 체육시설,서울,126.990525,37.498823,반포천,local,38,,OpenStreetMap (ODbL),way/278615352
+osm:way/804674051,성내천 테니스장(이름 없음),riverside_sports,둔치 체육시설,서울,127.11567,37.524197,성내천,local,20,,OpenStreetMap (ODbL),way/804674051
+osm:way/475090351,송파구여성축구장,riverside_sports,둔치 체육시설,서울,127.118403,37.524392,성내천,local,43,,OpenStreetMap (ODbL),way/475090351
+osm:way/475090352,송파시각장애인축구장,riverside_sports,둔치 체육시설,서울,127.119377,37.524661,성내천,local,28,,OpenStreetMap (ODbL),way/475090352
+osm:way/664551336,안양천 게이트볼장(이름 없음),riverside_sports,둔치 체육시설,서울,126.888204,37.53977,안양천,national,34,,OpenStreetMap (ODbL),way/664551336
+osm:way/924827161,안양천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,126.869654,37.500297,안양천,national,0,,OpenStreetMap (ODbL),way/924827161
+osm:way/664800096,안양천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,126.886733,37.539301,안양천,national,28,,OpenStreetMap (ODbL),way/664800096
+osm:way/313527496,안양천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,126.880725,37.517706,안양천,national,0,,OpenStreetMap (ODbL),way/313527496
+osm:way/591840225,안양천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,126.875359,37.511911,안양천,national,0,,OpenStreetMap (ODbL),way/591840225
+osm:relation/15332508,안양천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,126.888347,37.532485,안양천,national,48,,OpenStreetMap (ODbL),relation/15332508
+osm:way/505014397,안양천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,126.886711,37.542845,안양천,national,49,,OpenStreetMap (ODbL),way/505014397
+osm:way/566310658,안양천 야구장(이름 없음),riverside_sports,둔치 체육시설,서울,126.878124,37.515235,안양천,national,0,,OpenStreetMap (ODbL),way/566310658
+osm:way/313528010,안양천 축구장(이름 없음),riverside_sports,둔치 체육시설,서울,126.878658,37.518033,안양천,national,0,,OpenStreetMap (ODbL),way/313528010
+osm:way/924827164,안양천 축구장(이름 없음),riverside_sports,둔치 체육시설,서울,126.872068,37.502404,안양천,national,0,,OpenStreetMap (ODbL),way/924827164
+osm:way/505014396,안양천 축구장(이름 없음),riverside_sports,둔치 체육시설,서울,126.886207,37.543798,안양천,national,50,,OpenStreetMap (ODbL),way/505014396
+osm:way/383396062,양재천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,126.995805,37.444285,양재천,local,40,,OpenStreetMap (ODbL),way/383396062
+osm:way/469679007,양재천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.06794,37.48983,양재천,local,53,,OpenStreetMap (ODbL),way/469679007
+osm:node/12045047584,양재천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.00413,37.45075,양재천,local,21,,OpenStreetMap (ODbL),node/12045047584
+osm:way/370040775,양재천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.030696,37.463768,양재천,local,22,,OpenStreetMap (ODbL),way/370040775
+osm:way/182205823,양재천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.036985,37.473078,양재천,local,33,,OpenStreetMap (ODbL),way/182205823
+osm:way/383384981,양재천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,126.995606,37.443647,양재천,local,60,,OpenStreetMap (ODbL),way/383384981
+osm:way/182205825,양재천 테니스장(이름 없음),riverside_sports,둔치 체육시설,서울,127.03558,37.472858,양재천,local,26,,OpenStreetMap (ODbL),way/182205825
+osm:way/344164661,어린이야구장,riverside_sports,둔치 체육시설,서울,126.898388,37.552953,한강,national,0,,OpenStreetMap (ODbL),way/344164661
+osm:way/313527498,영롱이 인라인 트랙,riverside_sports,둔치 체육시설,서울,126.880734,37.51759,안양천,national,0,,OpenStreetMap (ODbL),way/313527498
+osm:way/1216952253,우이천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.055345,37.618506,우이천,local,72,,OpenStreetMap (ODbL),way/1216952253
+osm:way/845545951,우이천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.055703,37.618334,우이천,local,65,,OpenStreetMap (ODbL),way/845545951
+osm:way/381758694,우이천 테니스장(이름 없음),riverside_sports,둔치 체육시설,서울,127.015885,37.649792,우이천,local,71,,OpenStreetMap (ODbL),way/381758694
+osm:way/826514626,잠실카트체험장,riverside_sports,둔치 체육시설,서울,127.068574,37.517628,탄천,local,43,,OpenStreetMap (ODbL),way/826514626
+osm:way/244215085,장충리틀야구장,riverside_sports,둔치 체육시설,서울,127.003705,37.556055,청계천,local,1493,,OpenStreetMap (ODbL),way/244215085
+osm:way/416596947,전농천 축구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.054057,37.56026,전농천,local,69,,OpenStreetMap (ODbL),way/416596947
+osm:way/1004627321,정릉천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.035679,37.573173,정릉천,local,40,,OpenStreetMap (ODbL),way/1004627321
+osm:way/751314457,정릉천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.040154,37.599425,정릉천,local,45,,OpenStreetMap (ODbL),way/751314457
+osm:way/1176743401,정릉천 축구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.033955,37.581102,정릉천,local,65,,OpenStreetMap (ODbL),way/1176743401
+osm:way/752903352,정릉천 테니스장(이름 없음),riverside_sports,둔치 체육시설,서울,127.039273,37.594146,정릉천,local,50,,OpenStreetMap (ODbL),way/752903352
+osm:way/471334466,정릉천 테니스장(이름 없음),riverside_sports,둔치 체육시설,서울,127.038337,37.588369,정릉천,local,58,,OpenStreetMap (ODbL),way/471334466
+osm:way/464213999,족구장,riverside_sports,둔치 체육시설,서울,126.952498,37.529205,한강,national,39,,OpenStreetMap (ODbL),way/464213999
+osm:way/923982357,중랑천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.055218,37.645064,중랑천,national,5,yes,OpenStreetMap (ODbL),way/923982357
+osm:way/933044772,중랑천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.070994,37.612357,중랑천,national,13,yes,OpenStreetMap (ODbL),way/933044772
+osm:way/932558650,중랑천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.072687,37.585602,중랑천,national,13,yes,OpenStreetMap (ODbL),way/932558650
+osm:way/933888459,중랑천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.054763,37.651899,중랑천,national,13,yes,OpenStreetMap (ODbL),way/933888459
+osm:way/1507365595,중랑천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.046819,37.553809,중랑천,national,18,,OpenStreetMap (ODbL),way/1507365595
+osm:way/925881934,중랑천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.07271,37.60573,중랑천,national,20,,OpenStreetMap (ODbL),way/925881934
+osm:way/1066935005,중랑천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.06929,37.594024,중랑천,national,21,,OpenStreetMap (ODbL),way/1066935005
+osm:way/932558645,중랑천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.077699,37.574577,중랑천,national,25,,OpenStreetMap (ODbL),way/932558645
+osm:way/844369196,중랑천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.066715,37.553079,중랑천,national,25,yes,OpenStreetMap (ODbL),way/844369196
+osm:way/473269343,중랑천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.038294,37.552109,중랑천,national,33,,OpenStreetMap (ODbL),way/473269343
+osm:way/923982358,중랑천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.055073,37.644544,중랑천,national,7,yes,OpenStreetMap (ODbL),way/923982358
+osm:way/933044771,중랑천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.070999,37.611392,중랑천,national,13,yes,OpenStreetMap (ODbL),way/933044771
+osm:way/932558649,중랑천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.067408,37.553966,중랑천,national,16,yes,OpenStreetMap (ODbL),way/932558649
+osm:way/1112067049,중랑천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.072349,37.587877,중랑천,national,20,,OpenStreetMap (ODbL),way/1112067049
+osm:way/932558637,중랑천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.07335,37.602596,중랑천,national,21,,OpenStreetMap (ODbL),way/932558637
+osm:way/932558646,중랑천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.077602,37.575366,중랑천,national,24,yes,OpenStreetMap (ODbL),way/932558646
+osm:way/1507365593,중랑천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.047595,37.553841,중랑천,national,27,,OpenStreetMap (ODbL),way/1507365593
+osm:way/1203543852,중랑천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.076552,37.566384,중랑천,national,28,,OpenStreetMap (ODbL),way/1203543852
+osm:way/1097751888,중랑천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,서울,127.070985,37.611978,중랑천,national,14,,OpenStreetMap (ODbL),way/1097751888
+osm:way/856831623,중랑천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,서울,127.039651,37.552579,중랑천,national,32,,OpenStreetMap (ODbL),way/856831623
+osm:way/1370240755,중랑천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,서울,127.070019,37.620205,중랑천,national,54,,OpenStreetMap (ODbL),way/1370240755
+osm:way/473240150,중랑천 축구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.037397,37.551844,중랑천,national,53,,OpenStreetMap (ODbL),way/473240150
+osm:way/468972241,중랑천 테니스장,riverside_sports,둔치 체육시설,서울,127.036499,37.551366,중랑천,national,55,,OpenStreetMap (ODbL),way/468972241
+osm:way/1081840532,중랑천 테니스장(이름 없음),riverside_sports,둔치 체육시설,서울,127.075104,37.584526,중랑천,national,19,,OpenStreetMap (ODbL),way/1081840532
+osm:way/1066935006,중랑천 테니스장(이름 없음),riverside_sports,둔치 체육시설,서울,127.069355,37.593749,중랑천,national,23,,OpenStreetMap (ODbL),way/1066935006
+osm:way/1280847310,청계천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.043575,37.570535,청계천,local,44,,OpenStreetMap (ODbL),way/1280847310
+osm:way/922989380,청계천 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,127.016322,37.56935,청계천,local,45,private,OpenStreetMap (ODbL),way/922989380
+osm:node/8027328945,청계천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,서울,127.028303,37.569515,청계천,local,71,,OpenStreetMap (ODbL),node/8027328945
+osm:way/470689432,체육과학관,riverside_sports,둔치 체육시설,서울,127.129928,37.519059,성내천,local,57,,OpenStreetMap (ODbL),way/470689432
+osm:way/136990293,축구장,riverside_sports,둔치 체육시설,서울,127.016701,37.525672,한강,national,48,,OpenStreetMap (ODbL),way/136990293
+osm:node/10918274970,탄천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,서울,127.108697,37.489457,탄천,local,0,,OpenStreetMap (ODbL),node/10918274970
+osm:way/1065033284,탄천 테니스장(이름 없음),riverside_sports,둔치 체육시설,서울,127.137658,37.469578,탄천,local,1254,,OpenStreetMap (ODbL),way/1065033284
+osm:way/959055012,탄천 테니스장(이름 없음),riverside_sports,둔치 체육시설,서울,127.150804,37.467726,탄천,local,2390,,OpenStreetMap (ODbL),way/959055012
+osm:way/383384975,테니스장,riverside_sports,둔치 체육시설,서울,126.994957,37.442041,양재천,local,70,,OpenStreetMap (ODbL),way/383384975
+osm:way/344164650,한강 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,126.900953,37.551142,한강,national,0,,OpenStreetMap (ODbL),way/344164650
+osm:way/1216509270,한강 농구장(이름 없음),riverside_sports,둔치 체육시설,서울,126.957483,37.521963,한강,national,50,,OpenStreetMap (ODbL),way/1216509270
+osm:way/472275984,한강 다목적 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,127.073931,37.518796,한강,national,63,,OpenStreetMap (ODbL),way/472275984
+osm:way/344164651,한강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,126.897529,37.553859,한강,national,0,,OpenStreetMap (ODbL),way/344164651
+osm:way/522082055,한강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,126.915949,37.534658,한강,national,62,,OpenStreetMap (ODbL),way/522082055
+osm:way/1456491840,한강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,126.924898,37.532611,한강,national,71,,OpenStreetMap (ODbL),way/1456491840
+osm:way/344164653,한강 축구장(이름 없음),riverside_sports,둔치 체육시설,서울,126.900348,37.551519,한강,national,0,,OpenStreetMap (ODbL),way/344164653
+osm:way/344164648,한강 테니스장(이름 없음),riverside_sports,둔치 체육시설,서울,126.899278,37.552347,한강,national,0,,OpenStreetMap (ODbL),way/344164648
+osm:way/174866931,한강 테니스장(이름 없음),riverside_sports,둔치 체육시설,서울,127.07783,37.527304,한강,national,55,,OpenStreetMap (ODbL),way/174866931
+osm:way/1529606394,홍제천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,126.949661,37.597337,홍제천,local,53,,OpenStreetMap (ODbL),way/1529606394
+osm:way/1159702977,홍제천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,서울,126.93168,37.579158,홍제천,local,66,,OpenStreetMap (ODbL),way/1159702977
+osm:node/11302801665,금강 세월교(이름 없음),low_bridge,세월교·잠수교,세종,127.306141,36.507917,금강,national,0,,OpenStreetMap (ODbL),node/11302801665
+osm:node/10567708419,대교천 세월교(이름 없음),low_bridge,세월교·잠수교,세종,127.239445,36.477962,대교천,local,0,,OpenStreetMap (ODbL),node/10567708419
+osm:node/13092527192,방축천 세월교(이름 없음),low_bridge,세월교·잠수교,세종,127.257824,36.494849,방축천,local,0,,OpenStreetMap (ODbL),node/13092527192
+osm:node/8670631343,정안천 세월교(이름 없음),low_bridge,세월교·잠수교,세종,127.124201,36.534797,정안천,local,0,,OpenStreetMap (ODbL),node/8670631343
+osm:node/11438785434,정안천 세월교(이름 없음),low_bridge,세월교·잠수교,세종,127.124354,36.512827,정안천,local,0,,OpenStreetMap (ODbL),node/11438785434
+osm:way/1257123731,금강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,세종,127.123236,36.466494,금강,national,0,,OpenStreetMap (ODbL),way/1257123731
+osm:way/1436322508,금강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,세종,127.137446,36.463948,금강,national,49,,OpenStreetMap (ODbL),way/1436322508
+osm:way/819825894,금강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,세종,127.129987,36.468206,금강,national,61,,OpenStreetMap (ODbL),way/819825894
+osm:way/1436322513,금강 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,세종,127.129999,36.467799,금강,national,24,,OpenStreetMap (ODbL),way/1436322513
+osm:way/693846462,금강 야구장(이름 없음),riverside_sports,둔치 체육시설,세종,127.265268,36.478078,금강,national,0,,OpenStreetMap (ODbL),way/693846462
+osm:way/1105726135,금강 축구장(이름 없음),riverside_sports,둔치 체육시설,세종,127.267408,36.478958,금강,national,0,,OpenStreetMap (ODbL),way/1105726135
+osm:way/530808242,금강 축구장(이름 없음),riverside_sports,둔치 체육시설,세종,127.12785,36.469242,금강,national,46,,OpenStreetMap (ODbL),way/530808242
+osm:way/1105726137,금강 풋살장(이름 없음),riverside_sports,둔치 체육시설,세종,127.26824,36.479175,금강,national,0,,OpenStreetMap (ODbL),way/1105726137
+osm:way/1481996155,정안게이트볼장,riverside_sports,둔치 체육시설,세종,127.124326,36.608628,정안천,local,28,,OpenStreetMap (ODbL),way/1481996155
+osm:way/919624572,제민천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,세종,127.122009,36.455805,제민천,local,65,,OpenStreetMap (ODbL),way/919624572
+osm:way/693846460,프로그램광장,riverside_sports,둔치 체육시설,세종,127.261556,36.47695,금강,national,0,,OpenStreetMap (ODbL),way/693846460
+osm:node/11828188570,고산천 세월교(이름 없음),low_bridge,세월교·잠수교,울산,129.286991,35.417596,고산천,local,0,,OpenStreetMap (ODbL),node/11828188570
+osm:node/10828808613,단장천 세월교(이름 없음),low_bridge,세월교·잠수교,울산,129.012565,35.544673,단장천,local,0,,OpenStreetMap (ODbL),node/10828808613
+osm:node/11024143603,단장천 세월교(이름 없음),low_bridge,세월교·잠수교,울산,129.013057,35.563551,단장천,local,25,,OpenStreetMap (ODbL),node/11024143603
+osm:node/9236826624,대정천 세월교(이름 없음),low_bridge,세월교·잠수교,울산,129.338131,35.432292,대정천,local,2,,OpenStreetMap (ODbL),node/9236826624
+osm:node/9281668427,무룡천 세월교(이름 없음),low_bridge,세월교·잠수교,울산,129.420291,35.607781,무룡천,local,0,,OpenStreetMap (ODbL),node/9281668427
+osm:node/11998020707,상리천 세월교(이름 없음),low_bridge,세월교·잠수교,울산,129.119421,35.444153,상리천,local,0,,OpenStreetMap (ODbL),node/11998020707
+osm:node/12810925056,양등천 세월교(이름 없음),low_bridge,세월교·잠수교,울산,129.05627,35.604149,양등천,local,11,,OpenStreetMap (ODbL),node/12810925056
+osm:way/1476265644,명곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,울산,129.170377,35.415081,명곡천,local,0,,OpenStreetMap (ODbL),way/1476265644
+osm:way/1475067221,명곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,울산,129.165312,35.410355,명곡천,local,2,,OpenStreetMap (ODbL),way/1475067221
+osm:way/1476265640,삼호동 공영주차장,riverside_parking,둔치·하천변 주차장,울산,129.170928,35.41644,명곡천,local,36,,OpenStreetMap (ODbL),way/1476265640
+osm:way/1363882978,상안천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,울산,129.346633,35.609547,상안천,local,169,,OpenStreetMap (ODbL),way/1363882978
+osm:way/886512702,유곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,울산,129.296042,35.561527,유곡천,local,46,,OpenStreetMap (ODbL),way/886512702
+osm:way/1505134798,주남천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,울산,129.167615,35.416751,주남천,local,24,,OpenStreetMap (ODbL),way/1505134798
+osm:way/827162213,태화강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,울산,129.293414,35.54477,태화강,national,34,,OpenStreetMap (ODbL),way/827162213
+osm:way/1505667722,회야강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,울산,129.167891,35.415362,회야강,local,12,,OpenStreetMap (ODbL),way/1505667722
+osm:way/1270612547,효암천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,울산,129.303767,35.334138,효암천,local,30,,OpenStreetMap (ODbL),way/1270612547
+osm:way/852570080,동천 자전거 연습장,riverside_sports,둔치 체육시설,울산,129.351645,35.567439,동천,local,29,,OpenStreetMap (ODbL),way/852570080
+osm:way/1484711465,명곡천 농구장(이름 없음),riverside_sports,둔치 체육시설,울산,129.170832,35.400517,명곡천,local,58,,OpenStreetMap (ODbL),way/1484711465
+osm:way/1363883336,상안천 농구장(이름 없음),riverside_sports,둔치 체육시설,울산,129.343831,35.612903,상안천,local,347,,OpenStreetMap (ODbL),way/1363883336
+osm:way/1363883341,상안천 야구장(이름 없음),riverside_sports,둔치 체육시설,울산,129.344425,35.612561,상안천,local,301,,OpenStreetMap (ODbL),way/1363883341
+osm:way/1482943069,소주천 농구장(이름 없음),riverside_sports,둔치 체육시설,울산,129.160399,35.411733,소주천,local,40,,OpenStreetMap (ODbL),way/1482943069
+osm:way/1482943070,소주천 테니스장(이름 없음),riverside_sports,둔치 체육시설,울산,129.160099,35.411885,소주천,local,41,,OpenStreetMap (ODbL),way/1482943070
+osm:way/1414013079,척과천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,울산,129.267435,35.561594,척과천,local,56,,OpenStreetMap (ODbL),way/1414013079
+osm:way/1414001254,척과천 풋살장(이름 없음),riverside_sports,둔치 체육시설,울산,129.270515,35.565431,척과천,local,43,,OpenStreetMap (ODbL),way/1414001254
+osm:way/1154375429,태화강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,울산,129.238534,35.566966,태화강,local,47,,OpenStreetMap (ODbL),way/1154375429
+osm:way/283953937,태화강 축구장(이름 없음),riverside_sports,둔치 체육시설,울산,129.279503,35.553989,태화강,national,26,,OpenStreetMap (ODbL),way/283953937
+osm:way/154329124,태화강 축구장(이름 없음),riverside_sports,둔치 체육시설,울산,129.286486,35.551512,태화강,national,50,,OpenStreetMap (ODbL),way/154329124
+osm:way/1154375427,태화강 풋살장(이름 없음),riverside_sports,둔치 체육시설,울산,129.238106,35.567186,태화강,local,36,,OpenStreetMap (ODbL),way/1154375427
+osm:node/11080585103,장수천 세월교(이름 없음),low_bridge,세월교·잠수교,인천,126.75422,37.456725,장수천,local,7,,OpenStreetMap (ODbL),node/11080585103
+osm:way/1537223775,길정천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,인천,126.409314,37.48507,길정천,local,14540,,OpenStreetMap (ODbL),way/1537223775
+osm:way/457714516,부평1동 행정복지센터 주차장,riverside_parking,둔치·하천변 주차장,인천,126.7201,37.49433,굴포천,national,1476,yes,OpenStreetMap (ODbL),way/457714516
+osm:way/1143884469,심곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,인천,126.667413,37.540415,심곡천,local,23,,OpenStreetMap (ODbL),way/1143884469
+osm:way/474844972,갈산천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,인천,126.723907,37.514064,갈산천,local,22,,OpenStreetMap (ODbL),way/474844972
+osm:way/1056459821,공촌천 농구장(이름 없음),riverside_sports,둔치 체육시설,인천,126.606198,37.53469,공촌천,local,460,,OpenStreetMap (ODbL),way/1056459821
+osm:way/545254874,공촌천 축구장(이름 없음),riverside_sports,둔치 체육시설,인천,126.64629,37.541987,공촌천,local,52,,OpenStreetMap (ODbL),way/545254874
+osm:way/545254873,공촌천 테니스장(이름 없음),riverside_sports,둔치 체육시설,인천,126.646593,37.541914,공촌천,local,60,,OpenStreetMap (ODbL),way/545254873
+osm:way/472253767,굴포천 농구장(이름 없음),riverside_sports,둔치 체육시설,인천,126.740562,37.521239,굴포천,national,681,,OpenStreetMap (ODbL),way/472253767
+osm:way/558249141,굴포천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,인천,126.722132,37.509447,굴포천,national,44,,OpenStreetMap (ODbL),way/558249141
+osm:way/768798014,굴포천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,인천,126.738654,37.520811,굴포천,national,701,,OpenStreetMap (ODbL),way/768798014
+osm:way/557935801,굴포천 테니스장(이름 없음),riverside_sports,둔치 체육시설,인천,126.725313,37.509189,굴포천,national,14,,OpenStreetMap (ODbL),way/557935801
+osm:way/558235785,굴포천 테니스장(이름 없음),riverside_sports,둔치 체육시설,인천,126.742848,37.514449,굴포천,national,53,,OpenStreetMap (ODbL),way/558235785
+osm:way/700635096,승기천 농구장(이름 없음),riverside_sports,둔치 체육시설,인천,126.662714,37.392126,승기천,local,795,,OpenStreetMap (ODbL),way/700635096
+osm:way/700635098,승기천 농구장(이름 없음),riverside_sports,둔치 체육시설,인천,126.656428,37.396641,승기천,local,1350,,OpenStreetMap (ODbL),way/700635098
+osm:way/473960473,승기천 농구장(이름 없음),riverside_sports,둔치 체육시설,인천,126.646574,37.404802,승기천,local,2471,,OpenStreetMap (ODbL),way/473960473
+osm:way/319099550,승기천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,인천,126.660273,37.393595,승기천,local,990,,OpenStreetMap (ODbL),way/319099550
+osm:way/700635097,승기천 배구장(이름 없음),riverside_sports,둔치 체육시설,인천,126.662065,37.392516,승기천,local,844,,OpenStreetMap (ODbL),way/700635097
+osm:way/700635100,승기천 축구장(이름 없음),riverside_sports,둔치 체육시설,인천,126.6514,37.400982,승기천,local,1910,,OpenStreetMap (ODbL),way/700635100
+osm:way/1569162365,승기천 테니스장(이름 없음),riverside_sports,둔치 체육시설,인천,126.655985,37.39703,승기천,local,1397,,OpenStreetMap (ODbL),way/1569162365
+osm:way/1558036852,심곡천 농구장(이름 없음),riverside_sports,둔치 체육시설,인천,126.5053,37.482838,심곡천,local,9929,,OpenStreetMap (ODbL),way/1558036852
+osm:way/545213801,심곡천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,인천,126.655801,37.527792,심곡천,local,65,,OpenStreetMap (ODbL),way/545213801
+osm:way/501235834,심곡천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,인천,126.509239,37.480626,심곡천,local,9754,,OpenStreetMap (ODbL),way/501235834
+osm:way/666241605,심곡천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,인천,126.648105,37.527827,심곡천,local,71,,OpenStreetMap (ODbL),way/666241605
+osm:way/493179868,심곡천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,인천,126.63577,37.524968,심곡천,local,98,,OpenStreetMap (ODbL),way/493179868
+osm:way/545109400,심곡천 축구장(이름 없음),riverside_sports,둔치 체육시설,인천,126.661534,37.532151,심곡천,local,25,,OpenStreetMap (ODbL),way/545109400
+osm:way/1558036813,심곡천 축구장(이름 없음),riverside_sports,둔치 체육시설,인천,126.505995,37.481784,심곡천,local,9934,,OpenStreetMap (ODbL),way/1558036813
+osm:way/546676677,심곡천 테니스장(이름 없음),riverside_sports,둔치 체육시설,인천,126.650819,37.527627,심곡천,local,48,,OpenStreetMap (ODbL),way/546676677
+osm:way/1558036850,심곡천 테니스장(이름 없음),riverside_sports,둔치 체육시설,인천,126.50503,37.482763,심곡천,local,9953,,OpenStreetMap (ODbL),way/1558036850
+osm:node/12040274685,연수정,riverside_sports,둔치 체육시설,인천,126.685562,37.407868,승기천,local,24,,OpenStreetMap (ODbL),node/12040274685
+osm:way/469680840,청천천 농구장(이름 없음),riverside_sports,둔치 체육시설,인천,126.72672,37.513949,청천천,local,22,,OpenStreetMap (ODbL),way/469680840
+osm:node/12818116193,광양동천 세월교(이름 없음),low_bridge,세월교·잠수교,전남,127.599816,34.965083,광양동천,local,0,,OpenStreetMap (ODbL),node/12818116193
+osm:way/724077718,구산천 세월교(이름 없음),low_bridge,세월교·잠수교,전남,126.561286,34.422792,구산천,local,0,,OpenStreetMap (ODbL),way/724077718
+osm:node/12566600179,구산천 세월교(이름 없음),low_bridge,세월교·잠수교,전남,126.583433,34.423685,구산천,local,0,,OpenStreetMap (ODbL),node/12566600179
+osm:node/13991371930,금석천 세월교(이름 없음),low_bridge,세월교·잠수교,전남,126.638977,35.178492,금석천,local,1,,OpenStreetMap (ODbL),node/13991371930
+osm:node/12306641512,대덕천 세월교(이름 없음),low_bridge,세월교·잠수교,전남,127.095288,35.203409,대덕천,local,0,,OpenStreetMap (ODbL),node/12306641512
+osm:node/13386308348,백록천 세월교(이름 없음),low_bridge,세월교·잠수교,전남,127.222914,35.102936,백록천,local,0,,OpenStreetMap (ODbL),node/13386308348
+osm:node/12998539574,석정천 세월교(이름 없음),low_bridge,세월교·잠수교,전남,126.959988,34.948611,석정천,local,0,,OpenStreetMap (ODbL),node/12998539574
+osm:node/12168778570,신평천 세월교(이름 없음),low_bridge,세월교·잠수교,전남,127.198157,34.464384,신평천,local,1,,OpenStreetMap (ODbL),node/12168778570
+osm:node/8769325284,영산강 세월교(이름 없음),low_bridge,세월교·잠수교,전남,126.741061,35.048682,영산강,national,0,,OpenStreetMap (ODbL),node/8769325284
+osm:node/1448582149,영산강 세월교(이름 없음),low_bridge,세월교·잠수교,전남,127.028352,35.337691,영산강,local,0,,OpenStreetMap (ODbL),node/1448582149
+osm:node/11373213896,오례천 세월교(이름 없음),low_bridge,세월교·잠수교,전남,127.080105,35.268226,오례천,local,0,,OpenStreetMap (ODbL),node/11373213896
+osm:node/11985522689,월산천 세월교(이름 없음),low_bridge,세월교·잠수교,전남,126.964024,35.361678,월산천,local,0,,OpenStreetMap (ODbL),node/11985522689
+osm:node/12060878895,청풍천 세월교(이름 없음),low_bridge,세월교·잠수교,전남,126.977436,34.873634,청풍천,local,0,,OpenStreetMap (ODbL),node/12060878895
+osm:way/484692358,고흥제2공영주차장,riverside_parking,둔치·하천변 주차장,전남,127.298306,34.605158,고흥천,local,24,,OpenStreetMap (ODbL),way/484692358
+osm:node/4655763247,광양서천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,127.57479,34.981512,광양서천,local,0,,OpenStreetMap (ODbL),node/4655763247
+osm:node/4634897910,광양서천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,127.578836,34.967725,광양서천,local,14,,OpenStreetMap (ODbL),node/4634897910
+osm:way/1196995919,광주천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.948246,35.088851,광주천,national,23,,OpenStreetMap (ODbL),way/1196995919
+osm:way/1180007406,광주천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.918893,35.140351,광주천,national,26,,OpenStreetMap (ODbL),way/1180007406
+osm:way/1191958947,광주천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.940343,35.092878,광주천,national,34,customers,OpenStreetMap (ODbL),way/1191958947
+osm:way/1533054191,만연천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.989338,35.063943,만연천,local,13,,OpenStreetMap (ODbL),way/1533054191
+osm:way/653971779,망호출렁다리 주차장,riverside_parking,둔치·하천변 주차장,전남,126.771877,34.528812,도암천,local,1625,,OpenStreetMap (ODbL),way/653971779
+osm:way/1346775141,보성강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,127.096156,34.790767,보성강,local,18,,OpenStreetMap (ODbL),way/1346775141
+osm:way/1441553577,불갑천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.537663,35.204019,불갑천,local,1630,,OpenStreetMap (ODbL),way/1441553577
+osm:way/1414583715,석정천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.961797,34.952056,석정천,local,12,,OpenStreetMap (ODbL),way/1414583715
+osm:way/1257628290,섬진강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,127.786724,35.007089,섬진강,national,5,,OpenStreetMap (ODbL),way/1257628290
+osm:way/484454079,순천동천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,127.491593,34.954988,순천동천,local,20,,OpenStreetMap (ODbL),way/484454079
+osm:way/1112695132,순천동천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,127.488688,34.962435,순천동천,local,22,,OpenStreetMap (ODbL),way/1112695132
+osm:node/2382901396,양동시장지하유료주차장,riverside_parking,둔치·하천변 주차장,전남,126.901637,35.155195,광주천,national,14,,OpenStreetMap (ODbL),node/2382901396
+osm:node/12635843662,연등천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,127.729241,34.744619,연등천,local,14,,OpenStreetMap (ODbL),node/12635843662
+osm:way/1363784710,연등천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,127.730824,34.737458,연등천,local,15,,OpenStreetMap (ODbL),way/1363784710
+osm:way/1345166882,연등천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,127.673202,34.743936,연등천,local,3522,,OpenStreetMap (ODbL),way/1345166882
+osm:way/1217455158,영산강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.98112,35.324379,영산강,national,1,,OpenStreetMap (ODbL),way/1217455158
+osm:way/1388720528,영산강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.70246,35.000893,영산강,national,34,,OpenStreetMap (ODbL),way/1388720528
+osm:way/1346786669,영산강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.891902,35.250926,영산강,national,35,,OpenStreetMap (ODbL),way/1346786669
+osm:way/630802870,옥곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,127.705547,34.985719,옥곡천,local,15,,OpenStreetMap (ODbL),way/630802870
+osm:way/1028944489,옥과천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,127.132573,35.26954,옥과천,local,25,,OpenStreetMap (ODbL),way/1028944489
+osm:way/481369088,옥천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,127.485032,34.952894,옥천,local,1,,OpenStreetMap (ODbL),way/481369088
+osm:way/1267320149,용천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.961991,35.316753,용천,local,12,,OpenStreetMap (ODbL),way/1267320149
+osm:way/1180015793,웰빙주차장,riverside_parking,둔치·하천변 주차장,전남,126.918101,35.141303,광주천,national,25,,OpenStreetMap (ODbL),way/1180015793
+osm:way/1044692732,장수천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.806308,35.176726,장수천,local,26,destination,OpenStreetMap (ODbL),way/1044692732
+osm:node/9289136763,주차장,riverside_parking,둔치·하천변 주차장,전남,127.339066,34.850426,벌교천,local,26,,OpenStreetMap (ODbL),node/9289136763
+osm:way/1306096509,지석천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.855462,35.020371,지석천,national,0,,OpenStreetMap (ODbL),way/1306096509
+osm:way/1185485756,철물주차장,riverside_parking,둔치·하천변 주차장,전남,126.917763,35.141737,광주천,national,26,,OpenStreetMap (ODbL),way/1185485756
+osm:way/832423354,칠량천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.79003,34.535364,칠량천,local,1397,,OpenStreetMap (ODbL),way/832423354
+osm:way/1158741820,침곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,127.344878,35.2643,침곡천,local,38,,OpenStreetMap (ODbL),way/1158741820
+osm:way/534579722,탐진강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.903099,34.674784,탐진강,national,0,,OpenStreetMap (ODbL),way/534579722
+osm:way/478447249,탐진강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.887754,34.752636,탐진강,national,33,,OpenStreetMap (ODbL),way/478447249
+osm:way/532532784,태봉천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.399244,34.9617,태봉천,local,2209,,OpenStreetMap (ODbL),way/532532784
+osm:way/1293784861,화개천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,127.623102,35.189029,화개천,local,0,,OpenStreetMap (ODbL),way/1293784861
+osm:way/743401734,황룡강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전남,126.734612,35.158475,황룡강,local,18,yes,OpenStreetMap (ODbL),way/743401734
+osm:way/707544219,고흥천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,전남,127.293454,34.606254,고흥천,local,65,,OpenStreetMap (ODbL),way/707544219
+osm:way/473291772,공공운동장,riverside_sports,둔치 체육시설,전남,126.845906,35.048025,지석천,national,0,,OpenStreetMap (ODbL),way/473291772
+osm:node/12040274841,관덕정,riverside_sports,둔치 체육시설,전남,127.347715,34.841854,칠동천,local,56,,OpenStreetMap (ODbL),node/12040274841
+osm:way/458019832,광양서천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,전남,127.580884,34.966234,광양서천,local,44,,OpenStreetMap (ODbL),way/458019832
+osm:way/1176835204,광주천 농구장(이름 없음),riverside_sports,둔치 체육시설,전남,126.857049,35.168131,광주천,national,49,,OpenStreetMap (ODbL),way/1176835204
+osm:way/714789758,광주천 다목적 운동장(이름 없음),riverside_sports,둔치 체육시설,전남,126.867574,35.168509,광주천,national,35,,OpenStreetMap (ODbL),way/714789758
+osm:node/4634877683,금강 스포츠 센터,riverside_sports,둔치 체육시설,전남,127.57728,34.97266,광양서천,local,69,,OpenStreetMap (ODbL),node/4634877683
+osm:way/900342773,남창천 농구장(이름 없음),riverside_sports,둔치 체육시설,전남,126.47709,34.807928,남창천,local,40,,OpenStreetMap (ODbL),way/900342773
+osm:node/12040274894,담양총무정담양군궁도협회,riverside_sports,둔치 체육시설,전남,126.98966,35.32342,영산강,national,48,,OpenStreetMap (ODbL),node/12040274894
+osm:way/938289821,대강천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,전남,127.332429,34.781338,대강천,local,70,,OpenStreetMap (ODbL),way/938289821
+osm:way/893655224,대촌천 다목적 운동장(이름 없음),riverside_sports,둔치 체육시설,전남,126.868998,35.102792,대촌천,local,39,,OpenStreetMap (ODbL),way/893655224
+osm:way/1107936762,대촌천 테니스장(이름 없음),riverside_sports,둔치 체육시설,전남,126.873163,35.104155,대촌천,local,11,,OpenStreetMap (ODbL),way/1107936762
+osm:way/601011435,벌고천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,전남,126.975588,35.054786,벌고천,local,62,,OpenStreetMap (ODbL),way/601011435
+osm:way/1458198546,봉화천 축구장(이름 없음),riverside_sports,둔치 체육시설,전남,127.09615,34.776264,봉화천,local,49,,OpenStreetMap (ODbL),way/1458198546
+osm:relation/16531030,삼계천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,전남,126.666088,35.25787,삼계천,local,57,,OpenStreetMap (ODbL),relation/16531030
+osm:way/1217105044,삼계천 축구장(이름 없음),riverside_sports,둔치 체육시설,전남,126.6661,35.257877,삼계천,local,58,,OpenStreetMap (ODbL),way/1217105044
+osm:way/1418550562,섬진강 농구장(이름 없음),riverside_sports,둔치 체육시설,전남,127.760571,34.976741,섬진강,national,35,,OpenStreetMap (ODbL),way/1418550562
+osm:way/1418550563,섬진강 배구장(이름 없음),riverside_sports,둔치 체육시설,전남,127.760554,34.976498,섬진강,national,36,,OpenStreetMap (ODbL),way/1418550563
+osm:way/475269387,수완 인라인 롤러 경기장,riverside_sports,둔치 체육시설,전남,126.820962,35.195267,풍영정천,local,60,,OpenStreetMap (ODbL),way/475269387
+osm:way/636632179,순천동천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,전남,127.49747,34.986069,순천동천,local,34,,OpenStreetMap (ODbL),way/636632179
+osm:way/636629082,순천동천 축구장(이름 없음),riverside_sports,둔치 체육시설,전남,127.5009,34.987616,순천동천,local,44,,OpenStreetMap (ODbL),way/636629082
+osm:node/12040274757,순천인향정,riverside_sports,둔치 체육시설,전남,127.47668,35.011536,순천서천,local,37,,OpenStreetMap (ODbL),node/12040274757
+osm:way/1066012311,씨름장,riverside_sports,둔치 체육시설,전남,126.7685,35.298842,취암천,local,22,,OpenStreetMap (ODbL),way/1066012311
+osm:node/12040274737,영덕정,riverside_sports,둔치 체육시설,전남,126.966109,34.9909,지석천,national,20,,OpenStreetMap (ODbL),node/12040274737
+osm:way/598956703,영산강 농구장(이름 없음),riverside_sports,둔치 체육시설,전남,126.830894,35.146528,영산강,national,0,,OpenStreetMap (ODbL),way/598956703
+osm:way/598956702,영산강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,전남,126.830988,35.147994,영산강,national,0,,OpenStreetMap (ODbL),way/598956702
+osm:way/1215797370,영산강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,전남,126.990674,35.32345,영산강,national,55,,OpenStreetMap (ODbL),way/1215797370
+osm:way/1388720527,영산강 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,전남,126.706487,35.001625,영산강,national,35,,OpenStreetMap (ODbL),way/1388720527
+osm:way/1164753334,영산강 야구장(이름 없음),riverside_sports,둔치 체육시설,전남,126.831449,35.171306,영산강,national,0,,OpenStreetMap (ODbL),way/1164753334
+osm:way/1267320155,영산강 야구장(이름 없음),riverside_sports,둔치 체육시설,전남,126.963393,35.316291,영산강,national,72,,OpenStreetMap (ODbL),way/1267320155
+osm:way/1198005255,영산강 축구장(이름 없음),riverside_sports,둔치 체육시설,전남,126.949877,35.27854,영산강,national,0,,OpenStreetMap (ODbL),way/1198005255
+osm:way/598956704,영산강 축구장(이름 없음),riverside_sports,둔치 체육시설,전남,126.830914,35.147248,영산강,national,0,,OpenStreetMap (ODbL),way/598956704
+osm:way/1267108886,영산강 축구장(이름 없음),riverside_sports,둔치 체육시설,전남,126.970895,35.316606,영산강,national,50,,OpenStreetMap (ODbL),way/1267108886
+osm:way/1388720524,영산강 축구장(이름 없음),riverside_sports,둔치 체육시설,전남,126.705408,35.001646,영산강,national,62,,OpenStreetMap (ODbL),way/1388720524
+osm:way/474357339,용산생활체육공원 인조잔디축구장,riverside_sports,둔치 체육시설,전남,126.933244,35.116835,광주천,national,44,,OpenStreetMap (ODbL),way/474357339
+osm:way/1019357193,운곡천 축구장(이름 없음),riverside_sports,둔치 체육시설,전남,127.123033,35.265067,운곡천,local,60,,OpenStreetMap (ODbL),way/1019357193
+osm:way/468585589,운동장,riverside_sports,둔치 체육시설,전남,127.512618,34.932966,해룡천,local,53,,OpenStreetMap (ODbL),way/468585589
+osm:way/602486504,운동장,riverside_sports,둔치 체육시설,전남,127.487335,34.99827,순천서천,local,82,,OpenStreetMap (ODbL),way/602486504
+osm:way/1069458867,운동장,riverside_sports,둔치 체육시설,전남,127.557188,34.933593,인덕천,local,1933,,OpenStreetMap (ODbL),way/1069458867
+osm:way/489265410,웰빙건강랜드,riverside_sports,둔치 체육시설,전남,126.918299,35.141389,광주천,national,45,,OpenStreetMap (ODbL),way/489265410
+osm:way/574968534,이사천 축구장(이름 없음),riverside_sports,둔치 체육시설,전남,127.449769,34.943722,이사천,local,43,,OpenStreetMap (ODbL),way/574968534
+osm:way/1291669785,이사천 축구장(이름 없음),riverside_sports,둔치 체육시설,전남,127.464877,34.927925,이사천,local,66,,OpenStreetMap (ODbL),way/1291669785
+osm:way/1253824387,족구장,riverside_sports,둔치 체육시설,전남,126.686438,34.513889,구수천,local,1526,,OpenStreetMap (ODbL),way/1253824387
+osm:way/807068480,축구장,riverside_sports,둔치 체육시설,전남,127.514025,34.928918,해룡천,local,54,,OpenStreetMap (ODbL),way/807068480
+osm:way/478447251,탐진강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,전남,126.893304,34.755687,탐진강,national,58,,OpenStreetMap (ODbL),way/478447251
+osm:way/793373070,탐진강 축구장(이름 없음),riverside_sports,둔치 체육시설,전남,126.774364,34.620536,탐진강,national,170,,OpenStreetMap (ODbL),way/793373070
+osm:way/1253824386,풋살구장,riverside_sports,둔치 체육시설,전남,126.686083,34.513599,구수천,local,1494,,OpenStreetMap (ODbL),way/1253824386
+osm:way/1444641436,풍영정천 농구장(이름 없음),riverside_sports,둔치 체육시설,전남,126.813475,35.173992,풍영정천,local,28,,OpenStreetMap (ODbL),way/1444641436
+osm:way/672655798,풍영정천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,전남,126.818897,35.186087,풍영정천,local,20,,OpenStreetMap (ODbL),way/672655798
+osm:way/1212877608,풍영정천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,전남,126.819813,35.166939,풍영정천,local,65,,OpenStreetMap (ODbL),way/1212877608
+osm:way/1017791056,풍영정천 테니스장(이름 없음),riverside_sports,둔치 체육시설,전남,126.813427,35.174239,풍영정천,local,28,,OpenStreetMap (ODbL),way/1017791056
+osm:way/1164753338,풍영정천 테니스장(이름 없음),riverside_sports,둔치 체육시설,전남,126.820759,35.165797,풍영정천,local,56,,OpenStreetMap (ODbL),way/1164753338
+osm:way/1164751657,풍영정천 풋살장(이름 없음),riverside_sports,둔치 체육시설,전남,126.81345,35.204771,풍영정천,local,59,,OpenStreetMap (ODbL),way/1164751657
+osm:way/1523961807,학곡천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,전남,127.27502,34.64692,학곡천,local,44,,OpenStreetMap (ODbL),way/1523961807
+osm:way/1418256569,화개천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,전남,127.627619,35.194674,화개천,local,36,,OpenStreetMap (ODbL),way/1418256569
+osm:way/1135337547,화순천 축구장(이름 없음),riverside_sports,둔치 체육시설,전남,127.007555,35.03797,화순천,local,50,,OpenStreetMap (ODbL),way/1135337547
+osm:way/490516064,화순천 축구장(이름 없음),riverside_sports,둔치 체육시설,전남,126.969521,35.048741,화순천,local,52,,OpenStreetMap (ODbL),way/490516064
+osm:way/590789038,황룡강 배구장(이름 없음),riverside_sports,둔치 체육시설,전남,126.735895,35.161306,황룡강,local,0,,OpenStreetMap (ODbL),way/590789038
+osm:way/590789043,황룡강 테니스장(이름 없음),riverside_sports,둔치 체육시설,전남,126.735756,35.161622,황룡강,local,0,,OpenStreetMap (ODbL),way/590789043
+osm:way/598956714,히딩크 드림필드,riverside_sports,둔치 체육시설,전남,126.835636,35.168975,영산강,national,26,,OpenStreetMap (ODbL),way/598956714
+osm:way/844513967,경포천동길,low_bridge,세월교·잠수교,전북,126.726541,35.97406,경포천,local,7,,OpenStreetMap (ODbL),way/844513967
+osm:node/14135410372,고창천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,126.70381,35.433723,고창천,local,0,,OpenStreetMap (ODbL),node/14135410372
+osm:node/14121099891,고창천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,126.697744,35.434562,고창천,local,0,,OpenStreetMap (ODbL),node/14121099891
+osm:node/14324211535,고창천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,126.712143,35.431651,고창천,local,0,,OpenStreetMap (ODbL),node/14324211535
+osm:way/1560959834,구량천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.590804,35.857024,구량천,local,0,,OpenStreetMap (ODbL),way/1560959834
+osm:node/13176086991,금강 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.53578,35.79339,금강,local,0,,OpenStreetMap (ODbL),node/13176086991
+osm:node/12462703509,무주남대천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.644182,35.998652,무주남대천,local,0,,OpenStreetMap (ODbL),node/12462703509
+osm:node/12703270590,사전천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.695243,35.875429,사전천,local,0,,OpenStreetMap (ODbL),node/12703270590
+osm:node/8974810850,삼유천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.608937,35.947634,삼유천,local,0,,OpenStreetMap (ODbL),node/8974810850
+osm:node/13055592373,삼천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.11113,35.809998,삼천,local,0,,OpenStreetMap (ODbL),node/13055592373
+osm:node/13055592348,삼천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.112723,35.817268,삼천,local,0,,OpenStreetMap (ODbL),node/13055592348
+osm:node/10018213061,소퇴천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.665922,35.937893,소퇴천,local,0,,OpenStreetMap (ODbL),node/10018213061
+osm:node/10018247165,소퇴천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.673255,35.934231,소퇴천,local,5,,OpenStreetMap (ODbL),node/10018247165
+osm:node/14084597737,안정천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.43823,35.945618,안정천,local,0,,OpenStreetMap (ODbL),node/14084597737
+osm:node/11974438582,요천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.480293,35.553395,요천,national,0,,OpenStreetMap (ODbL),node/11974438582
+osm:node/14168891610,은천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.411081,35.745262,은천,local,0,,OpenStreetMap (ODbL),node/14168891610
+osm:node/14295240515,전주천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.212241,35.764881,전주천,local,0,,OpenStreetMap (ODbL),node/14295240515
+osm:node/14219690442,전주천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.138975,35.815787,전주천,local,0,,OpenStreetMap (ODbL),node/14219690442
+osm:node/9177505479,학선천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.188696,35.87066,학선천,local,0,,OpenStreetMap (ODbL),node/9177505479
+osm:node/13261399083,학정천 세월교(이름 없음),low_bridge,세월교·잠수교,전북,127.28339,35.291401,학정천,local,0,,OpenStreetMap (ODbL),node/13261399083
+osm:way/1464994616,경천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전북,127.137288,35.373779,경천,local,13,,OpenStreetMap (ODbL),way/1464994616
+osm:way/1194693401,금강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전북,126.874656,36.065191,금강,national,28,,OpenStreetMap (ODbL),way/1194693401
+osm:way/1307905585,마산천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전북,127.007048,35.865163,마산천,local,22,,OpenStreetMap (ODbL),way/1307905585
+osm:way/1190513558,섬진강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전북,127.273279,35.672086,섬진강,local,17,,OpenStreetMap (ODbL),way/1190513558
+osm:way/970278396,신기천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전북,126.743123,35.725939,신기천,local,1762,,OpenStreetMap (ODbL),way/970278396
+osm:way/1222300752,신창천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전북,126.66464,35.578768,신창천,local,1500,,OpenStreetMap (ODbL),way/1222300752
+osm:way/117026845,전주천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,전북,127.144285,35.812535,전주천,local,10,,OpenStreetMap (ODbL),way/117026845
+osm:way/1163966041,만경강 축구장(이름 없음),riverside_sports,둔치 체육시설,전북,127.198849,35.9761,만경강,national,54,,OpenStreetMap (ODbL),way/1163966041
+osm:way/110861514,섬진강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,전북,127.274359,35.672635,섬진강,local,42,,OpenStreetMap (ODbL),way/110861514
+osm:way/1255475437,섬진강 배구장(이름 없음),riverside_sports,둔치 체육시설,전북,127.276611,35.676614,섬진강,local,33,,OpenStreetMap (ODbL),way/1255475437
+osm:way/970278411,신기천 농구장(이름 없음),riverside_sports,둔치 체육시설,전북,126.741851,35.725944,신기천,local,1650,,OpenStreetMap (ODbL),way/970278411
+osm:way/839915793,신기천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,전북,126.740823,35.725132,신기천,local,1542,,OpenStreetMap (ODbL),way/839915793
+osm:way/469012218,완주맥파이스 야구장,riverside_sports,둔치 체육시설,전북,127.168197,35.923122,만경강,national,45,,OpenStreetMap (ODbL),way/469012218
+osm:node/14257334142,악근천 세월교(이름 없음),low_bridge,세월교·잠수교,제주,126.494169,33.261525,악근천,local,0,,OpenStreetMap (ODbL),node/14257334142
+osm:node/11556469138,의귀천 세월교(이름 없음),low_bridge,세월교·잠수교,제주,126.73968,33.281426,의귀천,local,0,,OpenStreetMap (ODbL),node/11556469138
+osm:node/10294578913,전포천 세월교(이름 없음),low_bridge,세월교·잠수교,제주,126.657585,33.279298,전포천,local,3,,OpenStreetMap (ODbL),node/10294578913
+osm:way/1550986382,중문천 세월교(이름 없음),low_bridge,세월교·잠수교,제주,126.418356,33.245098,중문천,local,0,,OpenStreetMap (ODbL),way/1550986382
+osm:way/583881687,하례망장포로,low_bridge,세월교·잠수교,제주,126.639262,33.263739,신례천,local,0,,OpenStreetMap (ODbL),way/583881687
+osm:node/12642188131,한림천 세월교(이름 없음),low_bridge,세월교·잠수교,제주,126.27688,33.418402,한림천,local,0,,OpenStreetMap (ODbL),node/12642188131
+osm:node/6574772786,화북천 세월교(이름 없음),low_bridge,세월교·잠수교,제주,126.575693,33.449051,화북천,local,0,,OpenStreetMap (ODbL),node/6574772786
+osm:node/9813668610,흘천 세월교(이름 없음),low_bridge,세월교·잠수교,제주,126.482488,33.491768,흘천,local,0,,OpenStreetMap (ODbL),node/9813668610
+osm:way/1530525395,동문재래시장공영주차장,riverside_parking,둔치·하천변 주차장,제주,126.526086,33.510816,산지천,local,27,,OpenStreetMap (ODbL),way/1530525395
+osm:way/1531562296,산지천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,제주,126.530048,33.516884,산지천,local,33,,OpenStreetMap (ODbL),way/1531562296
+osm:way/242451274,중문천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,제주,126.418809,33.244167,중문천,local,15,,OpenStreetMap (ODbL),way/242451274
+osm:node/10617356137,갈산천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,126.575173,36.803286,갈산천,local,0,,OpenStreetMap (ODbL),node/10617356137
+osm:way/115836070,갑천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,127.274754,36.193157,갑천,local,0,,OpenStreetMap (ODbL),way/115836070
+osm:way/173028044,갑천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,127.281968,36.220384,갑천,local,2,,OpenStreetMap (ODbL),way/173028044
+osm:node/9850686120,곡교천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,127.150803,36.72886,곡교천,local,0,,OpenStreetMap (ODbL),node/9850686120
+osm:way/189521551,금성천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,127.40621,36.162304,금성천,local,0,,OpenStreetMap (ODbL),way/189521551
+osm:node/9161020705,당진천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,126.633329,36.887172,당진천,local,0,,OpenStreetMap (ODbL),node/9161020705
+osm:way/133336303,두계천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,127.248412,36.286998,두계천,local,0,,OpenStreetMap (ODbL),way/133336303
+osm:node/11974325858,봉황천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,127.447782,36.033433,봉황천,local,0,,OpenStreetMap (ODbL),node/11974325858
+osm:node/11217532613,어천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,126.988199,36.461822,어천,local,0,,OpenStreetMap (ODbL),node/11217532613
+osm:way/173719693,연산천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,127.183015,36.21492,연산천,local,0,,OpenStreetMap (ODbL),way/173719693
+osm:node/12123165522,와룡천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,126.542438,36.594159,와룡천,local,0,,OpenStreetMap (ODbL),node/12123165522
+osm:node/9030233348,용두천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,127.047751,36.793177,용두천,local,11,,OpenStreetMap (ODbL),node/9030233348
+osm:node/8974013395,용수천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,127.253456,36.388801,용수천,local,0,,OpenStreetMap (ODbL),node/8974013395
+osm:way/452971446,용수천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,127.223389,36.353953,용수천,local,0,,OpenStreetMap (ODbL),way/452971446
+osm:node/9023054813,유구천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,126.954847,36.555423,유구천,local,0,,OpenStreetMap (ODbL),node/9023054813
+osm:node/12836949403,진산천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,127.394567,36.15661,진산천,local,0,,OpenStreetMap (ODbL),node/12836949403
+osm:node/5314025260,치성천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,126.957787,36.409502,치성천,local,0,,OpenStreetMap (ODbL),node/5314025260
+osm:node/10055324823,화산천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,127.282926,36.340222,화산천,local,0,,OpenStreetMap (ODbL),node/10055324823
+osm:node/13274531040,화양천 세월교(이름 없음),low_bridge,세월교·잠수교,충남,126.741316,36.613899,화양천,local,0,,OpenStreetMap (ODbL),node/13274531040
+osm:way/1545967045,교성천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충남,126.506496,36.411586,교성천,local,14,,OpenStreetMap (ODbL),way/1545967045
+osm:way/1188229919,금강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충남,127.008512,36.155651,금강,national,0,,OpenStreetMap (ODbL),way/1188229919
+osm:way/469667020,금강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충남,126.908181,36.29009,금강,national,29,,OpenStreetMap (ODbL),way/469667020
+osm:way/1115503502,대전천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충남,127.462842,36.285475,대전천,local,28,,OpenStreetMap (ODbL),way/1115503502
+osm:way/1551156100,대천천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충남,126.601568,36.351517,대천천,local,0,,OpenStreetMap (ODbL),way/1551156100
+osm:way/1246212869,대천천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충남,126.59819,36.346444,대천천,local,0,,OpenStreetMap (ODbL),way/1246212869
+osm:way/1352011443,삼룡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충남,127.160864,36.795928,삼룡천,local,23,,OpenStreetMap (ODbL),way/1352011443
+osm:way/816889392,원성천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충남,127.152754,36.800295,원성천,local,28,,OpenStreetMap (ODbL),way/816889392
+osm:way/487162405,장재천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충남,127.108567,36.803727,장재천,local,23,,OpenStreetMap (ODbL),way/487162405
+osm:way/968029404,제민천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충남,127.119856,36.444009,제민천,local,36,,OpenStreetMap (ODbL),way/968029404
+osm:way/1216426623,제민천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충남,127.123833,36.434853,제민천,local,39,,OpenStreetMap (ODbL),way/1216426623
+osm:way/790625436,천안천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충남,127.137715,36.787344,천안천,local,23,,OpenStreetMap (ODbL),way/790625436
+osm:way/480451320,천안천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충남,127.146593,36.819314,천안천,local,361,,OpenStreetMap (ODbL),way/480451320
+osm:way/368180898,천안천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충남,127.180928,36.839991,천안천,local,807,,OpenStreetMap (ODbL),way/368180898
+osm:way/1391602858,강경천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,충남,127.014189,36.166939,강경천,national,0,,OpenStreetMap (ODbL),way/1391602858
+osm:way/1217478958,강변테니스장,riverside_sports,둔치 체육시설,충남,127.043106,36.795307,용두천,local,47,,OpenStreetMap (ODbL),way/1217478958
+osm:way/119425879,곡교천 야구장(이름 없음),riverside_sports,둔치 체육시설,충남,126.992871,36.799462,곡교천,national,58,,OpenStreetMap (ODbL),way/119425879
+osm:way/119423480,곡교천 축구장(이름 없음),riverside_sports,둔치 체육시설,충남,126.997974,36.798809,곡교천,national,59,,OpenStreetMap (ODbL),way/119423480
+osm:way/480775148,구룡천 농구장(이름 없음),riverside_sports,둔치 체육시설,충남,127.130869,36.780221,구룡천,local,35,,OpenStreetMap (ODbL),way/480775148
+osm:way/480775147,구룡천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,충남,127.129614,36.78007,구룡천,local,65,,OpenStreetMap (ODbL),way/480775147
+osm:way/1162045176,금강 농구장(이름 없음),riverside_sports,둔치 체육시설,충남,126.93943,36.316516,금강,national,0,,OpenStreetMap (ODbL),way/1162045176
+osm:way/1391602806,금강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,충남,127.00984,36.160241,금강,national,0,,OpenStreetMap (ODbL),way/1391602806
+osm:way/1108517634,금강 야구장(이름 없음),riverside_sports,둔치 체육시설,충남,126.74581,36.026862,금강,national,0,,OpenStreetMap (ODbL),way/1108517634
+osm:way/1162045175,금강 축구장(이름 없음),riverside_sports,둔치 체육시설,충남,126.93922,36.316736,금강,national,0,,OpenStreetMap (ODbL),way/1162045175
+osm:way/1159416576,금강 테니스장(이름 없음),riverside_sports,둔치 체육시설,충남,127.008516,36.156802,금강,national,0,,OpenStreetMap (ODbL),way/1159416576
+osm:way/1548139115,대천천 농구장(이름 없음),riverside_sports,둔치 체육시설,충남,126.602864,36.352103,대천천,local,0,,OpenStreetMap (ODbL),way/1548139115
+osm:way/1548139116,대천천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,충남,126.602693,36.35179,대천천,local,0,,OpenStreetMap (ODbL),way/1548139116
+osm:way/1311647718,무한천 축구장(이름 없음),riverside_sports,둔치 체육시설,충남,126.830219,36.731469,무한천,national,83,,OpenStreetMap (ODbL),way/1311647718
+osm:way/1320233217,삼룡천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,충남,127.163127,36.792759,삼룡천,local,26,,OpenStreetMap (ODbL),way/1320233217
+osm:way/1217478968,용두천 테니스장(이름 없음),riverside_sports,둔치 체육시설,충남,127.042735,36.795108,용두천,local,24,,OpenStreetMap (ODbL),way/1217478968
+osm:way/487162406,장재천 농구장(이름 없음),riverside_sports,둔치 체육시설,충남,127.108778,36.804485,장재천,local,18,,OpenStreetMap (ODbL),way/487162406
+osm:way/368180897,제1운동장,riverside_sports,둔치 체육시설,충남,127.181805,36.839941,천안천,local,876,,OpenStreetMap (ODbL),way/368180897
+osm:way/557191096,제민천 농구장(이름 없음),riverside_sports,둔치 체육시설,충남,127.118083,36.442424,제민천,local,72,,OpenStreetMap (ODbL),way/557191096
+osm:way/557191095,제민천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,충남,127.118502,36.44287,제민천,local,63,,OpenStreetMap (ODbL),way/557191095
+osm:way/557191085,제민천 테니스장(이름 없음),riverside_sports,둔치 체육시설,충남,127.120182,36.44484,제민천,local,31,,OpenStreetMap (ODbL),way/557191085
+osm:way/804269108,천안천 게이트볼장(이름 없음),riverside_sports,둔치 체육시설,충남,127.112997,36.78186,천안천,local,57,,OpenStreetMap (ODbL),way/804269108
+osm:way/1276294460,천안천 배드민턴장(이름 없음),riverside_sports,둔치 체육시설,충남,127.087739,36.776505,천안천,local,31,,OpenStreetMap (ODbL),way/1276294460
+osm:way/480451312,천안천 축구장(이름 없음),riverside_sports,둔치 체육시설,충남,127.147538,36.820127,천안천,local,343,,OpenStreetMap (ODbL),way/480451312
+osm:way/37273041,금강 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.64986,36.27592,금강,national,0,,OpenStreetMap (ODbL),way/37273041
+osm:node/8918851944,달천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.750809,36.57405,달천,local,0,,OpenStreetMap (ODbL),node/8918851944
+osm:node/8776482287,달천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.778957,36.675463,달천,local,0,,OpenStreetMap (ODbL),node/8776482287
+osm:node/8918866597,달천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.690941,36.567223,달천,local,0,,OpenStreetMap (ODbL),node/8918866597
+osm:node/9144098723,달천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.778599,36.549386,달천,local,0,,OpenStreetMap (ODbL),node/9144098723
+osm:way/294925097,대전천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.474752,36.2438,대전천,local,0,,OpenStreetMap (ODbL),way/294925097
+osm:node/951245395,동달천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,128.077384,36.892745,동달천,local,0,,OpenStreetMap (ODbL),node/951245395
+osm:node/8682015141,매포천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,128.31482,37.042184,매포천,local,0,,OpenStreetMap (ODbL),node/8682015141
+osm:node/12024612782,묘암천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.52137,36.482838,묘암천,local,0,,OpenStreetMap (ODbL),node/12024612782
+osm:node/13684240131,석문동천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.988949,36.845928,석문동천,local,0,,OpenStreetMap (ODbL),node/13684240131
+osm:node/9184275463,석화천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.596306,36.728274,석화천,local,0,,OpenStreetMap (ODbL),node/9184275463
+osm:node/9143476341,쌍천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.889517,36.7878,쌍천,local,0,,OpenStreetMap (ODbL),node/9143476341
+osm:node/8927760769,압항천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.738337,36.698217,압항천,local,0,,OpenStreetMap (ODbL),node/8927760769
+osm:node/8956095737,압항천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.757565,36.679554,압항천,local,0,,OpenStreetMap (ODbL),node/8956095737
+osm:node/8927763873,압항천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.719018,36.720995,압항천,local,3,,OpenStreetMap (ODbL),node/8927763873
+osm:node/8927763878,압항천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.724575,36.715868,압항천,local,4,,OpenStreetMap (ODbL),node/8927763878
+osm:way/561460410,우산로,low_bridge,세월교·잠수교,충북,127.672953,36.278153,금강,national,0,,OpenStreetMap (ODbL),way/561460410
+osm:node/9120408174,월운천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.513323,36.602773,월운천,local,0,,OpenStreetMap (ODbL),node/9120408174
+osm:node/12947546815,응천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.602634,37.025565,응천,local,0,,OpenStreetMap (ODbL),node/12947546815
+osm:node/12509421468,인경천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.599796,36.653122,인경천,local,0,,OpenStreetMap (ODbL),node/12509421468
+osm:node/9229596535,장평천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,128.224623,37.124943,장평천,local,0,,OpenStreetMap (ODbL),node/9229596535
+osm:node/6366924948,초평천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.56749,36.857917,초평천,local,0,,OpenStreetMap (ODbL),node/6366924948
+osm:node/8304991002,초평천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.560997,36.85166,초평천,local,0,,OpenStreetMap (ODbL),node/8304991002
+osm:node/8788838708,학산천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.675287,36.106399,학산천,local,0,,OpenStreetMap (ODbL),node/8788838708
+osm:node/9150826425,행목동천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.916431,36.728489,행목동천,local,0,,OpenStreetMap (ODbL),node/9150826425
+osm:node/8927760736,황암천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.736363,36.71278,황암천,local,0,,OpenStreetMap (ODbL),node/8927760736
+osm:node/8927701452,황암천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.736643,36.721799,황암천,local,0,,OpenStreetMap (ODbL),node/8927701452
+osm:node/8927701437,황암천 세월교(이름 없음),low_bridge,세월교·잠수교,충북,127.737302,36.726981,황암천,local,0,,OpenStreetMap (ODbL),node/8927701437
+osm:way/679659996,군자천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충북,127.550584,36.909833,군자천,local,1379,,OpenStreetMap (ODbL),way/679659996
+osm:way/1037384856,미호천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충북,127.493639,36.829599,미호천,local,34,,OpenStreetMap (ODbL),way/1037384856
+osm:way/1154335462,백곡천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충북,127.441042,36.860933,백곡천,local,0,,OpenStreetMap (ODbL),way/1154335462
+osm:way/1493311750,석문동천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충북,127.988463,36.84632,석문동천,local,26,,OpenStreetMap (ODbL),way/1493311750
+osm:way/1540244319,응천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충북,127.594398,36.994559,응천,local,4,,OpenStreetMap (ODbL),way/1540244319
+osm:way/471693833,조천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충북,127.305299,36.604426,조천,local,0,,OpenStreetMap (ODbL),way/471693833
+osm:node/8663689657,주차장,riverside_parking,둔치·하천변 주차장,충북,128.205536,37.184273,하소천,local,402,,OpenStreetMap (ODbL),node/8663689657
+osm:way/1331220839,창골주차장,riverside_parking,둔치·하천변 주차장,충북,127.93174,36.931367,달천,national,41,,OpenStreetMap (ODbL),way/1331220839
+osm:way/1246036313,충주천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충북,127.930179,36.972262,충주천,local,40,,OpenStreetMap (ODbL),way/1246036313
+osm:way/1564368692,하소천 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충북,128.205512,37.18052,하소천,local,29,,OpenStreetMap (ODbL),way/1564368692
+osm:way/931986693,한강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충북,127.961637,37.025853,한강,national,18,,OpenStreetMap (ODbL),way/931986693
+osm:way/472165855,한강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충북,127.865569,37.019652,한강,national,25,,OpenStreetMap (ODbL),way/472165855
+osm:node/9131785366,한강 둔치 주차장(이름 없음),riverside_parking,둔치·하천변 주차장,충북,128.370903,36.980465,한강,national,46,,OpenStreetMap (ODbL),node/9131785366
+osm:way/164146526,금강 농구장(이름 없음),riverside_sports,둔치 체육시설,충북,127.409249,36.453386,금강,national,0,,OpenStreetMap (ODbL),way/164146526
+osm:way/1347231910,금강11공구축구장,riverside_sports,둔치 체육시설,충북,127.390792,36.437505,갑천,national,0,,OpenStreetMap (ODbL),way/1347231910
+osm:way/438853860,무심천 체육공원,riverside_sports,둔치 체육시설,충북,127.483248,36.639308,무심천,national,0,,OpenStreetMap (ODbL),way/438853860
+osm:way/1446418872,요도천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,충북,127.869062,36.967438,요도천,local,36,,OpenStreetMap (ODbL),way/1446418872
+osm:way/469398570,조천 농구장(이름 없음),riverside_sports,둔치 체육시설,충북,127.304774,36.603924,조천,local,0,,OpenStreetMap (ODbL),way/469398570
+osm:way/1410919072,조천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,충북,127.303182,36.605115,조천,local,0,,OpenStreetMap (ODbL),way/1410919072
+osm:way/297131560,중원체육공원,riverside_sports,둔치 체육시설,충북,127.856924,37.03006,한강,national,46,,OpenStreetMap (ODbL),way/297131560
+osm:way/920701215,충주천 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,충북,127.920903,36.978537,충주천,local,68,,OpenStreetMap (ODbL),way/920701215
+osm:relation/20628216,테니스장 (W1),riverside_sports,둔치 체육시설,충북,127.870167,36.96715,요도천,local,30,,OpenStreetMap (ODbL),relation/20628216
+osm:node/12045047624,한강 둔치 운동장(이름 없음),riverside_sports,둔치 체육시설,충북,128.369002,36.989391,한강,national,21,,OpenStreetMap (ODbL),node/12045047624
+osm:way/1160892888,한강 축구장(이름 없음),riverside_sports,둔치 체육시설,충북,127.914807,37.011079,한강,national,26,,OpenStreetMap (ODbL),way/1160892888

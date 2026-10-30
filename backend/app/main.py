@@ -246,7 +246,7 @@ def _start_watch_log() -> None:
 
 
 @app.get("/api/watch/season-board", tags=["watch"])
-def watch_season_board(season: int = Query(default=None, ge=2026, le=2100), limit: int = Query(default=300, ge=1, le=2000)):
+def watch_season_board(season: int = Query(default=None, ge=2026, le=2100), limit: int = Query(default=300, ge=1, le=10000)):
     """Every facility scored from the board the server recorded every 10 minutes (no historical download)."""
     from . import watch_log
 
@@ -930,7 +930,7 @@ def watch_facility_status(
     at: str | None = Query(default=None, description="ISO time to replay from the stored hourly series; omit for live"),
     region: str | None = Query(default=None, max_length=20),
     group: Literal["underpass", "riverside"] | None = None,
-    limit: int = Query(default=2000, ge=1, le=2000),
+    limit: int = Query(default=2000, ge=1, le=10000),
     rain_mode: Literal["live", "replay"] | None = Query(default=None, description="Use current live rainfall independently from the selected river replay time"),
 ):
     """Facilities ordered by the stage of the gauge standing in for them, then by the rain beside them."""
@@ -946,7 +946,7 @@ def watch_facility_risk(
     at: str | None = Query(default=None, description="ISO time to replay from the stored hourly series; omit for live"),
     region: str | None = Query(default=None, max_length=20),
     driver: Literal["river", "pluvial"] | None = None,
-    limit: int = Query(default=300, ge=1, le=2000),
+    limit: int = Query(default=300, ge=1, le=10000),
     rain_mode: Literal["live", "replay"] | None = Query(default=None, description="Use current live rainfall independently from the selected river replay time"),
     sim: Literal["central", "chungcheong", "south"] | None = Query(default=None, description="Test only: synthetic heavy-rain scenario instead of observed rain and official feeds"),
 ):
