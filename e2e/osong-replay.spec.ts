@@ -1,8 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 test("enter Osong, replay stages, toggle a layer, and show provenance", async ({ page }) => {
-  await page.goto("/");
-  await page.getByRole("navigation", { name: "FloodOps 화면" }).getByRole("link", { name: "검증" }).click();
+  await page.goto("/#intro");
+  await page.getByLabel("FloodOps 화면 이동").click();
+  await page.getByRole("navigation", { name: "FloodOps 화면" }).getByRole("link", { name: "사례 검증", exact: true }).click();
   await expect(page).toHaveURL(/#cases$/);
 
   await page.locator(".fo-case-slide.is-center .fo-case.is-ready").click();

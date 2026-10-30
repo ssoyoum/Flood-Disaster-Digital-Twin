@@ -228,8 +228,12 @@ def _layers_gzip(event_id: str, layer_year: int) -> bytes:
 
 @app.on_event("startup")
 def _warm_layer_cache() -> None:
-    # Build the default layer payload in the background so the first visitor after a restart does not wait.
-    threading.Thread(target=_layers_gzip, args=(EVENT_ID, 2023), daemon=True).start()
+    # Build the default and Seoul case payloads in the background so first navigation does not pay the cold cost.
+    def warm_supported_layers() -> None:
+        _layers_gzip(EVENT_ID, 2023)
+        _layers_gzip(SEOUL_EVENT_ID, 2022)
+
+    threading.Thread(target=warm_supported_layers, daemon=True).start()
 
 
 @app.get("/api/events/{event_id}/layers")
@@ -1006,9 +1010,20 @@ def agent_planner_status():
     }
 
 
+class FrontendFiles(StaticFiles):
+    # Hashed bundles never change; pages must revalidate or browsers keep showing the previous deploy.
+    async def get_response(self, path: str, scope):
+        response = await super().get_response(path, scope)
+        if Path(path).parts[:1] == ("assets",):
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        else:
+            response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
 _static_dir = os.getenv("FLOODOPS_STATIC_DIR")
 if _static_dir:
     static_path = Path(_static_dir)
     if not (static_path / "index.html").is_file():
         raise RuntimeError(f"FLOODOPS_STATIC_DIR has no index.html: {static_path}")
-    app.mount("/", StaticFiles(directory=static_path, html=True), name="frontend")
+    app.mount("/", FrontendFiles(directory=static_path, html=True), name="frontend")

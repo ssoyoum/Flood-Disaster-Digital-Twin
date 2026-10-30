@@ -1,0 +1,239 @@
+{
+  "schema_version": "1.1",
+  "dataset_id": "floodops-multifactor-v2",
+  "generated_at_utc": "2026-10-26T11:01:25+00:00",
+  "script": "data/scripts/build_multifactor_dataset.py",
+  "scope": "facility candidate inventory plus an all-available-period 10-minute Osong external-flood feature panel",
+  "profiles": {
+    "candidate_facility_count": 754,
+    "inflow_path_confirmed_count": 1,
+    "catalog_grade_available_count": 1,
+    "facility_grade_note": "Catalog fields are preserved with their catalogue status; a catalogue listing is not a site inspection."
+  },
+  "osong_panel": {
+    "path": "data/processed/multifactor/osong-2023/facility-timeseries-10m.csv.gz",
+    "sha256": "6b9914bce86da287b4d50982d29d5a90aa16b2ead53c8aa1d8827fee57656c90",
+    "compression": "gzip, mtime=0",
+    "rows": 409152,
+    "first_timestamp_kst": "2019-01-01 00:00",
+    "last_timestamp_kst": "2026-10-12 07:50",
+    "rain_complete_window_rows": {
+      "1h": 140504,
+      "3h": 140408,
+      "12h": 139976
+    },
+    "official_alert_state_row_counts": {
+      "NONE": 408409,
+      "ADVISORY": 277,
+      "WARNING": 466
+    },
+    "primary_river_stage_thresholds_used_for_linear_diagnostics_m": {
+      "warning": 8.0,
+      "planned_flood": 9.38,
+      "source_vintage": "HRFCO station catalogue fetched 2026-10-10; historical threshold history not joined"
+    },
+    "rain_station_distance_km": 5.38,
+    "rain_station_within_5km": false
+  },
+  "event_labels": {
+    "path": "data/processed/multifactor/osong-2023/event-labels.csv",
+    "rows": 8,
+    "sha256": "bfdc72ccdf52ec5da23b667d9c55ec5aa6ada5bc02b2cf9a621d87cb9d6c2164"
+  },
+  "event_rainfall_crosscheck": {
+    "path": "data/processed/multifactor/osong-2023/rainfall-crosscheck-hourly.csv",
+    "rows": 144,
+    "sha256": "0e94fac132d1aab53ea706cc918ab3e2bc7444d5f0dea5c5e831be554760b5e5"
+  },
+  "rain_gauge_sensitivity": {
+    "path": "data/processed/multifactor/osong-2023/rain-gauge-sensitivity.csv",
+    "rows": 12,
+    "sha256": "a3971fc226da9f07c0784c4a754a6f3a9b245628c8e0639ac2846c6738f1fa8a",
+    "event_window": {
+      "start_kst": "2023-07-14 12:00",
+      "end_kst": "2023-07-15 08:40",
+      "expected_10m_bins": 125
+    },
+    "candidates": [
+      {
+        "station_id": "30114070",
+        "station_name": "세종시(농정원)",
+        "distance_km": "5.38",
+        "role": "nearest_candidate_rank_1",
+        "series_status": "OBSERVED_SERIES",
+        "event_expected_10m_bins": 125,
+        "event_valid_10m_bins": 125,
+        "event_coverage_pct": "100"
+      },
+      {
+        "station_id": "30114110",
+        "station_name": "옥산",
+        "distance_km": "5.94",
+        "role": "nearest_candidate_rank_2",
+        "series_status": "NO_SERIES_FILE",
+        "event_expected_10m_bins": 125,
+        "event_valid_10m_bins": 0,
+        "event_coverage_pct": "0"
+      },
+      {
+        "station_id": "30104010",
+        "station_name": "세종시(부강면사무소)",
+        "distance_km": "11.03",
+        "role": "nearest_candidate_rank_3",
+        "series_status": "NO_SERIES_FILE",
+        "event_expected_10m_bins": 125,
+        "event_valid_10m_bins": 0,
+        "event_coverage_pct": "0"
+      },
+      {
+        "station_id": "30114020",
+        "station_name": "청주시(흥덕교)",
+        "distance_km": "13.063",
+        "role": "available_regional_sensitivity_gauge",
+        "series_status": "OBSERVED_SERIES",
+        "event_expected_10m_bins": 125,
+        "event_valid_10m_bins": 125,
+        "event_coverage_pct": "100"
+      }
+    ],
+    "interpretation": "Observed gauge-to-gauge differences are a sensitivity check, not proof that any station represents the facility's local rainfall."
+  },
+  "event_case_coverage": {
+    "path": "data/processed/multifactor/event-case-coverage.csv",
+    "rows": 4,
+    "confirmed_mechanisms": 1,
+    "calibration_ready_cases": 0,
+    "sha256": "8f045192598c82fa54611787090bae9e06833f3a7e665f60e1d7041fa09f74b5"
+  },
+  "feature_readiness": {
+    "path": "data/processed/multifactor/feature-readiness.csv",
+    "rows": 13,
+    "sha256": "badb18c7f0ec2e7798be0c724c9cfede45593eeaab4177d336257f436d77e151"
+  },
+  "stage_design": {
+    "path": "data/processed/multifactor/stage-design.csv",
+    "rows": 5,
+    "sha256": "41b2cc3cf4dc3d96dae770016f30db3493ee9eb19bc54b4eae7a7e647a41a06a"
+  },
+  "threshold_reference": {
+    "path": "data/processed/multifactor/threshold-reference.csv",
+    "rows": 9,
+    "sha256": "a4bb44ed3c17c343c0d39c9e5d8ae91387f632bd0f317575942ce01cff82b8e0"
+  },
+  "inputs": {
+    "facility_links": {
+      "path": "data/processed/facilities/facility_gauge_links.csv",
+      "sha256": "d364e3685f138b2376ccfb7a05b739666be7af38c372018b425c7fa795bbf12c"
+    },
+    "underpass_inventory": {
+      "path": "data/processed/facilities/underpass_inventory.csv",
+      "sha256": "3ad8592e09119c6051b85f8b7466d826cb1f3a63139048fa14db6d15d475df7b"
+    },
+    "registry": {
+      "path": "data/facilities/registry.json",
+      "sha256": "9241cd5185f38b59b86be118d06ec70c834fd5f7dc767ad7e1b99dc9bc6b7cf8"
+    },
+    "station_catalog": {
+      "path": "data/manifests/hrfco-stations.json",
+      "sha256": "0c43a4d1aa9f2558f50eb7be97f2d7aeabd8bf5ca1193ba48095cac48e4a1d0e"
+    },
+    "kma_aws_stations": {
+      "path": "data/processed/kma/aws_stations.json",
+      "sha256": "bf7dcfa141bf67621a3b3a7b5b55669fe5801df18cc88cd6d82fbb6f6706d2b4"
+    },
+    "water_primary": {
+      "path": "data/processed/hrfco/waterlevel_3011665_10M.csv",
+      "sha256": "f86f5a5edb50db5908e8022d1255693f805c6af726692c42b8164392625a6962"
+    },
+    "water_upstream": {
+      "path": "data/processed/hrfco/waterlevel_3011635_10M.csv",
+      "sha256": "48d4744c6968dbca51e6255cfb9f135ddf586aee9b59877e2996b5dad9dce9c9"
+    },
+    "water_downstream": {
+      "path": "data/processed/hrfco/waterlevel_3011685_10M.csv",
+      "sha256": "10ac70fc9ba4b8c0748aa81a6d50cda4b8e4f68a5f472d6686b0c2841dc5ced7"
+    },
+    "rain_primary": {
+      "path": "data/processed/hrfco/rainfall_30114070_10M.csv",
+      "sha256": "9eac7962587cc23517df12b2ef81d2f09fcbfb887e5ed87c53458e905823705f"
+    },
+    "rain_regional_sensitivity": {
+      "path": "data/processed/hrfco/rainfall_30114020_10M.csv",
+      "sha256": "91bc820a206637d65e7c93bb9fe47ec8192cba803e9cc0166bc4e89571e1a1e9"
+    },
+    "flood_alerts": {
+      "path": "data/processed/flood_forecast/flood_forecast_issuances.csv",
+      "sha256": "33b3ca4517d742ffae0212b75a77ad748d070d7245f5f910a199af3f0b995c2a"
+    },
+    "case_scorecard": {
+      "path": "data/processed/validation/case_scorecard.json",
+      "sha256": "686ad91ad793720489a7f19591e2cde706635f35033d6ef46acf7f35a0775d19"
+    },
+    "history_manifest": {
+      "path": "data/manifests/hrfco-history.json",
+      "sha256": "1c67f9b6a260f1840e303f46b20536575af7311c12a5bde058677d26fbeaefd2"
+    },
+    "osong_event_rain": {
+      "path": "data/processed/osong/osong_kma_aws_rainfall_2023-07-14_17.csv",
+      "sha256": "fb7cabe89fa0c8dc5bfc76e31f01e55dd8141c37f3a90960d99897c3ea87e4d5"
+    }
+  },
+  "method_notes": [
+    "Observed HRFCO rainfall is summed over the trailing 6, 18, and 72 ten-minute bins. A window is blank unless every bin is present and numeric.",
+    "River 30-minute rates use endpoint change over 30 minutes, and are blank unless all four 10-minute readings are present. Linear time-to-threshold is a retrospective diagnostic, not a forecast.",
+    "Observed rainfall is compared with KMA expected-rainfall criteria only as a reference screen; historical KMA warning issuance is not joined.",
+    "Rain-gauge sensitivity uses every nearby candidate link and any additional available station file; absent candidate series stay explicitly unavailable. The selected gauge is not presumed representative because it is nearest.",
+    "Missing rainfall windows remain blank. The sensitivity table records both the number of valid 10-minute bins and whether a complete window exists.",
+    "Raw gauge values are preserved. A change of at least 0.3 m per 10 minutes is flagged for review; changes of at least 3 m are separately flagged. No reading is silently removed.",
+    "The historical case labels an external river flood through temporary-levee failure. It does not supply a continuous levee-condition feature, measured underpass depth, pump telemetry, or surveyed low-point elevation.",
+    "The event-case coverage register draws candidate facilities, control/inflow reference times and source precision from the current replay scorecard. Except Osong's officially investigated cause, regional control reports do not establish facility-specific mechanism or outcome labels and are not admitted to path calibration.",
+    "Current station thresholds are included as metadata references. Their values are not asserted to be the values in force during every historical year."
+  ],
+  "outputs": [
+    {
+      "path": "data/processed/multifactor/facility-profiles.csv",
+      "sha256": "c679745bbd380cf9568ca84a37a065276ceb3957cc019e36c0a9579cab1b8caf",
+      "bytes": 270297
+    },
+    {
+      "path": "data/processed/multifactor/threshold-reference.csv",
+      "sha256": "a4bb44ed3c17c343c0d39c9e5d8ae91387f632bd0f317575942ce01cff82b8e0",
+      "bytes": 3936
+    },
+    {
+      "path": "data/processed/multifactor/feature-readiness.csv",
+      "sha256": "badb18c7f0ec2e7798be0c724c9cfede45593eeaab4177d336257f436d77e151",
+      "bytes": 3059
+    },
+    {
+      "path": "data/processed/multifactor/stage-design.csv",
+      "sha256": "41b2cc3cf4dc3d96dae770016f30db3493ee9eb19bc54b4eae7a7e647a41a06a",
+      "bytes": 2315
+    },
+    {
+      "path": "data/processed/multifactor/osong-2023/event-labels.csv",
+      "sha256": "bfdc72ccdf52ec5da23b667d9c55ec5aa6ada5bc02b2cf9a621d87cb9d6c2164",
+      "bytes": 3230
+    },
+    {
+      "path": "data/processed/multifactor/osong-2023/rainfall-crosscheck-hourly.csv",
+      "sha256": "0e94fac132d1aab53ea706cc918ab3e2bc7444d5f0dea5c5e831be554760b5e5",
+      "bytes": 30510
+    },
+    {
+      "path": "data/processed/multifactor/osong-2023/rain-gauge-sensitivity.csv",
+      "sha256": "a3971fc226da9f07c0784c4a754a6f3a9b245628c8e0639ac2846c6738f1fa8a",
+      "bytes": 5121
+    },
+    {
+      "path": "data/processed/multifactor/event-case-coverage.csv",
+      "sha256": "8f045192598c82fa54611787090bae9e06833f3a7e665f60e1d7041fa09f74b5",
+      "bytes": 3090
+    },
+    {
+      "path": "data/processed/multifactor/osong-2023/facility-timeseries-10m.csv.gz",
+      "sha256": "6b9914bce86da287b4d50982d29d5a90aa16b2ead53c8aa1d8827fee57656c90",
+      "bytes": 2494940
+    }
+  ]
+}

@@ -364,7 +364,9 @@
   };
   const get = (path) => request(path);
 
-  let prevReco = null, current = toMin("08:00"), map = null, facility = null, marker = null, levels = null, seq = 0, playing = null, sourceMode = "replay", currentStatus = null;
+  const requestedAt = params.get("at");
+  const replayAt = requestedAt && /^2023-07-15T(?:0[0-8]:[0-5]\d|09:00):00$/.test(requestedAt) ? requestedAt : null;
+  let prevReco = null, current = toMin(replayAt ? replayAt.slice(11, 16) : "08:00"), map = null, facility = null, marker = null, levels = null, seq = 0, playing = null, sourceMode = "replay", currentStatus = null;
 
   function renderAlert(status) {
     const alert = $("twc-alert");
@@ -430,11 +432,13 @@
 
   /* ---- number count-up ---- */
   function countTo(el, to, digits = 2) {
+    const version = String((Number(el.dataset.countVersion) || 0) + 1);
+    el.dataset.countVersion = version;
     const from = parseFloat(el.dataset.v ?? "0") || 0;
     el.dataset.v = to;
     if (reduced) { el.textContent = to.toFixed(digits); return; }
     const start = performance.now(), dur = 650;
-    const step = (now) => { const k = Math.min(1, (now - start) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = (from + (to - from) * e).toFixed(digits); if (k < 1) requestAnimationFrame(step); };
+    const step = (now) => { if (el.dataset.countVersion !== version) return; const k = Math.min(1, (now - start) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = (from + (to - from) * e).toFixed(digits); if (k < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   }
 
@@ -546,8 +550,21 @@
     let st, rise;
     const query = sourceMode === "live" ? "" : `?at=${encodeURIComponent(at)}`;
     try { [st, rise] = await Promise.all([get(`/api/twin/facilities/${FAC}/status${query}`), get(`/api/twin/facilities/${FAC}/rise-forecast${query}`).catch(() => null)]); }
-    catch (error) { $("twc-why").textContent = `관측을 불러오지 못했습니다: ${error.message}`; renderAlert({ status: "NO_OBSERVATION" }); return; }
+    catch (error) {
+      if (my !== seq) return;
+      currentStatus = null;
+      $("twc-why").textContent = `관측을 불러오지 못했습니다: ${error.message}`;
+      $("twc-badge").textContent = "관측 없음";
+      $("twc-at").textContent = `${at} · 관측 미확인`;
+      const level = $("twc-k-level");
+      level.dataset.countVersion = String((Number(level.dataset.countVersion) || 0) + 1);
+      level.dataset.v = "0"; level.textContent = "—";
+      ["twc-k-margin", "twc-k-rate", "twc-k-eta", "twc-rise-v", "twc-rise-q", "twc-rise-lin", "twc-rise-rain"].forEach((id) => { $(id).textContent = "—"; });
+      $("twc-chart").replaceChildren();
+      renderAlert({ status: "NO_OBSERVATION" }); return;
+    }
     if (my !== seq) return;
+    if (sourceMode !== "live" && window.parent !== window) window.parent.postMessage({ type: "floodops-twin-time", at }, window.location.origin);
     currentStatus = st;
     renderAlert(st);
     if (sourceMode === "live" && st.observation?.time) {
@@ -563,6 +580,7 @@
     prevReco = st.recommendation;
     $("twc-at").textContent = `${sourceMode === "live" ? "실시간" : "2023-07-15 재생"} · ${localTime(st.observation?.time ?? st.at)} 기준 · 단계 ${st.stage_label ?? "관측 없음"}`;
     if (st.observation) countTo($("twc-k-level"), st.observation.water_level_m);
+    else { const level = $("twc-k-level"); level.dataset.countVersion = String((Number(level.dataset.countVersion) || 0) + 1); level.dataset.v = "0"; level.textContent = "—"; }
     const m = st.margin_to_planned_flood_m;
     const rm = $("twc-r-margin");
     if (m != null && m <= 0) { $("twc-k-margin-l").textContent = "계획홍수위 초과"; $("twc-k-margin").innerHTML = `+${Math.abs(m).toFixed(2)}<small>m</small>`; setTone(rm, "hot"); }
@@ -572,6 +590,7 @@
     // 도달 전에는 "N분 남음", 도달 뒤(재생)에는 2023년 실제 유입까지 남은 분.
     const eta = $("twc-r-eta");
     if (m != null && m > 0) { $("twc-k-eta-l").textContent = "현재 속도로 계획홍수위까지"; $("twc-k-eta").innerHTML = st.minutes_to_planned_flood == null ? "상승 없음" : `${st.minutes_to_planned_flood}<small>분</small>`; setTone(eta, st.minutes_to_planned_flood != null && st.minutes_to_planned_flood <= 60 ? "hot" : "ok"); }
+    else if (!st.observation) { $("twc-k-eta").textContent = "자료 없음"; }
     else if (st.reference_minutes_to_inflow != null) { $("twc-k-eta-l").textContent = "2023 실제 유입(08:27)까지"; $("twc-k-eta").innerHTML = st.reference_minutes_to_inflow > 0 ? `${st.reference_minutes_to_inflow}<small>분</small>` : "유입 이후"; setTone(eta, "replay"); }
     else { $("twc-k-eta-l").textContent = "계획홍수위까지"; $("twc-k-eta").textContent = "도달"; setTone(eta, "hot"); }
 
@@ -607,13 +626,18 @@
   async function init() {
     const [facs, layers, bt, mode] = await Promise.all([get("/api/twin/facilities"), get("/api/events/osong-2023/layers"), get(`/api/twin/facilities/${FAC}/backtest`), get("/api/twin/mode")]);
     facility = facs.find((f) => f.id === FAC);
-    sourceMode = mode.mode === "live" ? "live" : "replay";
+    sourceMode = replayAt ? "replay" : mode.mode === "live" ? "live" : "replay";
     renderMode();
     $("twc-fname").textContent = facility.name; $("twc-fsub").textContent = `${facility.road} · ${facility.gauge.name} 연결`;
     const G = { inflow_path: "유입 경로", representative_gauge: "대표 관측소", site_instrumentation: "현장 계측", validation_event: "검증 사건" };
     $("twc-gates").innerHTML = Object.entries(G).map(([k, l]) => { const s = facility.gates?.[k]?.status; return `<span class="twc-gate ${s === "CONFIRMED" ? "twc-ok" : "twc-miss"}" title="${facility.gates?.[k]?.note ?? ""}">${l} ${s === "CONFIRMED" ? "✓" : s === "MISSING" ? "없음" : "확인 중"}</span>`; }).join("");
     if (sourceMode !== "live") buildTimeline(bt.stage_transitions, bt.first_closure_review?.time?.slice(11, 16));
     await loadDecisionRecords();
+    // Observation and review information must remain available if the basemap/CDN fails.
+    await setTime(current, { chart: "static" });
+    root.classList.add("twc-go");
+    if (sourceMode === "live") window.setInterval(() => setTime(current, { chart: "static" }), 5 * 60_000);
+    if (typeof maplibregl === "undefined") { $("twc-toast").textContent = "지도를 불러오지 못했습니다. 관측과 통제 검토 정보는 계속 표시합니다."; return; }
 
     const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas";
     map = new maplibregl.Map({
@@ -642,7 +666,6 @@
       marker = new maplibregl.Marker({ element: el, anchor: "left", offset: [-7, 0] }).setLngLat(facility.location).addTo(map);
       $("twc-toast").remove();
       setTime(current, { chart: "intro" }).then(() => { if (sourceMode !== "live") intro(); else { root.classList.add("twc-go"); map.easeTo({ center: facility.location, zoom: 13.8, pitch: 35, bearing: -18, padding: padding(), duration: reduced ? 0 : 1800 }); } });
-      if (sourceMode === "live") window.setInterval(() => setTime(current, { chart: "static" }), 5 * 60_000);
     });
   }
 
@@ -706,6 +729,13 @@
   init().catch((e) => { $("twc-toast").textContent = `불러오지 못했습니다: ${e.message} · 백엔드(8033)가 켜져 있는지 확인하세요`; });
   // 바깥에서 쓸 수 있게 최소 API만 노출: 인트로 다시 보기, 시각 이동
   root.twc = { intro: () => map && intro(), setTime: (hhmmStr) => setTime(toMin(hhmmStr)) };
+  window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin || event.source !== window.parent || event.data?.type !== "floodops-twin-set-time") return;
+    const at = event.data.at;
+    if (typeof at === "string" && /^2023-07-15T(?:0[0-8]:[0-5]\d|09:00):00$/.test(at)) {
+      sourceMode = "replay"; renderMode(); setTime(toMin(at.slice(11, 16)));
+    } else if (at == null) window.location.reload();
+  });
 })();
 </script>
 </body>

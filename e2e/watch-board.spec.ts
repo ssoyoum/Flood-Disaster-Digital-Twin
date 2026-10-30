@@ -1,48 +1,48 @@
 import { expect, test } from "@playwright/test";
 
-// FLOODOPS_TWIN_MODE=replay makes the watch board read the stored hourly series, so the national
-// picture is the morning of 2023-07-15 without touching the live HRFCO feed.
-test("the watch board is the first screen and ranks gauges by their own official levels", async ({ page }) => {
+// A separate proxy client from the event conversation suite keeps the real 6/minute gate intact.
+test.beforeEach(async ({ page }) => {
+  await page.setExtraHTTPHeaders({ "X-Forwarded-For": "198.51.100.42" });
+  // Exercise the actual failure boundary instead of relying on CI access to a public CDN.
+  await page.route("https://unpkg.com/**", route => route.abort());
+});
+
+// Current home UI lives in an iframe and ranks facilities, rather than gauges.
+test("home ranks facilities and keeps selected region and facility in the URL", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("h1")).toContainText("하천 접점 시설 감시 보드");
-  await expect(page.locator(".tw-mode")).toContainText("저장 자료 재생");
-
-  const priority = page.locator('[aria-label="우선순위"]');
-  await expect(priority.locator("li").first()).toContainText("계획홍수위");
-
-  await page.getByLabel("지역").selectOption("충북");
+  const board = page.frameLocator('iframe[title="FloodOps 전국 하천 감시 보드"]');
+  await expect(board.getByRole("heading", { name: "실시간 위험 순위" })).toBeVisible();
+  await expect(board.locator("#demo-mode")).toContainText("수위 재생");
+  await expect(board.locator("#wx-map")).toContainText("시설 목록과 판정 근거는 계속 확인");
+  await board.locator("#wx-rbtn").click();
+  await board.locator('[data-r="충북"]').click();
   await expect(page).toHaveURL(/region=%EC%B6%A9%EB%B6%81/);
-  await expect(priority).toContainText("미호강교");
-
-  await priority.getByRole("button", { name: /미호강교/ }).click();
-  const station = page.locator('[aria-label="선택 관측소"]');
-  await expect(station).toContainText("청주시(미호강교)");
-  await expect(station).toContainText("예보 아님");
-  await expect(page.locator('[aria-label="연결 시설"]')).toContainText("궁평2지하차도");
-  await expect(page.locator('[aria-label="연결 시설"] a[href="#twin"]')).toBeVisible();
+  await board.getByRole("searchbox", { name: "시설 검색" }).fill("궁평2");
+  await board.locator(".wx-row").filter({ hasText: "궁평2" }).first().click();
+  await expect(board.locator("#wx-st-name")).toContainText("궁평2");
+  await expect(board.locator("#wx-fac-list")).toContainText("하천");
 });
 
-test("the board agent moves the map and answers from the watch tools without a model", async ({ page }) => {
+test("watch agent moves the view using registered tools without a model", async ({ page }) => {
   await page.goto("/");
-  await page.getByLabel("Agent request").fill("강원도로 가자");
-  await page.getByRole("button", { name: "질문" }).click();
-  await expect(page.locator(".dk-agent-answer").last()).toContainText("강원(으)로 이동했습니다");
+  const board = page.frameLocator('iframe[title="FloodOps 전국 하천 감시 보드"]');
+  await board.locator("#wx-launch").click();
+  await board.getByRole("textbox", { name: "질문", exact: true }).fill("강원도로 가자");
+  await board.locator("#wx-ag-send").click();
+  await expect(board.locator("#wx-turns")).toContainText("강원");
   await expect(page).toHaveURL(/region=%EA%B0%95%EC%9B%90/);
-
-  // Answers stack in the panel, so each check reads the newest one.
-  await page.getByLabel("Agent request").fill("미호강교 지금 몇 단계야?");
-  await page.getByRole("button", { name: "질문" }).click();
-  await expect(page.locator(".dk-agent-answer").last()).toContainText("청주시(미호강교)");
-  await expect(page.locator('[aria-label="선택 관측소"]')).toContainText("청주시(미호강교)");
-  await expect(page.locator(".wb-rainline")).toContainText("근처 강우");
+  await board.getByRole("textbox", { name: "질문", exact: true }).fill("미호강교 지금 몇 단계야?");
+  await board.locator("#wx-ag-send").click();
+  await expect(board.locator("#wx-turns")).toContainText("청주시(미호강교)");
+  await expect(board.locator("#wx-ag-error")).toBeHidden();
 });
 
-test("rain from the stored hours shows on the side card and answers a rain question", async ({ page }) => {
+test("missing rain stays explicit and cannot be mistaken for zero rain", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".wb-rain-toggle")).toContainText(/강우 중 \d+곳/);
-  await expect(page.locator('[aria-label="비 많이 오는 곳"] li').first()).toContainText("1시간");
-  await page.getByLabel("Agent request").fill("지금 비 많이 오는 곳 어디야?");
-  await page.getByRole("button", { name: "질문" }).click();
-  await expect(page.locator(".dk-agent-answer").last()).toContainText("강우 관측소");
-  await expect(page.locator(".dk-agent-answer").last()).toContainText("강우만으로 단계나 침수를 판정하지 않습니다");
+  const board = page.frameLocator('iframe[title="FloodOps 전국 하천 감시 보드"]');
+  const rain = board.locator("#demo-rain-mode");
+  await expect(rain).toHaveAttribute("data-available", "false");
+  await expect(rain).toContainText("자료 없음");
+  await board.locator("#wx-info-btn").click();
+  await expect(board.getByRole("dialog", { name: "판정 기준", exact: true })).toContainText("시설이 실제로 잠기는지는 배수·펌프 용량이 정한다");
 });

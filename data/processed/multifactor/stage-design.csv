@@ -1,0 +1,6 @@
+stage_order,stage,river_path_signal,rain_path_signal,vulnerability_adjustment,field_override,operator_action,required_evidence,validation_status
+1,관심,시설 대표 관측소의 관심 기준 접근·상승 추세,1·3·12시간 관측 누적의 증가 또는 특보 기준 접근,취약성 자료와 조기 단계 이동 효과 검증 전에는 적용하지 않음,없음,자료 신선도·관측소 대표성 확인,수위·강우 관측과 품질·관측시각,DATA_AVAILABLE_RULE_UNCALIBRATED
+2,주의,공식 홍수주의보 또는 검증된 시설별 수위 기준,공식 호우주의보 발효; 관측 누적은 예보 기준과 참고 비교,확인된 고위험 시설에서만 한 단계 조기화 후보를 검증,현장 이상 보고가 있으면 단계 검토를 요청,담당자 알림·현장 및 시설 상태 확인,"발령·발효 이력, 지점별 기준, 통제·침수 기록",KMA_HISTORICAL_ISSUANCE_AND_SITE_REVIEW_PENDING
+3,통제 준비,공식 홍수경보 또는 시설별 준비 기준 도달,공식 호우경보 또는 검증된 강우·배수 용량 조건,임시제방·공사·저점 등 확인된 상태만 반영,펌프 정지·배수 장애·제방 이상은 별도 신호로 표시,차단시설·우회·인력과 통제 절차 준비,"특보·관측, 펌프 용량·가동·유입, 시설 상태",PUMP_AND_SITE_STATE_DATA_MISSING
+4,통제 검토,시설별 통제 검토 기준 또는 검증된 도달 예상시간 조건,시설별 내수 기준과 공식 특보·펌프 부담을 함께 확인,검증된 시설 취약성으로만 단계 상향; 임의 가중치 금지,현장 확인 결과와 공식 기준을 한 화면에서 검토,사람이 통제 여부와 시각을 결정하고 근거를 기록,시설별 승인 기준·경로별 신호·과거 통제 대조,EXISTING_OSONG_RULE_IS_PROTOTYPE_ONLY
+5,즉시 통제,시설 유입·침수 관측 또는 현행 공식 시설 통제 조건 충족,현장 침수심이 적용 가능한 공식 시설 기준을 초과,취약성은 조기 경보에만 사용; 현장 통제 기준을 늦추지 않음,현장 실측과 시설별 통제계획 우선,기존 SOP에 따라 진입 차단 및 우회 안내,시각이 있는 현장 침수심·통제 기준·차단기 상태,5CM_POLICY_REFERENCE_SITE_APPLICABILITY_AND_SENSOR_DATA_PENDING

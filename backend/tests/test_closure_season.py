@@ -50,7 +50,7 @@ def test_season_without_records_leaves_the_recommendation_unrecorded():
     card = client.get(f"{BASE}/season-scorecard?season=2023").json()
     assert card["counts"]["unrecorded"] == 1 and card["counts"]["hit"] == 0
     assert card["rows"][0]["episode"]["start"] == "2023-07-15T05:50:00"
-    assert sum(c["is_current_rule"] for c in card["candidates"]) == 1 and len(card["candidates"]) == 8
+    assert sum(c["is_current_rule"] for c in card["candidates"]) == 1 and len(card["candidates"]) == 12
 
 
 def test_season_matches_closures_to_recommendations():

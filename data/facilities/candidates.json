@@ -5,12 +5,15 @@
   "underpass_coordinates.csv": {
    "rows": 938,
    "chungbuk_rows": 32,
-   "chungbuk_rows_with_coordinates": 7,
+   "chungbuk_rows_with_coordinates": 17,
    "sha256": "078ae79aabd03b4e282731fce1ca80ae2b64d2968979369584a79f71c7081160"
   },
+  "underpass_api_coordinates.csv": {
+   "sha256": "f4904ad988303cee5863adbd345b08c0615292e02c3f17286a448b2a5dd5f763"
+  },
   "facility_gauge_links.csv": {
-   "rows": 2550,
-   "sha256": "ff71f5510b25d5ff1a8dd427d2ec94bee8a0d73d5b304c1d8922f75ea8eab1bd"
+   "rows": 4524,
+   "sha256": "d364e3685f138b2376ccfb7a05b739666be7af38c372018b425c7fa795bbf12c"
   },
   "chungbuk_underpass_candidates.csv": {
    "rows": 32,
@@ -21,14 +24,7 @@
    "sha256": "9241cd5185f38b59b86be118d06ec70c834fd5f7dc767ad7e1b99dc9bc6b7cf8"
   }
  },
- "excluded": [
-  {
-   "molit_no": "916",
-   "name": "계룡지하차도(복)",
-   "region": "충청북도 영동군",
-   "reason": "목록상 위치는 영동군이지만 OSM 이름 매칭 좌표가 대전 유성구(만년교 0.39 km)에 있음 — 다른 시설을 가리킨 매칭으로 보고 좌표 확인 전까지 제외"
-  }
- ],
+ "excluded": [],
  "selection": {
   "sido": "충청북도",
   "max_gauge_km": 5.0,
@@ -42,11 +38,11 @@
   "not_a_ranking": "후보 순서는 국토부 순번이며 위험 순위가 아니다. 가까운 관측소는 후보일 뿐 대표성이 확인된 것이 아니다."
  },
  "counts": {
-  "candidates": 7,
-  "with_coordinates": 5,
-  "with_pending_gauge": 4,
+  "candidates": 12,
+  "with_coordinates": 12,
+  "with_pending_gauge": 10,
   "with_review_notes": 2,
-  "excluded": 1
+  "excluded": 0
  },
  "candidates": [
   {
@@ -57,8 +53,8 @@
    "status": "CANDIDATE",
    "region": "서울특별시 강서구",
    "location": [
-    126.817889,
-    37.550435
+    126.817894,
+    37.550432
    ],
    "road": null,
    "managing_agency": null,
@@ -69,7 +65,7 @@
     "source_record_id": "15124755:43",
     "molit_no": "43",
     "source_url": "https://data.go.kr/data/15124755/fileData.do",
-    "coordinates": "underpass_coordinates.csv (OSM matched name)",
+    "coordinates": "underpass_api_coordinates.csv (국토부 도로터널 API)",
     "osm_way_ids": "219882855;219882857"
    },
    "selected_by": "TODO.md pluvial-rule comparison candidate",
@@ -147,7 +143,7 @@
     }
    },
    "review_notes": [
-    "가까운 수위 관측소가 모두 다른 시군(굴포천, 박촌1교, 인천시)에 있음 — 목록상 위치 강서구와 OSM 좌표가 어긋날 수 있어 확인 필요"
+    "가까운 수위 관측소가 모두 다른 시군(굴포천, 박촌1교, 인천시)에 있음 — 목록상 위치 강서구와 좌표가 어긋날 수 있어 확인 필요"
    ],
    "driver_hypothesis": "pluvial",
    "driver_hypothesis_note": "Comparison hypothesis only; inflow path, site instrumentation and a validation event are unconfirmed."
@@ -160,8 +156,8 @@
    "status": "CANDIDATE",
    "region": "충청북도 청주시",
    "location": [
-    127.3452,
-    36.622705
+    127.34518,
+    36.622788
    ],
    "road": null,
    "managing_agency": null,
@@ -174,7 +170,7 @@
     "source_url": "https://data.go.kr/data/15124755/fileData.do",
     "source_date": null,
     "source_updated_at": null,
-    "coordinates": "underpass_coordinates.csv (OSM 이름 매칭)",
+    "coordinates": "underpass_api_coordinates.csv (국토부 도로터널 API)",
     "osm_way_ids": "647718908;647718915"
    },
    "selected_by": "충청북도 · 좌표 있음 · 5 km 안 홍수예보 수위관측소",
@@ -203,7 +199,7 @@
      "station_id": "3011675",
      "name": "세종시(상조천교)",
      "agency": "기후에너지환경부",
-     "distance_km": 5.34,
+     "distance_km": 5.33,
      "flood_forecast_station": true,
      "planned_flood_m": 4.77,
      "warning_m": 4.2,
@@ -221,7 +217,7 @@
      "station_id": "30114110",
      "name": "옥산",
      "agency": "기후에너지환경부",
-     "distance_km": 5.94
+     "distance_km": 5.93
     },
     {
      "station_id": "30104010",
@@ -260,7 +256,10 @@
    "driver": "unverified",
    "status": "CANDIDATE",
    "region": "충청북도 청주시",
-   "location": null,
+   "location": [
+    127.319547,
+    36.615788
+   ],
    "road": null,
    "managing_agency": null,
    "management_category": "공공",
@@ -272,11 +271,61 @@
     "source_url": "https://data.go.kr/data/15124755/fileData.do",
     "source_date": "20230930",
     "source_updated_at": "2025-11-18",
-    "coordinates": null
+    "coordinates": "underpass_api_coordinates.csv (국토부 도로터널 API)"
    },
    "selected_by": "docs/UNDERPASS_EXPANSION.md 1차 확인 후보",
-   "nearby_gauges": [],
-   "nearby_rain_gauges": [],
+   "nearby_gauges": [
+    {
+     "station_id": "3011665",
+     "name": "청주시(미호강교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 2.88,
+     "flood_forecast_station": true,
+     "planned_flood_m": 9.38,
+     "warning_m": 8.0,
+     "advisory_m": 7.0
+    },
+    {
+     "station_id": "3011675",
+     "name": "세종시(상조천교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 3.63,
+     "flood_forecast_station": true,
+     "planned_flood_m": 4.77,
+     "warning_m": 4.2,
+     "advisory_m": 3.2
+    },
+    {
+     "station_id": "3011685",
+     "name": "세종시(미호교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 3.71,
+     "flood_forecast_station": false,
+     "planned_flood_m": 8.85,
+     "warning_m": 7.1,
+     "advisory_m": 5.4
+    }
+   ],
+   "nearby_rain_gauges": [
+    {
+     "station_id": "30114070",
+     "name": "세종시(농정원)",
+     "agency": "기후에너지환경부",
+     "distance_km": 3.54
+    },
+    {
+     "station_id": "30114110",
+     "name": "옥산",
+     "agency": "기후에너지환경부",
+     "distance_km": 7.53
+    },
+    {
+     "station_id": "30104010",
+     "name": "세종시(부강면사무소)",
+     "agency": "기후에너지환경부",
+     "distance_km": 10.68
+    }
+   ],
    "gauge": null,
    "control_rule": null,
    "reference_event": null,
@@ -286,8 +335,109 @@
      "note": "하천 월류형인지 내수 배수형인지 미확인"
     },
     "representative_gauge": {
+     "status": "PENDING",
+     "note": "청주시(미호강교) 3011665 · 2.88 km · 홍수예보 지점 — 같은 유역인지, 유입을 설명하는지 확인 전"
+    },
+    "site_instrumentation": {
      "status": "UNKNOWN",
-     "note": "좌표가 없어 관측소를 연결하지 못함"
+     "note": "현장 계측(침수심·집수정·펌프) 설치 여부 미조사"
+    },
+    "validation_event": {
+     "status": "UNKNOWN",
+     "note": "시각 있는 침수·통제 기록 미확보"
+    }
+   },
+   "review_notes": []
+  },
+  {
+   "id": "cb-520-ochang",
+   "name": "오창지하차도",
+   "kind": "underpass",
+   "driver": "unverified",
+   "status": "CANDIDATE",
+   "region": "충청북도 청주시",
+   "location": [
+    127.443685,
+    36.725183
+   ],
+   "road": null,
+   "managing_agency": null,
+   "management_category": "공공",
+   "structure_raw": "형식 : 박스형 / 연장 : 260.0 m, 차로수 : 4",
+   "source": {
+    "dataset_id": "15124755",
+    "source_record_id": "15124755:520",
+    "molit_no": "520",
+    "source_url": "https://data.go.kr/data/15124755/fileData.do",
+    "source_date": null,
+    "source_updated_at": null,
+    "coordinates": "underpass_api_coordinates.csv (국토부 도로터널 API)",
+    "osm_way_ids": null
+   },
+   "selected_by": "충청북도 · 좌표 있음 · 5 km 안 홍수예보 수위관측소",
+   "nearby_gauges": [
+    {
+     "station_id": "3011633",
+     "name": "청주시(복현교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 2.67,
+     "flood_forecast_station": false,
+     "planned_flood_m": 2.5,
+     "warning_m": 2.0,
+     "advisory_m": 1.6
+    },
+    {
+     "station_id": "3011635",
+     "name": "청주시(팔결교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 3.09,
+     "flood_forecast_station": true,
+     "planned_flood_m": 7.32,
+     "warning_m": 6.3,
+     "advisory_m": 5.3
+    },
+    {
+     "station_id": "3011657",
+     "name": "오창",
+     "agency": "한국농어촌공사",
+     "distance_km": 3.33,
+     "flood_forecast_station": false,
+     "planned_flood_m": null,
+     "warning_m": null,
+     "advisory_m": null
+    }
+   ],
+   "nearby_rain_gauges": [
+    {
+     "station_id": "30114100",
+     "name": "천안시(화청교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 5.77
+    },
+    {
+     "station_id": "30114110",
+     "name": "옥산",
+     "agency": "기후에너지환경부",
+     "distance_km": 9.24
+    },
+    {
+     "station_id": "30114020",
+     "name": "청주시(흥덕교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 9.36
+    }
+   ],
+   "gauge": null,
+   "control_rule": null,
+   "reference_event": null,
+   "gates": {
+    "inflow_path": {
+     "status": "UNKNOWN",
+     "note": "하천 월류형인지 내수 배수형인지 미확인"
+    },
+    "representative_gauge": {
+     "status": "PENDING",
+     "note": "청주시(팔결교) 3011635 · 3.09 km · 홍수예보 지점 — 같은 유역인지, 유입을 설명하는지 확인 전"
     },
     "site_instrumentation": {
      "status": "UNKNOWN",
@@ -308,8 +458,8 @@
    "status": "CANDIDATE",
    "region": "충청북도 청주시",
    "location": [
-    127.516557,
-    36.6195
+    127.516607,
+    36.619879
    ],
    "road": null,
    "managing_agency": null,
@@ -322,7 +472,7 @@
     "source_url": "https://data.go.kr/data/15124755/fileData.do",
     "source_date": "20230930",
     "source_updated_at": "2025-11-18",
-    "coordinates": "underpass_coordinates.csv (OSM 이름 매칭)"
+    "coordinates": "underpass_api_coordinates.csv (국토부 도로터널 API)"
    },
    "selected_by": "docs/UNDERPASS_EXPANSION.md 1차 확인 후보",
    "nearby_gauges": [
@@ -330,7 +480,7 @@
      "station_id": "3011639",
      "name": "청주시(운암1교)",
      "agency": "기후에너지환경부",
-     "distance_km": 1.01,
+     "distance_km": 1.03,
      "flood_forecast_station": false,
      "planned_flood_m": 4.0,
      "warning_m": 3.3,
@@ -340,7 +490,7 @@
      "station_id": "3011637",
      "name": "청주시(월오교)",
      "agency": "기후에너지환경부",
-     "distance_km": 1.72,
+     "distance_km": 1.73,
      "flood_forecast_station": false,
      "planned_flood_m": 3.16,
      "warning_m": 2.6,
@@ -350,7 +500,7 @@
      "station_id": "3011643",
      "name": "청주시(용평교)",
      "agency": "기후에너지환경부",
-     "distance_km": 1.93,
+     "distance_km": 1.96,
      "flood_forecast_station": false,
      "planned_flood_m": 4.9,
      "warning_m": 4.0,
@@ -362,19 +512,19 @@
      "station_id": "30114020",
      "name": "청주시(흥덕교)",
      "agency": "기후에너지환경부",
-     "distance_km": 4.36
+     "distance_km": 4.33
     },
     {
      "station_id": "30114040",
      "name": "청주시(가덕초교)",
      "agency": "기후에너지환경부",
-     "distance_km": 7.13
+     "distance_km": 7.15
     },
     {
      "station_id": "30084080",
      "name": "청원군(상장리)",
      "agency": "한국수자원공사",
-     "distance_km": 11.89
+     "distance_km": 11.93
     }
    ],
    "gauge": null,
@@ -407,7 +557,10 @@
    "driver": "unverified",
    "status": "CANDIDATE",
    "region": "충청북도 청주시",
-   "location": null,
+   "location": [
+    127.553739,
+    36.715537
+   ],
    "road": null,
    "managing_agency": null,
    "management_category": "공공",
@@ -419,11 +572,61 @@
     "source_url": "https://data.go.kr/data/15124755/fileData.do",
     "source_date": "20230930",
     "source_updated_at": "2025-11-18",
-    "coordinates": null
+    "coordinates": "underpass_api_coordinates.csv (국토부 도로터널 API)"
    },
    "selected_by": "docs/UNDERPASS_EXPANSION.md 1차 확인 후보",
-   "nearby_gauges": [],
-   "nearby_rain_gauges": [],
+   "nearby_gauges": [
+    {
+     "station_id": "3011652",
+     "name": "청주시(서당교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 0.73,
+     "flood_forecast_station": false,
+     "planned_flood_m": 3.75,
+     "warning_m": 3.1,
+     "advisory_m": 2.4
+    },
+    {
+     "station_id": "3011635",
+     "name": "청주시(팔결교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 6.97,
+     "flood_forecast_station": true,
+     "planned_flood_m": 7.32,
+     "warning_m": 6.3,
+     "advisory_m": 5.3
+    },
+    {
+     "station_id": "3011630",
+     "name": "청주시(여암교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 7.4,
+     "flood_forecast_station": false,
+     "planned_flood_m": 5.8,
+     "warning_m": 4.8,
+     "advisory_m": 4.3
+    }
+   ],
+   "nearby_rain_gauges": [
+    {
+     "station_id": "30114060",
+     "name": "증평군(반탄교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 7.75
+    },
+    {
+     "station_id": "30114020",
+     "name": "청주시(흥덕교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 10.01
+    },
+    {
+     "station_id": "10044170",
+     "name": "괴산군(문당리)",
+     "agency": "기후에너지환경부",
+     "distance_km": 10.87
+    }
+   ],
    "gauge": null,
    "control_rule": null,
    "reference_event": null,
@@ -434,7 +637,7 @@
     },
     "representative_gauge": {
      "status": "UNKNOWN",
-     "note": "좌표가 없어 관측소를 연결하지 못함"
+     "note": "5 km 안 홍수예보 관측소 없음"
     },
     "site_instrumentation": {
      "status": "UNKNOWN",
@@ -469,7 +672,7 @@
     "source_url": "https://data.go.kr/data/15124755/fileData.do",
     "source_date": null,
     "source_updated_at": null,
-    "coordinates": "underpass_coordinates.csv (OSM 이름 매칭)",
+    "coordinates": "underpass_api_coordinates.csv (OSM 이름 매칭)",
     "osm_way_ids": "549714958"
    },
    "selected_by": "충청북도 · 좌표 있음 · 5 km 안 홍수예보 수위관측소",
@@ -549,6 +752,107 @@
    "review_notes": []
   },
   {
+   "id": "cb-923",
+   "name": "가화지하도",
+   "kind": "underpass",
+   "driver": "unverified",
+   "status": "CANDIDATE",
+   "region": "충청북도 옥천군",
+   "location": [
+    127.564603,
+    36.301611
+   ],
+   "road": null,
+   "managing_agency": null,
+   "management_category": "공공",
+   "structure_raw": "형식 : 박스형 / 연장 : 65.0 m, 차로수 : 2",
+   "source": {
+    "dataset_id": "15124755",
+    "source_record_id": "15124755:923",
+    "molit_no": "923",
+    "source_url": "https://data.go.kr/data/15124755/fileData.do",
+    "source_date": null,
+    "source_updated_at": null,
+    "coordinates": "underpass_api_coordinates.csv (국토부 도로터널 API)",
+    "osm_way_ids": null
+   },
+   "selected_by": "충청북도 · 좌표 있음 · 5 km 안 홍수예보 수위관측소",
+   "nearby_gauges": [
+    {
+     "station_id": "3008630",
+     "name": "옥천군(옥각교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 1.97,
+     "flood_forecast_station": true,
+     "planned_flood_m": 5.44,
+     "warning_m": 4.4,
+     "advisory_m": 3.4
+    },
+    {
+     "station_id": "3006690",
+     "name": "옥천군((구)금강2교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 7.36,
+     "flood_forecast_station": false,
+     "planned_flood_m": 15.42,
+     "warning_m": 12.4,
+     "advisory_m": 9.4
+    },
+    {
+     "station_id": "3006675",
+     "name": "옥천",
+     "agency": "기타",
+     "distance_km": 8.58,
+     "flood_forecast_station": false,
+     "planned_flood_m": null,
+     "warning_m": null,
+     "advisory_m": null
+    }
+   ],
+   "nearby_rain_gauges": [
+    {
+     "station_id": "30084010",
+     "name": "옥천",
+     "agency": "기후에너지환경부",
+     "distance_km": 3.09
+    },
+    {
+     "station_id": "30084040",
+     "name": "옥천군(대정리)",
+     "agency": "한국수자원공사",
+     "distance_km": 9.47
+    },
+    {
+     "station_id": "30084060",
+     "name": "금산군(상곡리)",
+     "agency": "한국수자원공사",
+     "distance_km": 10.5
+    }
+   ],
+   "gauge": null,
+   "control_rule": null,
+   "reference_event": null,
+   "gates": {
+    "inflow_path": {
+     "status": "UNKNOWN",
+     "note": "하천 월류형인지 내수 배수형인지 미확인"
+    },
+    "representative_gauge": {
+     "status": "PENDING",
+     "note": "옥천군(옥각교) 3008630 · 1.97 km · 홍수예보 지점 — 같은 유역인지, 유입을 설명하는지 확인 전"
+    },
+    "site_instrumentation": {
+     "status": "UNKNOWN",
+     "note": "현장 계측(침수심·집수정·펌프) 설치 여부 미조사"
+    },
+    "validation_event": {
+     "status": "UNKNOWN",
+     "note": "시각 있는 침수·통제 기록 미확보"
+    }
+   },
+   "review_notes": []
+  },
+  {
    "id": "cb-933-gungpyeong",
    "name": "궁평지하차도",
    "kind": "underpass",
@@ -556,8 +860,8 @@
    "status": "CANDIDATE",
    "region": "충청북도 청주시",
    "location": [
-    127.337657,
-    36.62464
+    127.337679,
+    36.624624
    ],
    "road": null,
    "managing_agency": null,
@@ -570,7 +874,7 @@
     "source_url": "https://data.go.kr/data/15124755/fileData.do",
     "source_date": null,
     "source_updated_at": null,
-    "coordinates": "underpass_coordinates.csv (OSM 이름 매칭)",
+    "coordinates": "underpass_api_coordinates.csv (국토부 도로터널 API)",
     "osm_way_ids": "556705089;988994037"
    },
    "selected_by": "충청북도 · 좌표 있음 · 5 km 안 홍수예보 수위관측소",
@@ -599,7 +903,7 @@
      "station_id": "3011685",
      "name": "세종시(미호교)",
      "agency": "기후에너지환경부",
-     "distance_km": 5.06,
+     "distance_km": 5.05,
      "flood_forecast_station": false,
      "planned_flood_m": 8.85,
      "warning_m": 7.1,
@@ -648,8 +952,311 @@
     }
    },
    "review_notes": [
-    "좌표가 운영 시설 궁평2지하차도(gungpyeong2-underpass)과 0.1 km 안에 겹침 — OSM 이름 매칭이 이웃 시설을 가리켰을 수 있어 좌표 확인 필요"
+    "좌표가 운영 시설 궁평2지하차도(gungpyeong2-underpass)과 0.1 km 안에 겹침 — 이름 매칭이 이웃 시설을 가리켰을 수 있어 좌표 확인 필요"
    ]
+  },
+  {
+   "id": "cb-935",
+   "name": "묵방지하차도",
+   "kind": "underpass",
+   "driver": "unverified",
+   "status": "CANDIDATE",
+   "region": "충청북도 청주시",
+   "location": [
+    127.522833,
+    36.696444
+   ],
+   "road": null,
+   "managing_agency": null,
+   "management_category": "공공",
+   "structure_raw": "형식 : 박스형 / 연장 : 45.0 m, 차로수 : 1",
+   "source": {
+    "dataset_id": "15124755",
+    "source_record_id": "15124755:935",
+    "molit_no": "935",
+    "source_url": "https://data.go.kr/data/15124755/fileData.do",
+    "source_date": null,
+    "source_updated_at": null,
+    "coordinates": "underpass_api_coordinates.csv (국토부 도로터널 API)",
+    "osm_way_ids": null
+   },
+   "selected_by": "충청북도 · 좌표 있음 · 5 km 안 홍수예보 수위관측소",
+   "nearby_gauges": [
+    {
+     "station_id": "3011652",
+     "name": "청주시(서당교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 4.12,
+     "flood_forecast_station": false,
+     "planned_flood_m": 3.75,
+     "warning_m": 3.1,
+     "advisory_m": 2.4
+    },
+    {
+     "station_id": "3011646",
+     "name": "청주시(율량1교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 4.37,
+     "flood_forecast_station": false,
+     "planned_flood_m": 2.15,
+     "warning_m": 1.8,
+     "advisory_m": 1.4
+    },
+    {
+     "station_id": "3011635",
+     "name": "청주시(팔결교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 4.65,
+     "flood_forecast_station": true,
+     "planned_flood_m": 7.32,
+     "warning_m": 6.3,
+     "advisory_m": 5.3
+    }
+   ],
+   "nearby_rain_gauges": [
+    {
+     "station_id": "30114020",
+     "name": "청주시(흥덕교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 6.66
+    },
+    {
+     "station_id": "30114060",
+     "name": "증평군(반탄교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 10.66
+    },
+    {
+     "station_id": "30114100",
+     "name": "천안시(화청교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 13.29
+    }
+   ],
+   "gauge": null,
+   "control_rule": null,
+   "reference_event": null,
+   "gates": {
+    "inflow_path": {
+     "status": "UNKNOWN",
+     "note": "하천 월류형인지 내수 배수형인지 미확인"
+    },
+    "representative_gauge": {
+     "status": "PENDING",
+     "note": "청주시(팔결교) 3011635 · 4.65 km · 홍수예보 지점 — 같은 유역인지, 유입을 설명하는지 확인 전"
+    },
+    "site_instrumentation": {
+     "status": "UNKNOWN",
+     "note": "현장 계측(침수심·집수정·펌프) 설치 여부 미조사"
+    },
+    "validation_event": {
+     "status": "UNKNOWN",
+     "note": "시각 있는 침수·통제 기록 미확보"
+    }
+   },
+   "review_notes": []
+  },
+  {
+   "id": "cb-937-ochang",
+   "name": "오창지하차도",
+   "kind": "underpass",
+   "driver": "unverified",
+   "status": "CANDIDATE",
+   "region": "충청북도 청주시",
+   "location": [
+    127.443685,
+    36.725183
+   ],
+   "road": null,
+   "managing_agency": null,
+   "management_category": "공공",
+   "structure_raw": "형식 : 박스형 / 연장 : 97.0 m, 차로수 : 4",
+   "source": {
+    "dataset_id": "15124755",
+    "source_record_id": "15124755:937",
+    "molit_no": "937",
+    "source_url": "https://data.go.kr/data/15124755/fileData.do",
+    "source_date": null,
+    "source_updated_at": null,
+    "coordinates": "underpass_api_coordinates.csv (국토부 도로터널 API)",
+    "osm_way_ids": null
+   },
+   "selected_by": "충청북도 · 좌표 있음 · 5 km 안 홍수예보 수위관측소",
+   "nearby_gauges": [
+    {
+     "station_id": "3011633",
+     "name": "청주시(복현교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 2.67,
+     "flood_forecast_station": false,
+     "planned_flood_m": 2.5,
+     "warning_m": 2.0,
+     "advisory_m": 1.6
+    },
+    {
+     "station_id": "3011635",
+     "name": "청주시(팔결교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 3.09,
+     "flood_forecast_station": true,
+     "planned_flood_m": 7.32,
+     "warning_m": 6.3,
+     "advisory_m": 5.3
+    },
+    {
+     "station_id": "3011657",
+     "name": "오창",
+     "agency": "한국농어촌공사",
+     "distance_km": 3.33,
+     "flood_forecast_station": false,
+     "planned_flood_m": null,
+     "warning_m": null,
+     "advisory_m": null
+    }
+   ],
+   "nearby_rain_gauges": [
+    {
+     "station_id": "30114100",
+     "name": "천안시(화청교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 5.77
+    },
+    {
+     "station_id": "30114110",
+     "name": "옥산",
+     "agency": "기후에너지환경부",
+     "distance_km": 9.24
+    },
+    {
+     "station_id": "30114020",
+     "name": "청주시(흥덕교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 9.36
+    }
+   ],
+   "gauge": null,
+   "control_rule": null,
+   "reference_event": null,
+   "gates": {
+    "inflow_path": {
+     "status": "UNKNOWN",
+     "note": "하천 월류형인지 내수 배수형인지 미확인"
+    },
+    "representative_gauge": {
+     "status": "PENDING",
+     "note": "청주시(팔결교) 3011635 · 3.09 km · 홍수예보 지점 — 같은 유역인지, 유입을 설명하는지 확인 전"
+    },
+    "site_instrumentation": {
+     "status": "UNKNOWN",
+     "note": "현장 계측(침수심·집수정·펌프) 설치 여부 미조사"
+    },
+    "validation_event": {
+     "status": "UNKNOWN",
+     "note": "시각 있는 침수·통제 기록 미확보"
+    }
+   },
+   "review_notes": []
+  },
+  {
+   "id": "cb-938",
+   "name": "달천지하차도",
+   "kind": "underpass",
+   "driver": "unverified",
+   "status": "CANDIDATE",
+   "region": "충청북도 충주시",
+   "location": [
+    127.901854,
+    36.96388
+   ],
+   "road": null,
+   "managing_agency": null,
+   "management_category": "공공",
+   "structure_raw": "형식 : 박스형 / 연장 : 34.0 m, 차로수 : 1",
+   "source": {
+    "dataset_id": "15124755",
+    "source_record_id": "15124755:938",
+    "molit_no": "938",
+    "source_url": "https://data.go.kr/data/15124755/fileData.do",
+    "source_date": null,
+    "source_updated_at": null,
+    "coordinates": "underpass_api_coordinates.csv (국토부 도로터널 API)",
+    "osm_way_ids": null
+   },
+   "selected_by": "충청북도 · 좌표 있음 · 5 km 안 홍수예보 수위관측소",
+   "nearby_gauges": [
+    {
+     "station_id": "1004696",
+     "name": "충주시(봉계교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 2.19,
+     "flood_forecast_station": false,
+     "planned_flood_m": 5.4,
+     "warning_m": 4.7,
+     "advisory_m": 4.0
+    },
+    {
+     "station_id": "1004695",
+     "name": "충주시(국원대교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 2.69,
+     "flood_forecast_station": true,
+     "planned_flood_m": 7.6,
+     "warning_m": 6.0,
+     "advisory_m": 5.0
+    },
+    {
+     "station_id": "1005605",
+     "name": "충주시(탄금교)",
+     "agency": "기후에너지환경부",
+     "distance_km": 2.94,
+     "flood_forecast_station": false,
+     "planned_flood_m": 6.2,
+     "warning_m": 5.1,
+     "advisory_m": 4.0
+    }
+   ],
+   "nearby_rain_gauges": [
+    {
+     "station_id": "10044130",
+     "name": "충주시(향산리)",
+     "agency": "한국수자원공사",
+     "distance_km": 4.78
+    },
+    {
+     "station_id": "10034130",
+     "name": "충주시(충주댐)",
+     "agency": "한국수자원공사",
+     "distance_km": 9.34
+    },
+    {
+     "station_id": "10044120",
+     "name": "충주시(대곡리)",
+     "agency": "한국수자원공사",
+     "distance_km": 12.55
+    }
+   ],
+   "gauge": null,
+   "control_rule": null,
+   "reference_event": null,
+   "gates": {
+    "inflow_path": {
+     "status": "UNKNOWN",
+     "note": "하천 월류형인지 내수 배수형인지 미확인"
+    },
+    "representative_gauge": {
+     "status": "PENDING",
+     "note": "충주시(국원대교) 1004695 · 2.69 km · 홍수예보 지점 — 같은 유역인지, 유입을 설명하는지 확인 전"
+    },
+    "site_instrumentation": {
+     "status": "UNKNOWN",
+     "note": "현장 계측(침수심·집수정·펌프) 설치 여부 미조사"
+    },
+    "validation_event": {
+     "status": "UNKNOWN",
+     "note": "시각 있는 침수·통제 기록 미확보"
+    }
+   },
+   "review_notes": []
   }
  ]
 }

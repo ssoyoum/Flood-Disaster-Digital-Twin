@@ -1,5 +1,8 @@
 """National watch over the stored hourly series (replay) and the board-operator Agent tools."""
 
+from dataclasses import replace
+from datetime import datetime, timedelta
+
 from fastapi.testclient import TestClient
 import pytest
 
@@ -35,12 +38,35 @@ def test_replay_overview_counts_stages_and_links_facilities_by_tier():
     assert data["stations"][0]["stage"] == "planned_flood"  # priority order: stage first
 
 
-def test_overview_region_filter_and_changes_between_hours():
+def test_overview_region_filter_uses_station_regions(monkeypatch):
+    # The committed replay stations can all belong to Chungbuk. Give one stored
+    # station a second region so a filter regression is detectable in any checkout.
+    catalogue = dict(nw.stations())
+    other = next(code for code in nw.stored_station_codes() if code != "3011665")
+    catalogue[other] = replace(catalogue[other], region="서울")
+    monkeypatch.setattr(nw, "stations", lambda: catalogue)
     region = nw.overview(at=AT, region="충북")
-    assert region["stations_total"] < nw.overview(at=AT)["stations_total"]
+    assert region["stations_total"] == nw.overview(at=AT)["stations_total"] - 1
     assert all(row["region"] == "충북" for row in region["stations"])
+
+
+def test_changes_between_hours_uses_each_stations_thresholds(monkeypatch):
+    now = datetime.fromisoformat(AT)
+    before = now - timedelta(hours=1)
+    station = nw.stations()["3011665"]
+    # Both levels use the station's registered 8.0 m warning threshold; no raw
+    # archive update can silently change this test from a stage move to a rise.
+    current = nw.Snapshot(now, "1H", {station.code: (now, 8.5)})
+    earlier = nw.Snapshot(before, "1H", {station.code: (before, 7.5)})
+    monkeypatch.setattr(nw, "stations", lambda: {station.code: station})
+    monkeypatch.setattr(nw, "_frame", lambda at: ("replay", now, current, {}, [], None))
+    monkeypatch.setattr(nw, "replay_snapshot", lambda at: (earlier, {}))
     diff = nw.changes(60, at=AT)
-    assert diff["available"] and any(item["code"] == "3011645" for item in diff["stage_up"])
+    assert diff["available"]
+    assert [(item["code"], item["from"], item["to"], item["delta_m"]) for item in diff["stage_up"]] == [
+        (station.code, "advisory", "warning", 1.0)
+    ]
+    assert diff["stage_down"] == [] and diff["new_rising"] == []
 
 
 def test_station_detail_rate_and_recent_series():

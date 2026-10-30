@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import * as api from "../api";
 import type { CaseLeadTimes } from "../types";
 import { FloodOpsLogo } from "./Landing";
+import { AppNavigation } from "./Navigation";
 import "./landing.css";
 import "./compare.css";
 
@@ -49,6 +50,7 @@ export default function CaseComparePage({ onBack, onOpen }: { onBack: () => void
       <header className="cc-head">
         <button className="fo-ghost" type="button" onClick={onBack}><ArrowLeft size={16} /> 사례 선택</button>
         <div className="cc-brand"><FloodOpsLogo size={34} /><strong>FloodOps</strong></div>
+        <AppNavigation active="compare" />
       </header>
       <section className="cc-intro">
         <p className="fo-eyebrow">CROSS-CASE</p>

@@ -1,0 +1,72 @@
+{
+ "event": "osong-2023",
+ "generated_at": "2026-10-26T17:09:36",
+ "source": "KMA API hub wrn_now_data.php with tm (alerts in effect at that minute)",
+ "areas": [
+  "청주시"
+ ],
+ "window_kst": {
+  "start": "2023-07-14T00:00",
+  "end": "2023-07-15T09:00",
+  "step_min": 10
+ },
+ "samples": 199,
+ "requests_failed": [],
+ "changes": [
+  {
+   "area": "청주시",
+   "first_sampled_at": "2023-07-14T00:00",
+   "level": "advisory",
+   "level_ko": "호우주의보",
+   "issued_at": "2023-07-13T22:00",
+   "effective_at": "2023-07-13T22:00",
+   "in_effect": "true",
+   "command": "발표"
+  },
+  {
+   "area": "청주시",
+   "first_sampled_at": "2023-07-14T04:00",
+   "level": "warning",
+   "level_ko": "호우경보",
+   "issued_at": "2023-07-14T04:00",
+   "effective_at": "2023-07-14T05:00",
+   "in_effect": "false",
+   "command": "변경"
+  },
+  {
+   "area": "청주시",
+   "first_sampled_at": "2023-07-14T05:00",
+   "level": "warning",
+   "level_ko": "호우경보",
+   "issued_at": "2023-07-14T04:00",
+   "effective_at": "2023-07-14T05:00",
+   "in_effect": "true",
+   "command": "변경"
+  },
+  {
+   "area": "청주시",
+   "first_sampled_at": "2023-07-14T06:30",
+   "level": "advisory",
+   "level_ko": "호우주의보",
+   "issued_at": "2023-07-14T06:30",
+   "effective_at": "2023-07-14T06:30",
+   "in_effect": "true",
+   "command": "변경"
+  },
+  {
+   "area": "청주시",
+   "first_sampled_at": "2023-07-14T12:10",
+   "level": "warning",
+   "level_ko": "호우경보",
+   "issued_at": "2023-07-14T12:10",
+   "effective_at": "2023-07-14T12:10",
+   "in_effect": "true",
+   "command": "변경"
+  }
+ ],
+ "note": "issued_at is KMA TM_FC of the zone's latest command. in_effect=false means that command takes effect later; the alert it replaces is not returned, so the level in effect during that gap is unknown. level 'none' means no heavy-rain row for the zone.",
+ "output": {
+  "path": "data/processed/kma/events/osong-2023_warnings.csv",
+  "sha256": "fab32ef31d95fb8570427bf31f763753ee1c1dbd07afd6bd799806b574b4e53c"
+ }
+}

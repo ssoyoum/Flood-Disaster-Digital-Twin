@@ -36,8 +36,9 @@ def _stamp(value: str) -> str | None:
 
 
 def _level(value: str) -> str | None:
+    # The live response uses 주의/경보 (예비 = preliminary, not in effect); older docs show 1/2 or 주의보.
     value = (value or "").strip()
-    if value == "1" or "주의보" in value:
+    if value == "1" or value.startswith("주의"):
         return "advisory"
     if value == "2" or "경보" in value:
         return "warning"
@@ -52,7 +53,8 @@ def parse(body: str) -> list[dict[str, Any]]:
     for line in lines:
         if not line.startswith("#"):
             continue
-        tokens = line.lstrip("#").split()
+        # Column names are padded with dashes to the field width ("REG_KO-----").
+        tokens = [token.rstrip("-") for token in line.lstrip("#").split()]
         if required.issubset(tokens):
             columns = tokens
             break
@@ -63,7 +65,8 @@ def parse(body: str) -> list[dict[str, Any]]:
     for line in lines:
         if line.startswith("#"):
             continue
-        cells = line.split()
+        # Rows are comma-separated and end with "=", and ED_TM values contain spaces.
+        cells = [cell.strip() for cell in line.rstrip("=").split(",")] if "," in line else line.split()
         if len(cells) < len(columns):
             continue
         row = dict(zip(columns, cells))
@@ -92,6 +95,35 @@ def parse(body: str) -> list[dict[str, Any]]:
     return out
 
 
+def _request(key: str, tm: str = "") -> list[dict[str, Any]]:
+    query = urllib.parse.urlencode({"fe": "f", "tm": tm, "disp": "0", "help": "1", "authKey": key})
+    with urllib.request.urlopen(urllib.request.Request(f"{URL}?{query}"), timeout=15) as response:
+        return parse(response.read().decode("euc-kr", errors="replace"))
+
+
+def at(moment: datetime) -> dict[str, Any]:
+    """Heavy-rain alert rows as of a past KST minute (`tm` on wrn_now_data.php). Uncached.
+
+    The response holds only the latest command per zone, so an alert announced for a later minute replaces the one
+    still in effect. Such rows are kept with `in_effect: False` instead of being read as "no alert".
+    """
+    from .llm_planner import _load_env_file_once
+
+    _load_env_file_once()
+    key = os.environ.get("KMA_API_HUB_KEY", "")
+    if not key:
+        return {"available": False, "rows": [], "error": "KMA_API_HUB_KEY is not configured"}
+    try:
+        rows = _request(key, moment.strftime("%Y%m%d%H%M"))
+    except urllib.error.HTTPError as exc:
+        return {"available": False, "rows": [], "error": f"HTTP {exc.code} from the KMA warning API"}
+    except Exception as exc:
+        return {"available": False, "rows": [], "error": f"{type(exc).__name__} while reading the KMA warning API"}
+    for row in rows:
+        row["in_effect"] = bool(row["effective_at"]) and datetime.fromisoformat(row["effective_at"]) <= moment
+    return {"available": True, "rows": rows, "error": None}
+
+
 def current(force: bool = False) -> dict[str, Any]:
     """Return the cached current warning feed; never include the API key in an error."""
     from .llm_planner import _load_env_file_once
@@ -106,12 +138,8 @@ def current(force: bool = False) -> dict[str, Any]:
         if not key:
             _FEED.update(fetched_at=now, available=False, active=[], error="KMA_API_HUB_KEY is not configured")
             return dict(_FEED)
-        query = urllib.parse.urlencode({"fe": "f", "tm": "", "disp": "0", "help": "1", "authKey": key})
-        request = urllib.request.Request(f"{URL}?{query}")
         try:
-            with urllib.request.urlopen(request, timeout=15) as response:
-                body = response.read().decode("euc-kr", errors="replace")
-            rows = parse(body)
+            rows = _request(key)
             active = []
             for row in rows:
                 effective = datetime.fromisoformat(row["effective_at"]) if row["effective_at"] else None
