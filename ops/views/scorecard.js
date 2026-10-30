@@ -1,88 +1,65 @@
-import { arrow, cached, esc, hhmm, hydrograph, leadBar, minutes, num, REFERENCE_KO, tierOf, ymd } from "../lib.js";
+import { cached, esc, hhmm, minutes, num, ymd } from "../lib.js";
 
-// 장마 후 · 기준 채점.
-// "일찍 알렸다"는 숫자는 혼자 쓰지 않는다. 언제나 울리는 경보도 일찍 알리기 때문이다.
-// 그래서 선행 분 옆에 ① 무엇을 넘었나 ② 다른 해에 몇 번 울렸나 ③ 같은 시각 몇 곳이 같이 올랐나를 둔다.
+// 장마 후 · 기준 채점. 이번 시즌 담당자가 남긴 통제 기록과 규칙의 권고를 맞춘다.
+// 과거 홍수에 규칙을 재생한 검증은 사례 재구성에서만 보여 준다.
 
 const LEVEL_NAME = { advisory: "주의보 수위", warning: "경보 수위" };
+const OUTCOME = {
+  hit: { label: "적중", tone: "ok", note: "권고 구간 앞뒤로 통제 기록이 있음" },
+  not_closed: { label: "막지 않음", tone: "", note: "권고를 보고 막지 않기로 기록함" },
+  unrecorded: { label: "기록 없음", tone: "wait", note: "권고는 났지만 통제 기록이 없음(오경보로 세지 않음)" },
+  miss: { label: "누락", tone: "bad", note: "권고 없이 통제한 기록" },
+  quiet: { label: "조용", tone: "", note: "권고도 통제 기록도 없음" },
+};
 
-function why3({ rule, lead, cost }) {
-  return `<dl class="op-why">
-    <div><dt><b>1</b>무엇을 넘었나</dt><dd>${rule}</dd></div>
-    <div><dt><b>2</b>얼마나 먼저</dt><dd>${lead}</dd></div>
-    <div><dt><b>3</b>헛경보는</dt><dd>${cost}</dd></div>
-  </dl>`;
+function countsBlock(counts) {
+  return `<div class="op-grid-4">${["hit", "not_closed", "unrecorded", "miss"].map((k) => `<div class="op-card">
+      <span class="op-chip" data-tone="${OUTCOME[k].tone}">${OUTCOME[k].label}</span>
+      <h3 class="op-num">${num(counts?.[k] ?? 0)}<small>건</small></h3>
+      <p class="op-note">${OUTCOME[k].note}</p></div>`).join("")}</div>`;
 }
 
-async function facilityBlock(facility) {
-  const [card, review, backtest] = await Promise.all([
-    cached(`/api/twin/facilities/${facility.id}/scorecard`),
-    cached(`/api/twin/facilities/${facility.id}/criteria-review`),
-    cached(`/api/twin/facilities/${facility.id}/backtest?points=true`),
-  ]);
-  const levels = review.station.levels_m;
-  const first = backtest.first_closure_review;
-  const ref = card.reference_event ?? {};
-  const lead = card.lead_minutes ?? {};
-  const s = card.scorecard;
-  const years = review.by_year ?? [];
-  const closeCalls = s.close_call_years.map((year) => {
-    const row = years.find((r) => r.year === year);
-    return `${year}년 최고 ${row?.max_water_level_m ?? "—"} m`;
-  });
-  const floor = LEVEL_NAME[card.rule?.stage_floor] ?? "경보 수위";
-
-  const ruleText = first
-    ? `${floor} ${levels[card.rule.stage_floor]} m 이상이고, 지금 상승 속도로 계획홍수위 ${levels.planned_flood} m까지 ${card.rule.lead_threshold_min}분 이내
-       <small>첫 권고 ${hhmm(first.time)} · 수위 ${first.water_level_m} m · ${esc(first.reason)}</small>`
-    : "등록된 규칙이 이 사건에서 권고를 내지 않았습니다.";
-  const leadText = lead.underpass_inflow != null
-    ? `<strong class="op-early">${lead.underpass_inflow}분</strong> 먼저 <small>지하차도 유입 ${hhmm(ref.underpass_inflow)} 기준 · 공식 통제 요건(${hhmm(ref.official_requirement_met)})보다 ${lead.official_requirement_met}분 · 제방 붕괴보다 ${lead.levee_failure}분</small>`
-    : "—";
-  // 더 일찍 잡은 기준 후보가 무엇을 대가로 치르는지 한 줄로 붙인다.
-  const earlier = (review.sweep ?? []).filter((r) => r.stage_floor === card.rule?.stage_floor && r.lead_to_inflow_min > (lead.underpass_inflow ?? Infinity))
-    .sort((a, b) => a.lead_to_inflow_min - b.lead_to_inflow_min)[0];
-  const tradeoff = earlier ? ` 기준을 계획홍수위 ${earlier.lead_threshold_min}분 전으로 당기면 ${earlier.lead_to_inflow_min}분 먼저지만 다른 해 권고가 ${earlier.other_episode_count}회(${earlier.other_review_minutes}분) 생깁니다.` : "";
-  const costText = `<strong>${s.false_alarm_candidates}회</strong> 다른 해 권고 <small>${s.years_covered[0]}–${s.years_covered[s.years_covered.length - 1]}년 ${s.years_covered.length}개 해에 같은 규칙을 돌린 결과${closeCalls.length ? ` · 근접(권고 없이 경보 수위): ${closeCalls.join(", ")}` : ""}.${tradeoff}</small>`;
-
-  const events = [
-    { key: "official_requirement_met", color: "#fbbf24" },
-    { key: "levee_failure", color: "#fb923c" },
-    { key: "underpass_inflow", color: "#f87171", primary: true },
-    { key: "full_inundation", color: "#f87171" },
-  ].filter((e) => ref[e.key]).map((e) => ({ ...e, time: ref[e.key], label: REFERENCE_KO[e.key], lead: lead[e.key] }));
-  const chart = backtest.points?.length ? hydrograph({ points: backtest.points, levels, from: "2023-07-14T12:00", to: "2023-07-15T10:00", review: first, events }) : "";
-
-  return `<article class="op-card">
-    <div class="op-card-head"><div><h3>${esc(card.facility)}</h3><small>대표 관측소 ${esc(review.station.name)} · 기준 사건 ${ymd(ref.underpass_inflow)} · 저장된 10분 수위 ${num(backtest.series.records)}개</small></div>
-      <a class="op-go" href="#/facility/criteria">기준 후보 비교 ${arrow}</a></div>
-    ${why3({ rule: ruleText, lead: leadText, cost: costText })}
-    <div class="op-hydro">${chart}</div>
-    <p class="op-note">초록 구간이 권고와 유입 사이의 시간입니다. 점선은 관측소 기준 수위이고, 권고는 경보 수위를 넘은 뒤 상승 속도까지 맞아야 나옵니다(경보 수위만 넘은 시각은 ${esc(hhmm(backtest.stage_transitions.find((t) => t.stage === "warning")?.time))}). ${esc(backtest.note)}</p>
-  </article>`;
+function rowsTable(rows) {
+  if (!rows.length) return '<p class="op-note">이 시즌에는 규칙 권고도, 담당자 통제 기록도 없었습니다.</p>';
+  return `<div class="op-table-wrap"><table class="op-table">
+    <thead><tr><th>권고 구간</th><th>최고 수위</th><th>통제 기록</th><th>결과</th><th>권고 → 통제</th></tr></thead>
+    <tbody>${rows.map((r) => {
+      const ep = r.episode;
+      const recs = (r.records ?? []).map((x) => `${esc(String(x.started_at ?? "").slice(5, 16).replace("T", " "))} ${esc(x.checked_by ?? "")}`).join("<br>") || "—";
+      const o = OUTCOME[r.outcome] ?? { label: r.outcome, tone: "" };
+      return `<tr><td>${ep ? `${esc(ep.start.slice(5, 16).replace("T", " "))} ~ ${hhmm(ep.end)} <span class="op-note">${ep.review_minutes}분</span>` : "권고 없음"}</td>
+        <td class="op-num">${ep?.peak_water_level_m ?? "—"} m</td><td>${recs}</td>
+        <td><span class="op-chip" data-tone="${o.tone}">${o.label}</span></td>
+        <td class="op-num">${r.lead_min == null ? "—" : minutes(r.lead_min)}</td></tr>`;
+    }).join("")}</tbody></table></div>`;
 }
 
-function caseCard(item) {
-  const ref = item.reference;
-  const near = item.region_at_reference;
-  const share = near && near.total ? near.advisory_or_above / near.total : null;
-  const select = near ? `<div class="op-select" title="기준 시각에 같은 지역에서 함께 주의 이상이던 시설 비율. 높을수록 이 시설만 골라낸 신호가 아닙니다.">
-      <span>같은 시각 ${esc(item.region)} ${near.total}곳 중 주의 이상 <b>${near.advisory_or_above}</b> · 경계 이상 ${near.warning_or_above}</span>
-      <span class="track"><i style="width:${(near.warning_or_above / near.total) * 100}%;background:#fb923c"></i><i style="width:${((near.advisory_or_above - near.warning_or_above) / near.total) * 100}%;background:#fbbf24"></i></span>
-      <span class="op-num">${share == null ? "—" : `${Math.round(share * 100)}%`}</span></div>` : "";
-  const rows = item.signals.map((s) => `<li>
-      <span class="tier">${tierOf(s.signal)}</span>
-      <span class="name"><b>${esc(s.signal)}</b>${s.why ? `<small>${esc(s.why)}</small>` : s.source ? `<small>${esc(s.source)}</small>` : ""}</span>
-      <span class="at">${s.at ? hhmm(s.at) : "—"}</span>
-      ${leadBar(s.lead_min)}
-      <span class="lead ${s.lead_min == null ? "" : s.lead_min >= 0 ? "op-early" : "op-late"}">${s.lead_min == null ? "없음" : `${minutes(s.lead_min)}${s.lead_is_lower_bound ? "↑" : ""}`}</span>
-    </li>`).join("");
+function candidatesTable(card) {
+  const lv = card.levels_m;
+  return `<div class="op-table-wrap"><table class="op-table">
+    <thead><tr><th>기준 단계</th><th>상승 속도 조건</th><th>권고 구간</th><th>적중</th><th>기록 없음</th><th>누락</th></tr></thead>
+    <tbody>${card.candidates.map((c) => `<tr class="${c.is_current_rule ? "cur" : ""}">
+      <td>${LEVEL_NAME[c.stage_floor] ?? c.stage_floor} ${lv[c.stage_floor]} m 이상</td>
+      <td>${c.lead_threshold_min ? `계획홍수위까지 ${c.lead_threshold_min}분 이내` : "계획홍수위 도달"}${c.is_current_rule ? ' <span class="op-chip" data-tone="ok">현재 규칙</span>' : ""}</td>
+      <td class="op-num">${c.episodes}</td><td class="op-num">${c.counts.hit}</td><td class="op-num">${c.counts.unrecorded}</td><td class="op-num">${c.counts.miss}</td></tr>`).join("")}</tbody>
+  </table></div>`;
+}
+
+async function facilityBlock(facility, season) {
+  const card = await cached(`/api/twin/facilities/${facility.id}/season-scorecard?season=${season}`);
+  const w = card.window;
+  const seasons = card.available_seasons.map((y) => `<a class="op-chip" href="#/scorecard?season=${y}"${y === card.season ? ' data-tone="ok" aria-current="true"' : ""}>${y}</a>`).join(" ");
   return `<article class="op-card">
-    <div class="op-card-head"><div><h3>${esc(item.title.replace(/ \d{4}-\d{2}-\d{2}$/, ""))}</h3>
-      <small>${ymd(ref.at)} · 기준 <b>${hhmm(ref.at)}</b> ${esc(ref.label)} · ${esc(ref.precision_ko)}</small></div>
-      <a class="op-go" href="#/watch?at=${encodeURIComponent(`${ref.at}:00`)}&rain=replay">그날 ${hhmm(ref.at)} 보드로 ${arrow}</a></div>
-    ${select}
-    <ul class="op-sig">${rows}</ul>
+    <div class="op-card-head"><div><h3>${esc(card.facility)} · ${card.season} 장마</h3>
+      <small>${ymd(w.start)} – ${ymd(w.end)} · 저장된 10분 수위 ${num(w.readings)}개 · 시즌 최고 ${w.max_water_level_m ?? "—"} m · 통제 기록 ${num(card.records)}건</small></div>
+      <div>${seasons}</div></div>
+    ${countsBlock(card.counts)}
+    <h3>권고와 통제 기록</h3>
+    ${rowsTable(card.rows)}
+    <p class="op-note">권고 → 통제 중앙값 ${card.median_lead_min == null ? "—" : minutes(card.median_lead_min)} · ${esc(card.method)}</p>
+    <h3>같은 기록으로 본 기준 후보 ${card.candidates.length}개</h3>
+    ${candidatesTable(card)}
+    <ul class="op-limits">${(card.limitations ?? []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
   </article>`;
 }
 
@@ -107,30 +84,24 @@ function historyBlock(h) {
   </div>`;
 }
 
-export async function renderScorecard(view) {
-  const [registry, validation, history] = await Promise.all([
+export async function renderScorecard(view, route) {
+  const [registry, history] = await Promise.all([
     cached("/api/twin/registry"),
-    cached("/api/watch/validation-cases").catch(() => null),
     cached("/api/watch/flood-forecast-history").catch(() => null),
   ]);
-  const facilityHtml = (await Promise.all(registry.operational.map((f) => facilityBlock(f).catch((e) => `<p class="op-err">${esc(f.name)} 성적표를 불러오지 못했습니다: ${esc(e.message)}</p>`)))).join("");
+  const season = Number(route.query.get("season")) || new Date().getFullYear();
+  const facilityHtml = (await Promise.all(registry.operational.map((f) => facilityBlock(f, season).catch((e) => `<p class="op-err">${esc(f.name)} 성적표를 불러오지 못했습니다: ${esc(e.message)}</p>`)))).join("");
 
   view.innerHTML = `<div class="op-page">
     <header>
       <p class="op-eyebrow">장마 후 · 기준 채점</p>
-      <h1 class="op-h1">기준이 실제 통제보다 빨랐나</h1>
-      <p class="op-lead">언제나 울리는 경보도 "일찍" 알립니다. 그래서 선행 분은 혼자 보지 않고 세 가지와 같이 봅니다. <b>무엇을 넘었나</b>(기준), <b>다른 해에 몇 번 울렸나</b>(헛경보), <b>같은 시각 몇 곳이 같이 올랐나</b>(선별력). 늦은 사례와 헛경보가 많은 기준은 다음 해에 고칩니다.</p>
+      <h1 class="op-h1">이번 장마, 기준이 실제 통제보다 빨랐나</h1>
+      <p class="op-lead">담당자가 남긴 통제 기록과 규칙의 권고를 시즌 단위로 맞춥니다. 권고만 나고 기록이 없으면 오경보로 세지 않고 «기록 없음»으로 둡니다. 과거 홍수에 규칙을 재생한 검증은 <a href="#/cases">사례 재구성</a>에서 봅니다.</p>
     </header>
 
     <section class="op-sec">
-      <div class="op-sec-head"><h2>운영 시설 통제 검토 규칙</h2><span>운영 등록 ${registry.counts.operational}곳 · 저장된 사건 수위에 규칙을 그대로 재생</span></div>
+      <div class="op-sec-head"><h2>운영 시설 시즌 성적표</h2><span>운영 등록 ${registry.counts.operational}곳 · 시즌 5/15–10/15 · 통제 기록은 시설 기준 › 지금 상태에서 남김</span></div>
       ${facilityHtml}
-    </section>
-
-    <section class="op-sec">
-      <div class="op-sec-head"><h2>과거 홍수 단계·특보 신호</h2><span>${validation ? `${validation.cases.length}건` : "불러오지 못함"} · 대비 시작(주의) 신호와 통제 준비(경보·경계) 신호를 나눠 봄 · 막대는 300분에서 끊음</span></div>
-      <div class="op-grid-2">${(validation?.cases ?? []).map(caseCard).join("")}</div>
-      ${validation ? `<ul class="op-limits">${validation.limitations.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
     </section>
 
     <section class="op-sec">

@@ -1,4 +1,4 @@
-import { arrow, cached, divergingTicks, esc, minutes, num, splitBar, unitDots, yearBars } from "../lib.js";
+import { arrow, cached, esc, num, splitBar, unitDots, yearBars } from "../lib.js";
 
 // 장마 전 → 중 → 후가 한 바퀴로 이어지고, 채점 결과가 다음 해 기준으로 돌아간다.
 const CYCLE = `<figure class="op-cycle" aria-label="장마 전·중·후 업무 순환">
@@ -27,10 +27,9 @@ function kpi({ label, value, unit, color, chart, caption }) {
 }
 
 export async function renderHome(view) {
-  const [risk, history, validation, registry] = await Promise.all([
+  const [risk, history, registry] = await Promise.all([
     cached("/api/watch/facility-risk?limit=2000").catch(() => null),
     cached("/api/watch/flood-forecast-history").catch(() => null),
-    cached("/api/watch/validation-cases").catch(() => null),
     cached("/api/twin/registry").catch(() => null),
   ]);
   const facilities = risk?.facilities ?? [];
@@ -39,11 +38,10 @@ export async function renderHome(view) {
   const river = count((f) => f.driver === "river"), pluvial = count((f) => f.driver === "pluvial");
   const fromAws = count((f) => f.rain?.source === "KMA AWS"), fromHrfco = count((f) => f.rain?.source === "HRFCO"), noRain = facilities.length - fromAws - fromHrfco;
   const aws = (risk?.rain_gauges ?? []).filter((g) => String(g.code).startsWith("kma:")).length;
-  const cases = validation?.cases ?? [];
-  const officialLead = cases.map((c) => {
-    const s = c.signals.find((x) => x.signal === "공식 홍수경보" && x.at) ?? c.signals.find((x) => x.signal === "공식 홍수주의보");
-    return { label: c.title.replace(/ \d{4}-\d{2}-\d{2}$/, ""), lead: s?.lead_min ?? null };
-  });
+  const byLevel = risk?.counts?.by_level ?? {};
+  const watchLevels = ["주의", "경계", "심각"].map((label) => ({ label, n: byLevel[label] ?? 0 }));
+  const watching = watchLevels.reduce((sum, p) => sum + p.n, 0);
+  const lastYear = history ? Object.keys(history.issuances.by_year).slice(-1)[0] : null;
 
   const kpis = [
     kpi({ label: "감시 시설", value: num(facilities.length || null), unit: "곳", color: "#e4e4e7",
@@ -57,27 +55,23 @@ export async function renderHome(view) {
       caption: aws ? `시설별 강우 출처 · AWS ${fromAws} · 홍수통제소 ${fromHrfco} · 없음 ${noRain}` : `지금 기상청 AWS 응답 없음 · 홍수통제소 강우로 대신 ${fromHrfco}곳` }),
     kpi({ label: "공식 홍수특보 이력", value: num(history?.issuances?.issuances), unit: "건", color: "#fb923c",
       chart: history ? yearBars(history.issuances.by_year, "#fb923c") : "",
-      caption: history ? `${history.issuances.years} 연도별 발령 · 진한 막대 2023` : "이력을 불러오지 못함" }),
-    kpi({ label: "과거 홍수 채점", value: num(cases.length || null), unit: "건", color: "#34d399",
-      chart: divergingTicks(officialLead, "#34d399"),
-      caption: `공식 경보가 통제보다 ${officialLead.map((v) => minutes(v.lead)).join(" · ")}` }),
+      caption: history ? `${history.issuances.years} 연도별 발령 · 진한 막대 ${lastYear}` : "이력을 불러오지 못함" }),
+    kpi({ label: risk?.mode === "replay" ? "주의 이상 시설(재생)" : "지금 주의 이상 시설", value: num(risk ? watching : null), unit: "곳", color: "#fbbf24",
+      chart: watching ? splitBar(watchLevels, "#fbbf24") : "",
+      caption: risk ? `${String(risk.observed_at ?? risk.at ?? "").slice(5, 16).replace("T", " ")} 관측 · ${watchLevels.map((p) => `${p.label} ${p.n}`).join(" · ")}` : "불러오지 못함" }),
   ].join("");
 
   const total = registry?.counts;
   const doors = [
     { id: "watch", season: "장마 중", title: "관제 보드", q: "지금 어디를 먼저 볼까",
-      points: ["시설 536곳 원인별 위험 순위(10분)", "공식 홍수특보·호우특보를 단계 하한으로", "시설 상세에서 «그날과 비교»", "보드 운영 에이전트"] },
-    { id: "scorecard", season: "장마 후", title: "기준 채점", q: "기준이 실제 통제보다 빨랐나",
-      points: ["선행 분은 기준·헛경보·동시 경보와 함께", "궁평2 수위 곡선 위 기준선과 권고 시각", "과거 홍수 4건 · 특보 이력 1,151건"],
-      foot: cases.map((c) => {
-        const s = c.signals.find((x) => x.signal === "공식 홍수경보" && x.at) ?? c.signals.find((x) => x.signal === "공식 홍수주의보");
-        return `<div class="op-mini-row"><b>${esc(c.title.replace(/ \d{4}-\d{2}-\d{2}$/, ""))}</b><span>특보</span><span class="${(s?.lead_min ?? 0) >= 0 ? "op-early" : "op-late"} op-num">${minutes(s?.lead_min)}</span></div>`;
-      }).join("") },
+      points: [`시설 ${num(facilities.length || null)}곳 원인별 위험 순위(10분)`, "공식 홍수특보·호우특보를 단계 하한으로", "보드 운영 에이전트"] },
+    { id: "scorecard", season: "장마 후", title: "기준 채점", q: "이번 장마, 기준이 실제 통제보다 빨랐나",
+      points: ["담당자 통제 기록과 권고를 시즌 단위로 맞춤", "기준 후보를 같은 기록으로 비교", `공식 특보 이력 ${num(history?.issuances?.issuances)}건`] },
     { id: "facility", season: "장마 전", title: "시설 기준", q: "이 시설은 어떤 신호로, 몇 분 전에 막나",
-      points: ["운영 등록 관문 4개", "기준 후보별 선행 분과 헛경보 비교", "백테스트 · 지금 상태 · 담당자 확인 기록"],
+      points: ["운영 등록 관문 4개", "기준 후보별 권고 횟수 비교", "지금 상태 · 담당자 확인 기록"],
       foot: `<div class="op-mini-row"><b>운영 ${total ? total.operational : "—"} · 후보 ${total ? total.candidate : "—"}</b><span>등록</span><span></span></div>` },
     { id: "cases", season: "근거", title: "사례 재구성", q: "왜 필요한가",
-      points: [],
+      points: ["과거 사건 재구성과 규칙 재생은 이 화면에서만"],
       foot: [["오송 HAND 시뮬레이션", "2023 · 붕괴 시각까지 단계별 범위", "osong-2023"], ["서울 도림천", "2022 · 내수 침수", "seoul-2022"], ["포항 냉천", "2022 · 지하주차장", "pohang-2022"], ["안동·의성", "2026 · 대피명령", "andong-uiseong-2026"]]
         .map(([t, s, id]) => `<a class="op-mini-link" href="#/cases/${id}"><b>${t}</b><span>${arrow}</span><small>${s}</small></a>`).join("") },
   ].map((d) => `<article class="op-door">
@@ -97,6 +91,6 @@ export async function renderHome(view) {
     </section>
     <section class="op-kpis" aria-label="주요 수치">${kpis}</section>
     <section class="op-doors" aria-label="네 화면">${doors}</section>
-    <p class="op-note">순위·권고는 공개 관측과 공식 특보로 본 선행 지표이며, 통제 결정은 담당자 판단과 현장 기준이 우선합니다. 통제 시각은 보도 기준(분 단위 기록은 오송뿐)이고, 침수 범위는 관측·지형 기반 근사 재구성이며 공식 침수범위가 아닙니다.</p>
+    <p class="op-note">순위·권고는 공개 관측과 공식 특보로 본 선행 지표이며, 통제 결정은 담당자 판단과 현장 기준이 우선합니다. 과거 사건의 통제 시각·침수 범위는 사례 재구성에서 출처와 확인 수준을 함께 표시합니다.</p>
   </div>`;
 }

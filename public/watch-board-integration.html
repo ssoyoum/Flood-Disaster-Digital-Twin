@@ -600,6 +600,8 @@ body.wx-in-shell .demo-top { display: none; }
 (() => {
   const root = document.getElementById("wx-root");
   const params = new URLSearchParams(window.location.search);
+  // ops 앱 안에서는 지금 상황만 본다. 과거 사건 재생·검증은 ops의 사례 재구성 화면이 맡는다.
+  const IN_OPS = params.get("shell") === "ops";
   const API = params.has("api") ? params.get("api") : root.dataset.api || "http://127.0.0.1:8033";
   const $ = (id) => root.querySelector(`#${id}`);
   const get = (path) => fetch(API + path).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
@@ -612,7 +614,7 @@ body.wx-in-shell .demo-top { display: none; }
   const REGION_CENTER = { 서울: [126.98, 37.56], 부산: [129.05, 35.18], 대구: [128.6, 35.87], 인천: [126.7, 37.46], 광주: [126.85, 35.16], 대전: [127.38, 36.35], 울산: [129.31, 35.54], 세종: [127.29, 36.48], 경기: [127.2, 37.45], 강원: [128.3, 37.6], 충북: [127.7, 36.75], 충남: [126.9, 36.5], 전북: [127.1, 35.75], 전남: [126.9, 34.85], 경북: [128.75, 36.4], 경남: [128.3, 35.35], 제주: [126.55, 33.4] };
 
   const TWIN_HREF = params.get("twin_href") || root.dataset.twinHref || "/#twin?tab=now";
-  const st = { at: params.get("at") ?? root.dataset.at ?? "", overview: null, changes: null, region: params.get("region") ?? "", minStage: params.get("stage") || null, q: "", sort: "risk", facOnly: false, driver: params.get("driver") || "all", showCalm: true, selected: params.get("facility") || params.get("station") || null, rsort: "risk", rainLayer: false, rainReplay: params.get("rain") === "replay" };
+  const st = { at: IN_OPS ? "" : (params.get("at") ?? root.dataset.at ?? ""), overview: null, changes: null, region: params.get("region") ?? "", minStage: params.get("stage") || null, q: "", sort: "risk", facOnly: false, driver: params.get("driver") || "all", showCalm: true, selected: params.get("facility") || params.get("station") || null, rsort: "risk", rainLayer: false, rainReplay: params.get("rain") === "replay" };
   let map = null, marker = null, hoverPop = null, stSeq = 0, prevStage = null, liveRefresh = null;
   const rank = (r) => ORDER.indexOf(r.stage ?? "unrated");
   const clock = (iso) => (iso ? `${iso.slice(5, 7)}.${iso.slice(8, 10)} ${iso.slice(11, 16)}` : "—");
@@ -870,6 +872,7 @@ body.wx-in-shell .demo-top { display: none; }
   }
   async function loadExamples() {
     try { sugItems = await get(`/api/agent/examples?event_id=osong-2023&board=watch`); } catch { sugItems = []; /* 입력만 */ }
+    if (IN_OPS) sugItems = sugItems.filter((s) => !["validation_cases", "post_event_review"].includes(s.workflow));
     renderSugs();
   }
   function applyView(v) {
@@ -1136,7 +1139,7 @@ body.wx-in-shell .demo-top { display: none; }
     const factorRows = `<div class="wx-detail-row"><b>판정 자료 상태</b><span>${esc(assessmentText)}</span></div><div class="wx-detail-row"><b>하천 경로</b><span>${esc(riverFactorText)}</span></div><div class="wx-detail-row"><b>공식 홍수특보</b><span>${esc(riverAlertText)}</span></div><div class="wx-detail-row"><b>강우 경로</b><span>${esc(rainFactorText)} · 관측값과 호우특보 기준량 비교는 참고 신호</span></div><div class="wx-detail-row"><b>취약성</b><span>미확인 · 시설 표고·펌프 용량·임시제방 상태는 가중치에 반영하지 않음</span></div><div class="wx-detail-row"><b>현장 확인</b><span>수심·펌프 상태·CCTV 미연결 · 즉시 통제 단계는 현장 자료로 평가하지 않음</span></div>`;
     $("wx-fac-list").innerHTML = `<div class="wx-detail-row"><b>잠김 원인</b><span>${f.assessment_route === "pluvial_fallback" ? "하천 관측소 미연결 · 주변 강우로 대체 판정" : f.driver === "river" ? "하천 수위" : "지역 강우(내수)"}</span></div><div class="wx-detail-row"><b>분류</b><span>${esc(f.kind_ko)} · ${tier}</span></div><div class="wx-detail-row"><b>판정 이유</b><span>${esc(f.why)}</span></div><div class="wx-detail-row"><b>기상청 호우특보</b><span>${esc(weatherText)}</span></div><div class="wx-detail-row"><b>강우 기준</b><span>${esc(st.overview.rain_basis || "자료 없음")}</span></div>${factorRows}${f.tier === "operational" ? `<a class="wx-link" href="${esc(TWIN_HREF)}" target="_top">운영 시설 상세로 이동 →</a>` : ""}`;
     const cases = validationCasesFor(f.facility_id);
-    if (cases.length) {
+    if (cases.length && !IN_OPS) {
       // 지금 단계(주의 미만이면 주의)에 그날 처음 들어간 시각과, 그 뒤 실제 통제(오송은 유입)까지 걸린 분
       const target = f.level >= 3 ? "경계" : "주의";
       const past = cases.map((c) => {
@@ -1311,6 +1314,10 @@ body.wx-in-shell .demo-top { display: none; }
     $("wx-map").textContent = "지도를 불러오지 못했습니다. 시설 목록과 판정 근거는 계속 확인할 수 있습니다.";
   }
   async function init() {
+    if (IN_OPS) {
+      [...$("wx-time").options].filter((o) => o.value).forEach((o) => o.remove());
+      $("wx-tab-vc").hidden = true;
+    }
     // 기준 채점 화면에서 넘어온 시각은 목록에 없을 수 있다.
     if (st.at && ![...$("wx-time").options].some((o) => o.value === st.at)) $("wx-time").add(new Option(`${st.at.slice(0, 16).replace("T", " ").replaceAll("-", ".")} · 그날 재생`, st.at));
     $("wx-time").value = st.at;
@@ -1320,7 +1327,7 @@ body.wx-in-shell .demo-top { display: none; }
     loadValidation().then(() => { if (st.selected) renderStation(st.selected); });
     scheduleLiveRefresh();
     if (st.selected) openDrawer(true);
-    if (params.get("tab") === "vc") { openDrawer(true); showTab("vc"); }
+    if (params.get("tab") === "vc" && !IN_OPS) { openDrawer(true); showTab("vc"); }
     if (typeof maplibregl === "undefined") mapUnavailable();
     else initMap().catch(mapUnavailable);
   }

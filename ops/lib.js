@@ -84,7 +84,7 @@ export function yearBars(byYear, color) {
   const w = 220 / entries.length;
   return `<svg viewBox="0 0 220 34" preserveAspectRatio="none" role="img" aria-label="연도별 발령">${entries.map(([year, n], i) => {
     const h = (n / max) * 26;
-    return `<rect x="${(i * w + 1).toFixed(1)}" y="${(28 - h).toFixed(1)}" width="${(w - 3).toFixed(1)}" height="${h.toFixed(1)}" rx="1.5" fill="${color}" opacity="${year === "2023" ? 1 : 0.55}"><title>${year} ${n}건</title></rect>`;
+    return `<rect x="${(i * w + 1).toFixed(1)}" y="${(28 - h).toFixed(1)}" width="${(w - 3).toFixed(1)}" height="${h.toFixed(1)}" rx="1.5" fill="${color}" opacity="${i === entries.length - 1 ? 1 : 0.55}"><title>${year} ${n}건</title></rect>`;
   }).join("")}<line x1="0" x2="220" y1="28.5" y2="28.5" stroke="rgba(255,255,255,.15)"/></svg>`;
 }
 

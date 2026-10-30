@@ -1,10 +1,10 @@
-import { API, arrow, cached, esc, get, hhmm, hydrograph, num, REFERENCE_KO, STAGE_COLOR, STAGE_KO } from "../lib.js";
+import { API, arrow, cached, esc, get, STAGE_COLOR, STAGE_KO } from "../lib.js";
 
-// 장마 전 · 시설 기준. 업무 순서대로: 어떤 시설을 운영할지 → 기준 → 과거 사건으로 확인 → 장마 중 지금 상태.
+// 장마 전 · 시설 기준. 업무 순서대로: 어떤 시설을 운영할지 → 기준 → 장마 중 지금 상태.
+// 과거 사건에 규칙을 재생한 결과는 사례 재구성에서만 보여 준다.
 const SUBTABS = [
   { id: "registry", label: "시설 등록" },
   { id: "criteria", label: "통제 기준 검토" },
-  { id: "backtest", label: "백테스트" },
   { id: "now", label: "지금 상태" },
 ];
 const GATE_TONE = { CONFIRMED: "ok", PENDING: "wait", MISSING: "bad", UNKNOWN: "" };
@@ -44,22 +44,19 @@ function registryView(registry) {
 function criteriaView(review) {
   const lv = review.station.levels_m;
   const cur = review.current_rule;
-  const maxLead = Math.max(...review.sweep.map((r) => r.lead_to_inflow_min ?? 0));
   const maxCost = Math.max(1, ...review.sweep.map((r) => r.other_review_minutes ?? 0));
   const rows = review.sweep.map((r) => {
     const isCur = r.stage_floor === cur.stage_floor && r.lead_threshold_min === cur.lead_threshold_min;
     return `<tr class="${isCur ? "cur" : ""}">
       <td>${r.stage_floor === "warning" ? "경보" : "주의보"} 수위 ${lv[r.stage_floor]} m 이상</td>
       <td>${r.lead_threshold_min ? `계획홍수위까지 ${r.lead_threshold_min}분 이내` : "계획홍수위 도달"}${isCur ? ' <span class="op-chip" data-tone="ok">현재 규칙</span>' : ""}</td>
-      <td>${hhmm(r.first_review_time)}</td>
-      <td><div class="op-cellbar"><i style="width:${((r.lead_to_inflow_min ?? 0) / maxLead) * 120}px"></i><b>${r.lead_to_inflow_min ?? "—"}분</b></div></td>
       <td><div class="op-cellbar"><i class="cost" style="width:${((r.other_review_minutes ?? 0) / maxCost) * 80}px"></i><b>${r.other_episode_count}회</b><span class="op-note">${r.other_review_minutes}분</span></div></td>
     </tr>`;
   }).join("");
   const maxYear = Math.max(lv.planned_flood, ...review.by_year.map((y) => y.max_water_level_m ?? 0));
   const years = review.by_year.map((y) => {
     const pct = (v) => `${(v / maxYear) * 100}%`;
-    return `<tr${y.reference_event ? ' class="cur"' : ""}><td>${y.year}${y.reference_event ? " (기준 사건)" : ""}</td>
+    return `<tr><td>${y.year}</td>
       <td style="width:55%"><div style="position:relative;height:10px;border-radius:5px;background:rgba(255,255,255,.05)">
         <i style="position:absolute;left:0;top:0;bottom:0;width:${pct(y.max_water_level_m ?? 0)};border-radius:5px;background:${(y.max_water_level_m ?? 0) >= lv.warning ? "#fb923c" : "#38bdf8"}"></i>
         ${["advisory", "warning", "planned_flood"].map((k) => `<span title="${STAGE_KO[k]} ${lv[k]} m" style="position:absolute;left:${pct(lv[k])};top:-3px;bottom:-3px;width:1px;background:${STAGE_COLOR[k]}"></span>`).join("")}
@@ -67,36 +64,17 @@ function criteriaView(review) {
       <td class="op-num">${y.max_water_level_m ?? "—"} m</td><td class="op-num">${y.episodes}회 · ${y.review_minutes}분</td></tr>`;
   }).join("");
   return `<section class="op-sec">
-      <div class="op-sec-head"><h2>기준 후보 비교</h2><span>${esc(review.station.name)} · 일찍 잡을수록 선행은 늘지만 다른 해 권고(헛경보 후보)도 늘어납니다</span></div>
+      <div class="op-sec-head"><h2>기준 후보 비교</h2><span>${esc(review.station.name)} · 일찍 잡는 기준일수록 권고가 자주 납니다</span></div>
       <div class="op-card"><div class="op-table-wrap"><table class="op-table">
-        <thead><tr><th>기준 단계</th><th>상승 속도 조건</th><th>첫 권고</th><th>유입(08:27)보다 먼저</th><th>다른 해 권고</th></tr></thead>
+        <thead><tr><th>기준 단계</th><th>상승 속도 조건</th><th>저장된 해 권고</th></tr></thead>
         <tbody>${rows}</tbody></table></div>
-        <p class="op-note">"계획홍수위까지 N분 이내"는 지금 상승 속도를 이어 그었을 때의 시간입니다. 다른 해 권고는 통제·침수 기록과 대조하지 않은 후보이며 오경보로 확정하지 않습니다.</p>
+        <p class="op-note">"계획홍수위까지 N분 이내"는 지금 상승 속도를 이어 그었을 때의 시간입니다. 권고 횟수는 통제·침수 기록과 대조하지 않은 후보이며 오경보로 확정하지 않습니다. 과거 사건 대비 몇 분 먼저였는지는 <a href="#/cases/osong-2023">사례 재구성 › 오송 ${arrow}</a>에서 봅니다.</p>
       </div>
     </section>
     <section class="op-sec">
       <div class="op-sec-head"><h2>해마다 최고 수위</h2><span>세로선은 주의보 ${lv.advisory} · 경보 ${lv.warning} · 계획홍수위 ${lv.planned_flood} m. 경보 수위를 넘고도 권고가 없던 해는 상승 속도가 조건에 못 미친 해입니다.</span></div>
       <div class="op-card"><div class="op-table-wrap"><table class="op-table"><thead><tr><th>연도</th><th>최고 수위</th><th></th><th>권고</th></tr></thead><tbody>${years}</tbody></table></div>
       <ul class="op-limits">${(review.limitations ?? []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>
-    </section>`;
-}
-
-function backtestView(bt, review) {
-  const ref = bt.reference_event;
-  const events = Object.keys(REFERENCE_KO).filter((k) => ref[k]).map((k) => ({
-    time: ref[k], label: REFERENCE_KO[k], lead: bt.lead_minutes?.[k], primary: k === "underpass_inflow",
-    color: { official_requirement_met: "#fbbf24", levee_failure: "#fb923c", underpass_inflow: "#f87171", full_inundation: "#f87171" }[k],
-  }));
-  return `<section class="op-sec">
-      <div class="op-sec-head"><h2>2023-07-15 사건에 규칙 재생</h2><span>${esc(bt.rule.review_when)}</span></div>
-      <div class="op-card"><div class="op-hydro">${hydrograph({ points: bt.points, levels: review.station.levels_m, from: "2023-07-14T00:00", to: "2023-07-16T00:00", review: bt.first_closure_review, events })}</div>
-        <p class="op-note">${esc(bt.note)}</p></div>
-    </section>
-    <section class="op-sec">
-      <div class="op-sec-head"><h2>단계가 바뀐 시각</h2><span>저장된 10분 수위 ${num(bt.series.records)}개</span></div>
-      <div class="op-card"><div class="op-table-wrap"><table class="op-table"><thead><tr><th>시각</th><th>단계</th><th>수위</th></tr></thead><tbody>
-        ${bt.stage_transitions.map((t) => `<tr><td>${t.time.slice(5, 16).replace("T", " ")}</td><td><span class="op-chip" style="border-color:${STAGE_COLOR[t.stage]};color:${STAGE_COLOR[t.stage]}">${STAGE_KO[t.stage] ?? t.stage}</span></td><td class="op-num">${t.water_level_m} m</td></tr>`).join("")}
-      </tbody></table></div></div>
     </section>`;
 }
 
@@ -118,16 +96,13 @@ export async function renderFacility(view, route) {
   if (sub === "registry") body = registryView(registry);
   else if (!facility) body = '<p class="op-note">운영 등록 시설이 없습니다.</p>';
   else if (sub === "criteria") body = criteriaView(await cached(`/api/twin/facilities/${facility.id}/criteria-review`));
-  else if (sub === "backtest") {
-    const [bt, review] = await Promise.all([cached(`/api/twin/facilities/${facility.id}/backtest?points=true`), cached(`/api/twin/facilities/${facility.id}/criteria-review`)]);
-    body = backtestView(bt, review);
-  } else body = await nowView(facility);
+  else body = await nowView(facility);
 
   view.innerHTML = `<div class="op-page">
     <header>
       <p class="op-eyebrow">장마 전 · 시설 기준</p>
       <h1 class="op-h1">이 시설은 어떤 신호로, 몇 분 전에 막나</h1>
-      <p class="op-lead">${facility ? `${esc(facility.name)} · 대표 관측소 ${esc(facility.gauge?.name ?? "")}. ` : ""}관문을 통과한 시설에만 통제 규칙을 붙이고, 기준 후보마다 선행 분과 헛경보를 같이 비교해 고릅니다.</p>
+      <p class="op-lead">${facility ? `${esc(facility.name)} · 대표 관측소 ${esc(facility.gauge?.name ?? "")}. ` : ""}관문을 통과한 시설에만 통제 규칙을 붙이고, 기준 후보마다 권고가 얼마나 자주 나는지 비교해 고릅니다.</p>
     </header>
     <nav class="op-subtabs" aria-label="시설 기준">${SUBTABS.map((t) => `<a href="#/facility/${t.id}"${t.id === sub ? ' aria-current="page"' : ""}>${t.label}</a>`).join("")}</nav>
     ${body}

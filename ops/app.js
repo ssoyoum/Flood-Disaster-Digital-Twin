@@ -51,7 +51,7 @@ function renderStatus(active) {
 // 관제 보드는 지도를 다시 띄우지 않도록 한 번 만든 iframe을 숨겼다 보였다 한다.
 function showWatch(query) {
   const params = new URLSearchParams({ api: API, shell: "ops", twin_href: `${window.location.pathname}#/facility/now` });
-  ["at", "rain", "facility", "region", "stage", "tab"].forEach((key) => { if (query.get(key)) params.set(key, query.get(key)); });
+  ["facility", "region", "stage"].forEach((key) => { if (query.get(key)) params.set(key, query.get(key)); });
   const src = `../public/watch-board-integration.html?${params}`;
   if (src !== watchSrc) {
     watchSrc = src;

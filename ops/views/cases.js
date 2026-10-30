@@ -1,6 +1,7 @@
-import { arrow, cached, esc, hhmm, ymd } from "../lib.js";
+import { arrow, cached, esc, hhmm, hydrograph, leadBar, minutes, num, REFERENCE_KO, STAGE_COLOR, STAGE_KO, tierOf, ymd } from "../lib.js";
 
 // 근거 · 사례 재구성. 지난 홍수를 시각 단위로 다시 놓고, 통제·대피가 언제 가능했는지 본다.
+// 과거 사건에 관한 화면(규칙 재생·사건별 신호)은 모두 여기에만 둔다.
 const CASES = {
   "osong-2023": { name: "2023 오송 궁평2지하차도", place: "충북 청주시 흥덕구 오송읍", flow: "미호천 제방 붕괴 → 월류 → 지하차도 침수" },
   "seoul-2022": { name: "2022 서울 도림천 유역", place: "서울 관악·동작·영등포", flow: "집중호우 → 설계강우 초과 → 저지대·반지하 침수" },
@@ -42,14 +43,88 @@ function leadChart(cases) {
     <text x="${W - R}" y="${H}" text-anchor="end" font-size="11" fill="#71717a">← 늦음 · 먼저 →</text>${rows}</svg>`;
 }
 
+// 과거 홍수 하나에 대해 신호마다 기준 사건보다 몇 분 먼저였는지와, 같은 시각 같은 지역에서 함께 오른 비율(선별력).
+function signalCard(item) {
+  const ref = item.reference;
+  const near = item.region_at_reference;
+  const share = near && near.total ? near.advisory_or_above / near.total : null;
+  const select = near ? `<div class="op-select" title="기준 시각에 같은 지역에서 함께 주의 이상이던 시설 비율. 높을수록 이 시설만 골라낸 신호가 아닙니다.">
+      <span>같은 시각 ${esc(item.region)} ${near.total}곳 중 주의 이상 <b>${near.advisory_or_above}</b> · 경계 이상 ${near.warning_or_above}</span>
+      <span class="track"><i style="width:${(near.warning_or_above / near.total) * 100}%;background:#fb923c"></i><i style="width:${((near.advisory_or_above - near.warning_or_above) / near.total) * 100}%;background:#fbbf24"></i></span>
+      <span class="op-num">${share == null ? "—" : `${Math.round(share * 100)}%`}</span></div>` : "";
+  const rows = item.signals.map((s) => `<li>
+      <span class="tier">${tierOf(s.signal)}</span>
+      <span class="name"><b>${esc(s.signal)}</b>${s.why ? `<small>${esc(s.why)}</small>` : s.source ? `<small>${esc(s.source)}</small>` : ""}</span>
+      <span class="at">${s.at ? hhmm(s.at) : "—"}</span>
+      ${leadBar(s.lead_min)}
+      <span class="lead ${s.lead_min == null ? "" : s.lead_min >= 0 ? "op-early" : "op-late"}">${s.lead_min == null ? "없음" : `${minutes(s.lead_min)}${s.lead_is_lower_bound ? "↑" : ""}`}</span>
+    </li>`).join("");
+  return `<article class="op-card">
+    <div class="op-card-head"><div><h3>${esc(item.title.replace(/ \d{4}-\d{2}-\d{2}$/, ""))}</h3>
+      <small>${ymd(ref.at)} · 기준 <b>${hhmm(ref.at)}</b> ${esc(ref.label)} · ${esc(ref.precision_ko)}</small></div></div>
+    ${select}
+    <ul class="op-sig">${rows}</ul>
+  </article>`;
+}
+
+// 운영 시설 규칙을 오송 사건 수위에 그대로 재생한다: 수위 곡선, 기준 후보별 선행 분, 단계가 바뀐 시각.
+async function osongRuleReplay(facilityId) {
+  const [card, review, bt] = await Promise.all([
+    cached(`/api/twin/facilities/${facilityId}/scorecard`),
+    cached(`/api/twin/facilities/${facilityId}/criteria-review`),
+    cached(`/api/twin/facilities/${facilityId}/backtest?points=true`),
+  ]);
+  const levels = review.station.levels_m;
+  const ref = { ...(bt.reference_event ?? {}), ...(card.reference_event ?? {}) };
+  const lead = { ...(bt.lead_minutes ?? {}), ...(card.lead_minutes ?? {}) };
+  const first = bt.first_closure_review;
+  const events = Object.keys(REFERENCE_KO).filter((k) => ref[k]).map((k) => ({
+    time: ref[k], label: REFERENCE_KO[k], lead: lead[k], primary: k === "underpass_inflow",
+    color: { official_requirement_met: "#fbbf24", levee_failure: "#fb923c", underpass_inflow: "#f87171", full_inundation: "#f87171" }[k],
+  }));
+  const cur = review.current_rule;
+  const maxLead = Math.max(1, ...review.sweep.map((r) => r.lead_to_inflow_min ?? 0));
+  const sweep = review.sweep.map((r) => {
+    const isCur = r.stage_floor === cur.stage_floor && r.lead_threshold_min === cur.lead_threshold_min;
+    return `<tr class="${isCur ? "cur" : ""}"><td>${r.stage_floor === "warning" ? "경보" : "주의보"} 수위 ${levels[r.stage_floor]} m 이상</td>
+      <td>${r.lead_threshold_min ? `계획홍수위까지 ${r.lead_threshold_min}분 이내` : "계획홍수위 도달"}${isCur ? ' <span class="op-chip" data-tone="ok">현재 규칙</span>' : ""}</td>
+      <td>${hhmm(r.first_review_time)}</td>
+      <td><div class="op-cellbar"><i style="width:${((r.lead_to_inflow_min ?? 0) / maxLead) * 120}px"></i><b>${r.lead_to_inflow_min ?? "—"}분</b></div></td>
+      <td class="op-num">${r.other_episode_count}회</td></tr>`;
+  }).join("");
+  const s = card.scorecard;
+  return `<section class="op-sec">
+      <div class="op-sec-head"><h2>궁평2 통제 검토 규칙을 이 사건에 재생</h2><span>${esc(bt.rule.review_when)}</span></div>
+      <dl class="op-why">
+        <div><dt><b>1</b>첫 권고</dt><dd>${first ? `<strong>${hhmm(first.time)}</strong><small>수위 ${first.water_level_m} m · ${esc(first.reason)}</small>` : "권고 없음"}</dd></div>
+        <div><dt><b>2</b>얼마나 먼저</dt><dd>${lead.underpass_inflow != null ? `<strong class="op-early">${lead.underpass_inflow}분</strong> 먼저<small>지하차도 유입 ${hhmm(ref.underpass_inflow)} 기준 · 공식 통제 요건(${hhmm(ref.official_requirement_met)})보다 ${lead.official_requirement_met}분</small>` : "—"}</dd></div>
+        <div><dt><b>3</b>다른 해 권고</dt><dd><strong>${s.false_alarm_candidates}회</strong><small>${s.years_covered[0]}–${s.years_covered[s.years_covered.length - 1]}년 같은 규칙 재생</small></dd></div>
+      </dl>
+      <div class="op-card"><div class="op-hydro">${hydrograph({ points: bt.points, levels, from: "2023-07-14T12:00", to: "2023-07-15T12:00", review: first, events })}</div>
+        <p class="op-note">초록 구간이 권고와 유입 사이의 시간입니다. ${esc(bt.note)}</p></div>
+    </section>
+    <section class="op-sec">
+      <div class="op-sec-head"><h2>기준 후보별 이 사건 선행 분</h2><span>${esc(review.station.name)} · 일찍 잡을수록 선행은 늘지만 다른 해 권고도 늘어납니다</span></div>
+      <div class="op-card"><div class="op-table-wrap"><table class="op-table">
+        <thead><tr><th>기준 단계</th><th>상승 속도 조건</th><th>첫 권고</th><th>유입(${hhmm(ref.underpass_inflow)})보다 먼저</th><th>다른 해 권고</th></tr></thead>
+        <tbody>${sweep}</tbody></table></div></div>
+    </section>
+    <section class="op-sec">
+      <div class="op-sec-head"><h2>단계가 바뀐 시각</h2><span>저장된 10분 수위 ${num(bt.series.records)}개</span></div>
+      <div class="op-card"><div class="op-table-wrap"><table class="op-table"><thead><tr><th>시각</th><th>단계</th><th>수위</th></tr></thead><tbody>
+        ${bt.stage_transitions.map((t) => `<tr><td>${t.time.slice(5, 16).replace("T", " ")}</td><td><span class="op-chip" style="border-color:${STAGE_COLOR[t.stage]};color:${STAGE_COLOR[t.stage]}">${STAGE_KO[t.stage] ?? t.stage}</span></td><td class="op-num">${t.water_level_m} m</td></tr>`).join("")}
+      </tbody></table></div></div>
+    </section>`;
+}
+
 async function listView(view) {
-  const [events, leads] = await Promise.all([cached("/api/events"), cached("/api/cases/lead-times").catch(() => null)]);
+  const [events, leads, validation] = await Promise.all([cached("/api/events"), cached("/api/cases/lead-times").catch(() => null), cached("/api/watch/validation-cases").catch(() => null)]);
   const ready = events.filter((e) => CASES[e.id]);
   view.innerHTML = `<div class="op-page">
     <header>
       <p class="op-eyebrow">근거 · 사례 재구성</p>
       <h1 class="op-h1">왜 필요한가: 지난 홍수를 시각 단위로 다시 봅니다</h1>
-      <p class="op-lead">신호가 언제 있었고, 통제·대피가 언제 가능했는지 기록된 시각만으로 맞춰 놓습니다. 기준 채점의 근거 자료입니다.</p>
+      <p class="op-lead">신호가 언제 있었고, 통제·대피가 언제 가능했는지 기록된 시각만으로 맞춰 놓습니다. 과거 사건 재구성과 규칙 재생은 이 화면에서만 봅니다.</p>
     </header>
     <section class="op-doors">${ready.map((e) => {
       const c = CASES[e.id];
@@ -58,6 +133,9 @@ async function listView(view) {
     ${leads ? `<section class="op-sec"><div class="op-sec-head"><h2>사례 간 비교</h2><span>대응 시각과 기준 사건 사이의 분 · 음수는 기준 사건 뒤 · 사례마다 기준 사건이 달라 순위로 읽지 않습니다</span></div>
       <div class="op-card"><div class="op-lead-chart">${leadChart(leads.cases)}</div>
       <ul class="op-limits">${leads.cases.map((c) => `<li>${esc(c.case)}: ${esc(c.counterfactual?.label ?? "")} · ${esc(c.evidence ?? "")}</li>`).join("")}${leads.limitations.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div></section>` : ""}
+    ${validation ? `<section class="op-sec"><div class="op-sec-head"><h2>과거 홍수 단계·특보 신호</h2><span>${validation.cases.length}건 · 대비 시작(주의) 신호와 통제 준비(경보·경계) 신호를 나눠 봄 · 막대는 300분에서 끊음</span></div>
+      <div class="op-grid-2">${validation.cases.map(signalCard).join("")}</div>
+      <ul class="op-limits">${validation.limitations.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></section>` : ""}
   </div>`;
 }
 
@@ -124,6 +202,7 @@ async function detailView(view, id) {
             <div class="op-map-legend"><span><i style="background:#f87171"></i>침수 추정 범위(HAND 근사)</span><span><i style="background:#1f6fa3"></i>하천</span><span><i style="background:#fbbf24"></i>궁평2지하차도</span><span id="op-hand-count"></span></div></div>`
         : `<div class="op-card"><h3 id="op-step-title">단계를 고르세요</h3><p class="op-note" id="op-step-body">왼쪽 단계를 누르면 출처와 확인 수준이 보입니다. 이 사례는 지도 없이 시각 기록만 재구성했습니다.</p></div>`}
     </div>
+    <div id="op-rule-replay"></div>
     <p class="op-note">침수 범위는 관측·지형(HAND) 기반 근사이며 공식 침수범위가 아닙니다. 시각은 보도·공식 발표 기준이고 확인 수준을 단계마다 표시합니다.</p>
   </div>`;
 
@@ -166,6 +245,13 @@ async function detailView(view, id) {
   select(0);
 
   if (isOsong) {
+    const registry = await cached("/api/twin/registry").catch(() => null);
+    const facilityId = registry?.operational.find((f) => f.id === "gungpyeong2-underpass")?.id;
+    if (facilityId) {
+      osongRuleReplay(facilityId)
+        .then((html) => { const slot = document.getElementById("op-rule-replay"); if (slot) slot.innerHTML = html; })
+        .catch((e) => { const slot = document.getElementById("op-rule-replay"); if (slot) slot.innerHTML = `<p class="op-err">규칙 재생을 불러오지 못했습니다: ${esc(e.message)}</p>`; });
+    }
     const layers = await cached("/api/events/osong-2023/layers?year=2023");
     if (!document.getElementById("op-map")) return;  // 그사이 다른 화면으로 옮겼다
     handFeatures = layers.hand_reconstruction?.data?.features ?? [];
