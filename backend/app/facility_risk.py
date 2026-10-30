@@ -110,7 +110,7 @@ def driver_of(facility: dict[str, Any]) -> tuple[str, str]:
     if facility["tier"] == "operational":
         return "river", "운영 등록(시설별 규칙)"
     if facility["group"] == "riverside":
-        return "river", "하천변 출입구"
+        return "river", {"riverside_camp": "하천변 야영장", "low_bridge": "세월교·잠수교"}.get(facility.get("kind"), "하천변 출입구")
     evidence = river_type_underpasses().get(facility["facility_id"])
     duplicate_note = duplicates_of_river_type().get(facility["facility_id"], "")
     if evidence is None and any(name in duplicate_note for name in operational_names()):

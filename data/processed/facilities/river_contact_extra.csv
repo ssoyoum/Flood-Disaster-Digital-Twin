@@ -1,0 +1,356 @@
+facility_id,name,kind,kind_ko,sido,lon,lat,river_name,river_class,distance_to_river_m,access,source,osm_id
+osm:way/374439413,세월교,low_bridge,세월교·잠수교,강원,127.724258,37.992845,사평천,local,0,,OpenStreetMap (ODbL),way/374439413
+osm:way/1565498839,HJ글램핑,riverside_camp,하천변 야영장,강원,127.389916,38.078784,도평천,local,46,,OpenStreetMap (ODbL),way/1565498839
+osm:node/12243998061,Wild camping spot,riverside_camp,하천변 야영장,강원,127.758152,37.166691,한강,national,0,,OpenStreetMap (ODbL),node/12243998061
+osm:node/368871302,각동야영장,riverside_camp,하천변 야영장,강원,128.538755,37.117294,한강,local,89,,OpenStreetMap (ODbL),node/368871302
+osm:way/559239550,각흘계곡캠핑장,riverside_camp,하천변 야영장,강원,127.392995,38.100374,도평천,local,53,,OpenStreetMap (ODbL),way/559239550
+osm:node/14273478947,갈천힐링캠프,riverside_camp,하천변 야영장,강원,128.505256,37.907181,후천,local,30,,OpenStreetMap (ODbL),node/14273478947
+osm:way/168747533,고인돌오토캠핑장,riverside_camp,하천변 야영장,강원,128.574106,38.054037,후천,local,11,,OpenStreetMap (ODbL),way/168747533
+osm:way/1356573251,구만천 야영장(이름 없음),riverside_camp,하천변 야영장,강원,127.696011,37.702681,구만천,local,142,,OpenStreetMap (ODbL),way/1356573251
+osm:way/1187504126,그자리야영장,riverside_camp,하천변 야영장,강원,127.72377,37.69529,홍천강,national,192,,OpenStreetMap (ODbL),way/1187504126
+osm:node/368871078,금방아 민박 야영장,riverside_camp,하천변 야영장,강원,128.260271,37.31773,법흥천,local,32,,OpenStreetMap (ODbL),node/368871078
+osm:way/1256430425,김삿갓계곡캠핑장,riverside_camp,하천변 야영장,강원,128.602274,37.079203,마포천,local,36,,OpenStreetMap (ODbL),way/1256430425
+osm:way/983860071,꿈의대화 캠핑장,riverside_camp,하천변 야영장,강원,128.451308,37.50213,대화천,local,45,,OpenStreetMap (ODbL),way/983860071
+osm:way/469415903,내린천 야영장(이름 없음),riverside_camp,하천변 야영장,강원,128.463023,37.815633,내린천,local,24,,OpenStreetMap (ODbL),way/469415903
+osm:way/902202504,내설악글램핑파크,riverside_camp,하천변 야영장,강원,128.247983,38.136793,북천,local,68,,OpenStreetMap (ODbL),way/902202504
+osm:way/1534178455,내설악미리내캠프,riverside_camp,하천변 야영장,강원,128.288856,38.180028,북천,local,81,,OpenStreetMap (ODbL),way/1534178455
+osm:way/1565498840,뉴힐링캠프,riverside_camp,하천변 야영장,강원,127.388284,38.075338,도평천,local,25,,OpenStreetMap (ODbL),way/1565498840
+osm:node/10807360041,다그린캠핑장,riverside_camp,하천변 야영장,강원,128.326486,37.291889,평창강,national,59,,OpenStreetMap (ODbL),node/10807360041
+osm:way/1206798596,다둥이네캠핑장,riverside_camp,하천변 야영장,강원,127.563536,37.935096,화악천,local,53,,OpenStreetMap (ODbL),way/1206798596
+osm:way/1534461601,당마루관광농원캠핑장,riverside_camp,하천변 야영장,강원,128.351059,37.239231,평창강,national,39,,OpenStreetMap (ODbL),way/1534461601
+osm:node/7776476592,대기천 야영장(이름 없음),riverside_camp,하천변 야영장,강원,128.777093,37.58792,대기천,local,134,,OpenStreetMap (ODbL),node/7776476592
+osm:way/1565498815,더세븐글램핑 카라반,riverside_camp,하천변 야영장,강원,127.390069,38.065202,영평천,local,38,,OpenStreetMap (ODbL),way/1565498815
+osm:way/1518526861,동지화캠핑,riverside_camp,하천변 야영장,강원,127.697475,38.128619,화천천,local,20,,OpenStreetMap (ODbL),way/1518526861
+osm:node/10692474599,두루뭉 캠핑장,riverside_camp,하천변 야영장,강원,127.892647,37.439944,일리천,local,56,customers,OpenStreetMap (ODbL),node/10692474599
+osm:node/12135123749,라라솔캠핑장&펜션,riverside_camp,하천변 야영장,강원,127.867341,37.523503,일리천,local,39,,OpenStreetMap (ODbL),node/12135123749
+osm:way/1499482067,리버사이드영월,riverside_camp,하천변 야영장,강원,128.27634,37.292505,주천강,local,63,,OpenStreetMap (ODbL),way/1499482067
+osm:way/1534187583,발리봉캠핑장,riverside_camp,하천변 야영장,강원,128.196,38.177329,인북천,local,150,,OpenStreetMap (ODbL),way/1534187583
+osm:way/1534178442,백담고을캠핑장,riverside_camp,하천변 야영장,강원,128.356383,38.1921,영실천,local,68,,OpenStreetMap (ODbL),way/1534178442
+osm:node/368871181,백두대간 광원캠프,riverside_camp,하천변 야영장,강원,128.444177,37.828662,내린천,local,112,,OpenStreetMap (ODbL),node/368871181
+osm:way/1469021666,베이스캠프글램핑,riverside_camp,하천변 야영장,강원,128.873817,37.834145,사천천,local,51,,OpenStreetMap (ODbL),way/1469021666
+osm:way/1373648034,병자방오토캠핑장,riverside_camp,하천변 야영장,강원,128.057955,37.59508,대관대천,local,65,,OpenStreetMap (ODbL),way/1373648034
+osm:node/10807360042,보보스캇펜션 캠핑장,riverside_camp,하천변 야영장,강원,128.326751,37.290481,평창강,national,114,,OpenStreetMap (ODbL),node/10807360042
+osm:node/5662175321,북천 야영장(이름 없음),riverside_camp,하천변 야영장,강원,128.27191,38.166877,북천,local,0,,OpenStreetMap (ODbL),node/5662175321
+osm:node/6778806781,북천 야영장(이름 없음),riverside_camp,하천변 야영장,강원,128.32414,38.192478,북천,local,101,,OpenStreetMap (ODbL),node/6778806781
+osm:node/6773549588,북한강 야영장(이름 없음),riverside_camp,하천변 야영장,강원,127.616776,37.825068,북한강,national,30,,OpenStreetMap (ODbL),node/6773549588
+osm:way/1337852699,산솔오토캠핑장,riverside_camp,하천변 야영장,강원,128.707884,37.146515,옥동천,local,52,,OpenStreetMap (ODbL),way/1337852699
+osm:way/1291188718,삼산천 야영장(이름 없음),riverside_camp,하천변 야영장,강원,127.821771,37.367227,삼산천,local,112,,OpenStreetMap (ODbL),way/1291188718
+osm:way/1565685622,새연글램핑카라반 포천점,riverside_camp,하천변 야영장,강원,127.389912,38.083849,도평천,local,30,,OpenStreetMap (ODbL),way/1565685622
+osm:way/1386532686,샘골솔밭야영장,riverside_camp,하천변 야영장,강원,128.47594,37.832676,계방천,local,7,,OpenStreetMap (ODbL),way/1386532686
+osm:node/4196993727,섬강 두꺼비 오토 캠핑장,riverside_camp,하천변 야영장,강원,127.755586,37.251775,섬강,national,22,,OpenStreetMap (ODbL),node/4196993727
+osm:node/368871355,소금강학생야영장,riverside_camp,하천변 야영장,강원,128.786775,37.841591,신왕천,local,25,,OpenStreetMap (ODbL),node/368871355
+osm:way/1291188705,소금산그랜드밸리포레스트캠핑장,riverside_camp,하천변 야영장,강원,127.819204,37.367224,삼산천,local,23,,OpenStreetMap (ODbL),way/1291188705
+osm:way/1181245471,송라천펜션야영장,riverside_camp,하천변 야영장,강원,128.28423,37.874519,방내천,local,30,,OpenStreetMap (ODbL),way/1181245471
+osm:node/5023223221,송천 야영장(이름 없음),riverside_camp,하천변 야영장,강원,128.71987,37.706006,송천,local,28,,OpenStreetMap (ODbL),node/5023223221
+osm:node/7996533585,수봉야영장,riverside_camp,하천변 야영장,강원,128.511398,38.078116,오색천,local,13,,OpenStreetMap (ODbL),node/7996533585
+osm:way/1213478075,신대리산촌체험야영장,riverside_camp,하천변 야영장,강원,128.218547,37.591606,계천,local,53,,OpenStreetMap (ODbL),way/1213478075
+osm:way/1565498842,썬오브캠핑장,riverside_camp,하천변 야영장,강원,127.390018,38.087978,도평천,local,36,,OpenStreetMap (ODbL),way/1565498842
+osm:way/1213478076,아름채캠핑장,riverside_camp,하천변 야영장,강원,128.233505,37.589907,계천,local,49,,OpenStreetMap (ODbL),way/1213478076
+osm:node/7622877373,아미천캠핑장,riverside_camp,하천변 야영장,강원,127.116076,38.107059,아미천,local,68,,OpenStreetMap (ODbL),node/7622877373
+osm:way/1475948323,양구서천 야영장(이름 없음),riverside_camp,하천변 야영장,강원,127.981876,38.122052,양구서천,national,112,,OpenStreetMap (ODbL),way/1475948323
+osm:way/688910782,연천학생야영장,riverside_camp,하천변 야영장,강원,127.135725,38.211965,차탄천,local,104,,OpenStreetMap (ODbL),way/688910782
+osm:way/1499482066,영월아랫골캠핑장,riverside_camp,하천변 야영장,강원,128.275309,37.292741,주천강,local,24,,OpenStreetMap (ODbL),way/1499482066
+osm:way/1534535727,영월오아시스글램핑,riverside_camp,하천변 야영장,강원,128.43363,37.179713,평창강,national,70,,OpenStreetMap (ODbL),way/1534535727
+osm:way/1534526378,와룡천캠핑장,riverside_camp,하천변 야영장,강원,128.411119,37.189867,평창강,national,33,,OpenStreetMap (ODbL),way/1534526378
+osm:way/1125394669,외룡 캠핑장,riverside_camp,하천변 야영장,강원,128.665789,37.113548,옥동천,local,27,,OpenStreetMap (ODbL),way/1125394669
+osm:way/1198894996,용연계곡야영장,riverside_camp,하천변 야영장,강원,128.804102,37.788395,사천천,local,94,,OpenStreetMap (ODbL),way/1198894996
+osm:way/1428208733,우주캠프,riverside_camp,하천변 야영장,강원,128.138103,37.250928,황둔천,local,34,,OpenStreetMap (ODbL),way/1428208733
+osm:way/1244823208,을수골볓빛계곡,riverside_camp,하천변 야영장,강원,128.457651,37.818025,내린천,local,27,,OpenStreetMap (ODbL),way/1244823208
+osm:node/12019793127,인문학마을캠핑장,riverside_camp,하천변 야영장,강원,127.982518,38.122081,양구서천,national,56,,OpenStreetMap (ODbL),node/12019793127
+osm:way/1474722989,인북천 물빛테마공원 캠핑장,riverside_camp,하천변 야영장,강원,128.205906,38.225413,인북천,local,68,,OpenStreetMap (ODbL),way/1474722989
+osm:way/1414820617,인제연가리오토캠핑장,riverside_camp,하천변 야영장,강원,128.43501,37.974151,방태천,local,50,,OpenStreetMap (ODbL),way/1414820617
+osm:node/6780040361,자산천 야영장(이름 없음),riverside_camp,하천변 야영장,강원,128.423562,38.44054,자산천,local,120,,OpenStreetMap (ODbL),node/6780040361
+osm:way/1289028159,주막거리캠프,riverside_camp,하천변 야영장,강원,128.667783,37.039446,마포천,local,22,,OpenStreetMap (ODbL),way/1289028159
+osm:node/6004375775,지내천 야영장(이름 없음),riverside_camp,하천변 야영장,강원,127.779986,37.925697,지내천,local,34,,OpenStreetMap (ODbL),node/6004375775
+osm:way/1332811949,철원가산농원 캠핑장,riverside_camp,하천변 야영장,강원,127.264719,38.224047,한탄강,local,192,,OpenStreetMap (ODbL),way/1332811949
+osm:node/13420664001,청산캠핑장,riverside_camp,하천변 야영장,강원,127.892868,37.440605,일리천,local,58,,OpenStreetMap (ODbL),node/13420664001
+osm:node/368871105,청소년야영장,riverside_camp,하천변 야영장,강원,127.877968,37.99604,오항천,local,121,,OpenStreetMap (ODbL),node/368871105
+osm:node/7622877372,칠성야영장,riverside_camp,하천변 야영장,강원,127.115427,38.106092,아미천,local,47,,OpenStreetMap (ODbL),node/7622877372
+osm:way/1534526352,캠프에이프릴,riverside_camp,하천변 야영장,강원,128.395016,37.203708,평창강,national,39,,OpenStreetMap (ODbL),way/1534526352
+osm:way/1194650141,캠핑장,riverside_camp,하천변 야영장,강원,128.627139,37.360549,한강,local,43,,OpenStreetMap (ODbL),way/1194650141
+osm:way/1106526268,토토큰바위캠프,riverside_camp,하천변 야영장,강원,127.528029,37.96175,화악천,local,65,,OpenStreetMap (ODbL),way/1106526268
+osm:way/1228525070,통나무집캠핑장십이선녀탕계곡,riverside_camp,하천변 야영장,강원,128.302756,38.182994,북천,local,32,,OpenStreetMap (ODbL),way/1228525070
+osm:way/1356527054,평창국민여가캠핑장,riverside_camp,하천변 야영장,강원,128.385636,37.427585,계촌천,local,43,,OpenStreetMap (ODbL),way/1356527054
+osm:way/1565498853,포천 우리 글램핑,riverside_camp,하천변 야영장,강원,127.391674,38.088521,도평천,local,69,,OpenStreetMap (ODbL),way/1565498853
+osm:node/13013168944,포천 유리키즈 풀빌라,riverside_camp,하천변 야영장,강원,127.391706,38.088218,도평천,local,103,customers,OpenStreetMap (ODbL),node/13013168944
+osm:way/1565498844,포천계곡캠핑장,riverside_camp,하천변 야영장,강원,127.391517,38.090411,도평천,local,25,,OpenStreetMap (ODbL),way/1565498844
+osm:way/1112479696,하수남천 야영장(이름 없음),riverside_camp,하천변 야영장,강원,128.04554,37.407893,하수남천,local,61,,OpenStreetMap (ODbL),way/1112479696
+osm:node/13070751015,한강 야영장(이름 없음),riverside_camp,하천변 야영장,강원,127.698163,37.231798,한강,national,143,,OpenStreetMap (ODbL),node/13070751015
+osm:node/5729517424,홍천강 야영장(이름 없음),riverside_camp,하천변 야영장,강원,127.826712,37.712776,홍천강,national,83,,OpenStreetMap (ODbL),node/5729517424
+osm:way/1356573245,홍천강변캠핑장,riverside_camp,하천변 야영장,강원,127.71109,37.691068,홍천강,national,53,,OpenStreetMap (ODbL),way/1356573245
+osm:way/1187504142,홍천강오토캠핑장,riverside_camp,하천변 야영장,강원,127.787193,37.690337,홍천강,national,98,,OpenStreetMap (ODbL),way/1187504142
+osm:node/368871316,횡성학생야영장,riverside_camp,하천변 야영장,강원,127.850542,37.44605,이리천,local,173,,OpenStreetMap (ODbL),node/368871316
+osm:relation/14278339,사로 잠수교,low_bridge,세월교·잠수교,경기,127.149621,37.638189,왕숙천,local,0,,OpenStreetMap (ODbL),relation/14278339
+osm:way/605547002,세월교,low_bridge,세월교·잠수교,경기,127.489977,37.442389,세월천,local,0,,OpenStreetMap (ODbL),way/605547002
+osm:node/4102222295,KSTEC,riverside_camp,하천변 야영장,경기,127.1025,37.404319,금토천,local,50,,OpenStreetMap (ODbL),node/4102222295
+osm:way/488432307,Star camping,riverside_camp,하천변 야영장,경기,127.115631,37.95852,수동천,local,50,,OpenStreetMap (ODbL),way/488432307
+osm:node/6514332585,가정천 야영장(이름 없음),riverside_camp,하천변 야영장,경기,127.334688,37.54304,가정천,local,153,,OpenStreetMap (ODbL),node/6514332585
+osm:way/1566410267,가평은빛물결캠핑장,riverside_camp,하천변 야영장,경기,127.366283,37.802092,조종천,local,29,,OpenStreetMap (ODbL),way/1566410267
+osm:way/1271037128,가평천 야영장(이름 없음),riverside_camp,하천변 야영장,경기,127.538752,37.887741,가평천,local,61,,OpenStreetMap (ODbL),way/1271037128
+osm:way/1213208714,가평카라반캠핑농원,riverside_camp,하천변 야영장,경기,127.504136,37.838505,경반천,local,35,,OpenStreetMap (ODbL),way/1213208714
+osm:way/1271037130,가평화랑유원지캠핑장,riverside_camp,하천변 야영장,경기,127.5407,37.886344,가평천,local,19,,OpenStreetMap (ODbL),way/1271037130
+osm:way/1268305265,감성존글램핑캠핑장,riverside_camp,하천변 야영장,경기,127.242211,37.4741,엄미천,local,103,,OpenStreetMap (ODbL),way/1268305265
+osm:node/368871254,경기학생용인야영장,riverside_camp,하천변 야영장,경기,127.259911,37.289883,금어천,local,31,,OpenStreetMap (ODbL),node/368871254
+osm:way/228951568,경인아라뱃길 오토캠프장,riverside_camp,하천변 야영장,경기,126.761424,37.570854,아라천,national,132,,OpenStreetMap (ODbL),way/228951568
+osm:node/5570615622,광교오토캠핑장,riverside_camp,하천변 야영장,경기,127.065387,37.274272,여천,local,95,,OpenStreetMap (ODbL),node/5570615622
+osm:way/471377060,금은모래캠핑장,riverside_camp,하천변 야영장,경기,127.665788,37.293704,한강,national,60,,OpenStreetMap (ODbL),way/471377060
+osm:way/474325902,난지캠핑장,riverside_camp,하천변 야영장,경기,126.87225,37.569863,한강,national,0,,OpenStreetMap (ODbL),way/474325902
+osm:way/1549248886,남이섬마리나카라반,riverside_camp,하천변 야영장,경기,127.533057,37.839733,북한강,national,43,,OpenStreetMap (ODbL),way/1549248886
+osm:node/6773221138,더드림핑 글램핑,riverside_camp,하천변 야영장,경기,127.370295,37.652522,북한강,national,51,,OpenStreetMap (ODbL),node/6773221138
+osm:way/1565498774,도리돌캠핑장,riverside_camp,하천변 야영장,경기,127.386998,38.061152,영평천,local,26,,OpenStreetMap (ODbL),way/1565498774
+osm:way/1137615483,따봉캠핑장,riverside_camp,하천변 야영장,경기,126.790306,37.852143,동문천,local,18,,OpenStreetMap (ODbL),way/1137615483
+osm:node/5292924221,땅에미소캠핑장,riverside_camp,하천변 야영장,경기,127.087154,38.056924,한탄강,local,160,,OpenStreetMap (ODbL),node/5292924221
+osm:node/12714908509,뚜뚜키즈 풀빌라 & 글램핑,riverside_camp,하천변 야영장,경기,127.457101,37.818972,달전천,local,37,customers,OpenStreetMap (ODbL),node/12714908509
+osm:way/1493278840,로코코캠핑장,riverside_camp,하천변 야영장,경기,127.299993,37.714578,지둔천,local,46,,OpenStreetMap (ODbL),way/1493278840
+osm:way/1549248899,망고땡글램핑,riverside_camp,하천변 야영장,경기,127.528024,37.831406,북한강,national,59,,OpenStreetMap (ODbL),way/1549248899
+osm:way/1234109622,매송 캠핑장,riverside_camp,하천변 야영장,경기,126.916102,37.257908,어천,local,30,,OpenStreetMap (ODbL),way/1234109622
+osm:way/1534148227,문앤스타캠핑장,riverside_camp,하천변 야영장,경기,127.617437,37.542615,중원천,local,40,,OpenStreetMap (ODbL),way/1534148227
+osm:way/1199796921,미르힐자연캠핑장,riverside_camp,하천변 야영장,경기,127.26575,37.315921,상미천,local,168,,OpenStreetMap (ODbL),way/1199796921
+osm:way/1565498661,백운계곡글램핑,riverside_camp,하천변 야영장,경기,127.384541,38.051712,영평천,local,40,,OpenStreetMap (ODbL),way/1565498661
+osm:node/3042640239,병목안캠핑장,riverside_camp,하천변 야영장,경기,126.910332,37.382568,수암천,local,156,,OpenStreetMap (ODbL),node/3042640239
+osm:node/12703828206,보얀트캠핑,riverside_camp,하천변 야영장,경기,127.40488,37.75377,조종천,local,41,,OpenStreetMap (ODbL),node/12703828206
+osm:way/976970945,북한산캠핑장,riverside_camp,하천변 야영장,경기,126.938005,37.650475,창릉천,local,162,,OpenStreetMap (ODbL),way/976970945
+osm:way/1182174852,산정호수가족글램핑장,riverside_camp,하천변 야영장,경기,127.316984,38.066315,부소천,local,46,,OpenStreetMap (ODbL),way/1182174852
+osm:way/889215794,수도권매립지 캠핑장,riverside_camp,하천변 야영장,경기,126.658726,37.570105,아라천,national,145,customers,OpenStreetMap (ODbL),way/889215794
+osm:way/1495799422,아람말캠핑장,riverside_camp,하천변 야영장,경기,127.565165,37.432828,향리천,local,42,,OpenStreetMap (ODbL),way/1495799422
+osm:node/7176618390,알멕스랜드,riverside_camp,하천변 야영장,경기,127.006729,38.072953,임진강,national,155,,OpenStreetMap (ODbL),node/7176618390
+osm:node/5624540922,애령유원지,riverside_camp,하천변 야영장,경기,126.853306,37.828223,삼방천,local,28,,OpenStreetMap (ODbL),node/5624540922
+osm:way/999517643,양평오커빌리지,riverside_camp,하천변 야영장,경기,127.563732,37.509148,연수천,local,159,,OpenStreetMap (ODbL),way/999517643
+osm:node/9682573593,연지곤지 팜 캠핑장,riverside_camp,하천변 야영장,경기,127.16964,37.767318,봉선사천,local,99,,OpenStreetMap (ODbL),node/9682573593
+osm:node/4866121321,올덴 캠핑장,riverside_camp,하천변 야영장,경기,127.516997,37.702311,북한강,national,35,,OpenStreetMap (ODbL),node/4866121321
+osm:node/6773386783,와이캠핑장,riverside_camp,하천변 야영장,경기,127.424541,37.732301,조종천,local,76,,OpenStreetMap (ODbL),node/6773386783
+osm:way/1213206668,용추파크캠핑장,riverside_camp,하천변 야영장,경기,127.486731,37.845021,승안천,local,22,,OpenStreetMap (ODbL),way/1213206668
+osm:node/7622877371,우리야영장,riverside_camp,하천변 야영장,경기,127.114796,38.104917,아미천,local,33,,OpenStreetMap (ODbL),node/7622877371
+osm:way/1565452562,운악산진우네캠핑장,riverside_camp,하천변 야영장,경기,127.303485,37.887435,운악천,local,168,,OpenStreetMap (ODbL),way/1565452562
+osm:way/583619674,이포보 오토캠핑장,riverside_camp,하천변 야영장,경기,127.548729,37.386961,곡수천,local,195,,OpenStreetMap (ODbL),way/583619674
+osm:way/583842406,이포보 웰빙 캠핑장,riverside_camp,하천변 야영장,경기,127.547463,37.392893,한강,national,0,yes,OpenStreetMap (ODbL),way/583842406
+osm:way/1068258063,임송캠프장,riverside_camp,하천변 야영장,경기,127.158144,37.67257,왕숙천,local,37,,OpenStreetMap (ODbL),way/1068258063
+osm:way/1083996724,자동차야영장,riverside_camp,하천변 야영장,경기,127.058129,38.008711,한탄강,local,49,,OpenStreetMap (ODbL),way/1083996724
+osm:node/11961802083,자라섬오토캠핑장,riverside_camp,하천변 야영장,경기,127.5206,37.819497,북한강,national,109,,OpenStreetMap (ODbL),node/11961802083
+osm:node/368942858,자라섬캠핑장,riverside_camp,하천변 야영장,경기,127.520877,37.818413,북한강,national,49,,OpenStreetMap (ODbL),node/368942858
+osm:way/427074747,장현천 야영장(이름 없음),riverside_camp,하천변 야영장,경기,126.804487,37.381036,장현천,local,84,,OpenStreetMap (ODbL),way/427074747
+osm:way/1549248894,제이와이카라반캠핑장,riverside_camp,하천변 야영장,경기,127.508521,37.847444,가평천,local,44,,OpenStreetMap (ODbL),way/1549248894
+osm:way/842337409,진위천유원지 캠핑장,riverside_camp,하천변 야영장,경기,127.080557,37.098692,진위천,local,28,,OpenStreetMap (ODbL),way/842337409
+osm:node/11961805263,카라반사이트 B,riverside_camp,하천변 야영장,경기,127.523088,37.816518,북한강,national,0,,OpenStreetMap (ODbL),node/11961805263
+osm:way/1083996719,캐라반A1,riverside_camp,하천변 야영장,경기,127.061235,38.006801,한탄강,local,48,,OpenStreetMap (ODbL),way/1083996719
+osm:way/1083996720,캐라반A2,riverside_camp,하천변 야영장,경기,127.062131,38.006552,한탄강,local,31,,OpenStreetMap (ODbL),way/1083996720
+osm:way/1083996722,캐라반B,riverside_camp,하천변 야영장,경기,127.063722,38.006416,한탄강,local,31,,OpenStreetMap (ODbL),way/1083996722
+osm:way/1495749012,캠핑풍경마을3차,riverside_camp,하천변 야영장,경기,127.078109,38.05139,한탄강,local,83,,OpenStreetMap (ODbL),way/1495749012
+osm:way/1549248887,텐파크캠핑상,riverside_camp,하천변 야영장,경기,127.528995,37.833506,북한강,national,66,,OpenStreetMap (ODbL),way/1549248887
+osm:way/1565452561,포애뜰캠핑장,riverside_camp,하천변 야영장,경기,127.303812,37.888023,운악천,local,198,,OpenStreetMap (ODbL),way/1565452561
+osm:way/1271037114,플로렌스글램핑,riverside_camp,하천변 야영장,경기,127.551377,37.893096,화악천,local,87,,OpenStreetMap (ODbL),way/1271037114
+osm:node/4373194990,한강 야영장(이름 없음),riverside_camp,하천변 야영장,경기,127.6146,37.328533,한강,national,162,,OpenStreetMap (ODbL),node/4373194990
+osm:way/1083191825,한탄강관광지오토캠핑장,riverside_camp,하천변 야영장,경기,127.060829,38.008034,한탄강,local,139,,OpenStreetMap (ODbL),way/1083191825
+osm:way/1566410331,헬로우필 연인산캠핑장,riverside_camp,하천변 야영장,경기,127.372176,37.842447,마일천,local,57,,OpenStreetMap (ODbL),way/1566410331
+osm:way/1289236568,휴오토캠핑장,riverside_camp,하천변 야영장,경기,127.394112,37.774269,조종천,local,15,,OpenStreetMap (ODbL),way/1289236568
+osm:node/6817718187,가음정천 야영장(이름 없음),riverside_camp,하천변 야영장,경남,128.692226,35.205502,가음정천,local,9,,OpenStreetMap (ODbL),node/6817718187
+osm:way/1388908395,가화천 야영장(이름 없음),riverside_camp,하천변 야영장,경남,128.022536,35.128772,가화천,national,165,,OpenStreetMap (ODbL),way/1388908395
+osm:way/1281076615,거장산오토캠핑장,riverside_camp,하천변 야영장,경남,128.261806,35.436446,유곡천,local,48,,OpenStreetMap (ODbL),way/1281076615
+osm:node/10845631105,낙동강 야영장(이름 없음),riverside_camp,하천변 야영장,경남,128.645711,35.370887,낙동강,national,51,,OpenStreetMap (ODbL),node/10845631105
+osm:node/6525794299,낙동강 야영장(이름 없음),riverside_camp,하천변 야영장,경남,128.348263,35.556748,낙동강,national,63,,OpenStreetMap (ODbL),node/6525794299
+osm:node/4862727421,낙동강 야영장(이름 없음),riverside_camp,하천변 야영장,경남,128.756171,35.350868,낙동강,national,80,,OpenStreetMap (ODbL),node/4862727421
+osm:node/6531356585,낙동강 야영장(이름 없음),riverside_camp,하천변 야영장,경남,128.715697,35.359809,낙동강,national,92,,OpenStreetMap (ODbL),node/6531356585
+osm:node/5847433092,낙동강 야영장(이름 없음),riverside_camp,하천변 야영장,경남,128.506957,35.392376,낙동강,national,167,,OpenStreetMap (ODbL),node/5847433092
+osm:node/5250336427,낙원농원,riverside_camp,하천변 야영장,경남,129.126813,35.336381,수영강,national,136,,OpenStreetMap (ODbL),node/5250336427
+osm:node/11671456070,농장,riverside_camp,하천변 야영장,경남,128.124824,35.05821,대곡천,local,18,,OpenStreetMap (ODbL),node/11671456070
+osm:way/1115723327,대장경오토캠핑장,riverside_camp,하천변 야영장,경남,128.131992,35.766715,가야천,local,93,,OpenStreetMap (ODbL),way/1115723327
+osm:way/1158442192,럭셔리글램핑W,riverside_camp,하천변 야영장,경남,127.886711,35.393045,남강,national,165,,OpenStreetMap (ODbL),way/1158442192
+osm:way/1418198663,무림천 야영장(이름 없음),riverside_camp,하천변 야영장,경남,127.956478,34.804091,무림천,local,88,,OpenStreetMap (ODbL),way/1418198663
+osm:way/1554440170,밀양표충오토캠핑장,riverside_camp,하천변 야영장,경남,128.927566,35.52331,시전천,local,37,,OpenStreetMap (ODbL),way/1554440170
+osm:way/1430122186,배내골판타스밸리오토캠핑장,riverside_camp,하천변 야영장,경남,128.976544,35.467837,단장천,local,101,,OpenStreetMap (ODbL),way/1430122186
+osm:way/1187118570,산청백운계곡캠핑장,riverside_camp,하천변 야영장,경남,127.887193,35.294971,백운천,local,38,,OpenStreetMap (ODbL),way/1187118570
+osm:way/1539369866,산청펫글램핑,riverside_camp,하천변 야영장,경남,127.777982,35.438689,오봉천,local,119,,OpenStreetMap (ODbL),way/1539369866
+osm:node/5677834925,삼락공원 오토캠핑장,riverside_camp,하천변 야영장,경남,128.96982,35.166251,낙동강,national,0,,OpenStreetMap (ODbL),node/5677834925
+osm:way/1100996440,소리길오토캠핑장,riverside_camp,하천변 야영장,경남,128.127049,35.774665,가야천,local,58,,OpenStreetMap (ODbL),way/1100996440
+osm:node/1004979007,소막골야영장 (Somakgoll Camping Site),riverside_camp,하천변 야영장,경남,127.815881,35.35074,덕천강,local,15,,OpenStreetMap (ODbL),node/1004979007
+osm:way/1460436386,엠와이힐링캠핑장,riverside_camp,하천변 야영장,경남,128.804263,35.489174,덕성천,local,71,,OpenStreetMap (ODbL),way/1460436386
+osm:way/1281053898,영오반딧불이캠핑장,riverside_camp,하천변 야영장,경남,128.249036,35.115246,개천천,local,192,,OpenStreetMap (ODbL),way/1281053898
+osm:way/1320226478,오토캠핑장,riverside_camp,하천변 야영장,경남,127.828108,35.766287,거창위천,local,31,,OpenStreetMap (ODbL),way/1320226478
+osm:way/1426938423,용추밸리팸프펜션,riverside_camp,하천변 야영장,경남,127.7844,35.67239,지우천,local,36,,OpenStreetMap (ODbL),way/1426938423
+osm:node/11918744477,용추솔밭관광농원글램핑펜션캠핑장,riverside_camp,하천변 야영장,경남,127.775335,35.675541,지우천,local,175,,OpenStreetMap (ODbL),node/11918744477
+osm:way/1156847659,운곡관광농원 오토캠핑장,riverside_camp,하천변 야영장,경남,127.90346,35.314469,남사천,local,130,,OpenStreetMap (ODbL),way/1156847659
+osm:way/1336762142,유곡천 야영장(이름 없음),riverside_camp,하천변 야영장,경남,128.351014,35.443751,유곡천,local,19,,OpenStreetMap (ODbL),way/1336762142
+osm:way/1554440167,은하수관광농원,riverside_camp,하천변 야영장,경남,128.932218,35.524193,시전천,local,54,,OpenStreetMap (ODbL),way/1554440167
+osm:way/1164333157,지리산365오토캠핑펜션,riverside_camp,하천변 야영장,경남,127.759023,35.288607,시천천,local,51,,OpenStreetMap (ODbL),way/1164333157
+osm:way/1065009531,지리산국립공원 내원사 자동차 야영장,riverside_camp,하천변 야영장,경남,127.812739,35.296802,삼장천,local,31,,OpenStreetMap (ODbL),way/1065009531
+osm:node/8733629820,지리산백무동야영장 Jirisan Baengmudong Camp Site,riverside_camp,하천변 야영장,경남,127.679499,35.357794,강청천,local,65,yes,OpenStreetMap (ODbL),node/8733629820
+osm:way/1225589904,창원휴양림오토캠핑장,riverside_camp,하천변 야영장,경남,128.57126,35.110844,석곡천,local,156,,OpenStreetMap (ODbL),way/1225589904
+osm:way/1242754225,천태산오토팸핑장,riverside_camp,하천변 야영장,경남,128.927496,35.431956,원동천,local,20,,OpenStreetMap (ODbL),way/1242754225
+osm:way/1181512096,칠선계곡글램핑,riverside_camp,하천변 야영장,경남,127.697692,35.390138,의탄천,local,97,,OpenStreetMap (ODbL),way/1181512096
+osm:node/4890761821,하동다목적 캠핑장,riverside_camp,하천변 야영장,경남,127.890093,35.245163,덕천강,local,20,,OpenStreetMap (ODbL),node/4890761821
+osm:node/4420359492,함안군 강나루 오토캠핑장,riverside_camp,하천변 야영장,경남,128.510556,35.392595,낙동강,national,142,,OpenStreetMap (ODbL),node/4420359492
+osm:way/1284739109,함양용추오토캠핑장,riverside_camp,하천변 야영장,경남,127.772464,35.675008,지우천,local,31,,OpenStreetMap (ODbL),way/1284739109
+osm:way/1318023801,합천해피캠핑장,riverside_camp,하천변 야영장,경남,128.000333,35.534172,황강,national,118,,OpenStreetMap (ODbL),way/1318023801
+osm:way/1318527869,합천호코지캠핑장,riverside_camp,하천변 야영장,경남,128.038543,35.525828,금성천,local,74,,OpenStreetMap (ODbL),way/1318527869
+osm:way/1360811808,해달별캠핑장,riverside_camp,하천변 야영장,경남,127.786017,35.030126,횡천강,local,30,,OpenStreetMap (ODbL),way/1360811808
+osm:way/1350276863,화명오토캠핑장,riverside_camp,하천변 야영장,경남,128.999604,35.217226,낙동강,national,0,,OpenStreetMap (ODbL),way/1350276863
+osm:node/7234521285,Kor551,riverside_camp,하천변 야영장,경북,128.148696,36.327672,청하천,local,35,,OpenStreetMap (ODbL),node/7234521285
+osm:node/6866858185,Park,riverside_camp,하천변 야영장,경북,128.022449,36.124362,백운천,local,65,,OpenStreetMap (ODbL),node/6866858185
+osm:node/6866857785,Xazaystvini bozorcha,riverside_camp,하천변 야영장,경북,128.128696,36.119555,감천,national,115,,OpenStreetMap (ODbL),node/6866857785
+osm:node/4974847621,public campground,riverside_camp,하천변 야영장,경북,129.419672,36.570571,각리천,local,29,,OpenStreetMap (ODbL),node/4974847621
+osm:node/4972069622,각리천 야영장(이름 없음),riverside_camp,하천변 야영장,경북,129.422527,36.567563,각리천,local,47,,OpenStreetMap (ODbL),node/4972069622
+osm:way/1158923503,감꽃마을서울캠핑장,riverside_camp,하천변 야영장,경북,128.213338,36.330006,장천,local,75,,OpenStreetMap (ODbL),way/1158923503
+osm:node/4971380521,곡강천 야영장(이름 없음),riverside_camp,하천변 야영장,경북,129.349056,36.122925,곡강천,local,0,,OpenStreetMap (ODbL),node/4971380521
+osm:node/11055972200,구름아래오토캠핑장,riverside_camp,하천변 야영장,경북,129.002531,35.662876,신원천,local,35,,OpenStreetMap (ODbL),node/11055972200
+osm:node/5417710981,구지오토캠핑장,riverside_camp,하천변 야영장,경북,128.373121,35.670675,낙동강,national,49,,OpenStreetMap (ODbL),node/5417710981
+osm:way/1265830631,꿈애오토캠핑장,riverside_camp,하천변 야영장,경북,128.454055,35.99838,동정천,local,125,,OpenStreetMap (ODbL),way/1265830631
+osm:node/6522433785,낙동강 야영장(이름 없음),riverside_camp,하천변 야영장,경북,128.393557,35.982057,낙동강,national,43,,OpenStreetMap (ODbL),node/6522433785
+osm:node/5872666487,낙동강 야영장(이름 없음),riverside_camp,하천변 야영장,경북,128.365288,35.703753,낙동강,national,44,,OpenStreetMap (ODbL),node/5872666487
+osm:node/5872666488,낙동강 야영장(이름 없음),riverside_camp,하천변 야영장,경북,128.376652,35.699407,낙동강,national,96,,OpenStreetMap (ODbL),node/5872666488
+osm:node/4379852589,낙동강 야영장(이름 없음),riverside_camp,하천변 야영장,경북,128.251829,36.45563,낙동강,national,133,,OpenStreetMap (ODbL),node/4379852589
+osm:way/1454296607,단호샌드파크자동차야영장,riverside_camp,하천변 야영장,경북,128.630302,36.55563,낙동강,national,61,,OpenStreetMap (ODbL),way/1454296607
+osm:node/1307394276,대구대비호동산 야영장,riverside_camp,하천변 야영장,경북,128.847298,35.906056,대창천,local,147,,OpenStreetMap (ODbL),node/1307394276
+osm:way/759780084,동창천 야영장(이름 없음),riverside_camp,하천변 야영장,경북,128.899808,35.685652,동창천,local,0,,OpenStreetMap (ODbL),way/759780084
+osm:way/727003891,무지개오토캠핑장,riverside_camp,하천변 야영장,경북,128.120674,35.924609,대가천,local,0,,OpenStreetMap (ODbL),way/727003891
+osm:way/1367272292,무흘구곡펜션캠핑장,riverside_camp,하천변 야영장,경북,128.076395,35.917619,대가천,local,18,,OpenStreetMap (ODbL),way/1367272292
+osm:way/1189876628,문경오토캠핑장,riverside_camp,하천변 야영장,경북,128.122972,36.660172,영강,local,52,,OpenStreetMap (ODbL),way/1189876628
+osm:node/368871203,문경학생야영장,riverside_camp,하천변 야영장,경북,128.303838,36.722188,금천,local,73,,OpenStreetMap (ODbL),node/368871203
+osm:node/11056002610,물레방아집오토캠핑장,riverside_camp,하천변 야영장,경북,129.001504,35.664794,신원천,local,33,,OpenStreetMap (ODbL),node/11056002610
+osm:node/11056002618,배너미오토캠핑장,riverside_camp,하천변 야영장,경북,129.002623,35.665866,신원천,local,65,,OpenStreetMap (ODbL),node/11056002618
+osm:way/727004924,별고을 오토캠핑장,riverside_camp,하천변 야영장,경북,128.104598,35.927401,대가천,local,37,,OpenStreetMap (ODbL),way/727004924
+osm:way/471914365,봉화삼계쉼터,riverside_camp,하천변 야영장,경북,128.738709,36.894924,내성천,local,32,,OpenStreetMap (ODbL),way/471914365
+osm:way/1544984878,비타민팜오토캠핑장,riverside_camp,하천변 야영장,경북,128.977271,35.579898,동천,local,55,,OpenStreetMap (ODbL),way/1544984878
+osm:way/281244182,빙계계곡오토캠핑장,riverside_camp,하천변 야영장,경북,128.759006,36.229243,쌍계천,local,8,,OpenStreetMap (ODbL),way/281244182
+osm:way/1544984880,사과향기캠핑장,riverside_camp,하천변 야영장,경북,128.980278,35.578931,동천,local,24,,OpenStreetMap (ODbL),way/1544984880
+osm:way/731744171,산내들오토캠핑장,riverside_camp,하천변 야영장,경북,128.010138,35.97808,부항천,local,51,,OpenStreetMap (ODbL),way/731744171
+osm:way/1252160573,산장팬편캠프,riverside_camp,하천변 야영장,경북,129.069184,35.720978,동창천,local,14,,OpenStreetMap (ODbL),way/1252160573
+osm:way/1349509429,삼강나루캠핑장,riverside_camp,하천변 야영장,경북,128.301946,36.564163,낙동강,national,56,,OpenStreetMap (ODbL),way/1349509429
+osm:way/1157557188,상비오토캠핑,riverside_camp,하천변 야영장,경북,128.174564,35.79933,소가천,local,18,,OpenStreetMap (ODbL),way/1157557188
+osm:way/281243182,상의야영장,riverside_camp,하천변 야영장,경북,129.142159,36.392983,주방천,local,55,,OpenStreetMap (ODbL),way/281243182
+osm:way/1410856950,세모풀빌라글램핑,riverside_camp,하천변 야영장,경북,129.058766,35.707028,범곡천,local,24,,OpenStreetMap (ODbL),way/1410856950
+osm:way/1432689658,소백산캠핑장,riverside_camp,하천변 야영장,경북,128.61526,36.950791,사천,local,13,,OpenStreetMap (ODbL),way/1432689658
+osm:node/5078023413,소야 솔밭캠프장,riverside_camp,하천변 야영장,경북,128.117723,36.691152,조령천,local,11,,OpenStreetMap (ODbL),node/5078023413
+osm:node/368621227,쌍룡계곡 Ssangnyong Valley,riverside_camp,하천변 야영장,경북,127.965417,36.561754,영강,local,89,,OpenStreetMap (ODbL),node/368621227
+osm:node/10882876490,아이비캠프오토캠핑장,riverside_camp,하천변 야영장,경북,128.923423,35.606873,동천,local,18,,OpenStreetMap (ODbL),node/10882876490
+osm:way/1544984879,얼음골까투리펜션&캠핑장,riverside_camp,하천변 야영장,경북,128.979043,35.579565,동천,local,23,,OpenStreetMap (ODbL),way/1544984879
+osm:node/368871371,얼음골옥샘청소년야영장,riverside_camp,하천변 야영장,경북,128.970722,35.581598,동천,local,42,,OpenStreetMap (ODbL),node/368871371
+osm:node/6062360588,영강 야영장(이름 없음),riverside_camp,하천변 야영장,경북,128.215751,36.554324,영강,local,33,,OpenStreetMap (ODbL),node/6062360588
+osm:way/1268081132,영강 야영장(이름 없음),riverside_camp,하천변 야영장,경북,127.974898,36.570983,영강,local,40,,OpenStreetMap (ODbL),way/1268081132
+osm:node/368871189,영덕학생야영장,riverside_camp,하천변 야영장,경북,129.341681,36.585873,송천,local,77,,OpenStreetMap (ODbL),node/368871189
+osm:way/1272671570,영양수비별빛캠핑장,riverside_camp,하천변 야영장,경북,129.26477,36.79117,본돈천,local,40,,OpenStreetMap (ODbL),way/1272671570
+osm:way/1422813401,우니메이카,riverside_camp,하천변 야영장,경북,128.676321,36.520646,미천,local,41,,OpenStreetMap (ODbL),way/1422813401
+osm:way/1501368226,운문 사계절 카라반펜션오토캠핑장,riverside_camp,하천변 야영장,경북,128.972129,35.694578,운문천,local,43,,OpenStreetMap (ODbL),way/1501368226
+osm:way/759780121,운문천 야영장(이름 없음),riverside_camp,하천변 야영장,경북,128.955482,35.675118,운문천,local,22,,OpenStreetMap (ODbL),way/759780121
+osm:node/368871221,의성학생야영장,riverside_camp,하천변 야영장,경북,128.386422,36.472446,봉정천,local,78,,OpenStreetMap (ODbL),node/368871221
+osm:way/1362768482,중평솔밭캠핑장,riverside_camp,하천변 야영장,경북,129.033372,36.455807,용전천,local,39,,OpenStreetMap (ODbL),way/1362768482
+osm:way/1474569922,증산수도계곡 캠핑장,riverside_camp,하천변 야영장,경북,128.021445,35.898569,옥동천,local,24,,OpenStreetMap (ODbL),way/1474569922
+osm:way/1190737984,참나무숲글램핑펜션캠핑장,riverside_camp,하천변 야영장,경북,129.00352,35.661907,신원천,local,21,,OpenStreetMap (ODbL),way/1190737984
+osm:way/1258089162,청송오토캠핑장,riverside_camp,하천변 야영장,경북,129.156814,36.292681,노부천,local,92,,OpenStreetMap (ODbL),way/1258089162
+osm:way/1442061134,치산관광지캠핑장,riverside_camp,하천변 야영장,경북,128.713582,36.048251,신령천,local,38,,OpenStreetMap (ODbL),way/1442061134
+osm:way/1340176662,카카오캠핑장,riverside_camp,하천변 야영장,경북,128.927213,36.695246,동계천,local,86,,OpenStreetMap (ODbL),way/1340176662
+osm:way/1104205113,캠프원 오토캠핑장,riverside_camp,하천변 야영장,경북,128.850956,35.635277,동창천,local,73,,OpenStreetMap (ODbL),way/1104205113
+osm:way/1179643767,힐링캠프캠핑장,riverside_camp,하천변 야영장,경북,128.870992,35.600795,봉의천,local,34,,OpenStreetMap (ODbL),way/1179643767
+osm:node/5378087421,학림천 야영장(이름 없음),riverside_camp,하천변 야영장,광주,126.868599,35.237173,학림천,local,78,,OpenStreetMap (ODbL),node/5378087421
+osm:way/1027295820,모터캠핑장,riverside_camp,하천변 야영장,대구,128.61177,35.918815,금호강,national,46,,OpenStreetMap (ODbL),way/1027295820
+osm:way/1027295831,캠핑장,riverside_camp,하천변 야영장,대구,128.625938,35.899744,금호강,national,83,,OpenStreetMap (ODbL),way/1027295831
+osm:node/4634326706,스톤 계단,riverside_camp,하천변 야영장,부산,128.977996,35.136503,학장천,local,171,,OpenStreetMap (ODbL),node/4634326706
+osm:way/596516315,잠수교,low_bridge,세월교·잠수교,서울,126.996307,37.514935,한강,national,0,,OpenStreetMap (ODbL),way/596516315
+osm:way/922329541,안양천 야영장(이름 없음),riverside_camp,하천변 야영장,서울,126.872838,37.504646,안양천,national,0,,OpenStreetMap (ODbL),way/922329541
+osm:way/375713470,양재천 야영장(이름 없음),riverside_camp,하천변 야영장,서울,127.034663,37.472245,양재천,local,69,,OpenStreetMap (ODbL),way/375713470
+osm:way/1554026530,세종합강캠핑장,riverside_camp,하천변 야영장,세종,127.337229,36.516434,금강,national,153,,OpenStreetMap (ODbL),way/1554026530
+osm:way/1355955942,정안글램핑,riverside_camp,하천변 야영장,세종,127.123199,36.610867,정안천,local,54,,OpenStreetMap (ODbL),way/1355955942
+osm:way/283069383,진하천 야영장(이름 없음),riverside_camp,하천변 야영장,울산,129.344297,35.379993,진하천,local,124,,OpenStreetMap (ODbL),way/283069383
+osm:way/1297355474,행복카라반,riverside_camp,하천변 야영장,울산,129.452222,35.578832,금천,local,52,,OpenStreetMap (ODbL),way/1297355474
+osm:way/472865364,인천대공원 너나들이 캠핑장,riverside_camp,하천변 야영장,인천,126.75024,37.455095,장수천,local,46,,OpenStreetMap (ODbL),way/472865364
+osm:node/9115635566,Amnok,riverside_camp,하천변 야영장,전남,127.377149,35.192763,섬진강,national,0,,OpenStreetMap (ODbL),node/9115635566
+osm:way/1250192084,가인야영장,riverside_camp,하천변 야영장,전남,126.881047,35.433165,약수천,local,49,,OpenStreetMap (ODbL),way/1250192084
+osm:node/368871297,곡성군청소년야영장,riverside_camp,하천변 야영장,전남,127.369942,35.227515,섬진강,national,64,,OpenStreetMap (ODbL),node/368871297
+osm:node/13815119235,낭만글램핑,riverside_camp,하천변 야영장,전남,126.819392,35.167637,풍영정천,local,62,,OpenStreetMap (ODbL),node/13815119235
+osm:way/1533774420,달빛계곡캠핑장,riverside_camp,하천변 야영장,전남,126.866363,34.829865,봉덕천,local,196,,OpenStreetMap (ODbL),way/1533774420
+osm:way/1183365793,대덕힐링캠핑장,riverside_camp,하천변 야영장,전남,126.450761,35.350464,와탄천,local,162,,OpenStreetMap (ODbL),way/1183365793
+osm:way/1185408891,메타파크카라반 캠핑장,riverside_camp,하천변 야영장,전남,127.02182,35.370533,영산강,local,91,,OpenStreetMap (ODbL),way/1185408891
+osm:way/1153693231,무등산국립공원 도원야영장,riverside_camp,하천변 야영장,전남,127.026466,35.111223,장복천,local,7,,OpenStreetMap (ODbL),way/1153693231
+osm:node/368871088,백운학생야영장,riverside_camp,하천변 야영장,전남,127.60007,35.086032,광양동천,local,27,,OpenStreetMap (ODbL),node/368871088
+osm:node/12129045770,섬진강 야영장(이름 없음),riverside_camp,하천변 야영장,전남,127.782733,34.992101,섬진강,national,0,,OpenStreetMap (ODbL),node/12129045770
+osm:node/1002896064,야영장 (Camping Site),riverside_camp,하천변 야영장,전남,127.490363,35.244092,마산천,local,9,,OpenStreetMap (ODbL),node/1002896064
+osm:node/7457280188,양자캠프,riverside_camp,하천변 야영장,전남,127.476375,34.950258,옥천,local,0,,OpenStreetMap (ODbL),node/7457280188
+osm:node/5563941026,영산강 야영장(이름 없음),riverside_camp,하천변 야영장,전남,126.891215,35.250451,영산강,national,29,,OpenStreetMap (ODbL),node/5563941026
+osm:node/5582242221,영산강 야영장(이름 없음),riverside_camp,하천변 야영장,전남,127.018012,35.370968,영산강,local,29,,OpenStreetMap (ODbL),node/5582242221
+osm:way/1303045473,오토캠핑리조트,riverside_camp,하천변 야영장,전남,127.266207,35.261646,월봉천,local,50,,OpenStreetMap (ODbL),way/1303045473
+osm:way/1021019722,지리산호수공원오토캠핑장,riverside_camp,하천변 야영장,전남,127.419257,35.279843,서시천,local,81,,OpenStreetMap (ODbL),way/1021019722
+osm:node/368621396,피아골계곡 Piagol Valley,riverside_camp,하천변 야영장,전남,127.583462,35.261593,내서천,local,0,,OpenStreetMap (ODbL),node/368621396
+osm:node/368871100,피아골솔밭야영장 Piagolsolbat Camping Site,riverside_camp,하천변 야영장,전남,127.589242,35.238455,내서천,local,1,,OpenStreetMap (ODbL),node/368871100
+osm:way/1198569535,피아골오토캠핑장,riverside_camp,하천변 야영장,전남,127.58939,35.228105,내서천,local,50,,OpenStreetMap (ODbL),way/1198569535
+osm:node/8948425006,하조오토캠핑장,riverside_camp,하천변 야영장,전남,127.562622,35.076317,광양서천,local,66,,OpenStreetMap (ODbL),node/8948425006
+osm:way/1569575480,화순스케치캠핑장,riverside_camp,하천변 야영장,전남,127.019116,35.084136,동천,local,37,,OpenStreetMap (ODbL),way/1569575480
+osm:way/1171741868,경천자연쉼터캠핑장,riverside_camp,하천변 야영장,전북,127.238166,36.031845,고산천,local,111,,OpenStreetMap (ODbL),way/1171741868
+osm:way/1194882372,금강 야영장(이름 없음),riverside_camp,하천변 야영장,전북,126.877562,36.067431,금강,national,15,,OpenStreetMap (ODbL),way/1194882372
+osm:way/813383820,금산천 야영장(이름 없음),riverside_camp,하천변 야영장,전북,127.043918,35.716381,금산천,local,188,,OpenStreetMap (ODbL),way/813383820
+osm:way/1250704414,내장야영장,riverside_camp,하천변 야영장,전북,126.917629,35.498193,정읍천,local,50,,OpenStreetMap (ODbL),way/1250704414
+osm:node/1047428342,달궁야영장 Dalgung Camp Site,riverside_camp,하천변 야영장,전북,127.555412,35.35181,만수천,local,15,,OpenStreetMap (ODbL),node/1047428342
+osm:way/376901820,달궁자동차야영장,riverside_camp,하천변 야영장,전북,127.557805,35.354585,만수천,local,57,,OpenStreetMap (ODbL),way/376901820
+osm:way/1181282923,덕동오토캠핑장,riverside_camp,하천변 야영장,전북,127.568008,35.365119,만수천,local,49,,OpenStreetMap (ODbL),way/1181282923
+osm:node/10828308231,덕유대오토캠핑장,riverside_camp,하천변 야영장,전북,127.777019,35.89216,구천동천,local,54,,OpenStreetMap (ODbL),node/10828308231
+osm:way/1453458971,람천 야영장(이름 없음),riverside_camp,하천변 야영장,전북,127.643913,35.412169,람천,local,35,,OpenStreetMap (ODbL),way/1453458971
+osm:way/1564298892,마이산풍혈냉천캠핑장,riverside_camp,하천변 야영장,전북,127.302605,35.721431,섬진강,local,177,,OpenStreetMap (ODbL),way/1564298892
+osm:way/1195513666,무궁화오토캠핑장,riverside_camp,하천변 야영장,전북,127.233199,35.974185,시랑천,local,21,,OpenStreetMap (ODbL),way/1195513666
+osm:way/1266353328,무주솔밭야영장,riverside_camp,하천변 야영장,전북,127.672308,35.836207,명천,local,97,,OpenStreetMap (ODbL),way/1266353328
+osm:way/1337324392,무주수목원캠핑장,riverside_camp,하천변 야영장,전북,127.760778,35.908637,원당천,local,44,,OpenStreetMap (ODbL),way/1337324392
+osm:way/1181282922,뱀사골자동차야영장,riverside_camp,하천변 야영장,전북,127.576071,35.37053,만수천,local,42,,OpenStreetMap (ODbL),way/1181282922
+osm:way/1429875563,산중계곡캠핑장,riverside_camp,하천변 야영장,전북,127.805237,35.829909,소정천,local,7,,OpenStreetMap (ODbL),way/1429875563
+osm:way/1337627859,석포야영장,riverside_camp,하천변 야영장,전북,126.582092,35.601864,백천,local,122,,OpenStreetMap (ODbL),way/1337627859
+osm:way/1218657978,성수산자연휴양림,riverside_camp,하천변 야영장,전북,127.405588,35.638375,둔남천,local,27,,OpenStreetMap (ODbL),way/1218657978
+osm:node/11393223681,오토캠핑장,riverside_camp,하천변 야영장,전북,127.20173,35.460143,섬진강,national,9,,OpenStreetMap (ODbL),node/11393223681
+osm:way/1530244470,완주에코오토캠핑장,riverside_camp,하천변 야영장,전북,127.304036,35.981172,대아천,local,20,,OpenStreetMap (ODbL),way/1530244470
+osm:way/1333413740,용담섬바위오토캠핑장,riverside_camp,하천변 야영장,전북,127.527993,35.95202,금강,national,87,,OpenStreetMap (ODbL),way/1333413740
+osm:way/1546850034,운일암반일암구르미캠핑장,riverside_camp,하천변 야영장,전북,127.387165,35.982559,주자천,local,63,,OpenStreetMap (ODbL),way/1546850034
+osm:way/1546850031,운장산해마루캠핑,riverside_camp,하천변 야영장,전북,127.356244,35.934829,주자천,local,41,,OpenStreetMap (ODbL),way/1546850031
+osm:way/807160842,유각천 야영장(이름 없음),riverside_camp,하천변 야영장,전북,127.010965,35.719609,유각천,local,89,,OpenStreetMap (ODbL),way/807160842
+osm:node/5565446122,정읍천 야영장(이름 없음),riverside_camp,하천변 야영장,전북,126.895609,35.525144,정읍천,local,92,,OpenStreetMap (ODbL),node/5565446122
+osm:way/1453244066,좋은하루캠핑장,riverside_camp,하천변 야영장,전북,127.318275,36.066471,장선천,local,50,,OpenStreetMap (ODbL),way/1453244066
+osm:way/1489785967,직소천자동차야영장,riverside_camp,하천변 야영장,전북,126.567011,35.673683,직소천,local,143,,OpenStreetMap (ODbL),way/1489785967
+osm:node/9112526604,청계동솔바람야영장,riverside_camp,하천변 야영장,전북,127.262348,35.310966,섬진강,national,56,,OpenStreetMap (ODbL),node/9112526604
+osm:way/1198591102,하늘내들꽃마을캠핑장,riverside_camp,하천변 야영장,전북,127.542823,35.790437,금강,local,105,,OpenStreetMap (ODbL),way/1198591102
+osm:node/368871155,학생야영장,riverside_camp,하천변 야영장,전북,127.282092,35.700991,섬진강,local,56,,OpenStreetMap (ODbL),node/368871155
+osm:way/1326240095,향가오토캠핑장 제2야영장,riverside_camp,하천변 야영장,전북,127.190604,35.340712,섬진강,national,48,,OpenStreetMap (ODbL),way/1326240095
+osm:way/375034171,돈내코야영장,riverside_camp,하천변 야영장,제주,126.583099,33.300795,영천,local,123,,OpenStreetMap (ODbL),way/375034171
+osm:node/3786969144,이호테우 해변야영장,riverside_camp,하천변 야영장,제주,126.453733,33.497747,이호천,local,111,,OpenStreetMap (ODbL),node/3786969144
+osm:way/1171238482,세월교,low_bridge,세월교·잠수교,충남,126.799952,36.443883,지천,local,0,,OpenStreetMap (ODbL),way/1171238482
+osm:node/6054684273,3 platforms for tents,riverside_camp,하천변 야영장,충남,126.993109,36.371048,금강,national,99,,OpenStreetMap (ODbL),node/6054684273
+osm:node/6054682618,platform for tent,riverside_camp,하천변 야영장,충남,126.991362,36.352217,금강,national,114,,OpenStreetMap (ODbL),node/6054682618
+osm:way/1159801098,공주계곡펜션캠핑,riverside_camp,하천변 야영장,충남,127.01997,36.558124,마곡천,local,43,,OpenStreetMap (ODbL),way/1159801098
+osm:way/1311647791,국민여가캠핑장,riverside_camp,하천변 야영장,충남,126.798358,36.637141,무한천,local,198,,OpenStreetMap (ODbL),way/1311647791
+osm:way/1184361796,그리고캠핑장,riverside_camp,하천변 야영장,충남,126.694701,36.227357,옥현천,local,184,,OpenStreetMap (ODbL),way/1184361796
+osm:node/6054684379,금강 야영장(이름 없음),riverside_camp,하천변 야영장,충남,126.916816,36.301674,금강,national,126,,OpenStreetMap (ODbL),node/6054684379
+osm:way/1547178180,대둔산부엉빌리지 캠핑클럽,riverside_camp,하천변 야영장,충남,127.354291,36.085694,괴목동천,local,18,,OpenStreetMap (ODbL),way/1547178180
+osm:node/11288624669,산북천 야영장(이름 없음),riverside_camp,하천변 야영장,충남,126.921272,36.130969,산북천,local,46,,OpenStreetMap (ODbL),node/11288624669
+osm:node/368871293,천안시용연청소년야영장,riverside_camp,하천변 야영장,충남,127.226151,36.801249,산방천,local,91,,OpenStreetMap (ODbL),node/368871293
+osm:way/1386360277,청양동강리오토캠핑장,riverside_camp,하천변 야영장,충남,126.978511,36.339438,금강,national,61,,OpenStreetMap (ODbL),way/1386360277
+osm:way/1547178197,파랑새캠핑장,riverside_camp,하천변 야영장,충남,127.359638,36.09059,괴목동천,local,70,,OpenStreetMap (ODbL),way/1547178197
+osm:way/1079782643,해미읍성역사캠핑장,riverside_camp,하천변 야영장,충남,126.552628,36.71233,황락천,local,97,,OpenStreetMap (ODbL),way/1079782643
+osm:node/7621387687,기러기공원캠핑장,riverside_camp,하천변 야영장,충북,127.591566,36.116235,금강,national,30,,OpenStreetMap (ODbL),node/7621387687
+osm:way/789142544,다리안국민관광지,riverside_camp,하천변 야영장,충북,128.420303,36.964551,솔티천,local,100,,OpenStreetMap (ODbL),way/789142544
+osm:way/1382884516,단양무지개오토캠핑장,riverside_camp,하천변 야영장,충북,128.412411,37.044931,한강,local,65,,OpenStreetMap (ODbL),way/1382884516
+osm:way/1294643146,더하루만캠핑장,riverside_camp,하천변 야영장,충북,127.782249,36.634498,신월천,local,44,,OpenStreetMap (ODbL),way/1294643146
+osm:way/1254635152,덕동계곡초록꿈체험마을오토캠핑장,riverside_camp,하천변 야영장,충북,127.993067,37.186418,원서천,local,49,,OpenStreetMap (ODbL),way/1254635152
+osm:node/6285337996,목계솔밭 캠핑장,riverside_camp,하천변 야영장,충북,127.881344,37.073093,한강,national,127,,OpenStreetMap (ODbL),node/6285337996
+osm:way/484862980,무심천 야영장(이름 없음),riverside_camp,하천변 야영장,충북,127.446422,36.67727,무심천,national,39,,OpenStreetMap (ODbL),way/484862980
+osm:way/1546163662,물소리풍경캠핑장,riverside_camp,하천변 야영장,충북,127.895985,36.757844,행목동천,local,36,,OpenStreetMap (ODbL),way/1546163662
+osm:node/368871289,민속된장.하늘사랑야영장,riverside_camp,하천변 야영장,충북,127.804205,36.694814,달천,local,90,,OpenStreetMap (ODbL),node/368871289
+osm:node/368871269,반디랜드청소년야영장,riverside_camp,하천변 야영장,충북,127.757438,36.013881,무주남대천,local,115,,OpenStreetMap (ODbL),node/368871269
+osm:way/1409139541,벨루아캠핑장,riverside_camp,하천변 야영장,충북,127.408734,36.744048,용두천,local,159,,OpenStreetMap (ODbL),way/1409139541
+osm:node/8809326271,삼탄유원지야영장,riverside_camp,하천변 야영장,충북,128.030798,37.068988,한강,national,60,yes,OpenStreetMap (ODbL),node/8809326271
+osm:way/1383724500,소선암오토캠핑장,riverside_camp,하천변 야영장,충북,128.31091,36.926329,단양천,local,24,,OpenStreetMap (ODbL),way/1383724500
+osm:way/333857634,속리산 사내리야영장,riverside_camp,하천변 야영장,충북,127.826187,36.530481,달천,local,195,,OpenStreetMap (ODbL),way/333857634
+osm:way/1546163698,솔밭캠프,riverside_camp,하천변 야영장,충북,127.894863,36.760744,행목동천,local,77,,OpenStreetMap (ODbL),way/1546163698
+osm:node/5929623255,수주팔봉캠핑장,riverside_camp,하천변 야영장,충북,127.92475,36.899855,달천,national,0,,OpenStreetMap (ODbL),node/5929623255
+osm:node/368871337,영동학생야영장,riverside_camp,하천변 야영장,충북,127.879509,36.071053,초강,local,81,,OpenStreetMap (ODbL),node/368871337
+osm:way/1463197652,월악산국립공원 용하야영장,riverside_camp,하천변 야영장,충북,128.164187,36.857323,광천,local,18,,OpenStreetMap (ODbL),way/1463197652
+osm:way/1232063404,월악산국립공원송계오토캠핑장,riverside_camp,하천변 야영장,충북,128.078392,36.884865,동달천,local,46,,OpenStreetMap (ODbL),way/1232063404
+osm:node/11427866241,월악산닷돗재풀옵션야영장,riverside_camp,하천변 야영장,충북,128.078373,36.886007,동달천,local,41,,OpenStreetMap (ODbL),node/11427866241
+osm:node/368871073,웰빙문화수련원하늘사랑 야영장,riverside_camp,하천변 야영장,충북,127.805808,36.69387,달천,local,64,,OpenStreetMap (ODbL),node/368871073
+osm:way/1377622516,인삼골오토캠핑장,riverside_camp,하천변 야영장,충북,127.584089,36.087981,금강,national,57,,OpenStreetMap (ODbL),way/1377622516
+osm:way/1392240984,잭슨글램핑,riverside_camp,하천변 야영장,충북,127.866471,37.040557,한강,national,69,,OpenStreetMap (ODbL),way/1392240984
+osm:way/1230749973,좌구산캠핑공원,riverside_camp,하천변 야영장,충북,127.649438,36.713431,삼기천,local,20,,OpenStreetMap (ODbL),way/1230749973
+osm:node/368871345,중원학생야영장,riverside_camp,하천변 야영장,충북,127.864096,37.078661,한강,national,85,,OpenStreetMap (ODbL),node/368871345
+osm:node/368871250,청천면후평야영장,riverside_camp,하천변 야영장,충북,127.749352,36.657001,달천,local,66,,OpenStreetMap (ODbL),node/368871250
+osm:node/368871347,청천학생야영장,riverside_camp,하천변 야영장,충북,127.756317,36.658439,달천,local,113,,OpenStreetMap (ODbL),node/368871347
+osm:way/1177596191,초강 야영장(이름 없음),riverside_camp,하천변 야영장,충북,127.888296,36.232162,초강,local,39,,OpenStreetMap (ODbL),way/1177596191
+osm:way/1382884513,파인카라반캠핑장,riverside_camp,하천변 야영장,충북,128.416039,37.056851,한강,local,55,,OpenStreetMap (ODbL),way/1382884513
+osm:node/5929623256,팔봉글램핑장,riverside_camp,하천변 야영장,충북,127.923654,36.899989,달천,national,35,,OpenStreetMap (ODbL),node/5929623256
+osm:way/1387107900,포레스트힐링캠프,riverside_camp,하천변 야영장,충북,128.404896,37.008536,하일천,local,35,,OpenStreetMap (ODbL),way/1387107900
+osm:way/1384181533,하선암카라반캠핑장,riverside_camp,하천변 야영장,충북,128.307787,36.91082,단양천,local,131,,OpenStreetMap (ODbL),way/1384181533
+osm:node/10830918605,한강 야영장(이름 없음),riverside_camp,하천변 야영장,충북,127.81134,37.108592,한강,national,48,,OpenStreetMap (ODbL),node/10830918605
+osm:way/1546163671,행목동천 야영장(이름 없음),riverside_camp,하천변 야영장,충북,127.901986,36.745169,행목동천,local,42,,OpenStreetMap (ODbL),way/1546163671
+osm:way/1150923193,현도자동차캠핑장,riverside_camp,하천변 야영장,충북,127.406157,36.479182,금강,national,0,,OpenStreetMap (ODbL),way/1150923193
+osm:way/1272763444,화양동캠핑장,riverside_camp,하천변 야영장,충북,127.806477,36.6833,달천,local,85,,OpenStreetMap (ODbL),way/1272763444

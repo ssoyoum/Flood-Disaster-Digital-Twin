@@ -33,8 +33,10 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 CATALOG_FILE = REPO_ROOT / "data" / "manifests" / "hrfco-stations.json"
 LINKS_FILE = REPO_ROOT / "data" / "processed" / "facilities" / "facility_gauge_links.csv"
 RIVERSIDE_FILE = REPO_ROOT / "data" / "processed" / "facilities" / "riverside_access.csv"
+RIVER_CONTACT_EXTRA_FILE = REPO_ROOT / "data" / "processed" / "facilities" / "river_contact_extra.csv"
 FACILITY_LINK_KM = 5.0
-KIND_KO = {"underpass": "지하차도", "riverside_parking": "둔치·하천변 주차장", "riverside_park": "하천 둔치 공원", "riverbed_road": "하상도로"}
+KIND_KO = {"underpass": "지하차도", "riverside_parking": "둔치·하천변 주차장", "riverside_park": "하천 둔치 공원", "riverbed_road": "하상도로",
+           "riverside_camp": "하천변 야영장", "low_bridge": "세월교·잠수교"}
 GROUP_KO = {"underpass": "지하차도", "riverside": "하천변 출입구"}
 HOURLY_DIR = REPO_ROOT / "data" / "processed" / "hrfco"
 LIVE_RAIN_HISTORY_FILE = REPO_ROOT / "data" / "interim" / "hrfco_live_rainfall_1h.json"
@@ -193,12 +195,14 @@ def facility_catalog() -> tuple[dict[str, Any], ...]:
                     raw.append({"facility_id": row["facility_id"], "name": row["facility_name"], "kind": "underpass", "sido": row.get("sido", ""),
                                 "sgg": row.get("sgg") or None, "lon": float(row["facility_lon"]), "lat": float(row["facility_lat"]),
                                 "river_name": None, "source": "국토교통부 지하차도 현황 + 도로터널 API 좌표(없으면 OSM)"})
-    if RIVERSIDE_FILE.exists():
-        with RIVERSIDE_FILE.open(encoding="utf-8", newline="") as handle:
+    for path, source in ((RIVERSIDE_FILE, "OpenStreetMap 이름 + WAMIS 하천 선형 거리"),
+                         (RIVER_CONTACT_EXTRA_FILE, "OpenStreetMap 야영장·교량 + WAMIS 하천 선형 거리")):
+        if not path.exists():
+            continue
+        with path.open(encoding="utf-8", newline="") as handle:
             for row in csv.DictReader(handle):
                 raw.append({"facility_id": row["facility_id"], "name": row["name"], "kind": row["kind"], "sido": row["sido"], "sgg": None,
-                            "lon": float(row["lon"]), "lat": float(row["lat"]), "river_name": row["river_name"] or None,
-                            "source": "OpenStreetMap 이름 + WAMIS 하천 선형 거리"})
+                            "lon": float(row["lon"]), "lat": float(row["lat"]), "river_name": row["river_name"] or None, "source": source})
     placed: dict[str, list[tuple[float, float]]] = {}
     for row in raw:
         if row["facility_id"] in seen:
