@@ -63,6 +63,36 @@ async function facilityBlock(facility, season) {
   </article>`;
 }
 
+// 전체 시설: 서버가 10분마다 기록한 실시간 보드로 채점한다. 과거 이력을 받지 않으므로 기록 시작 이후만 있다.
+function boardBlock(b) {
+  const cov = b.coverage;
+  const c = b.counts;
+  const since = cov.from ? `${cov.from.slice(0, 16).replace("T", " ")}부터 ${cov.to.slice(5, 16).replace("T", " ")}까지 ${num(cov.snapshots)}회 기록` : "아직 기록 없음 · 서버가 실시간으로 돌면 10분마다 쌓입니다";
+  const tiles = [
+    ["주의 이상 도달", c.reached["주의"], "곳", "#fbbf24"], ["경계 이상 도달", c.reached["경계"], "곳", "#fb923c"],
+    ["경보 구간", c.episodes, "회", "#e4e4e7"], ["특보 없이 혼자 울림", c.episodes_alone, "회", "#a1a1aa"],
+  ].map(([label, value, unit, color]) => `<div class="op-card"><span class="op-note">${label}</span><h3 class="op-num" style="color:${color}">${num(value)}<small>${unit}</small></h3></div>`).join("");
+  const rows = b.facilities.filter((r) => r.episodes > 0).slice(0, 50);
+  const table = rows.length ? `<div class="op-table-wrap"><table class="op-table">
+      <thead><tr><th>시설</th><th>유형 · 지역</th><th>최고 단계</th><th>경보 구간</th><th>특보 동반 / 혼자</th><th>주의·경계·심각 시간</th><th>마지막 구간</th></tr></thead>
+      <tbody>${rows.map((r) => {
+        const m = r.minutes_by_level;
+        const last = r.last_episode;
+        return `<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.kind_ko ?? "")} · ${esc(r.region ?? "")}</td><td>${esc(r.peak_label ?? "—")}</td>
+          <td class="op-num">${r.episodes}</td><td class="op-num">${r.episodes_with_official} / ${r.episodes_alone}</td>
+          <td class="op-num">${Math.round(m["주의"] / 60)} · ${Math.round(m["경계"] / 60)} · ${Math.round(m["심각"] / 60)}시간</td>
+          <td>${last ? `${esc(last.start.slice(5, 16).replace("T", " "))} ~ ${hhmm(last.end)}` : "—"}</td></tr>`;
+      }).join("")}</tbody></table></div>`
+    : '<p class="op-note">기록 기간 동안 주의 이상에 든 시설이 없습니다. 비가 오면 여기에 시설별 경보 구간이 쌓입니다. 화면을 시험하려면 관제 보드의 «가상 강우»를 쓰세요(가상 강우는 기록하지 않음).</p>';
+  return `<div class="op-card">
+    <div class="op-card-head"><div><h3>전체 ${num(c.facilities)}곳 · ${b.season}년 기록</h3><small>${since}</small></div></div>
+    <div class="op-grid-4">${tiles}</div>
+    ${table}
+    <p class="op-note">${esc(b.method)}</p>
+    <ul class="op-limits">${b.limitations.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+  </div>`;
+}
+
 function historyBlock(h) {
   const cmp = h.official_vs_observed;
   const row = (name, d) => {
@@ -85,11 +115,12 @@ function historyBlock(h) {
 }
 
 export async function renderScorecard(view, route) {
-  const [registry, history] = await Promise.all([
+  const season = Number(route.query.get("season")) || new Date().getFullYear();
+  const [registry, history, board] = await Promise.all([
     cached("/api/twin/registry"),
     cached("/api/watch/flood-forecast-history").catch(() => null),
+    cached(`/api/watch/season-board?season=${Math.max(2026, season)}`).catch(() => null),
   ]);
-  const season = Number(route.query.get("season")) || new Date().getFullYear();
   const facilityHtml = (await Promise.all(registry.operational.map((f) => facilityBlock(f, season).catch((e) => `<p class="op-err">${esc(f.name)} 성적표를 불러오지 못했습니다: ${esc(e.message)}</p>`)))).join("");
 
   view.innerHTML = `<div class="op-page">
@@ -98,6 +129,11 @@ export async function renderScorecard(view, route) {
       <h1 class="op-h1">이번 장마, 기준이 실제 통제보다 빨랐나</h1>
       <p class="op-lead">담당자가 남긴 통제 기록과 규칙의 권고를 시즌 단위로 맞춥니다. 권고만 나고 기록이 없으면 오경보로 세지 않고 «기록 없음»으로 둡니다. 과거 홍수에 규칙을 재생한 검증은 <a href="#/cases">사례 재구성</a>에서 봅니다.</p>
     </header>
+
+    <section class="op-sec">
+      <div class="op-sec-head"><h2>전체 시설 시즌 기록</h2><span>과거 이력 없이, 서버가 10분마다 남긴 실시간 판정으로 채점 · 새로 넣은 시설도 넣은 때부터 자동으로 채점</span></div>
+      ${board ? boardBlock(board) : '<p class="op-err">시즌 기록을 불러오지 못했습니다.</p>'}
+    </section>
 
     <section class="op-sec">
       <div class="op-sec-head"><h2>운영 시설 시즌 성적표</h2><span>운영 등록 ${registry.counts.operational}곳 · 시즌 5/15–10/15 · 통제 기록은 시설 기준 › 지금 상태에서 남김</span></div>

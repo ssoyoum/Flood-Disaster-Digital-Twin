@@ -2,6 +2,7 @@ import gzip
 import json
 import threading
 import os
+from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
@@ -234,6 +235,22 @@ def _warm_layer_cache() -> None:
         _layers_gzip(SEOUL_EVENT_ID, 2022)
 
     threading.Thread(target=warm_supported_layers, daemon=True).start()
+
+
+@app.on_event("startup")
+def _start_watch_log() -> None:
+    from . import watch_log
+
+    if "PYTEST_CURRENT_TEST" not in os.environ:
+        watch_log.start_background()
+
+
+@app.get("/api/watch/season-board", tags=["watch"])
+def watch_season_board(season: int = Query(default=None, ge=2026, le=2100), limit: int = Query(default=300, ge=1, le=2000)):
+    """Every facility scored from the board the server recorded every 10 minutes (no historical download)."""
+    from . import watch_log
+
+    return watch_log.season_board(season or datetime.now().year, limit)
 
 
 @app.get("/api/events/{event_id}/layers")
