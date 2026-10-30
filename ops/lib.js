@@ -1,6 +1,7 @@
 // 화면들이 같이 쓰는 API 호출·문자열·작은 그림.
 
-export const API = new URLSearchParams(window.location.search).get("api") ?? "http://127.0.0.1:8091";
+// 로컬 정적 서버(/ops/)에서는 8091 API를, 서버가 루트에서 직접 내보낼 때는 같은 주소를 쓴다.
+export const API = new URLSearchParams(window.location.search).get("api") ?? (window.location.pathname.startsWith("/ops/") ? "http://127.0.0.1:8091" : "");
 
 export async function get(path) {
   const response = await fetch(API + path);
