@@ -1,0 +1,77 @@
+{
+ "built_at": "2026-11-02T04:09:27",
+ "rule": "헛울림 비율 = 확인된 사건 중 헛울림(예) 건수 / 확인된 사건 전체 건수. 미확인·보류 사건은 분모에서 제외한다.",
+ "counts": {
+  "확인": 4,
+  "미확인": 1,
+  "헛울림(확인 사건 중)": 0
+ },
+ "false_alarm_ratio": 0.0,
+ "cases": [
+  {
+   "id": "daejeon-2020-07-30",
+   "title": "대전 만년지하차도 2020-07-30",
+   "date": "2020-07-30",
+   "facility": "만년지하차도",
+   "region": "대전",
+   "confirm_status": "확인",
+   "control_status": "통제함",
+   "false_alarm": "아니오",
+   "source": "https://www.ytn.co.kr/_ln/0115_202007300601136499",
+   "note": "만년·태평 지하차도 통제(새벽부터, 06:01 보도 시점에 통제 중)",
+   "needs_ceo_confirmation": false
+  },
+  {
+   "id": "daejeon-2023-07-14",
+   "title": "대전 하상도로·하상주차장 2023-07-14",
+   "date": "2023-07-14",
+   "facility": "하상도로·하상주차장",
+   "region": "대전",
+   "confirm_status": "확인",
+   "control_status": "통제함",
+   "false_alarm": "아니오",
+   "source": "https://www.ccnnews.co.kr/news/articleView.html?idxno=301544",
+   "note": "하상도로·하상주차장 16곳 출입 제한(05:30경)",
+   "needs_ceo_confirmation": false
+  },
+  {
+   "id": "osong-2023",
+   "title": "오송 궁평2지하차도 2023-07-15",
+   "date": "2023-07-15",
+   "facility": "궁평2지하차도",
+   "region": "충북",
+   "confirm_status": "확인",
+   "control_status": "통제 안 함(유입)",
+   "false_alarm": "아니오",
+   "source": "국무조정실 감찰 결과 시각(osong_repository, 원문 쪽수 미연결)",
+   "note": "통제 없이 지하차도 유입 시작(08:40 완전 침수)",
+   "needs_ceo_confirmation": false
+  },
+  {
+   "id": "daejeon-2024-07-10",
+   "title": "대전 갑천 교량·오량지하차도 2024-07-10",
+   "date": "2024-07-10",
+   "facility": "갑천 교량·오량지하차도",
+   "region": "대전",
+   "confirm_status": "확인",
+   "control_status": "통제함",
+   "false_alarm": "아니오",
+   "source": "https://m.joongdo.co.kr/view.php?key=20240710010003018",
+   "note": "교량 8곳·오량지하차도 양방향 통제(6시께부터)",
+   "needs_ceo_confirmation": false
+  },
+  {
+   "id": "gungpyeong2-2025-07-17",
+   "title": "오송 궁평2지하차도 2025-07-17",
+   "date": "2025-07-17",
+   "facility": "궁평2지하차도",
+   "region": "충북",
+   "confirm_status": "미확인",
+   "control_status": null,
+   "false_alarm": "판정 보류",
+   "source": null,
+   "note": "실제 통제 여부 확인 필요 → 충북도로관리사업소 확인 대기 중(TODO.md 0번 항목). 대표님 확인 필요.",
+   "needs_ceo_confirmation": true
+  }
+ ]
+}
