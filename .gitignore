@@ -56,3 +56,7 @@ docs/presentations/
 
 # Hackathon planning notes stay local.
 docs/META_HACKATHON.md
+
+# Local scratch (deploy copies, PDFs, screenshots) and generated decks/images stay local.
+tmp/
+output/
