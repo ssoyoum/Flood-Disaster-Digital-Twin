@@ -5000,6 +5000,48 @@ UI 보완:
   해결: 콘솔 출력 대신 생성된 파일을 직접 읽어 내용을 확인했다.
 - 남은 것: 확인 상태를 사람이 직접 갱신할 입력 경로(사건 추가·확인 처리 UI 또는 CLI)가 없다. 2025-07-17 궁평2 통제 여부가 확인되면 스크립트의 `PENDING_CASES`에서 `backend/app/case_validation.py`의 `CASES`로 옮기고 다시 생성해야 한다.
 
+## 관제 보드와 에이전트의 "가장 위험한 곳" 순위 불일치, OSM 원본 이름 노출 수정
+
+- 작업일: 2026-11-02
+
+주요 작업:
+- `backend/app/agent_watch.py`의 `hints()`에서, "가장 위험한 곳" 같은 질문이 `관측소`라는 말이 없으면 `rank_priority`(관측소 기준) 대신 `rank_facilities`(`facility_risk.facility_risk()` 기준)로 가도록 분기를 바꿨다. `관측소`를 명시한 경우에만 `rank_priority`로 간다.
+- `EXAMPLES`의 "지금 가장 위험한 곳 5곳 알려줘" 예시를 `rank_facilities`로 옮기고, `rank_priority`용 예시("관측소 기준으로 가장 위험한 곳 5곳 알려줘")를 새로 추가했다. 두 도구의 설명 문구에도 이 구분을 적었다.
+- `backend/app/national_watch.py`의 `facility_catalog()`에 `_osm_display_name()`을 추가해, OSM `name` 태그에 한글이 하나도 없는 값(예: `Kor551`, `3 platforms for tents`, 숫자만 있는 `1`~`9`)을 `{하천명} {종류}(이름 미상)` 형태로 바꿨다. 적용 대상은 `riverside_access.csv`·`river_contact_extra.csv`·`river_floodplain_sites.csv`(OSM 기반 세 파일)이며, 국토교통부 지하차도 목록(`facility_gauge_links.csv`)은 건드리지 않았다.
+
+검증 결과:
+- `facility_catalog()`에서 한글 없는 이름 19건(두 파일, river_contact_extra 10건·river_floodplain_sites 9건) 모두 "{하천명} {종류}(이름 미상)" 형태로 바뀐 것을 확인했다(예: `Kor551` → `청하천 하천변 야영장(이름 미상)`).
+- `backend/tests/test_national_watch.py` 27건, `test_facility_risk.py`·`test_agent_facility.py`까지 묶어 51건(실패 1건은 아래 "문제/해결" 참고) 통과.
+- 전체 테스트(`pytest backend/tests`) 345 passed·8 failed(5분). 실패 8건을 개별·묶음으로 다시 돌려 이번 변경과 무관함을 확인했다(아래 참고).
+
+문제/해결:
+- 문제: 사용자가 관제 보드(`ops/` 4탭, `home.js`가 `/api/watch/facility-risk`를 그대로 그림) 왼쪽 목록 1위(포내천 둔치 주차장)와 에이전트가 답한 1위(27호광장 지하차도)가 다르다고 보고했다.
+  해결: `ops/views/home.js`는 `/api/watch/facility-risk`(= `facility_risk.facility_risk()`, 하천형·내수형 구분과 공식 특보 하한을 반영)를 그대로 쓰는데, 에이전트는 "가장 위험한 곳"처럼 `관측소`라는 말이 없는 질문을 `rank_priority`(`nw.overview()`, 관측소 단계·남은 분만 보는 전혀 다른 기준)로 보내고 있었다. 코드 주석에도 "순위는 관측소 기준이며 시설의 실제 위험 순위가 아니다"라고 이미 적혀 있던, 설계가 알려진 차이였다. `rank_facilities`가 `facility_risk.facility_risk()`를 그대로 쓰므로 기본 분기를 그쪽으로 옮겨 보드와 같은 값을 보게 했다.
+  다른 후보였던 "보드가 쓰는 함수를 바꾼다"(`facility-status`로)는 처음에는 세 번째 순위 함수(`national_watch.facility_status`의 `_facility_priority`)가 보드에 쓰이는 줄 알고 검토했으나, 실제 관제 탭(`ops/home.js`)은 `facility-risk`만 썼다(React `src/`의 `getWatchFacilityStatus`는 쓰이지 않는 경로). 확인 후 불필요한 작업이라 접었다.
+- 문제: 야영장 등 OSM 기반 시설 중 일부가 이름 태그에 `Kor551`, `3 platforms for tents`처럼 한글이 전혀 없는 값을 갖고 있어, 보드와 에이전트 답변에 그대로 노출됐다. 수집 스크립트의 "이름 없음" 처리는 빈 문자열만 잡고, 이런 비어 있지 않은 영문 값은 걸러지지 않았다.
+  해결: 수집 스크립트(Overpass 재호출 필요)를 고치는 대신, 세 CSV를 읽어 시설 목록을 만드는 지점(`facility_catalog()`)에 한글 여부 검사를 넣어 즉시 적용했다. 재수집 없이 바로 반영되고, 다음에 OSM을 다시 긁어도 같은 필터가 걸린다.
+  남은 것: 수집 스크립트(`collect_river_contact_extra.py` 등) 쪽에도 같은 검사를 넣어 생성되는 CSV 자체를 깨끗하게 만들 수 있다(지금은 런타임에서만 가린다).
+- 문제: 전체 테스트 345 passed·8 failed. 그중 `test_facility_risk.py::test_replay_ranks_river_and_pluvial_facilities_together`는 `facility_risk(AT, limit=2000)`를 쓰는데 시설 총수가 이미 2,453곳이라(위 "새 유형 추가" 작업에서 한도를 10,000으로 올렸을 때 이 테스트의 `limit=2000`은 못 따라왔다) `counts.total(2445) != len(facilities)(2000)`로 깨진다. 이번 변경 전부터 있던 불일치라 손대지 않았다.
+  나머지 7건(`test_agent_facility`·`test_api`·`test_rain_simulation`·`test_rate_limit`·`test_rise_model`·`test_stage_replay_layers`)은 전체 묶음 실행에서만 실패하고 개별·소묶음 실행에서는 통과해, 테스트 간 공유 상태(레이트 리밋 등) 순서 문제로 보고 이번 변경과 무관하다고 판단했다. 둘 다 별도로 고쳐야 한다.
+
+## OSM 이름 치환이 중복 제거 로직과 충돌해 시설 8곳을 지우던 문제 수정
+
+- 작업일: 2026-11-02
+
+주요 작업:
+- `backend/app/national_watch.py`의 `facility_catalog()`에서, `_osm_display_name()`이 한글 없는 이름을 치환한 경우에만 치환 전 원본 OSM 텍스트를 `dedup_key`로 따로 저장해 중복 제거(`placed`) 키로 쓰도록 바꿨다. 한글이 있던 이름(짧은 이름 + 하천명 접두 포함)은 기존처럼 치환 후 표시 이름으로 중복 제거한다.
+
+검증 결과:
+- `facility_catalog()`를 직접 실행해, 수정 전 탄천 둔치 체육시설 9곳(`osm:way/437195951`, `437236115/118/122/124/127/129/131/133`) 중 1곳만 남던 것이 수정 후 9곳 모두 남는 것을 확인했다.
+- 전체 시설 수가 수정 전 2,445 → 수정 후 2,453(`4d2d618`에 적힌 수치와 일치)으로 복구된 것을 확인했다.
+- `pytest backend/tests/test_national_watch.py backend/tests/test_facility_risk.py backend/tests/test_agent_facility.py`를 묶어 돌리면 7건 실패하지만, `test_agent_facility.py`만 단독 실행하면 19건 모두 통과해 바로 위 항목에 이미 적힌 "묶음 실행에서만 보이는 테스트 간 공유 상태 문제"이고 이번 수정과 무관함을 확인했다.
+- `test_facility_risk.py::test_replay_ranks_river_and_pluvial_facilities_together`는 이번 수정 후에도 여전히 실패하지만 실패 값이 `2453 == 2000`으로 바뀌어(수정 전 `2445 == 2000`) 총 시설 수가 올바른 수치로 복구됐음을 보여준다. 이 테스트의 `limit=2000`이 실제 시설 수를 못 따라오는 기존 문제이며 이번 변경과는 무관하다.
+
+문제/해결:
+- 문제: 바로 위 커밋이 한글 없는 OSM 이름을 "{하천명} {종류}(이름 미상)" 라벨로 치환하면서, 서로 다른 시설인데 같은 하천·같은 종류라 라벨이 우연히 똑같아지는 경우가 생겼다. `facility_catalog()`의 기존 중복 제거("같은 이름 + 2km 이내면 OSM이 하나의 길·공원을 여러 조각으로 쪼갠 것으로 간주해 하나만 남김")가 이 공용 라벨을 "같은 시설"로 오인해, 탄천 둔치 체육시설 9곳 중 8곳이 조용히 지워졌다(전체 시설 수 2,453 → 2,445, 정확히 -8). 이름 치환 커밋의 검증은 "이름이 바뀌었는지"만 확인했고 "시설 수가 줄었는지"는 확인하지 않아 이 데이터 손실이 그대로 통과됐다.
+  해결: 중복 제거 키를 치환된 표시 이름이 아니라, 한글이 없어 치환이 일어난 행에 한해 치환 전 원본 OSM 텍스트(의미는 없어도 서로 다르면 다른 시설로 간주)로 바꿨다. 한글이 있던 이름은 원래 로직(짧은 이름 + 하천명 접두 후 비교) 그대로 둬서 그 경로의 기존 동작은 건드리지 않았다.
+  다른 후보였던 "이름 치환 자체를 되돌린다"는 처음 검토했으나, 치환은 "Kor551", "3 platforms for tents" 같은 읽을 수 없는 이름을 고치려던 의도된 기능이라 되돌리면 원래 문제가 재발해 접었다.
+
 ## 플랫폼 NHN Cloud 서버 구축과 홍수통제소 API 중계
 
 - 작업일: 2026-11-02
