@@ -4963,3 +4963,27 @@ UI 보완:
 - 문제: 시설이 2,000곳을 넘으니 API·보드가 2,000곳에서 잘렸다.
   해결: 한도를 10,000으로 올렸다.
 - 남은 것: 위험도 응답이 7–11초로 느려졌다(시설마다 가까운 강우 관측소 탐색). 공간 색인으로 줄일 수 있다. 수면 근사로 고른 운동장·주차장은 지자체 통제 대상 목록과 대조하지 않았다.
+
+## 관제 보드와 에이전트의 "가장 위험한 곳" 순위 불일치, OSM 원본 이름 노출 수정
+
+- 작업일: 2026-11-02
+
+주요 작업:
+- `backend/app/agent_watch.py`의 `hints()`에서, "가장 위험한 곳" 같은 질문이 `관측소`라는 말이 없으면 `rank_priority`(관측소 기준) 대신 `rank_facilities`(`facility_risk.facility_risk()` 기준)로 가도록 분기를 바꿨다. `관측소`를 명시한 경우에만 `rank_priority`로 간다.
+- `EXAMPLES`의 "지금 가장 위험한 곳 5곳 알려줘" 예시를 `rank_facilities`로 옮기고, `rank_priority`용 예시("관측소 기준으로 가장 위험한 곳 5곳 알려줘")를 새로 추가했다. 두 도구의 설명 문구에도 이 구분을 적었다.
+- `backend/app/national_watch.py`의 `facility_catalog()`에 `_osm_display_name()`을 추가해, OSM `name` 태그에 한글이 하나도 없는 값(예: `Kor551`, `3 platforms for tents`, 숫자만 있는 `1`~`9`)을 `{하천명} {종류}(이름 미상)` 형태로 바꿨다. 적용 대상은 `riverside_access.csv`·`river_contact_extra.csv`·`river_floodplain_sites.csv`(OSM 기반 세 파일)이며, 국토교통부 지하차도 목록(`facility_gauge_links.csv`)은 건드리지 않았다.
+
+검증 결과:
+- `facility_catalog()`에서 한글 없는 이름 19건(두 파일, river_contact_extra 10건·river_floodplain_sites 9건) 모두 "{하천명} {종류}(이름 미상)" 형태로 바뀐 것을 확인했다(예: `Kor551` → `청하천 하천변 야영장(이름 미상)`).
+- `backend/tests/test_national_watch.py` 27건, `test_facility_risk.py`·`test_agent_facility.py`까지 묶어 51건(실패 1건은 아래 "문제/해결" 참고) 통과.
+- 전체 테스트(`pytest backend/tests`) 345 passed·8 failed(5분). 실패 8건을 개별·묶음으로 다시 돌려 이번 변경과 무관함을 확인했다(아래 참고).
+
+문제/해결:
+- 문제: 사용자가 관제 보드(`ops/` 4탭, `home.js`가 `/api/watch/facility-risk`를 그대로 그림) 왼쪽 목록 1위(포내천 둔치 주차장)와 에이전트가 답한 1위(27호광장 지하차도)가 다르다고 보고했다.
+  해결: `ops/views/home.js`는 `/api/watch/facility-risk`(= `facility_risk.facility_risk()`, 하천형·내수형 구분과 공식 특보 하한을 반영)를 그대로 쓰는데, 에이전트는 "가장 위험한 곳"처럼 `관측소`라는 말이 없는 질문을 `rank_priority`(`nw.overview()`, 관측소 단계·남은 분만 보는 전혀 다른 기준)로 보내고 있었다. 코드 주석에도 "순위는 관측소 기준이며 시설의 실제 위험 순위가 아니다"라고 이미 적혀 있던, 설계가 알려진 차이였다. `rank_facilities`가 `facility_risk.facility_risk()`를 그대로 쓰므로 기본 분기를 그쪽으로 옮겨 보드와 같은 값을 보게 했다.
+  다른 후보였던 "보드가 쓰는 함수를 바꾼다"(`facility-status`로)는 처음에는 세 번째 순위 함수(`national_watch.facility_status`의 `_facility_priority`)가 보드에 쓰이는 줄 알고 검토했으나, 실제 관제 탭(`ops/home.js`)은 `facility-risk`만 썼다(React `src/`의 `getWatchFacilityStatus`는 쓰이지 않는 경로). 확인 후 불필요한 작업이라 접었다.
+- 문제: 야영장 등 OSM 기반 시설 중 일부가 이름 태그에 `Kor551`, `3 platforms for tents`처럼 한글이 전혀 없는 값을 갖고 있어, 보드와 에이전트 답변에 그대로 노출됐다. 수집 스크립트의 "이름 없음" 처리는 빈 문자열만 잡고, 이런 비어 있지 않은 영문 값은 걸러지지 않았다.
+  해결: 수집 스크립트(Overpass 재호출 필요)를 고치는 대신, 세 CSV를 읽어 시설 목록을 만드는 지점(`facility_catalog()`)에 한글 여부 검사를 넣어 즉시 적용했다. 재수집 없이 바로 반영되고, 다음에 OSM을 다시 긁어도 같은 필터가 걸린다.
+  남은 것: 수집 스크립트(`collect_river_contact_extra.py` 등) 쪽에도 같은 검사를 넣어 생성되는 CSV 자체를 깨끗하게 만들 수 있다(지금은 런타임에서만 가린다).
+- 문제: 전체 테스트 345 passed·8 failed. 그중 `test_facility_risk.py::test_replay_ranks_river_and_pluvial_facilities_together`는 `facility_risk(AT, limit=2000)`를 쓰는데 시설 총수가 이미 2,453곳이라(위 "새 유형 추가" 작업에서 한도를 10,000으로 올렸을 때 이 테스트의 `limit=2000`은 못 따라왔다) `counts.total(2445) != len(facilities)(2000)`로 깨진다. 이번 변경 전부터 있던 불일치라 손대지 않았다.
+  나머지 7건(`test_agent_facility`·`test_api`·`test_rain_simulation`·`test_rate_limit`·`test_rise_model`·`test_stage_replay_layers`)은 전체 묶음 실행에서만 실패하고 개별·소묶음 실행에서는 통과해, 테스트 간 공유 상태(레이트 리밋 등) 순서 문제로 보고 이번 변경과 무관하다고 판단했다. 둘 다 별도로 고쳐야 한다.

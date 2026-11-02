@@ -38,6 +38,16 @@ RIVER_FLOODPLAIN_FILE = REPO_ROOT / "data" / "processed" / "facilities" / "river
 FACILITY_LINK_KM = 5.0
 KIND_KO = {"underpass": "지하차도", "riverside_parking": "둔치·하천변 주차장", "riverside_park": "하천 둔치 공원", "riverbed_road": "하상도로",
            "riverside_camp": "하천변 야영장", "low_bridge": "세월교·잠수교", "riverside_sports": "둔치 체육시설"}
+_HANGUL = re.compile(r"[가-힣]")
+
+
+def _osm_display_name(name: str, kind: str, river_name: str | None) -> str:
+    """OSM's free-text name tag sometimes holds a stray English note or a bare ref code (e.g. "3 platforms
+    for tents", "Kor551") instead of a place name. Without Hangul it is not something an operator can read
+    as a name, so fall back to the same river-plus-kind label used for an empty name tag."""
+    if name and _HANGUL.search(name):
+        return name
+    return f"{river_name or '하천'} {KIND_KO.get(kind, kind)}(이름 미상)"
 GROUP_KO = {"underpass": "지하차도", "riverside": "하천변 출입구"}
 HOURLY_DIR = REPO_ROOT / "data" / "processed" / "hrfco"
 LIVE_RAIN_HISTORY_FILE = REPO_ROOT / "data" / "interim" / "hrfco_live_rainfall_1h.json"
@@ -203,7 +213,8 @@ def facility_catalog() -> tuple[dict[str, Any], ...]:
             continue
         with path.open(encoding="utf-8", newline="") as handle:
             for row in csv.DictReader(handle):
-                raw.append({"facility_id": row["facility_id"], "name": row["name"], "kind": row["kind"], "sido": row["sido"], "sgg": None,
+                raw.append({"facility_id": row["facility_id"], "name": _osm_display_name(row["name"], row["kind"], row["river_name"] or None),
+                            "kind": row["kind"], "sido": row["sido"], "sgg": None,
                             "lon": float(row["lon"]), "lat": float(row["lat"]), "river_name": row["river_name"] or None, "source": source})
     placed: dict[str, list[tuple[float, float]]] = {}
     for row in raw:
