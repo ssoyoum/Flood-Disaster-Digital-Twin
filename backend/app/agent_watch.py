@@ -12,7 +12,8 @@ from typing import Any
 from . import national_watch as nw
 
 TOOL_NAMES = {"get_watch_overview", "navigate_board", "rank_priority", "summarize_changes", "get_station_status",
-              "draft_situation_report", "rule_scorecard", "get_rain_status", "rank_facilities", "get_official_forecasts", "validation_cases", "post_event_review"}
+              "draft_situation_report", "rule_scorecard", "get_rain_status", "rank_facilities", "get_official_forecasts", "validation_cases", "post_event_review",
+              "season_record"}
 PARAMETERS: dict[str, set[str]] = {
     "get_watch_overview": {"region", "min_stage"},
     "navigate_board": {"region", "station", "facility", "min_stage"},
@@ -26,6 +27,7 @@ PARAMETERS: dict[str, set[str]] = {
     "get_official_forecasts": {"region"},
     "validation_cases": {"region"},
     "post_event_review": {"region", "case_id"},
+    "season_record": {"region", "limit"},
 }
 EXAMPLES = [
     {"workflow": "watch_overview", "label": "전국 현황", "question": "지금 전국에서 주의보 이상인 관측소가 몇 곳이야?"},
@@ -42,6 +44,7 @@ EXAMPLES = [
     {"workflow": "get_official_forecasts", "label": "공식 특보", "question": "지금 홍수특보 내려진 곳 있어?"},
     {"workflow": "validation_cases", "label": "사례 검증", "question": "대전 사례에서 규칙이 실제 통제보다 빨랐어?"},
     {"workflow": "post_event_review", "label": "사후 검토", "question": "오송 사건 사후 검토 보고서 작성해줘"},
+    {"workflow": "season_record", "label": "시즌 기록", "question": "이번 장마 시즌 기록에서 경보 구간이 많았던 시설 5곳 알려줘"},
 ]
 WATCH_CAVEAT = "감시 등급 연결은 5 km 안 가장 가까운 관측소 기준이며 그 관측소가 시설 유입을 대표하는지는 검증하지 않았습니다."
 BASELINE_CAVEAT = "남은 분은 최근 상승 속도를 그대로 늘린 기준선이며 예보가 아닙니다."
@@ -53,29 +56,29 @@ _STAGE_WORDS = [("계획홍수위", "planned_flood"), ("경보", "warning"), ("�
 def tools() -> list[dict[str, Any]]:
     descriptions = [
         ("get_watch_overview", "전국 또는 한 지역의 관측소 단계 분포·상승 중 관측소 수·연결 시설 수를 센다. 몇 곳인지, 전체 현황을 물을 때.",
-         "region: 사용자가 쓴 시도 이름(강원·충북 등). min_stage: 사용자가 쓴 단계(관심·주의보·경보·계획홍수위). 쓰지 않으면 생략.",
+         "region: 사용자가 쓴 시도 또는 권역 이름(강원·충북·충청권 등). min_stage: 사용자가 쓴 단계(관심·주의보·경보·계획홍수위). 쓰지 않으면 생략.",
          "단계별 관측소 수, 상승 중 수, 자료 품질 수, 지역별 최고 단계, 상위 관측소.", "시설 침수 여부, 예보, 통제 명령."),
         ("navigate_board", "화면을 지역·관측소·시설로 옮긴다. '○○ 보여줘', '○○로 가', '○○ 지도에서' 같은 이동 요청.",
          "region: 사용자가 쓴 시도. station: 사용자가 쓴 관측소 이름. facility: 사용자가 쓴 시설 이름. min_stage: 사용자가 쓴 단계. 하나 이상.",
          "이동한 위치와 그곳의 현재 단계·수위·연결 시설.", "이동 대상이 아닌 다른 지역의 수치."),
         ("rank_priority", "계획홍수위까지 남은 분과 단계로 관측소를 정렬한다. 사용자가 '관측소'라고 명시해 가장 위험한 관측소, 상위 N곳을 물을 때(시설 순위는 rank_facilities를 쓴다).",
-         "region: 사용자가 쓴 시도(없으면 전국). limit: 사용자가 쓴 개수(기본 5).", "순위별 관측소·단계·수위·상승 속도·남은 분·연결 시설.", "순위 밖 관측소의 안전, 예보."),
+         "region: 사용자가 쓴 시도 또는 권역(충북·충청권·수도권 등, 없으면 전국). limit: 사용자가 쓴 개수(기본 5).", "순위별 관측소·단계·수위·상승 속도·남은 분·연결 시설.", "순위 밖 관측소의 안전, 예보."),
         ("summarize_changes", "최근 N분 사이 단계가 오르거나 내린 관측소와 새로 빠르게 오르는 관측소를 비교한다. 뭐가 바뀌었는지 물을 때.",
          "since_min: 사용자가 쓴 분(‘1시간’은 60, 기본 60). region: 사용자가 쓴 시도.", "단계 상승·하강 관측소, 새로 오르는 관측소, 비교 시각.", "원인(강우·방류)의 단정, 예보."),
         ("get_station_status", "관측소 한 곳의 지금 단계·수위·상승 속도·계획홍수위까지 남은 분·연결 시설을 설명한다. 특정 관측소를 물을 때.",
          "station: 사용자가 쓴 관측소 이름(예: 미호강교) 또는 코드.", "관측 시각·수위·단계·속도·남은 분·연결 시설과 등급.", "시설 침수 여부, 도달 시각 확정, 통제 명령."),
         ("draft_situation_report", "현재 시각 기준 상황 보고에 넣을 수치 묶음(단계 분포, 상위 관측소, 운영 시설 상태, 자료 품질)을 모은다. 보고·브리핑·정리를 요청할 때.",
-         "region: 사용자가 쓴 시도(없으면 전국).", "보고 시각, 단계별 수, 상위 5곳, 운영 등록 시설 상태, 품질 주의, 한계 문구.", "피해·사망, 원인 단정, 예보."),
+         "region: 사용자가 쓴 시도 또는 권역(충북·충청권·수도권 등, 없으면 전국).", "보고 시각, 단계별 수, 상위 5곳, 운영 등록 시설 상태, 품질 주의, 한계 문구.", "피해·사망, 원인 단정, 예보."),
         ("rule_scorecard", "운영 등록 시설의 통제 검토 규칙을 적중·누락·오경보 후보·근접으로 나눠 채점한다(Barnes et al. 2007의 네 분류를 따른다). 규칙이 얼마나 믿을 만한지, 성적표를 물을 때.",
          "facility: 사용자가 쓴 운영 시설 이름(예: 궁평2지하차도).", "기준 사건 적중 여부와 선행 분, 다른 해 권고 구간(오경보 후보) 수, 권고 없이 경보 수위에 닿은 해(근접) 수, 계획홍수위 미도달 권고 수.", "오경보 확정(통제 기록 대조 전), 피해 감소, 최적 기준 확정."),
         ("get_rain_status", "지금 비가 오는 강우 관측소와 강도(최근 10분 강우의 시간당 환산), 강한 비 아래에 있는 하천 관측소를 센다. 비·강우·호우·폭우를 물을 때.",
-         "region: 사용자가 쓴 시도(없으면 전국). limit: 사용자가 쓴 개수(기본 5).",
+         "region: 사용자가 쓴 시도 또는 권역(충북·충청권·수도권 등, 없으면 전국). limit: 사용자가 쓴 개수(기본 5).",
          "강우 관측소 수, 비 오는 곳 수, 강도별 수, 많이 오는 곳 상위 N곳, 강한 비 아래 하천 관측소의 단계·상승 속도.", "앞으로 내릴 비(예보), 침수 발생, 수위 상승 시각."),
         ("rank_facilities", "시설을 잠그는 원인에 맞춰 하천형은 연결 수위, 내수형은 시설 근처 강우로 순위를 낸다. 감시 보드가 보여주는 시설 순위와 같은 기준이며, '관측소'라고 쓰지 않은 '가장 위험한 곳' 질문의 기본값이다. 위험한 시설, 먼저 볼 지하차도, 비가 많이 오는 내수형을 물을 때.",
-         "region: 사용자가 쓴 시도(없으면 전국). group: 사용자가 '지하차도'라고 쓰면 underpass, '하천변·둔치·출입구·하상도로'라고 쓰면 riverside(쓰지 않으면 생략). driver: '하천형'이면 river, '내수형'이면 pluvial(쓰지 않으면 생략). limit: 사용자가 쓴 개수(기본 5).",
+         "region: 사용자가 쓴 시도 또는 권역(충북·충청권·수도권 등, 없으면 전국). group: 사용자가 '지하차도'라고 쓰면 underpass, '하천변·둔치·출입구·하상도로'라고 쓰면 riverside(쓰지 않으면 생략). driver: '하천형'이면 river, '내수형'이면 pluvial(쓰지 않으면 생략). limit: 사용자가 쓴 개수(기본 5).",
          "시설 이름·종류·지역, 하천형·내수형 분류, 위험 단계, 판단 이유, 하천 관측소와 거리, 계획홍수위까지 남은 분, 주변 1·3시간 강우.", "시설 침수 여부, 통제 실행, 배수·펌프 용량에 따른 실제 침수 판단."),
         ("get_official_forecasts", "홍수통제소가 낸 공식 홍수주의보·홍수경보 중인 관측소를 센다(실시간, 재생 시각이면 그 시각의 발령 이력). 특보·홍수경보·홍수주의보·발령을 물을 때.",
-         "region: 사용자가 쓴 시도(없으면 전국).",
+         "region: 사용자가 쓴 시도 또는 권역(충북·충청권·수도권 등, 없으면 전국).",
          "특보 종류별 관측소 수, 관측소별 발령 시각·발령 시 수위·예상 수위·예상 시각·경과 분.", "특보 문안 밖의 예보, 시설 침수 여부, 통제 실행."),
         ("validation_cases", "과거 사건(오송 2023, 대전 2020·2023·2024)에서 시설 위험 규칙과 공식 특보가 실제 통제·유입보다 몇 분 먼저였는지 보여준다. 검증·사례·규칙이 실제 통제보다 빨랐는지 물을 때.",
          "region: 사용자가 쓴 시도(대전·충북, 없으면 전부).",
@@ -85,6 +88,10 @@ def tools() -> list[dict[str, Any]]:
          "case_id: 사용자가 오송·궁평2 또는 대전 사건 연도·시설을 명시하면 해당 저장 사례. region: 사용자가 쓴 시도(사건을 특정하지 않으면 해당 시도, 없으면 전체 사례).",
          "사례별 출처가 있는 통제·유입 기준, 시각 정밀도, 공식 특보·시설 규칙 신호, 같은 지역 신호 수, 검토에 필요한 추가 증거.",
          "완전한 PERC, 통제 원인·대응 성패·피해·복구·취약성 평가, 저장 자료 밖의 사실."),
+        ("season_record", "서버가 10분마다 기록한 실시간 보드로 올해 장마 시즌 동안 시설별 경보 구간(주의 이상이 이어진 구간)·최고 단계·공식 특보 동반 여부를 센다. 이번 장마·시즌 기록·경보 구간·혼자 울린 경보를 물을 때.",
+         "region: 사용자가 쓴 시도 또는 권역(없으면 전국). limit: 사용자가 쓴 개수(기본 5).",
+         "기록 기간과 스냅샷 수, 주의·경계·심각 도달 시설 수, 경보 구간 수와 특보 동반·혼자 울림 수, 구간이 많았던 시설과 단계별 시간.",
+         "기록 시작 전 기간, 실제 통제·침수 여부(통제 기록과 대조하지 않음), 혼자 울린 구간의 오경보 확정."),
     ]
     return [{"name": name, "description": description, "input_fields": sorted(PARAMETERS[name]),
              "output": "national watch evidence with provenance and limitations", "use_when": description,
@@ -114,6 +121,7 @@ _OVERVIEW = re.compile(r"몇\s*곳|현황|전체|전국|몇\s*개")
 _STATUS = re.compile(r"단계|수위|남았|상태|여유|얼마")
 _OFFICIAL = re.compile(r"특보|홍수경보|홍수주의보|발령")
 _VALIDATE = re.compile(r"검증|사례|실제\s*통제|통제\s*(?:시각|보다)|빨랐|늦었")
+_SEASON = re.compile(r"시즌|(?:이번|올해|올)\s*장마|장마\s*(?:기록|동안)|경보\s*구간|혼자\s*울")
 _POST_EVENT_REVIEW = re.compile(r"사후\s*(?:검토|분석|보고서|평가|리뷰)|사건\s*(?:복기|사후\s*검토)|재난\s*(?:복기|사후\s*분석)|PERC", re.IGNORECASE)
 
 
@@ -173,6 +181,8 @@ def hints(message: str) -> list[dict[str, Any]]:
         add("post_event_review", case_id=review_case_id, region=region if not review_case_id else None)
     elif _SCORE.search(message) and facility and facility["tier"] == "operational":
         add("rule_scorecard", facility=facility["name"])
+    elif _SEASON.search(message):
+        add("season_record", region=region, limit=_written_limit(message))
     elif _VALIDATE.search(message):
         add("validation_cases", region=region)
     elif _OFFICIAL.search(message) and not station and not facility:
@@ -214,7 +224,7 @@ def validate(name: str, params: dict[str, Any], supplied: str) -> dict[str, Any]
     if params.get("region") is not None:
         region = nw.match_region(str(params["region"]))
         if region is None or region != nw.match_region(supplied):
-            raise ValueError("The region must be a 시도 the user named.")
+            raise ValueError("The region must be a 시도 or 권역 the user named.")
         clean["region"] = region
     if params.get("station") is not None:
         station = nw.find_station(str(params["station"])) or nw.find_station(supplied)
@@ -308,6 +318,10 @@ def _review_signal(signal: dict[str, Any], precision: str) -> dict[str, Any]:
 def _view(region: str | None = None, station: dict[str, Any] | None = None, facility: dict[str, Any] | None = None, min_stage: str | None = None,
           layer: str | None = None) -> dict[str, Any]:
     view: dict[str, Any] = {"region": region, "min_stage": min_stage, "station_code": None, "facility_id": None, "center": None, "zoom": None, "layer": layer}
+    if region in nw.REGION_GROUPS:
+        # The board's region tiles are 시도; a 권역 keeps the board national and names the 시도 it covers.
+        view.update(region=None, region_group=region, regions=list(nw.REGION_GROUPS[region]))
+        region = None
     if facility:
         view.update(station_code=facility["station_code"], facility_id=facility["facility_id"], center=[facility["lon"], facility["lat"]], zoom=13)
     elif station:
@@ -423,6 +437,7 @@ def run_tool(name: str, request: Any) -> dict[str, Any]:
         top = selected[0] if selected else None
         view_facility = {**top, "station_code": None} if top and not region else None
         return {"mode": data["mode"], "at": data["at"], "rain_at": data["rain_at"], "region": region or "전국",
+                "region_members": list(nw.region_members(region)) if region else None,
                 "group": nw.GROUP_KO.get(group or "", "전체 시설"), "driver": driver, "limit": limit,
                 "counts": counts, "ranked": ranked,
                 "view": _view(region=region, facility=view_facility, layer="rain" if driver == "pluvial" else None) if view_facility else _view(region=region, layer="rain" if driver == "pluvial" else None),
@@ -434,7 +449,7 @@ def run_tool(name: str, request: Any) -> dict[str, Any]:
         catalogue = nw.stations()
         active = [{**row, "region": catalogue[row["station_code"]].region if row["station_code"] in catalogue else None} for row in data["active"]]
         if region:
-            active = [row for row in active if row["region"] == region]
+            active = [row for row in active if nw.in_region(row["region"], region)]
         return {"mode": data["mode"], "at": data["at"], "region": region or "전국", "error": data["error"],
                 "counts": {"warning": sum(1 for row in active if row["level"] == "warning"), "advisory": sum(1 for row in active if row["level"] == "advisory")},
                 "active": active[:10], "active_total": len(active), "source": data["source"], "view": _view(region=region),
@@ -443,7 +458,7 @@ def run_tool(name: str, request: Any) -> dict[str, Any]:
     if name == "validation_cases":
         from . import case_validation
         data = case_validation.scorecard()
-        cases = [item for item in data["cases"] if not region or nw.match_region(item["region"]) == region]
+        cases = [item for item in data["cases"] if nw.in_region(nw.match_region(item["region"]), region)]
         return {"region": region or "전체", "built_at": data["built_at"], "rule": data["rule"], "cases": cases, "view": _view(region=region),
                 "coverage_note": "VALIDATION_REPLAY: stored replay of facility_risk every 10 minutes against reported control times.",
                 "limitations": data["limitations"]}
@@ -452,7 +467,7 @@ def run_tool(name: str, request: Any) -> dict[str, Any]:
         data = case_validation.scorecard()
         case_id = getattr(request, "case_id", None)
         cases = [item for item in data["cases"]
-                 if (not case_id or item["id"] == case_id) and (not region or nw.match_region(item["region"]) == region)]
+                 if (not case_id or item["id"] == case_id) and nw.in_region(nw.match_region(item["region"]), region)]
         reviewed = []
         for item in cases:
             reference = item["reference"]
@@ -489,6 +504,8 @@ def run_tool(name: str, request: Any) -> dict[str, Any]:
                             "현재 자료는 사건 기준·공식 특보·시설 위험 규칙 재생에 한정된다. 인터뷰, 취약성, 대응 과정, 피해·복구 자료가 없어 전체 재난관리 성과를 평가하지 않는다.",
                             "기준 시각이 보도상 근사 또는 상한이면 표시된 선행·지연은 실제 통제 시각과 같지 않을 수 있다."],
         }
+    if name == "season_record":
+        return season_record(region, getattr(request, "limit", None) or 5)
     if name == "get_rain_status":
         limit = getattr(request, "limit", None) or 5
         data = nw.overview(at, region, None, limit=2000, rain_mode=rain_mode)
@@ -505,6 +522,32 @@ def run_tool(name: str, request: Any) -> dict[str, Any]:
                 "coverage_note": "RAIN_OBSERVATION: observed rain only; no forecast and no flood attribution.",
                 "limitations": [*rain["limitations"], RAIN_CAVEAT]}
     raise KeyError(name)
+
+
+def season_record(region: str | None, limit: int = 5) -> dict[str, Any]:
+    """This year's season board (watch_log), optionally narrowed to a 시도 or 권역; read-only."""
+    from datetime import datetime
+
+    from . import watch_log
+    season = max(2026, datetime.now().year)
+    board = watch_log.season_board(season, limit=10000)
+    rows = [row for row in board["facilities"] if nw.in_region(row.get("region"), region)]
+    counts = board["counts"]
+    if region:
+        counts = {"facilities": sum(1 for f in nw.facility_catalog() if nw.in_region(f["region"], region)),
+                  "reached": {label: sum(1 for row in rows if row["peak_level"] >= level) for level, label in ((2, "주의"), (3, "경계"), (4, "심각"))},
+                  "episodes": sum(row["episodes"] for row in rows),
+                  "episodes_with_official": sum(row["episodes_with_official"] for row in rows),
+                  "episodes_alone": sum(row["episodes_alone"] for row in rows)}
+    keys = ("facility_id", "name", "kind_ko", "region", "driver", "peak_label", "episodes", "episodes_with_official", "episodes_alone",
+            "minutes_by_level", "first_alert_at", "last_episode")
+    alerted = [row for row in rows if row["episodes"] > 0]
+    ranked = [{"rank": index + 1, **{key: row.get(key) for key in keys}} for index, row in enumerate(alerted[:limit])]
+    return {"season": season, "region": region or "전국", "region_members": list(nw.region_members(region)) if region else None,
+            "coverage": board["coverage"], "counts": counts, "limit": limit, "ranked": ranked, "method": board["method"],
+            "view": _view(region=region),
+            "coverage_note": "SEASON_RECORD: live board snapshots recorded every 10 minutes since the recorder started; no historical backfill.",
+            "limitations": [*board["limitations"], "경보 구간은 시설 위험 단계 기록이며 실제 통제·침수 기록과 대조하지 않았다."]}
 
 
 def scorecard(facility_id: str) -> dict[str, Any]:
@@ -673,6 +716,22 @@ def summarize(calls: list[dict[str, Any]]) -> tuple[str, list[int]]:
                              + ", ".join(f"{s['signal']} {s['at'][11:16] if s['at'] else '없음'}({s['verdict']})" for s in picks)
                              + f"; 기준 시각에 {item['region']} 시설 {region_now.get('total', 0)}곳 중 주의 이상 {region_now.get('advisory_or_above', 0)}곳")
             text = " / ".join(parts) + ". 통제 시각은 보도 기준입니다." if parts else "이 지역의 검증 사례가 없습니다."
+        elif name == "season_record":
+            cov, counts = result.get("coverage") or {}, result.get("counts") or {}
+            if not cov.get("snapshots"):
+                text = f"{result.get('season')}년 시즌 기록이 아직 없습니다. 서버가 실시간으로 돌면 10분마다 쌓입니다."
+            else:
+                reached = counts.get("reached") or {}
+                text = (f"{result.get('season')}년 시즌 기록({(cov.get('from') or '')[:16].replace('T', ' ')}부터 {(cov.get('to') or '')[5:16].replace('T', ' ')}까지 "
+                        f"{cov.get('snapshots')}회) 기준 {result.get('region')} 시설 {counts.get('facilities', 0)}곳 중 주의 이상 도달 {reached.get('주의', 0)}곳, "
+                        f"경계 이상 {reached.get('경계', 0)}곳, 심각 {reached.get('심각', 0)}곳이고, 경보 구간은 {counts.get('episodes', 0)}회"
+                        f"(공식 특보 동반 {counts.get('episodes_with_official', 0)}회, 특보 없이 혼자 {counts.get('episodes_alone', 0)}회)입니다.")
+                rows = result.get("ranked") or []
+                if rows:
+                    text += " 구간이 많았던 시설: " + "; ".join(
+                        f"{row['rank']}위 {row['name']}({row.get('region') or '지역 미상'}) 최고 {row.get('peak_label') or '—'} · 구간 {row['episodes']}회"
+                        for row in rows) + "."
+                text += " 혼자 울린 구간은 헛경보 후보이며 오경보로 확정하지 않습니다."
         elif name == "get_rain_status":
             if not result.get("available"):
                 text = "이 시각의 강우 관측 자료가 없습니다."

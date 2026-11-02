@@ -1,4 +1,5 @@
 import { API, arrow, cached, esc, get, STAGE_COLOR, STAGE_KO } from "../lib.js";
+import { mountAgent } from "../agent.js";
 
 // 장마 전 · 시설 기준. 업무 순서대로: 어떤 시설을 운영할지 → 기준 → 장마 중 지금 상태.
 // 과거 사건에 규칙을 재생한 결과는 사례 재구성에서만 보여 준다.
@@ -12,6 +13,19 @@ const GATE_KO = { CONFIRMED: "확인", PENDING: "확인 대기", MISSING: "자�
 const RECO_KO = { NORMAL: "정상", MONITOR: "감시", CLOSURE_REVIEW: "통제 검토" };
 const CONFIRM_KO = { CONFIRMED: "통제 확인", NO_ACTION: "조치 없음", ESCALATE: "상급 보고" };
 const DRIVER_KO ={ river_stage: "하천 수위형", unverified: "미검증", pluvial_hypothesis: "내수형 가설" };
+// 하위 탭마다 시설 에이전트 추천 질문을 앞세우는 순서(workflow는 /api/agent/examples?facility_id= 의 값).
+const AGENT_FLOWS = {
+  registry: ["control_rule", "facility_backtest", "criteria_review", "facility_status", "rise_forecast"],
+  criteria: ["criteria_review", "facility_backtest", "control_rule", "facility_status", "rise_forecast"],
+  now: ["facility_status", "control_rule", "rise_forecast", "facility_backtest", "criteria_review"],
+};
+
+function gateChips(registry, f) {
+  return `<div class="op-gates">${registry.gates.map((g) => {
+    const gate = f.gates?.[g.id] ?? {};
+    return `<span class="op-chip" data-tone="${GATE_TONE[gate.status] ?? ""}" title="${esc(g.question)}${gate.note ? `\n${esc(gate.note)}` : ""}">${esc(g.label)} · ${GATE_KO[gate.status] ?? "미확인"}</span>`;
+  }).join("")}</div>`;
+}
 
 function registryView(registry) {
   const operationalNames = new Set(registry.operational.map((f) => f.name));
@@ -24,11 +38,9 @@ function registryView(registry) {
         <div><span>잠김 원인</span><b>${esc(DRIVER_KO[f.driver] ?? f.driver)}</b></div>
         <div><span>대표 관측소</span><b>${esc(f.gauge?.name ?? "미연결")}</b></div>
       </div>
-      <div class="op-gates">${registry.gates.map((g) => {
-        const gate = f.gates?.[g.id] ?? {};
-        return `<span class="op-chip" data-tone="${GATE_TONE[gate.status] ?? ""}" title="${esc(g.question)}${gate.note ? `\n${esc(gate.note)}` : ""}">${esc(g.label)} · ${GATE_KO[gate.status] ?? "미확인"}</span>`;
-      }).join("")}</div>
+      ${gateChips(registry, f)}
       ${duplicate ? '<p class="op-note" style="color:var(--amber)">운영 시설과 이름이 같은 후보입니다. 같은 시설이 중복 등록됐는지 확인이 필요합니다.</p>' : ""}
+      <a class="op-go" style="align-self:flex-start" href="#/facility/registry?facility=${encodeURIComponent(f.id)}&agent=open">${f.status === "OPERATIONAL" ? "이 시설 에이전트에게 묻기" : "에이전트 · 왜 답하지 않나"}</a>
     </article>`;
   };
   return `<section class="op-sec">
@@ -92,6 +104,8 @@ export async function renderFacility(view, route) {
   const sub = SUBTABS.some((t) => t.id === route.parts[0]) ? route.parts[0] : "registry";
   const registry = await cached("/api/twin/registry");
   const facility = registry.operational.find((f) => f.id === route.query.get("facility")) ?? registry.operational[0];
+  // 에이전트는 등록 카드에서 고른 시설(후보 포함)을 따른다. 기준 검토·지금 상태 본문은 운영 시설만 그린다.
+  const target = [...registry.operational, ...registry.candidates].find((f) => f.id === route.query.get("facility")) ?? facility;
   let body = "";
   if (sub === "registry") body = registryView(registry);
   else if (!facility) body = '<p class="op-note">운영 등록 시설이 없습니다.</p>';
@@ -104,8 +118,39 @@ export async function renderFacility(view, route) {
       <h1 class="op-h1">이 시설은 어떤 신호로, 몇 분 전에 막나</h1>
       <p class="op-lead">${facility ? `${esc(facility.name)} · 대표 관측소 ${esc(facility.gauge?.name ?? "")}. ` : ""}관문을 통과한 시설에만 통제 규칙을 붙이고, 기준 후보마다 권고가 얼마나 자주 나는지 비교해 고릅니다.</p>
     </header>
-    <nav class="op-subtabs" aria-label="시설 기준">${SUBTABS.map((t) => `<a href="#/facility/${t.id}"${t.id === sub ? ' aria-current="page"' : ""}>${t.label}</a>`).join("")}</nav>
+    <nav class="op-subtabs" aria-label="시설 기준">${SUBTABS.map((t) => `<a href="#/facility/${t.id}${route.query.get("facility") ? `?facility=${encodeURIComponent(route.query.get("facility"))}` : ""}"${t.id === sub ? ' aria-current="page"' : ""}>${t.label}</a>`).join("")}</nav>
     ${body}
     ${sub === "criteria" ? `<p class="op-note">현재 규칙의 결과는 <a href="#/scorecard">기준 채점 ${arrow}</a>에서 장마 후 성적표로 봅니다.</p>` : ""}
   </div>`;
+  if (target) mountAgent(view, facilityAgent(registry, target, facility, sub, route.query.get("agent") === "open"));
+}
+
+// 운영 시설은 시설 도구(관측 상태·통제 기준·백테스트·기준 비교·연구 모델)로 묻는다.
+// 후보 시설에는 붙은 도구가 없으므로 질문을 받지 않고, 어떤 관문이 남았는지만 보여 준다.
+function facilityAgent(registry, target, operational, sub, open) {
+  const base = { key: `facility:${target.id}`, title: `${target.name} 에이전트`, open };
+  if (target.status !== "OPERATIONAL") {
+    const pending = registry.gates.filter((g) => target.gates?.[g.id]?.status !== "CONFIRMED").map((g) => `${esc(g.label)}(${GATE_KO[target.gates?.[g.id]?.status] ?? "미확인"})`);
+    return {
+      ...base,
+      badge: "후보 · 도구 없음",
+      intro: `${esc(target.name)}${target.region ? ` · ${esc(target.region)}` : ""} — 운영 등록 전 후보 시설입니다.`,
+      gated: {
+        html: `<p>시설별 에이전트 도구(관측 상태·통제 검토 기준·과거 수위 백테스트·기준 비교)는 <b>네 관문을 모두 통과해 운영 등록된 시설</b>에만 붙습니다. 이 시설에는 아직 붙은 도구가 없어 질문을 받지 않습니다. 근거 없는 답을 만들지 않기 위해서입니다.</p>
+          ${gateChips(registry, target)}
+          <p>${pending.length ? `남은 관문: ${pending.join(" · ")}` : "관문 기록은 모두 확인이지만 아직 운영 등록되지 않았습니다."}</p>
+          ${operational ? `<p><a href="#/facility/${sub}?facility=${encodeURIComponent(operational.id)}&agent=open">운영 시설 ${esc(operational.name)} 에이전트로 ${arrow}</a></p>` : ""}`,
+      },
+    };
+  }
+  const eventId = target.event_id ?? "osong-2023";
+  return {
+    ...base,
+    badge: "운영 · 시설 도구",
+    intro: `${esc(target.name)} · 대표 관측소 ${esc(target.gauge?.name ?? "")}. 관측 상태, 통제 검토 기준과 근거, 과거 수위 백테스트, 기준을 바꿨을 때의 비교를 물어보세요. 실제 침수심·피해 감소·통제 실행은 계산하거나 수행하지 않습니다.`,
+    scope: { event_id: eventId, facility_id: target.id },
+    examples: `/api/agent/examples?event_id=${encodeURIComponent(eventId)}&facility_id=${encodeURIComponent(target.id)}`,
+    workflows: AGENT_FLOWS[sub] ?? AGENT_FLOWS.registry,
+    placeholder: "예: 기준을 경보+60분으로 바꾸면 몇 분 먼저 검토하나요?",
+  };
 }

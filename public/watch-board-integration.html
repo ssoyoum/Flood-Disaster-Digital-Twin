@@ -856,7 +856,7 @@ body.wx-in-shell .demo-top { display: none; }
     { key: "now", title: "현황·이동", flows: ["watch_overview", "navigate_board", "station_status", "summarize_changes"] },
     { key: "rank", title: "시설 순위", flows: ["rank_priority", "rank_facilities"] },
     { key: "rain", title: "강우·특보", flows: ["rain_status", "get_official_forecasts"] },
-    { key: "proof", title: "검증·보고", flows: ["rule_scorecard", "validation_cases", "post_event_review", "situation_report"] },
+    { key: "proof", title: "검증·보고", flows: ["rule_scorecard", "season_record", "validation_cases", "post_event_review", "situation_report"] },
   ];
   let sugItems = [], sugOpen = null;
   function renderSugs() {
@@ -872,7 +872,8 @@ body.wx-in-shell .demo-top { display: none; }
   }
   async function loadExamples() {
     try { sugItems = await get(`/api/agent/examples?event_id=osong-2023&board=watch`); } catch { sugItems = []; /* 입력만 */ }
-    if (IN_OPS) sugItems = sugItems.filter((s) => !["validation_cases", "post_event_review"].includes(s.workflow));
+    // 장마 후 검토 질문(시즌 기록·사례 검증·사후 검토)은 운영 앱의 기준 채점 탭 에이전트가 맡는다.
+    if (IN_OPS) sugItems = sugItems.filter((s) => !["season_record", "validation_cases", "post_event_review"].includes(s.workflow));
     renderSugs();
   }
   function applyView(v) {
