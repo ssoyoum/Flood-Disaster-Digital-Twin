@@ -1,0 +1,55 @@
+name: Traffic archive
+
+# GitHub keeps repository traffic for 14 days only. Save a daily snapshot
+# (views, clones, referrers, popular paths) to the `traffic-data` branch.
+# Needs a TRAFFIC_TOKEN secret: fine-grained token with Administration: read.
+
+on:
+  schedule:
+    - cron: "17 15 * * *" # 00:17 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: traffic-archive
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      TRAFFIC_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Save traffic snapshot
+        run: |
+          set -euo pipefail
+          if [ -z "$TRAFFIC_TOKEN" ]; then
+            echo "::notice::TRAFFIC_TOKEN is not set; skipping."
+            exit 0
+          fi
+          day=$(date -u +%F)
+          out="$RUNNER_TEMP/traffic"
+          mkdir -p "$out"
+          for ep in views clones popular/referrers popular/paths; do
+            GH_TOKEN="$TRAFFIC_TOKEN" gh api "repos/$GITHUB_REPOSITORY/traffic/$ep" > "$out/${ep//\//-}.json"
+          done
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git clone --quiet --no-checkout "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" archive
+          cd archive
+          if git ls-remote --exit-code --heads origin traffic-data > /dev/null; then
+            git checkout --quiet traffic-data
+          else
+            git checkout --quiet --orphan traffic-data
+            git rm -rfq --ignore-unmatch .
+          fi
+          mkdir -p "traffic/$day"
+          cp "$out"/*.json "traffic/$day/"
+          git add traffic
+          git commit --quiet -m "chore(repo): archive traffic for $day" || { echo "No change."; exit 0; }
+          git push --quiet origin traffic-data
