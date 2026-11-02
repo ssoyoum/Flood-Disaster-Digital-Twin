@@ -90,6 +90,23 @@ _REGION_ALIASES: dict[str, tuple[str, ...]] = {
     "경남": ("경상남도", "경남"),
     "제주": ("제주특별자치도", "제주도", "제주"),
 }
+# 권역: 시도 여러 곳을 묶은 이름. 지역 필터는 소속 시도 가운데 하나면 통과한다.
+REGION_GROUPS: dict[str, tuple[str, ...]] = {
+    "수도권": ("서울", "인천", "경기"),
+    "충청권": ("대전", "세종", "충북", "충남"),
+    "호남권": ("광주", "전북", "전남"),
+    "영남권": ("부산", "대구", "울산", "경북", "경남"),
+}
+# 사용자가 쓰는 권역 이름. 강원권·제주권은 시도 하나라 그 시도로 읽는다.
+# "경상"만 쓴 말은 경상자(부상)와 겹쳐 받지 않는다.
+_REGION_GROUP_ALIASES: dict[str, tuple[str, ...]] = {
+    "수도권": ("수도권",),
+    "충청권": ("충청권", "충청도", "충청"),
+    "호남권": ("호남권", "호남", "전라권", "전라도", "전라"),
+    "영남권": ("영남권", "영남", "경상권", "경상도"),
+    "강원": ("강원권",),
+    "제주": ("제주권",),
+}
 
 
 def consistent_levels(levels: dict[str, float]) -> dict[str, float]:
@@ -121,13 +138,27 @@ def region_of(address: str) -> str:
 
 
 def match_region(text: str) -> str | None:
-    """The region the user named, longest alias first so 전북 does not match inside 전북특별자치도 twice."""
+    """The region the user named, longest alias first so 전북 does not match inside 전북특별자치도 twice.
+
+    A 권역 name (충청권, 수도권 …) returns the group key; a 시도 wins a tie so 충청북도 stays 충북.
+    """
     best: tuple[int, str] | None = None
-    for short, aliases in _REGION_ALIASES.items():
-        for alias in aliases:
-            if alias in text and (best is None or len(alias) > best[0]):
-                best = (len(alias), short)
+    for aliases_by_region in (_REGION_ALIASES, _REGION_GROUP_ALIASES):
+        for short, aliases in aliases_by_region.items():
+            for alias in aliases:
+                if alias in text and (best is None or len(alias) > best[0]):
+                    best = (len(alias), short)
     return best[1] if best else None
+
+
+def region_members(region: str) -> tuple[str, ...]:
+    """The 시도 a region filter covers: the group's members, or the 시도 itself."""
+    return REGION_GROUPS.get(region, (region,))
+
+
+def in_region(value: str | None, region: str | None) -> bool:
+    """Whether a row's 시도 passes the filter; no filter passes everything."""
+    return not region or value in region_members(region)
 
 
 @dataclass(frozen=True)
@@ -620,7 +651,7 @@ def nearby_rain(code: str, readings: dict[str, dict[str, Any]]) -> dict[str, Any
 
 def rain_summary(at: str | None = None, region: str | None = None, limit: int = 200, frame: tuple | None = None) -> dict[str, Any]:
     mode, observed, readings = frame or rain_frame(at)
-    rows = [row for row in readings.values() if not region or row["region"] == region]
+    rows = [row for row in readings.values() if in_region(row["region"], region)]
     by = {key: 0 for _, key, _ in RAIN_CLASSES}
     by["light"] = 0
     for row in rows:
@@ -772,7 +803,7 @@ def _assess_all(at: str | None, region: str | None = None, rain_mode: str | None
     rain = rain_frame(at, live=rain_live)
     rows = []
     for station in stations().values():
-        if region and station.region != region:
+        if not in_region(station.region, region):
             continue
         latest = snapshot.observed.get(station.code)
         if mode == "replay" and station.code not in stored_station_codes():
@@ -872,7 +903,7 @@ def facility_status(at: str | None = None, region: str | None = None, group: str
     by_code = {row["code"]: row for row in rows}
     out = []
     for facility in facility_catalog():
-        if region and facility["region"] != region or group and facility["group"] != group:
+        if not in_region(facility["region"], region) or group and facility["group"] != group:
             continue
         gauge = by_code.get(facility["station_code"]) if facility["station_code"] else None
         item = {**facility, "gauge": None, "stage": None, "stage_label": "하천 관측소 없음" if not facility["station_code"] else "관측 없음",
@@ -932,7 +963,7 @@ def changes(since_min: int = 60, at: str | None = None, region: str | None = Non
                 "note": "비교할 이전 스냅샷이 아직 없습니다. 감시가 시작된 뒤 시간이 더 지나야 합니다.", "stage_up": [], "stage_down": [], "new_rising": []}
     up, down, rising = [], [], []
     for station in stations().values():
-        if region and station.region != region:
+        if not in_region(station.region, region):
             continue
         now_obs, then_obs = snapshot.observed.get(station.code), earlier.observed.get(station.code)
         if not now_obs or not then_obs:
