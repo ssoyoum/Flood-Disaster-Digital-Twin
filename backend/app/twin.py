@@ -36,7 +36,7 @@ WATER_LEVEL_FILE = OSONG_DIR / "osong_hrfco_water_level_10m_2023-07-14_17.csv"
 RAINFALL_FILE = OSONG_DIR / "osong_kma_aws_rainfall_2023-07-14_17.csv"
 # Explicit research quarantines (e.g. the 2023-05-16 미호강교 step fault) shared with the hourly audit.
 QUALITY_POLICY_FILE = REPO_ROOT / "data" / "manifests" / "hrfco-quality-policy.json"
-HRFCO_ENDPOINT = "https://api.hrfco.go.kr/{key}/waterlevel/list/{interval}/{station}/{start}/{end}.xml"
+HRFCO_ENDPOINT = os.environ.get("HRFCO_API_BASE", "https://api.hrfco.go.kr").rstrip("/") + "/{key}/waterlevel/list/{interval}/{station}/{start}/{end}.xml"
 DEFAULT_REPLAY_NOW = "2023-07-15T08:00:00"
 
 # Operational facilities live in data/facilities/registry.json (hand-kept; candidates are generated into

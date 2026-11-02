@@ -27,7 +27,8 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 HISTORY_FILE = REPO_ROOT / "data" / "processed" / "flood_forecast" / "flood_forecast_issuances.csv"
-LIVE_URL = "https://api.hrfco.go.kr/{key}/fldfct/list.json"
+HRFCO_API_BASE = os.environ.get("HRFCO_API_BASE", "https://api.hrfco.go.kr").rstrip("/")
+LIVE_URL = HRFCO_API_BASE + "/{key}/fldfct/list.json"
 REFRESH_SECONDS = 300
 ACTIVE_HOURS = 72
 LEVEL = {"홍수주의보": "advisory", "홍수경보": "warning"}

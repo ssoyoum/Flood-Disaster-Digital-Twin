@@ -41,7 +41,7 @@ KIND_KO = {"underpass": "지하차도", "riverside_parking": "둔치·하천변 
 GROUP_KO = {"underpass": "지하차도", "riverside": "하천변 출입구"}
 HOURLY_DIR = REPO_ROOT / "data" / "processed" / "hrfco"
 LIVE_RAIN_HISTORY_FILE = REPO_ROOT / "data" / "interim" / "hrfco_live_rainfall_1h.json"
-BULK_ENDPOINT = "https://api.hrfco.go.kr/{key}/{kind}/list/{interval}.json"
+BULK_ENDPOINT = os.environ.get("HRFCO_API_BASE", "https://api.hrfco.go.kr").rstrip("/") + "/{key}/{kind}/list/{interval}.json"
 DEFAULT_REPLAY_AT = "2023-07-15T08:00:00"
 
 STAGE_ORDER = ["unrated", "normal", "attention", "advisory", "warning", "planned_flood"]
