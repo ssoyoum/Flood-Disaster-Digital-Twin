@@ -213,7 +213,13 @@ def facility_catalog() -> tuple[dict[str, Any], ...]:
             continue
         with path.open(encoding="utf-8", newline="") as handle:
             for row in csv.DictReader(handle):
-                raw.append({"facility_id": row["facility_id"], "name": _osm_display_name(row["name"], row["kind"], row["river_name"] or None),
+                original_name = row["name"]
+                has_hangul = bool(_HANGUL.search(original_name)) if original_name else False
+                raw.append({"facility_id": row["facility_id"], "name": _osm_display_name(original_name, row["kind"], row["river_name"] or None),
+                            # A name without Hangul becomes the same placeholder for every facility of that
+                            # kind+river, so the dedup below must key on the original (even if unreadable)
+                            # text instead, or unrelated nameless facilities collapse into one.
+                            "dedup_key": None if has_hangul else (original_name or None),
                             "kind": row["kind"], "sido": row["sido"], "sgg": None,
                             "lon": float(row["lon"]), "lat": float(row["lat"]), "river_name": row["river_name"] or None, "source": source})
     placed: dict[str, list[tuple[float, float]]] = {}
@@ -224,9 +230,10 @@ def facility_catalog() -> tuple[dict[str, Any], ...]:
         # "하상도로", "천변공원" and the like say nothing on their own; the river name tells them apart.
         if row["river_name"] and len(row["name"]) <= 5 and row["river_name"] not in row["name"]:
             row["name"] = f"{row['river_name']} {row['name']}"
-        if any(_km(row["lon"], row["lat"], lon, lat) < 2.0 for lon, lat in placed.get(row["name"], [])):
+        dedup_key = row.get("dedup_key") or row["name"]
+        if any(_km(row["lon"], row["lat"], lon, lat) < 2.0 for lon, lat in placed.get(dedup_key, [])):
             continue  # two OSM segments of one road or park
-        placed.setdefault(row["name"], []).append((row["lon"], row["lat"]))
+        placed.setdefault(dedup_key, []).append((row["lon"], row["lat"]))
         near = _nearest_station(row["lon"], row["lat"], FACILITY_LINK_KM)
         region = region_of(row["sido"]) if row["sido"] else "기타"
         if region == "기타" and near:
