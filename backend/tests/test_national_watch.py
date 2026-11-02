@@ -90,7 +90,8 @@ def test_watch_api_routes():
 @pytest.mark.parametrize("question,tool,key", [
     ("충북 보여줘", "navigate_board", "region"),
     ("미호강교 지금 몇 단계야?", "get_station_status", "station"),
-    ("지금 가장 위험한 곳 5곳 알려줘", "rank_priority", "limit"),
+    ("지금 가장 위험한 곳 5곳 알려줘", "rank_facilities", "limit"),
+    ("관측소 기준으로 가장 위험한 곳 5곳 알려줘", "rank_priority", "limit"),
     ("지난 1시간 동안 뭐가 바뀌었어?", "summarize_changes", "since_min"),
     ("지금 상황 보고 초안 써줘", "draft_situation_report", None),
     ("궁평2지하차도 규칙 성적표 보여줘", "rule_scorecard", "facility"),
