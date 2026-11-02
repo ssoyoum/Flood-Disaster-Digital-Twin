@@ -29,7 +29,8 @@ PARAMETERS: dict[str, set[str]] = {
 }
 EXAMPLES = [
     {"workflow": "watch_overview", "label": "전국 현황", "question": "지금 전국에서 주의보 이상인 관측소가 몇 곳이야?"},
-    {"workflow": "rank_priority", "label": "우선순위", "question": "지금 가장 위험한 곳 5곳 알려줘"},
+    {"workflow": "rank_facilities", "label": "우선순위", "question": "지금 가장 위험한 곳 5곳 알려줘"},
+    {"workflow": "rank_priority", "label": "관측소 우선순위", "question": "관측소 기준으로 가장 위험한 곳 5곳 알려줘"},
     {"workflow": "navigate_board", "label": "지역 이동", "question": "충북 보여줘"},
     {"workflow": "station_status", "label": "관측소 상태", "question": "미호강교 지금 몇 단계야?"},
     {"workflow": "summarize_changes", "label": "변화 요약", "question": "지난 1시간 동안 뭐가 바뀌었어?"},
@@ -57,7 +58,7 @@ def tools() -> list[dict[str, Any]]:
         ("navigate_board", "화면을 지역·관측소·시설로 옮긴다. '○○ 보여줘', '○○로 가', '○○ 지도에서' 같은 이동 요청.",
          "region: 사용자가 쓴 시도. station: 사용자가 쓴 관측소 이름. facility: 사용자가 쓴 시설 이름. min_stage: 사용자가 쓴 단계. 하나 이상.",
          "이동한 위치와 그곳의 현재 단계·수위·연결 시설.", "이동 대상이 아닌 다른 지역의 수치."),
-        ("rank_priority", "계획홍수위까지 남은 분과 단계로 관측소를 정렬한다. 가장 위험한 곳, 먼저 볼 곳, 상위 N곳을 물을 때.",
+        ("rank_priority", "계획홍수위까지 남은 분과 단계로 관측소를 정렬한다. 사용자가 '관측소'라고 명시해 가장 위험한 관측소, 상위 N곳을 물을 때(시설 순위는 rank_facilities를 쓴다).",
          "region: 사용자가 쓴 시도(없으면 전국). limit: 사용자가 쓴 개수(기본 5).", "순위별 관측소·단계·수위·상승 속도·남은 분·연결 시설.", "순위 밖 관측소의 안전, 예보."),
         ("summarize_changes", "최근 N분 사이 단계가 오르거나 내린 관측소와 새로 빠르게 오르는 관측소를 비교한다. 뭐가 바뀌었는지 물을 때.",
          "since_min: 사용자가 쓴 분(‘1시간’은 60, 기본 60). region: 사용자가 쓴 시도.", "단계 상승·하강 관측소, 새로 오르는 관측소, 비교 시각.", "원인(강우·방류)의 단정, 예보."),
@@ -70,7 +71,7 @@ def tools() -> list[dict[str, Any]]:
         ("get_rain_status", "지금 비가 오는 강우 관측소와 강도(최근 10분 강우의 시간당 환산), 강한 비 아래에 있는 하천 관측소를 센다. 비·강우·호우·폭우를 물을 때.",
          "region: 사용자가 쓴 시도(없으면 전국). limit: 사용자가 쓴 개수(기본 5).",
          "강우 관측소 수, 비 오는 곳 수, 강도별 수, 많이 오는 곳 상위 N곳, 강한 비 아래 하천 관측소의 단계·상승 속도.", "앞으로 내릴 비(예보), 침수 발생, 수위 상승 시각."),
-        ("rank_facilities", "시설을 잠그는 원인에 맞춰 하천형은 연결 수위, 내수형은 시설 근처 강우로 순위를 낸다. 위험한 시설, 먼저 볼 지하차도, 비가 많이 오는 내수형을 물을 때.",
+        ("rank_facilities", "시설을 잠그는 원인에 맞춰 하천형은 연결 수위, 내수형은 시설 근처 강우로 순위를 낸다. 감시 보드가 보여주는 시설 순위와 같은 기준이며, '관측소'라고 쓰지 않은 '가장 위험한 곳' 질문의 기본값이다. 위험한 시설, 먼저 볼 지하차도, 비가 많이 오는 내수형을 물을 때.",
          "region: 사용자가 쓴 시도(없으면 전국). group: 사용자가 '지하차도'라고 쓰면 underpass, '하천변·둔치·출입구·하상도로'라고 쓰면 riverside(쓰지 않으면 생략). driver: '하천형'이면 river, '내수형'이면 pluvial(쓰지 않으면 생략). limit: 사용자가 쓴 개수(기본 5).",
          "시설 이름·종류·지역, 하천형·내수형 분류, 위험 단계, 판단 이유, 하천 관측소와 거리, 계획홍수위까지 남은 분, 주변 1·3시간 강우.", "시설 침수 여부, 통제 실행, 배수·펌프 용량에 따른 실제 침수 판단."),
         ("get_official_forecasts", "홍수통제소가 낸 공식 홍수주의보·홍수경보 중인 관측소를 센다(실시간, 재생 시각이면 그 시각의 발령 이력). 특보·홍수경보·홍수주의보·발령을 물을 때.",
@@ -190,8 +191,12 @@ def hints(message: str) -> list[dict[str, Any]]:
         add("summarize_changes", since_min=_written_minutes(message), region=region)
     elif _REPORT.search(message):
         add("draft_situation_report", region=region)
-    elif _RANK.search(message):
+    elif _RANK.search(message) and "관측소" in message:
         add("rank_priority", region=region, limit=_written_limit(message))
+    elif _RANK.search(message):
+        # The board's own ranked list is facility-based (facility_risk), so a bare "가장 위험한 곳" without
+        # "관측소" must land on the same list the operator sees, not the gauge-only rank_priority.
+        add("rank_facilities", region=region, group=_written_group(message), limit=_written_limit(message))
     elif station and _STATUS.search(message):
         add("get_station_status", station=station.short_name)
     elif facility and _STATUS.search(message):
