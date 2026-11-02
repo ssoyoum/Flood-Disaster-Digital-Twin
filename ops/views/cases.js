@@ -1,4 +1,5 @@
 import { arrow, cached, esc, hhmm, hydrograph, leadBar, minutes, num, REFERENCE_KO, STAGE_COLOR, STAGE_KO, tierOf, ymd } from "../lib.js";
+import { mountAgent } from "../agent.js";
 
 // 근거 · 사례 재구성. 지난 홍수를 시각 단위로 다시 놓고, 통제·대피가 언제 가능했는지 본다.
 // 과거 사건에 관한 화면(규칙 재생·사건별 신호)은 모두 여기에만 둔다.
@@ -164,7 +165,7 @@ function mountHandMap(container, layers, replay, onReady) {
   });
 }
 
-async function detailView(view, id) {
+async function detailView(view, id, agentOpen = false) {
   const c = CASES[id];
   if (!c) { view.innerHTML = '<div class="op-page"><p class="op-err">알 수 없는 사례입니다.</p></div>'; return; }
   const [recon, leads] = await Promise.all([cached(`/api/events/${id}/reconstruction`), cached("/api/cases/lead-times").catch(() => null)]);
@@ -243,6 +244,7 @@ async function detailView(view, id) {
     timer = window.setInterval(() => { if (current + 1 >= steps.length) { stop(); return; } select(current + 1); }, 1200);
   });
   select(0);
+  caseAgent(view, id, agentOpen);  // 지도(오송 약 10 MB)를 기다리기 전에 붙인다
 
   if (isOsong) {
     const registry = await cached("/api/twin/registry").catch(() => null);
@@ -259,9 +261,34 @@ async function detailView(view, id) {
   }
 }
 
+// 사례 에이전트: 보고 있는 사례의 재구성 도구(event_id)로만 묻는다. 목록에서는 사례를 먼저 고르게 한다.
+function caseAgent(view, id, open) {
+  const c = CASES[id];
+  if (!c) {
+    mountAgent(view, {
+      key: "cases", title: "사례 재구성 에이전트", badge: "사례 선택", open,
+      intro: "에이전트는 한 사례의 재구성 자료(시각 기록·대응 시각 비교·보도 수치)로만 답합니다.",
+      gated: { html: `<p>사례를 먼저 고르세요. 고른 사례의 도구로 질문을 받습니다.</p>${Object.entries(CASES).map(([key, item]) => `<p><a href="#/cases/${key}?agent=open">${esc(item.name)} ${arrow}</a></p>`).join("")}` },
+    });
+    return;
+  }
+  mountAgent(view, {
+    key: `case:${id}`,
+    title: `${c.name} 에이전트`,
+    badge: "사례 재구성",
+    open,
+    intro: `${esc(c.flow)}. 기록된 시각을 바꿔 대응이 몇 분 일렀는지, 재구성 타임라인, 보도 수치를 물어보세요. 시간 비교는 기록된 시각의 산술이며 대피 성공·피해 감소는 계산하지 않습니다.`,
+    scope: { event_id: id },
+    examples: `/api/agent/examples?event_id=${encodeURIComponent(id)}`,
+    placeholder: "예: 30분 일찍 안내했다면 몇 분 남나요?",
+  });
+}
+
 export async function renderCases(view, route) {
   cleanup();
-  if (route.parts[0]) return detailView(view, route.parts[0]);
-  return listView(view);
+  const open = route.query.get("agent") === "open";
+  if (route.parts[0]) return detailView(view, route.parts[0], open);
+  await listView(view);
+  caseAgent(view, null, open);
 }
 window.addEventListener("hashchange", () => { if (!window.location.hash.startsWith("#/cases/")) cleanup(); });

@@ -1,4 +1,5 @@
 import { cached, esc, hhmm, minutes, num, ymd } from "../lib.js";
+import { mountAgent } from "../agent.js";
 
 // 장마 후 · 기준 채점. 이번 시즌 담당자가 남긴 통제 기록과 규칙의 권고를 맞춘다.
 // 과거 홍수에 규칙을 재생한 검증은 사례 재구성에서만 보여 준다.
@@ -145,4 +146,22 @@ export async function renderScorecard(view, route) {
       ${history ? historyBlock(history) : ""}
     </section>
   </div>`;
+
+  // 장마 후 검토에 맞는 관제 보드 도구만 추천한다: 시즌 기록 → 규칙 성적표 → 과거 사례 검증 → 사후 검토.
+  mountAgent(view, {
+    key: "scorecard",
+    title: "기준 채점 에이전트",
+    badge: "장마 후",
+    intro: "이번 시즌 기록, 운영 시설 규칙 성적표, 과거 사례에서 규칙·공식 특보가 실제 통제보다 몇 분 먼저였는지, 사후 검토 초안을 물어보세요. 수치는 서버 도구가 계산하고 AI는 설명만 합니다. 권고만 나고 기록이 없는 구간은 오경보로 확정하지 않습니다.",
+    scope: { event_id: "osong-2023", board: "watch" },
+    examples: "/api/agent/examples?event_id=osong-2023&board=watch",
+    workflows: ["season_record", "rule_scorecard", "validation_cases", "post_event_review"],
+    fallback: [
+      { label: "규칙 성적표", question: "궁평2지하차도 규칙 성적표 보여줘" },
+      { label: "사례 검증", question: "대전 사례에서 규칙이 실제 통제보다 빨랐어?" },
+      { label: "사후 검토", question: "오송 사건 사후 검토 보고서 작성해줘" },
+    ],
+    placeholder: "예: 오송 사례에서 규칙이 실제 통제보다 빨랐어?",
+    open: route.query.get("agent") === "open",
+  });
 }
