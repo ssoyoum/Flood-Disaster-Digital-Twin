@@ -73,7 +73,7 @@ async function route() {
   view.hidden = false;
   view.scrollTop = 0;
   const render = VIEWS[active] ?? renderHome;
-  document.title = `${active === "home" ? "FloodOps 운영" : `${TABS.find((t) => t.id === active).label} · FloodOps`}`;
+  document.title = `${active === "home" ? "FloodOps · 홍수 대응 의사결정 디지털트윈" : `${TABS.find((t) => t.id === active).label} · FloodOps`}`;
   view.innerHTML = '<div class="op-page"><p class="op-wait">불러오는 중</p></div>';
   try {
     await render(view, r);

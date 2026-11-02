@@ -132,7 +132,7 @@ export async function renderHome(view) {
   view.innerHTML = `<div class="op-page">
     <section class="op-hero">
       <div>
-        <p class="op-eyebrow">만약에 침수 · 하천 접점 시설 통제 판단 트윈</p>
+        <p class="op-eyebrow">만약에 침수 · 홍수 대응 의사결정 디지털트윈</p>
         <h1>하천 시설의 통제 기준을 세우고,<br>장마 중에 쓰고, 장마 뒤에 채점합니다.</h1>
         <p class="op-lead">지하차도·하천변 출입구를 홍수통제소 수위·공식 홍수특보와 기상청 강우·호우특보로 10분마다 단계화합니다. 같은 데이터로 장마 전에는 시설별 통제 기준을, 장마 중에는 먼저 볼 시설을, 장마 뒤에는 그 기준의 성적표를 냅니다.</p>
       </div>
