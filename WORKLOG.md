@@ -4999,3 +4999,88 @@ UI 보완:
 - 문제: 콘솔에 한글을 출력하면 Windows 기본 코드페이지에서 깨져 보였다(파일 자체는 UTF-8로 정상 저장됨).
   해결: 콘솔 출력 대신 생성된 파일을 직접 읽어 내용을 확인했다.
 - 남은 것: 확인 상태를 사람이 직접 갱신할 입력 경로(사건 추가·확인 처리 UI 또는 CLI)가 없다. 2025-07-17 궁평2 통제 여부가 확인되면 스크립트의 `PENDING_CASES`에서 `backend/app/case_validation.py`의 `CASES`로 옮기고 다시 생성해야 한다.
+
+## 플랫폼 NHN Cloud 서버 구축과 홍수통제소 API 중계
+
+- 작업일: 2026-11-02
+
+주요 작업:
+- 민관협력 지원 플랫폼 NHN Cloud(프로젝트-26csp021, 판교)에 인스턴스 `floodops-web`(Ubuntu 22.04, m2.c2m4 2 vCPU·4 GB, HDD 50 GB)을 만들고 보안 그룹 `floodops-web`(수신 22/80/443), 키페어 `floodops-nhn`, Floating IP 133.186.144.89를 붙였다. 서버에서 4탭 앱 이미지(`floodops:ops-b8afee2-relay`, 정적 루트 = `ops/`, 그 아래 `public/`)를 빌드해 80번 포트로 띄웠다.
+- 홍수통제소 API 주소를 환경변수 `HRFCO_API_BASE`로 바꿀 수 있게 했다(`national_watch.py`·`twin.py`·`flood_forecast.py`, 기본값 `https://api.hrfco.go.kr`).
+- AWS basement EC2의 Caddy에 `hrfco-relay.54-180-81-225.sslip.io` 블록을 덧붙여 133.186.0.0/16에서 온 요청만 api.hrfco.go.kr로 넘기고 나머지는 403으로 막았다. NHN 서버의 `/etc/floodops.env`에 이 주소를 넣었다.
+
+검증 결과:
+- NHN에서 api.hrfco.go.kr·www.hrfco.go.kr·www.wamis.go.kr·www.me.go.kr은 TCP 연결부터 시간 초과, 같은 서버에서 data.go.kr·kma·mois·molit·kwater는 정상. Floating IP를 133.186.251.228 → 133.186.144.89로 바꿔도 같았다.
+- 중계 주소는 로컬 PC에서 403, NHN에서 200(0.5초).
+- `/api/watch/facility-risk?limit=1` 3회: NHN(중계) 8.7·5.6·5.9초, 관측 19:40 / AWS 6.7·6.3·6.3초, 관측 19:30. 둘 다 `mode=live`, 시설 2,453곳.
+- 관련 테스트 44건 통과(`test_national_watch.py`·`test_twin.py`·`test_flood_forecast.py`). `test_facility_status_orders_by_gauge_stage_then_rain` 1건은 로컬 샌드박스의 소켓 생성 오류(WinError 10014)로 실행 불가라 제외했다.
+- AWS 무료 플랜 잔여 크레딧 $105.46(만료 2027-03-08).
+
+문제/해결:
+- 문제: NHN 서버에서 위험도 응답이 25초 걸리고 `observed_at`이 비었다. 처음엔 홍수통제소가 IP를 막는다고 봤지만 사용자가 "AWS는 되는데 NHN만 안 되는 게 말이 되냐"고 물었다.
+  해결: 다른 부처·공공데이터포털은 열리고 환경부 본부(www.me.go.kr)까지 막힌 것을 확인해, NHN 쪽 출구 문제가 아니라 환경부 망이 이 클라우드 대역을 막는 것으로 좁혔다. 새 Floating IP로도 같아 IP 하나의 문제가 아님을 확인했다. 인증키 IP 등록 문제였다면 HTTP 940이 돌아와야 하는데 TCP 단계에서 끊겨, 키 재등록으로는 풀리지 않는다고 판단했다.
+- 문제: 플랫폼 카탈로그의 "한강홍수통제소_실시간 수위"도 같은 api.hrfco.go.kr로 연결돼 우회로가 아니었다. 플랫폼 CSP는 팀당 1계정(NHN 승인)이라 NCP·KT로 바꾸려면 사무국 재신청이 필요했다.
+  해결: 홍수통제소 요청만 AWS를 거치는 중계를 붙였다. 공개 프록시가 되지 않도록 NHN 대역만 허용했다.
+- 문제: Caddy 컨테이너 안의 `/etc/caddy/Caddyfile`이 예전 파일(inode가 바뀌기 전)을 보고 있어서, 그 경로로 reload하자 `floodops.duckdns.org`가 설정에서 빠져 약 2분간 접속이 끊겼다.
+  해결: 호스트 파일을 `docker cp`로 컨테이너 `/tmp/Caddyfile`에 넣고 거기서 reload해 5개 도메인을 모두 복구했다(floodops·basement 200 확인). 컨테이너가 재시작되면 예전 파일을 다시 읽으므로 마운트를 바로잡기 전까지 Caddy 재시작은 피해야 한다.
+- 남은 것: `floodops.duckdns.org`를 NHN으로 옮기기(DuckDNS), NHN에 HTTPS(Caddy), AWS의 `watch-log` 시즌 기록 이전, 미사용 Floating IP 133.186.251.228 정리, 환경부·홍수통제소에 NHN 대역 허용 요청.
+
+## AWS Caddy 컨테이너 재생성과 FloodOps 접속 로그 켜기
+
+- 작업일: 2026-11-02
+
+주요 작업:
+- `caddy` 컨테이너를 같은 설정(caddy:2, host 네트워크, unless-stopped, `caddy_data`·`caddy_config` 볼륨, `~/app/Caddyfile` 읽기 전용)으로 다시 만들어 컨테이너가 현재 Caddyfile을 보게 했다. 예전 컨테이너는 `caddy-old-20261102`로 멈춰 두었다.
+- FloodOps 사이트 블록에 반지하와 같은 형식의 접속 로그(`/data/floodops-logs/access.json`, 요청 헤더 삭제, 쿼리스트링 제거, user_agent 추가, 10 MiB·7일 보관)를 켰다. 홍수통제소 중계 블록은 URI에 인증키가 들어가므로 로그를 켜지 않았다.
+- 반지하 접속 로그(10-25~11-02, 642건, IP 48개)를 RDAP로 소속을 조회해 정리했다.
+
+검증 결과:
+- 재생성 직후 floodops.duckdns.org·basement-flood.duckdns.org·두 sslip 주소 200, 중계는 외부 403·NHN 200.
+- 새 컨테이너의 `/etc/caddy/Caddyfile`에 floodops 로그와 중계 블록이 보이고, `/data/floodops-logs/access.json`에 client_ip가 기록됨.
+- 반지하 스캐너 요청 298건(45.148.10.59 TECHOFF SRV/DMZHOST 등)은 모두 404(22 B) 또는 308로 끝났다.
+
+문제/해결:
+- 문제: 컨테이너가 Caddyfile의 예전 inode를 물고 있어, 컨테이너가 재시작되면 floodops.duckdns.org와 중계가 빠진 설정으로 뜰 상태였다. FloodOps 블록에는 접속 로그가 없어 방문자 IP를 알 수 없었다.
+  해결: 블록 수정은 파일을 같은 inode로 덮어쓰는 방식(`r+` + truncate)으로 하고 `caddy validate`를 먼저 통과시킨 뒤, 컨테이너를 같은 설정으로 다시 만들었다. 두 사이트가 200이 아니면 자동으로 예전 컨테이너로 되돌리게 했다.
+- 같은 날 이어서: 두 사이트 블록에 `log_append referer {http.request.header.Referer}`를 추가했다(백업 `Caddyfile.bak-20261102-referer`). 테스트 요청의 Referer가 floodops·basement 로그 양쪽에 기록되는 것과 다섯 도메인이 모두 다시 로드된 것을 확인했다.
+
+## 공식 주소를 플랫폼 NHN 서버로 전환
+
+- 작업일: 2026-11-02
+
+주요 작업:
+- AWS 컨테이너의 시즌 기록(`watch-log/2026.jsonl`, 468건, 10-30 13:23~)을 NHN 볼륨으로 옮겼다(NHN이 따로 쌓던 기록은 `watch-log.nhn-20261102`로 보존).
+- NHN 앱을 `127.0.0.1:8000`으로만 열고 앞에 Caddy(host 네트워크, `~/caddy` 디렉터리 마운트)를 세워 `floodops.duckdns.org` HTTPS와 접속 로그(7일, user_agent·referer)를 붙였다.
+- 사용자가 DuckDNS의 `floodops` IP를 133.186.144.89로 바꿨다. AWS 중계 허용 범위를 133.186.0.0/16에서 133.186.144.89/32로 좁혔다.
+
+검증 결과:
+- 8.8.8.8·1.1.1.1 모두 floodops.duckdns.org → 133.186.144.89. Let's Encrypt 인증서 발급(만료 2027-01-31), `/api/twin/mode` 200 `mode=live`.
+- `/api/watch/facility-risk?limit=1` 200, 9.3초, 관측 20:20, 시설 2,453곳. NHN Caddy 접속 로그에 host=floodops.duckdns.org 기록.
+- 중계: NHN 200, 로컬 403. AWS의 basement·sslip 주소 200 유지.
+
+문제/해결:
+- 문제: DNS를 바꾸기 전에 띄운 NHN Caddy가 인증서 발급을 시도해 AWS(54.180.81.225)로 검증 요청이 가서 실패했다.
+  해결: DNS 변경 뒤 Caddy의 자동 재시도로 발급됐다. 실패 기록은 전환 전 시도였다.
+- 문제: 기획서에 "플랫폼 서버 주소만 허용"이라고 썼는데 중계는 NHN 대역 전체를 허용하고 있었다.
+  해결: 허용 범위를 서버 IP 하나로 좁혀 문서와 실제를 맞췄다.
+- 남은 것: AWS Caddy 설정에 floodops.duckdns.org 블록이 남아 있다(DNS가 NHN이라 트래픽은 없고 인증서 갱신만 실패하게 됨). AWS FloodOps 컨테이너 정리, NHN 보안 업데이트 139건, AWS SSH 접근 제한.
+
+## AWS FloodOps 정리, AWS SSH 제한, NHN 보안 업데이트
+
+- 작업일: 2026-11-02
+
+주요 작업:
+- AWS의 FloodOps 컨테이너를 멈추고(restart=no, 이미지 보관) sslip 예비 주소는 floodops.duckdns.org로 302 넘기게 했다. 되돌리기: `Caddyfile.bak-20261102-retire-floodops` + `docker start floodops`.
+- AWS 보안 그룹 22번 포트를 0.0.0.0/0에서 소유자 IP(203.231.148.200, 휴대폰 핫스팟)와 EC2 Instance Connect 접두사 목록(pl-00ec8fd779e5b4175)으로 좁혔다.
+- NHN 서버 업데이트를 끝내고(커널 5.15.0-164 → 202) 자동 보안 업데이트(unattended-upgrades, apt-daily 타이머)를 다시 설치·활성화한 뒤 재부팅했다.
+
+검증 결과:
+- AWS: 반지하 가용 메모리 321 MB → 527 MB, 바뀐 보안 그룹으로 Instance Connect SSH 접속 확인.
+- NHN 재부팅 22:37:16 → 22:38:03 공개 주소 200 복귀. `uname -r` 5.15.0-202, 남은 업그레이드 0건, reboot-required 없음, caddy·floodops 컨테이너 자동 기동.
+- 재부팅 뒤 `/api/watch/overview` `mode=live`, 관측 22:30. 중계는 로컬에서 403 유지.
+
+문제/해결:
+- 문제: 업데이트가 2시간 동안 끝나지 않았다. openssh-server 설정 중 `sshd_config`를 유지할지 묻는 ucf 프롬프트에서 멈춰 있었고(클라우드 이미지가 수정한 파일), 그 사이 핫스팟 SSH가 끊겨 작업이 실패로 보고됐다.
+  해결: 멈춘 프로세스를 끝내고 `sshd_config`를 백업(`.bak-20261102`)한 뒤 `DEBIAN_FRONTEND=noninteractive UCF_FORCE_CONFFOLD=1`로 기존 설정을 유지하며 `dpkg --configure -a`부터 다시 돌렸다. SSH가 끊겨도 계속되도록 `nohup`으로 서버에서 실행했다. 끝난 뒤 `sshd_config`가 백업과 같고 `sshd -t`가 통과하는 것을 확인했다.
+- 문제: 일반 업그레이드 뒤에도 보안 업데이트 5건이 남았고 자동 업데이트를 켜도 동작하지 않았다.
+  해결: 남은 5건은 새 커널이라 `apt upgrade`가 보류한 것이어서 메타패키지를 `install`로 올렸다. NHN 이미지는 unattended-upgrades 패키지를 지우고(`rc`) apt-daily 타이머를 꺼 두어서, `unmask`만으로는 안 되고 패키지 재설치와 타이머 활성화가 필요했다.
