@@ -28,8 +28,8 @@ HOURLY = ROOT / "data" / "processed" / "hrfco"
 DEFAULT_OUT = ROOT.parent / "floodops-deploy-context.tar.gz"
 REPLAY_WINDOWS = [("2020-07-25", "2020-08-03"), ("2023-07-10", "2023-07-18"), ("2024-07-05", "2024-07-13")]
 ARCHIVE_PATHS = [
-    "Dockerfile.deploy", "package.json", "package-lock.json", "index.html", "tsconfig.json", "tsconfig.app.json", "vite.config.ts",
-    "src", "public", "backend/requirements.txt", "backend/app",
+    "Dockerfile.ops", "Dockerfile.deploy", "package.json", "package-lock.json", "index.html", "tsconfig.json", "tsconfig.app.json", "vite.config.ts",
+    "ops", "src", "public", "backend/requirements.txt", "backend/app",
     "data/processed/osong", "data/processed/seoul_2022", "data/processed/pohang_2022", "data/processed/andong_uiseong_2026",
     "data/models", "data/facilities", "data/manifests", "data/processed/facilities", "data/processed/flood_forecast",
     "data/processed/validation", "data/processed/kma", "data/processed/platform",

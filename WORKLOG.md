@@ -36,6 +36,21 @@
 - 문제: 교체 스크립트의 헬스 체크를 `/api/health`로 써서(실제는 `/health`) 새 컨테이너가 정상인데도 2분 뒤 이전 버전으로 되돌릴 상황이었다.
   해결: 되돌리기 전에 스크립트 프로세스를 멈춰 새 컨테이너를 유지했다. `deploy_remote.sh`의 `/api/health` 점검도 같은 오류다.
 
+## 배포 스크립트를 4탭 앱·Caddy 구성에 맞춤
+
+- 작업일: 2026-11-03
+
+주요 작업:
+- 서버에만 있던 `Dockerfile.ops`(정적 루트 `ops/`, 그 아래 `public/`)를 저장소에 넣고 `build_context.py` 묶음에 `Dockerfile.ops`와 `ops/`를 추가했다.
+- `deploy_remote.sh`가 `Dockerfile.ops`로 `floodops:ops-<커밋>-relay`를 빌드하고 `127.0.0.1:8000`(Caddy 뒤)에 띄우게 바꿨다. 기존 컨테이너는 `floodops-prev`로 보존하고, `/health`가 2분 안에 응답하지 않으면 되돌린다. 점검 요청은 서버 안에서 `127.0.0.1:8000`으로 보낸다.
+
+검증 결과:
+- Git Bash `bash -n deploy/deploy_remote.sh` 통과. `build_context.py` 결과에 `ops/` 10개 파일 포함(16.3 MB). `Dockerfile.ops`는 `git archive HEAD`로 묶이므로 커밋 뒤에 포함된다. 서버 실배포로는 아직 돌려 보지 않았다.
+
+문제/해결:
+- 문제: 11-02 NHN 배포는 스크립트 대신 손으로 했고, 그 결과 서버 구성(4탭 앱 이미지, Caddy 뒤 로컬 포트)과 스크립트(Vite 이미지, 80번 포트, `/api/health`)가 갈라져 있었다. 오늘 재배포에서 스크립트를 쓰지 못했고 손으로 만든 교체 스크립트는 헬스 경로를 틀렸다.
+  해결: 실행 중인 컨테이너의 `docker inspect` 값을 기준으로 스크립트를 다시 썼다. `Dockerfile.deploy`(Vite 화면)는 지우지 않고 남겼다.
+
 ## 운영 앱 세 탭 에이전트 패널, 권역 지역 필터, 시즌 기록 도구
 
 - 작업일: 2026-11-03
