@@ -306,6 +306,12 @@ body.wx-in-shell .demo-top { display: none; }
 .wx .maplibregl-ctrl-bottom-right { transition: right .32s cubic-bezier(.2,.7,.2,1); right: 4px; bottom: 4px; }
 .wx-drawer-open .maplibregl-ctrl-bottom-right { right: 398px; }
 .wx-attr { margin-top: auto; font-size: 11px; color: var(--wx-dim); }
+/* 6시간 최대 상승 예측: 연구 카드. 통제 권고와 섞이지 않게 점선 테두리로 구분한다 */
+.wx-rise-card { border-style: dashed; }
+.wx-rise-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.wx-rise-badge { padding: 0 7px; border-radius: 999px; font-size: 11px; font-weight: 800; background: rgba(167,139,250,.15); color: #c4b5fd; }
+.wx-rise-nums { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 8px; border-radius: 8px; overflow: hidden; background: var(--wx-line); }
+.wx-rise-nums .wx-m strong.wx-over { color: var(--wx-red); }
 /* 에이전트 열기 버튼 (드로어가 닫혀 있을 때) */
 .wx-launch { position: absolute; z-index: 10; top: 14px; right: 14px; display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--wx-ui); transition: opacity .2s; }
 .wx-launch:hover { border-color: var(--wx-ui); }
@@ -569,6 +575,7 @@ body.wx-in-shell .demo-top { display: none; }
         <span class="wx-chart-cap" id="wx-chart-cap">판정 기준</span>
         <svg id="wx-chart" viewBox="0 0 316 196" role="img" aria-label="최근 수위 그래프"></svg>
       </article>
+       <article class="wx-card wx-rise-card" id="wx-rise" aria-label="6시간 최대 상승 예측" hidden></article>
        <article class="wx-card" aria-label="시설 판정 근거">
         <span class="wx-chart-cap" id="wx-fac-cap">시설 판정 근거</span>
         <div id="wx-fac-list"></div>
@@ -1154,6 +1161,29 @@ body.wx-in-shell .demo-top { display: none; }
       $("wx-fac-list").insertAdjacentHTML("beforeend", `<button type="button" class="wx-vc-open">검증 사례 ${cases.length}건 보기 → ${esc(cases.map((c) => c.title.split(" ").slice(-1)[0]).join(" · "))}</button>`);
       $("wx-fac-list").querySelector(".wx-vc-open").addEventListener("click", () => showTab("vc"));
     }
+    renderRise(f);
+  }
+  // 운영 시설에만: 실명 관측소로 다시 학습한 6시간 최대 상승 예측(docs/RISE_MODEL.md). 권고는 이 값을 읽지 않는다.
+  const RISE_REASON = { MODEL_NOT_AVAILABLE: "서버에 학습된 모델 파일이 없습니다.", MISSING_EXACT_LAGS: "정시 수위 입력(1·3·6·12·24시간 전) 중 빠진 값이 있어 예측하지 않습니다.", OBSERVATION_NOT_FRESH: "최근 관측이 오래돼 예측하지 않습니다." };
+  async function renderRise(f) {
+    const card = $("wx-rise"), my = ++stSeq;
+    if (f.tier !== "operational") { card.hidden = true; return; }
+    let d; try { d = await get(`/api/twin/facilities/${encodeURIComponent(f.facility_id)}/rise-forecast${st.at ? `?at=${encodeURIComponent(st.at)}` : ""}`); } catch { d = null; }
+    if (my !== stSeq) return;
+    card.hidden = false;
+    const head = `<div class="wx-rise-head"><span class="wx-chart-cap" style="margin:0">6시간 최대 상승 예측</span><span class="wx-rise-badge">연구 · 통제 판단에 쓰지 않음</span></div>`;
+    if (!d) { card.innerHTML = `${head}<p class="wx-note">예측 API에 연결하지 못했습니다.</p>`; return; }
+    if (!d.prediction_available) { card.innerHTML = `${head}<p class="wx-note">${esc(RISE_REASON[d.reason] ?? d.reason)}</p>`; return; }
+    const signed = (v) => `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(2)}`;
+    const pfh = d.reaches_within_6h?.planned_flood, pfhQ = d.reaches_within_6h_q90?.planned_flood;
+    const rain = d.inputs?.rain ?? {}, m = d.model ?? {};
+    card.innerHTML = `${head}
+      <div class="wx-rise-nums">
+        <div class="wx-m"><span class="wx-lbl">중앙 예측 · 6시간 안 최고</span><strong class="${pfh ? "wx-over" : ""}">${signed(d.maxrise_6h_m)}<small>m → ${d.forecast_level_m.toFixed(2)} m</small></strong></div>
+        <div class="wx-m"><span class="wx-lbl">상한(90%) · 이 정도까지 가능</span><strong class="${pfhQ ? "wx-over" : ""}">${d.maxrise_6h_q90_m == null ? "—" : `${signed(d.maxrise_6h_q90_m)}<small>m → ${d.forecast_level_q90_m.toFixed(2)} m</small>`}</strong></div>
+      </div>
+      <p class="wx-note">${pfh ? "중앙 예측이 6시간 안에 계획홍수위에 닿습니다." : pfhQ ? "상한으로는 6시간 안에 계획홍수위에 닿을 수 있습니다." : "6시간 안에 계획홍수위 도달 예상 없음."} 중앙 예측 단계 ${esc(d.forecast_stage_label ?? "")} · 기준 관측 ${esc((d.as_of ?? "").slice(11, 16))} ${d.interval === "1H" ? "1시간" : "10분"} 자료 · 강우 입력 ${rain.sfc_rain_1h == null ? "없음(결측으로 예측)" : `${esc(rain.station ?? "")} 1시간 ${rain.sfc_rain_1h} mm`}</p>
+      <p class="wx-note">관측소 ${esc(m.stations ?? "—")}곳 실측으로 학습 · 교차검증 RMSE ${m.cv_oof_rmse_m ?? "—"} m(단순 외삽 ${m.cv_linear_rmse_m ?? "—"} m) · 1 m 넘는 급상승은 오차 ${m.cv_oof_rmse_target_gt_1m ?? "—"} m로 낮게 보는 경향 · 오송 계획홍수위 ${m.osong_planned_flood_lead_min ?? "—"}분 전 예고</p>`;
   }
   function renderAll() {
     const driverButton = $("wx-faconly");
