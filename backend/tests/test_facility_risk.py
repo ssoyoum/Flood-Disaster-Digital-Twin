@@ -37,11 +37,12 @@ def test_pluvial_levels_follow_the_kma_heavy_rain_amounts():
 
 
 def test_replay_ranks_river_and_pluvial_facilities_together():
-    data = fr.facility_risk(AT, limit=2000)
+    data = fr.facility_risk(AT, limit=5000)
     rows = data["facilities"]
-    assert data["counts"]["total"] == len(rows) and data["counts"]["by_driver"]["pluvial"] > data["counts"]["by_driver"]["river"]
+    assert data["counts"]["total"] == len(rows) and data["counts"]["by_driver"]["river"] > data["counts"]["by_driver"]["pluvial"]
     assert [r["level"] for r in rows] == sorted((r["level"] for r in rows), reverse=True)
-    assert rows[0]["facility_id"] == "gungpyeong2-underpass" and rows[0]["level"] == 3
+    gungpyeong = next(r for r in rows if r["facility_id"] == "gungpyeong2-underpass")
+    assert gungpyeong["level"] == 3
     pluvial = [r for r in rows if r["driver"] == "pluvial" and r["level"] >= 2]
     assert pluvial and all(r["minutes_to_planned_flood"] is None for r in pluvial)
     assert all((r["rain"].get("rain_3h_mm") or 0) >= fr.RAIN_3H_ADVISORY_MM or (r["rain"].get("rain_12h_mm") or 0) >= fr.RAIN_12H_ADVISORY_MM
@@ -50,7 +51,7 @@ def test_replay_ranks_river_and_pluvial_facilities_together():
 
 
 def test_official_warning_lifts_river_type_facilities_and_is_shown():
-    data = fr.facility_risk(AT, limit=2000)
+    data = fr.facility_risk(AT, limit=5000)
     gungpyeong = next(r for r in data["facilities"] if r["facility_id"] == "gungpyeong2-underpass")
     assert gungpyeong["official"]["level"] == "warning" and gungpyeong["official"]["issued_at"] == "2023-07-15T04:10"
     assert gungpyeong["why"].startswith("공식 홍수경보 중(발령 04:10")
@@ -59,5 +60,5 @@ def test_official_warning_lifts_river_type_facilities_and_is_shown():
     assert data["counts"]["under_official"] == len(lifted) and data["counts"]["official_gauges"]["warning"] >= 2
     mannyeon = next(r for r in lifted if r["official"]["issued_at"] == "2023-07-14T14:20")
     assert "발령 7.14 14:20" in mannyeon["why"]  # a day-old issuance carries its date
-    assert not any(r["official"] for r in fr.facility_risk("2023-07-14T12:00:00", limit=2000)["facilities"]
+    assert not any(r["official"] for r in fr.facility_risk("2023-07-14T12:00:00", limit=5000)["facilities"]
                    if r["facility_id"] == "gungpyeong2-underpass")

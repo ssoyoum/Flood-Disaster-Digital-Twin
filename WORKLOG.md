@@ -1,5 +1,24 @@
 # WORKLOG
 
+## CI 빨간불 해소와 README 공개 서버 공지 갱신
+
+- 작업일: 2026-11-03
+
+주요 작업:
+- `backend/tests/test_facility_risk.py`의 `facility_risk(..., limit=2000)` 3곳을 `limit=5000`으로 올리고, «하천형보다 내수형이 많다» 단언을 «하천형이 더 많다»로 뒤집었다. 1위 시설을 `rows[0]`로 보던 단언은 `gungpyeong2-underpass`를 id로 찾아 단계 3인지 보는 것으로 바꿨다.
+- README 상단 공지를 10-20 AWS·재생 모드 기준에서 11-03 NHN Cloud `4addfe1` 빌드·실시간 모드(시설 2,453곳)로 고치고, 기술 스택 «배포» 행을 `NHN Cloud(공개 서버) · AWS EC2(홍수통제소 API 중계)`로 바꿨다.
+- 작업 트리에 남아 있던 0바이트 파일 `.figcap`·`MapLibre`·`dict[str`(훅 리다이렉션 부산물)을 지웠다.
+
+검증 결과:
+- `pytest backend/tests` 375 passed. 첫 실행에서는 10 failed(`test_agent_trace`·`test_flood_forecast` 등)가 나왔으나 두 번 다시 돌려 모두 통과했고 재현되지 않아 원인은 확인하지 못했다.
+- 공개 서버: `/health` 200, `/api/watch/facility-risk?limit=1` `mode=live`, 시설 2,453곳(`by_driver` river 1,725·pluvial 728), `/api/agent/planner-status` `gemini-3.5-flash-lite`.
+
+문제/해결:
+- 문제: GitHub Actions CI가 10-29(`b753588`) 이후 한 번도 성공하지 못했다(11-02 8회, 11-03 5회 실패). 로그는 `assert (2453 == 2000)` 1건이다. 10-30 하천변 시설 위치 추가(1,224 → 2,453곳, `db81716`)에서 API·보드 한도는 10,000으로 올렸지만 테스트 호출은 `limit=2000`에 머물러 결과가 잘렸다.
+  해결: 테스트 한도를 5000으로 올렸다. 그러자 같은 테스트의 `pluvial > river` 단언이 728 > 1,725로 깨졌다. 버그인지 확인하려고 기록을 찾았고, 10-30 항목에 둔치 체육시설 608·세월교 373 등 하천변 시설 추가가 의도된 변경으로 남아 있어 `driver_of()`(riverside → river)는 그대로 두고 단언 방향을 데이터에 맞췄다. 1위 시설도 실시간·재생 순위에 따라 바뀔 수 있어 위치 대신 id로 찾게 했다.
+- 문제: README 첫 화면 공지가 «키가 없어 재생 모드로 열린다», 배포 «AWS EC2»로 남아 있어 11-02 NHN 전환 이후의 실제 서버와 달랐다.
+  해결: 공개 서버 응답을 직접 확인한 값(빌드·모드·시설 수)으로 바꿨다.
+
 ## 관제 보드 시설 목록 이름 말줄임과 행 리스너 정리
 
 - 작업일: 2026-11-03
