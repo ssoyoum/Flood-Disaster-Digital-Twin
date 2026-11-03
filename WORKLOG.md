@@ -19,6 +19,23 @@
 - 문제: 보드 파일에 `renderStation`이 관측소용(770행)과 시설용 두 개 있어 어느 쪽에 붙일지 헷갈렸다.
   해결: 같은 스코프의 함수 선언은 뒤의 것이 이기므로 실제로 쓰이는 시설용 끝에서 `renderRise(f)`를 부르고, 늦게 온 응답이 다른 시설 카드를 덮지 않게 `stSeq`로 막았다.
 
+## NHN 공개 서버를 4addfe1로 재배포
+
+- 작업일: 2026-11-03
+
+주요 작업:
+- `deploy/build_context.py`로 만든 컨텍스트에 `ops/`(git archive)와 서버의 기존 `Dockerfile.ops`를 더해 `~/floodops-build-4addfe1`에서 `floodops:ops-4addfe1-relay`를 빌드했다.
+- 기존 컨테이너는 `floodops-prev-b8afee2`(restart=no, 정지)로 남기고 같은 옵션(`127.0.0.1:8000`, `--env-file /etc/floodops.env`, `floodops-local`·`floodops-interim` 볼륨, unless-stopped)으로 새 컨테이너를 띄웠다. 11-02 배포(b8afee2) 이후 에이전트 패널·권역 필터·앱 제목·상승 예측 카드가 함께 반영됐다.
+
+검증 결과:
+- 공개 주소 `/health`·`/api/twin/mode`·`rise-forecast` 200, 헤드리스 Chromium으로 `#/watch?facility=gungpyeong2-underpass`에서 상승 예측 카드 표시(16:00 1시간 자료, 중앙 +0.10 m → 1.52 m).
+
+문제/해결:
+- 문제: `deploy/deploy_remote.sh`는 80번 포트·`Dockerfile.deploy`(Vite 화면) 기준이라, Caddy 뒤 `127.0.0.1:8000`·`Dockerfile.ops`(4탭 앱)로 바뀐 현재 서버와 맞지 않았고, `build_context.py`의 묶음에는 `ops/`가 없다.
+  해결: 스크립트를 쓰지 않고 실행 중인 컨테이너의 옵션을 `docker inspect`로 확인해 그대로 재현했다. 스크립트·컨텍스트를 4탭 앱 기준으로 고치는 것은 남은 일이다.
+- 문제: 교체 스크립트의 헬스 체크를 `/api/health`로 써서(실제는 `/health`) 새 컨테이너가 정상인데도 2분 뒤 이전 버전으로 되돌릴 상황이었다.
+  해결: 되돌리기 전에 스크립트 프로세스를 멈춰 새 컨테이너를 유지했다. `deploy_remote.sh`의 `/api/health` 점검도 같은 오류다.
+
 ## 운영 앱 세 탭 에이전트 패널, 권역 지역 필터, 시즌 기록 도구
 
 - 작업일: 2026-11-03
