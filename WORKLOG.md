@@ -1,5 +1,21 @@
 # WORKLOG
 
+## 관제 보드 시설 목록 이름 말줄임과 행 리스너 정리
+
+- 작업일: 2026-11-03
+
+주요 작업:
+- `public/watch-board-integration.html`의 관제 보드 시설 목록(`.wx-nmtop b`)은 시설명이 하천형·내수형 배지와 한 줄에서 경쟁해 "벌교천 주…" 처럼 자주 말줄임됐다. 이름을 줄 전체 폭으로 먼저 두고(배지는 아래 줄로 넘어가게 `flex-wrap`) 2줄까지는 안 잘리게(`-webkit-line-clamp`) 바꿨다.
+- 목록을 다시 그릴 때마다 행(최대 2,453개)마다 새로 붙이던 click·mouseenter·mouseleave 리스너를 `wx-body`에 위임 리스너 1개로 바꿔, 필터·정렬을 바꿀 때마다 수천 개 리스너를 다시 붙이지 않게 했다.
+
+검증 결과:
+- Claude in Chrome으로 공개 서버(`floodops.duckdns.org`)의 관제 보드를 열어 수정 전 화면에서 시설명 말줄임을 직접 확인했다(스크린샷).
+- `node -e "new Function(...)"`로 수정한 `watch-board-integration.html`의 두 `<script>` 블록 구문 확인.
+
+문제/해결:
+- 문제: 시설명이 하천형·내수형 배지, 공식 특보 배지와 같은 flex 줄을 나눠 쓰다 보니 긴 이름이 거의 항상 "…"로 잘렸다.
+  해결: `.wx-nmtop`에 `flex-wrap`을 주고 이름(`b`)을 `flex: 1 1 100%`로 줄 전체를 차지하게 해 배지가 자동으로 다음 줄로 넘어가게 했다.
+
 ## 관제 보드 /api/watch/facility-risk 50초대 응답 고침
 
 - 작업일: 2026-11-03

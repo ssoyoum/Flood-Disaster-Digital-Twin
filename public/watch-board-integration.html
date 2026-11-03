@@ -166,7 +166,7 @@ body.wx-in-shell .demo-top { display: none; }
 .wx-row:focus-visible { outline: 1px solid var(--wx-ui); outline-offset: -1px; }
 .wx-rk { font-size: 12px; font-weight: 700; color: var(--wx-dim); text-align: center; font-variant-numeric: tabular-nums; }
 .wx-nm { min-width: 0; }
-.wx-nm b { display: block; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wx-nm b { display: block; font-size: 14px; font-weight: 700; white-space: normal; overflow: hidden; word-break: break-word; }
 .wx-nm small { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--wx-muted); white-space: nowrap; overflow: hidden; font-variant-numeric: tabular-nums; }
 .wx-fac { padding: 0 5px; border-radius: 4px; background: rgba(255,255,255,.08); color: var(--wx-muted); font-size: 11px; font-weight: 700; }
 .wx-fac.wx-op { background: rgba(52,211,153,.14); color: var(--wx-green); }
@@ -387,8 +387,8 @@ body.wx-in-shell .demo-top { display: none; }
 .wx-row { align-items: start; padding: 10px 16px 11px; }
 .wx-row .wx-rk { padding-top: 2px; }
 .wx-row .wx-eta { padding-top: 0; }
-.wx-nmtop { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.wx-nmtop b { flex: 0 1 auto; min-width: 0; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wx-nmtop { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; min-width: 0; }
+.wx-nmtop b { flex: 1 1 100%; min-width: 0; font-size: 14px; font-weight: 700; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-word; }
 .wx-rise { flex: none; padding: 0 6px; border-radius: 4px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,.07); color: var(--wx-muted); font-variant-numeric: tabular-nums; }
 .wx-rise.wx-fastr { background: rgba(251,146,60,.15); color: var(--wx-orange); }
 .wx-rain { flex: none; padding: 0 6px; border-radius: 4px; font-size: 11px; font-weight: 700; background: rgba(56,189,248,.12); color: #7dd3fc; font-variant-numeric: tabular-nums; }
@@ -711,12 +711,15 @@ body.wx-in-shell .demo-top { display: none; }
     if (!n) html = st.q || st.facOnly || st.minStage || st.region
       ? `<div class="wx-empty"><b>조건에 맞는 관측소가 없습니다</b>검색어·지역·단계 조건을 줄여 보세요.</div>`
       : `<div class="wx-empty"><b>관심 수위 이상인 관측소가 없습니다</b>모든 관측소가 정상 범위입니다.</div>`;
-    $("wx-body").innerHTML = html;
-    $("wx-body").querySelectorAll(".wx-row").forEach((b) => {
-      b.addEventListener("click", () => select(b.dataset.code, true));
-      b.addEventListener("mouseenter", () => hoverOn(b.dataset.code));
-      b.addEventListener("mouseleave", hoverOff);
-    });
+    const body = $("wx-body");
+    body.innerHTML = html;
+    // One delegated listener instead of one click/mouseenter/mouseleave per row on every render.
+    if (!body.dataset.delegated) {
+      body.dataset.delegated = "1";
+      body.addEventListener("click", (e) => { const row = e.target.closest(".wx-row"); if (row) select(row.dataset.code, true); });
+      body.addEventListener("mouseover", (e) => { const row = e.target.closest(".wx-row"); if (row) hoverOn(row.dataset.code); });
+      body.addEventListener("mouseout", (e) => { const row = e.target.closest(".wx-row"); if (!row || row.contains(e.relatedTarget)) return; hoverOff(); });
+    }
     $("wx-lfoot").innerHTML = `<span>목록 ${n}곳${calm && !st.showCalm ? ` · 정상·기준 없음 ${calm}곳은 숨김` : ""}</span>${calm || st.showCalm ? `<button type="button" id="wx-calm">${st.showCalm ? "관심 이상만" : "모두 보기"}</button>` : ""}`;
     $("wx-calm")?.addEventListener("click", () => { st.showCalm = !st.showCalm; renderList(); });
   }
@@ -1048,11 +1051,16 @@ body.wx-in-shell .demo-top { display: none; }
       list.forEach((r) => { html += rowHtml(r, n++); });
     }
     if (!n) html = `<div class="wx-empty"><b>조건에 맞는 시설이 없습니다</b>검색어·지역·유형·위험 단계 조건을 확인하세요.</div>`;
-    $("wx-body").innerHTML = html;
-    $("wx-body").querySelectorAll(".wx-row").forEach((b) => {
-      b.addEventListener("click", () => select(b.dataset.code, true));
-      b.addEventListener("mouseenter", () => hoverOn(b.dataset.code)); b.addEventListener("mouseleave", hoverOff);
-    });
+    const body = $("wx-body");
+    body.innerHTML = html;
+    // One delegated listener instead of up to ~2,450 rows x 3 listeners each render — the rebind used to be
+    // slow enough on the full facility list to make the board feel frozen on every filter/sort/refresh.
+    if (!body.dataset.delegated) {
+      body.dataset.delegated = "1";
+      body.addEventListener("click", (e) => { const row = e.target.closest(".wx-row"); if (row) select(row.dataset.code, true); });
+      body.addEventListener("mouseover", (e) => { const row = e.target.closest(".wx-row"); if (row) hoverOn(row.dataset.code); });
+      body.addEventListener("mouseout", (e) => { const row = e.target.closest(".wx-row"); if (!row || row.contains(e.relatedTarget)) return; hoverOff(); });
+    }
     $("wx-lfoot").innerHTML = `<span>시설 ${n}곳 · 위험 단계순</span>`;
   }
   function regionStats() {
