@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 
 // Current home UI lives in an iframe and ranks facilities, rather than gauges.
 test("home ranks facilities and keeps selected region and facility in the URL", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/#watch");
   const board = page.frameLocator('iframe[title="FloodOps 전국 하천 감시 보드"]');
   await expect(board.getByRole("heading", { name: "실시간 위험 순위" })).toBeVisible();
   await expect(board.locator("#demo-mode")).toContainText("수위 재생");
@@ -24,7 +24,7 @@ test("home ranks facilities and keeps selected region and facility in the URL", 
 });
 
 test("watch agent moves the view using registered tools without a model", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/#watch");
   const board = page.frameLocator('iframe[title="FloodOps 전국 하천 감시 보드"]');
   await board.locator("#wx-launch").click();
   await board.getByRole("textbox", { name: "질문", exact: true }).fill("강원도로 가자");
@@ -38,7 +38,7 @@ test("watch agent moves the view using registered tools without a model", async 
 });
 
 test("missing rain stays explicit and cannot be mistaken for zero rain", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/#watch");
   const board = page.frameLocator('iframe[title="FloodOps 전국 하천 감시 보드"]');
   const rain = board.locator("#demo-rain-mode");
   await expect(rain).toHaveAttribute("data-available", "false");

@@ -681,7 +681,10 @@
       $("twc-map").classList.add("twc-in");
       map.easeTo({ center: facility.location, zoom: 14.3, pitch: 52, bearing: -22, padding: padding(), duration: reduced ? 0 : 4200, easing: (t) => 1 - Math.pow(1 - t, 3) });
       setTimeout(showSrcTip, reduced ? 0 : 2000);
-      setTimeout(() => { root.classList.add("twc-go"); ["twc-k-level"].forEach((id) => { const e = $(id); const v = parseFloat(e.dataset.v); e.dataset.v = 0; if (!isNaN(v)) countTo(e, v); }); }, reduced ? 0 : 700);
+      // Capture the reveal target now, not 700ms later: a real status update that lands in that window
+      // (e.g. an observation failure resetting #twc-k-level to "—") must not be clobbered by this replay.
+      const revealLevel = parseFloat($("twc-k-level").dataset.v);
+      setTimeout(() => { root.classList.add("twc-go"); const e = $("twc-k-level"); e.dataset.v = 0; if (!isNaN(revealLevel)) countTo(e, revealLevel); }, reduced ? 0 : 700);
       if (sourceMode !== "live") setTimeout(() => {
         map.setPaintProperty("hand-fill", "fill-opacity", .3); map.setPaintProperty("hand-glow", "line-opacity", .45); map.setPaintProperty("hand-line", "line-opacity", .85);
       }, reduced ? 0 : 2600);

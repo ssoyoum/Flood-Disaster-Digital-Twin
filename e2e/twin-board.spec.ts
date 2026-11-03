@@ -2,8 +2,8 @@ import { expect, test } from "@playwright/test";
 
 // The Playwright FastAPI server runs with FLOODOPS_TWIN_MODE=replay, so the board reads the stored 2023 series.
 test("the twin board shows the 2023 replay status, presets and backtest for the Osong underpass", async ({ page }) => {
-  await page.goto("/#twin");
-  await expect(page.locator("h1")).toContainText("지하차도 통제 판단 트윈");
+  await page.goto("/#twin?tab=now");
+  await expect(page.locator("h1")).toContainText("시설 기준");
   const frame = page.frameLocator('iframe[title="현재 지하차도 통제 판단 트윈"]');
   await expect(frame.locator("#twc-fname")).toContainText("궁평2지하차도");
   await expect(page.locator(".tw-mode")).toContainText("2023년 사건 재생");

@@ -1,5 +1,35 @@
 # WORKLOG
 
+## Playwright E2E 11건 실패 원인 분류와 수정
+
+- 작업일: 2026-11-04
+
+주요 작업:
+- `src/App.tsx`: `#event/<id>` 라우트에서 `READY_EVENTS`(관제 가능 4건) 확인 없이 바로 `EventConsole`을 띄우던 것을 고쳐, 미연결 사건은 다시 `#cases`로 보내고 주소도 `history.replaceState`로 정리한다.
+- `src/dark/Landing.tsx`: `CaseSelectPage`가 전체 이벤트를 그대로 렌더링하던 것을 고쳐, `READY_EVENTS`로 필터링한 `availableEvents`만 캐러셀에 띄운다(잠긴 카드 표시 제거). `READY_EVENTS`를 다시 `export`했다.
+- `public/twin-now-c.html`: 인트로 진입 애니메이션의 700ms 지연 타이머가 그 시점의 `#twc-k-level` 값을 다시 읽어 재애니메이션하던 것을 고쳐, 타이머를 예약하는 시점에 목표값을 미리 캡처한다.
+- `e2e/osong-replay.spec.ts`·`watch-board.spec.ts`·`twin-board.spec.ts`·`rise-forecast.spec.ts`·`water-level-bridge.spec.ts`: 화면 구조가 바뀐 뒤 남아 있던 낡은 선택자·URL·기대 문구를 지금 화면에 맞게 고쳤다.
+
+검증 결과:
+- CI 실행(run 41650249228, 커밋 431d3df)의 `gh run view --log-failed` 로그와 `test-results/*/error-context.md`로 11건을 모두 재현·분류했다.
+- `npm run build`(tsc -b && vite build) 통과.
+- `npx playwright test` 로컬 전체 재실행: 21건 중 20건 통과, 1건(`agent-latency`) 그대로 skip — CI와 같은 결과.
+- `pytest backend/tests` 375 passed(이번 수정은 백엔드 파일을 건드리지 않았고, E2E와 동시에 돌렸을 때만 2건이 일시적으로 실패했다가 단독 재실행에서는 통과해 동시 실행 자원 경합으로 판단).
+
+문제/해결:
+- 문제: `e2e/other-cases.spec.ts`의 "unavailable Iksan" 테스트가 `/#event/iksan-2024` 직접 접속 후 `#cases`로 안 돌아갔다(`toHaveURL` 실패, 실제 URL은 그대로 `#event/iksan-2024`). `git log -S"READY_EVENTS" -- src/App.tsx`로 보니 과거(`8f28971`, 10-20)에 이미 같은 문제를 고치며 `READY_EVENTS` 체크를 넣었는데, 지금 `src/App.tsx`에는 그 import·분기가 없었다. `preview/ia-official-criteria` 브랜치를 합친 병합 커밋(`15dcca9`, 10-20) 근처에서 그 변경이 사라진 것으로 보인다(정확한 머지 충돌 해소 과정은 재현하지 않았다).
+  해결: `READY_EVENTS` import와 `#event/`분기 리다이렉트, `history.replaceState` effect를 그대로 복원했다.
+- 문제: 같은 파일의 "Andong-Uiseong 2026" 테스트가 "다음 사례" 3번 클릭 후 가운데 카드에서 `.fo-case.is-ready`를 못 찾고 타임아웃났다. 캐러셀이 익산을 잠긴 카드로 그대로 보여주고 있어, 3번째 자리를 익산이 차지했다(안동은 4번째). `git show 8f28971 -- src/dark/Landing.tsx`로 보니 원래는 `availableEvents = events.filter(READY_EVENTS.has)`로 걸러 캐러셀에 4건만 뒀는데, 지금 코드는 `events`를 그대로 썼다. App.tsx와 같은 시점에 같은 식으로 소실된 것으로 보인다.
+  해결: `availableEvents` 필터와 잠긴 카드 렌더링 제거를 복원했다. `READY_EVENTS`를 다시 export했다.
+- 문제: `watch-board.spec.ts` 3건이 `/`에서 관제 보드 iframe(`FloodOps 전국 하천 감시 보드`)을 못 찾았다. `git log`로 보면 `/`(인트로 홈)와 `#watch`(관제 보드)를 분리한 것(`9bcf6cd`, 10-19)이 의도된 최신 구조이고, 테스트가 그 이전 구조(홈 = 관제 보드, `b71c42f`)를 가리키고 있었다.
+  해결: 세 테스트의 `page.goto("/")`를 `page.goto("/#watch")`로 고쳤다(실제 동작은 정상, 테스트만 낡음).
+- 문제: `twin-board.spec.ts`·`rise-forecast.spec.ts`·`water-level-bridge.spec.ts`가 `/#twin?at=...`(tab 파라미터 없이)에서 "지금 상태" 탭 iframe을 기대했는데 실제로는 "시설 등록" 탭이 떴다. `git show 80eb4e4 -- src/dark/TwinBoard.tsx`로 보면 기획 덱에 맞춰 탭 순서를 "등록→기준 검토→백테스트→지금 상태"로 바꾸며(10-19) 기본 탭을 `"now"`에서 `"registry"`로, h1을 "지하차도 통제 판단 트윈"에서 "시설 기준"으로 바꾼 것이 지금의 의도된 동작이다. 테스트는 그 이전 기본값을 기대하고 있었다.
+  해결: 세 파일의 `goto` URL에 `tab=now`를 추가하고, `twin-board.spec.ts`의 h1 기대 문구를 "시설 기준"으로 고쳤다. 라이브 코드에서 `#twin?at=`을 생성하는 곳이 없어(grep 결과 0건) 기본 탭을 되돌리는 대신 테스트를 현재 구조에 맞췄다.
+- 문제: `tab=now`를 추가해도 `water-level-bridge.spec.ts`의 "a failed later observation cannot retain the previous level or recommendation"만 남아 관측 실패 후 수위가 "—"가 아니라 "0.00"으로 남았다. trace.zip의 network 로그(`1-trace.network`)를 까보니 iframe 쪽 두 번째 상태 요청은 실제로 503을 받았는데도 화면은 "0.00"이었다. `public/twin-now-c.html`의 `intro()` 함수가 지도 인트로 애니메이션 중 700ms 뒤 `#twc-k-level`의 **그 시점** `dataset.v`를 다시 읽어 재애니메이션하는 코드를 갖고 있었는데, 에러 처리 코드가 이미 `dataset.v="0"`, 텍스트 "—"로 세팅한 뒤 이 지연 타이머가 늦게 발동하면 `v=0`을 다시 `countTo`해 "0.00"으로 덮어썼다. 이 테스트는 다른 파일들과 달리 화면 변경이 아니라 실제 레이스 버그였다.
+  해결: `intro()`에서 reveal 대상 값(`revealLevel`)을 `setTimeout`을 예약하는 시점에 한 번만 읽도록 고쳐, 700ms 사이에 실제 상태가 바뀌어도 되돌리지 않게 했다.
+- 문제: `osong-replay.spec.ts`의 첫 테스트가 `/#intro`에서 `getByLabel("FloodOps 화면 이동")`을 90초 동안 못 찾았다. 인트로 페이지(`IntroPage`)는 `AppNavigation`의 접고 펼치는 메뉴(`<details>/<summary aria-label="FloodOps 화면 이동">`) 대신 평평한 `<nav aria-label="FloodOps 화면">`을 직접 쓰고 있어 그 라벨의 엘리먼트 자체가 없었다. 전역 메뉴 링크 이름도 "사례 검증"에서 "사례 재구성"으로 바뀌어 있었다(`Navigation.tsx`의 `SCREENS`).
+  해결: "화면 이동" 클릭 줄을 지우고, 인트로 페이지의 평평한 nav에서 바로 "사례 재구성" 링크를 클릭하도록 고쳤다.
+
 ## README를 채용 포트폴리오 관점으로 재구성
 
 - 작업일: 2026-11-03

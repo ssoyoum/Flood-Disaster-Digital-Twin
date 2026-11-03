@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowLeft, ArrowRight, Gauge, GitCompare, History, ListChecks, Lock, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Gauge, GitCompare, History, ListChecks, ShieldCheck } from "lucide-react";
 import { getFacilityScorecard, getFloodForecastSummary, getTwinRegistry, getValidationCases, type ValidationCase, type ValidationSignal } from "../api";
 import { AppNavigation } from "./Navigation";
 import type { FloodEvent } from "../types";
@@ -16,7 +16,7 @@ const CASE_TEXT: Record<string, CaseText> = {
   "andong-uiseong-2026": { name: "2026 안동·의성 복합재난", place: "안동 일직면 귀미리 · 의성 단촌면 구계리", flow: "산불 이재민 임시주택 → 집중호우 → 미천 홍수경보 → 대피명령 시각 비교" },
 };
 
-const READY_EVENTS = new Set(["osong-2023", "seoul-2022", "pohang-2022", "andong-uiseong-2026"]);
+export const READY_EVENTS = new Set(["osong-2023", "seoul-2022", "pohang-2022", "andong-uiseong-2026"]);
 
 export function caseText(event: FloodEvent): CaseText {
   return CASE_TEXT[event.id] ?? { name: event.name, place: event.location, flow: event.analysis_flow };
@@ -222,17 +222,19 @@ export function IntroPage() {
 }
 
 export function CaseSelectPage({ events, onSelect, onBack, onCompare }: { events: FloodEvent[]; onSelect: (id: string) => void; onBack: () => void; onCompare?: () => void }) {
+  // 처리 레이어가 없는 사건(예: 익산)은 목록에서 빼고, 관제 가능한 사건만 보여준다.
+  const availableEvents = events.filter((event) => READY_EVENTS.has(event.id));
   const viewportRef = useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const activeIndex = events.length ? selectedIndex % events.length : 0;
+  const activeIndex = availableEvents.length ? selectedIndex % availableEvents.length : 0;
   const move = (step: number) => {
-    if (events.length < 2) return;
-    setSelectedIndex((index) => (index + step + events.length) % events.length);
+    if (availableEvents.length < 2) return;
+    setSelectedIndex((index) => (index + step + availableEvents.length) % availableEvents.length);
   };
 
   useEffect(() => {
     const viewport = viewportRef.current;
-    if (!viewport || events.length < 2) return;
+    if (!viewport || availableEvents.length < 2) return;
     let waiting = false;
     let timer: number | undefined;
     const onWheel = (event: WheelEvent) => {
@@ -240,7 +242,7 @@ export function CaseSelectPage({ events, onSelect, onBack, onCompare }: { events
       event.preventDefault();
       if (waiting) return;
       waiting = true;
-      setSelectedIndex((index) => (index + (event.deltaY > 0 ? 1 : -1) + events.length) % events.length);
+      setSelectedIndex((index) => (index + (event.deltaY > 0 ? 1 : -1) + availableEvents.length) % availableEvents.length);
       timer = window.setTimeout(() => { waiting = false; }, 380);
     };
     viewport.addEventListener("wheel", onWheel, { passive: false });
@@ -248,7 +250,7 @@ export function CaseSelectPage({ events, onSelect, onBack, onCompare }: { events
       viewport.removeEventListener("wheel", onWheel);
       window.clearTimeout(timer);
     };
-  }, [events.length]);
+  }, [availableEvents.length]);
 
   return (
     <main className="fo-landing fo-cases-page">
@@ -279,30 +281,29 @@ export function CaseSelectPage({ events, onSelect, onBack, onCompare }: { events
             if (event.key === "ArrowLeft" || event.key === "ArrowUp") { event.preventDefault(); move(-1); }
           }}
         >
-          {events.map((event, index) => {
+          {availableEvents.map((event, index) => {
             const text = caseText(event);
-            const ready = READY_EVENTS.has(event.id);
-            const forward = (index - activeIndex + events.length) % events.length;
-            const offset = forward > Math.floor(events.length / 2) ? forward - events.length : forward;
+            const forward = (index - activeIndex + availableEvents.length) % availableEvents.length;
+            const offset = forward > Math.floor(availableEvents.length / 2) ? forward - availableEvents.length : forward;
             const visible = Math.abs(offset) <= 1;
             return (
               <div key={event.id} className={`fo-case-slide ${offset === 0 ? "is-center" : offset === -1 ? "is-before" : offset === 1 ? "is-after" : offset < 0 ? "is-hidden is-hidden-before" : "is-hidden is-hidden-after"}`} aria-hidden={!visible}>
-                <button type="button" className={`fo-case ${ready ? "is-ready" : "is-locked"}`} disabled={!ready} tabIndex={visible ? 0 : -1} onClick={() => onSelect(event.id)}>
-                  <span className={`fo-case-status ${ready ? "ready" : "locked"}`}>{ready ? "관제 가능" : <><Lock size={12} /> 데이터 연결 예정</>}</span>
+                <button type="button" className="fo-case is-ready" tabIndex={visible ? 0 : -1} onClick={() => onSelect(event.id)}>
+                  <span className="fo-case-status ready">관제 가능</span>
                   <strong>{text.name}</strong>
                   <span className="fo-case-place">{text.place}</span>
                   <span className="fo-case-flow">{text.flow}</span>
-                  {ready && <span className="fo-case-go">관제 화면 열기 <ArrowRight size={15} /></span>}
+                  <span className="fo-case-go">관제 화면 열기 <ArrowRight size={15} /></span>
                 </button>
               </div>
             );
           })}
-          {!events.length && <p className="fo-case-empty">표시할 사례가 없습니다.</p>}
+          {!availableEvents.length && <p className="fo-case-empty">연결된 사례가 없습니다.</p>}
         </div>
         <div className="fo-case-controls">
-          <button type="button" aria-label="이전 사례" disabled={events.length < 2} onClick={() => move(-1)}><ArrowLeft size={18} /></button>
-          <span aria-live="polite">{events.length ? `${String(activeIndex + 1).padStart(2, "0")} / ${String(events.length).padStart(2, "0")}` : "00 / 00"}</span>
-          <button type="button" aria-label="다음 사례" disabled={events.length < 2} onClick={() => move(1)}><ArrowRight size={18} /></button>
+          <button type="button" aria-label="이전 사례" disabled={availableEvents.length < 2} onClick={() => move(-1)}><ArrowLeft size={18} /></button>
+          <span aria-live="polite">{availableEvents.length ? `${String(activeIndex + 1).padStart(2, "0")} / ${String(availableEvents.length).padStart(2, "0")}` : "00 / 00"}</span>
+          <button type="button" aria-label="다음 사례" disabled={availableEvents.length < 2} onClick={() => move(1)}><ArrowRight size={18} /></button>
         </div>
         <p className="fo-case-help">마우스 휠을 내리거나 방향키로 사례를 넘겨 보세요. 마지막 다음에는 첫 사례로 돌아갑니다.</p>
       </section>
