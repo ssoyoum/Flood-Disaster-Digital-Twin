@@ -11,152 +11,83 @@
   <a href="https://floodops.duckdns.org/docs"><img src="https://img.shields.io/badge/API-Swagger-38bdf8?style=for-the-badge&logo=fastapi&logoColor=white" alt="API 문서"></a>
 </p>
 
-**"이 지하차도, 지금 막아야 할까?"** FloodOps는 하천 수위로 지하차도가 지금 어느 단계이고 통제 검토 기준까지 몇 분 남았는지 보여주는 **지하차도 통제 판단 트윈** PoC입니다. 그 판단 규칙은 관측·공간 자료로 재구성한 과거 홍수(2023 오송)로 백테스트하고, 통제·대피 시점을 바꿔 대응 여유 시간을 비교하는 반사실 분석은 규칙을 검증하는 도구로 씁니다. 통제 결정은 담당자가 하며, 트윈은 근거와 남은 시간을 보여줄 뿐 자동으로 차단하지 않습니다.
-
-> 2026-11-03 기준 공개 서버는 민관협력 지원 플랫폼 NHN Cloud에서 `4addfe1` 빌드로 운영됩니다. 홍수통제소·기상청 실시간 자료로 전국 시설 2,453곳(지하차도 748·하천변 시설 1,705)을 판정합니다(`/api/watch/facility-risk` 응답 `mode=live`). 아래 트윈·시설 도구·벤치마크는 저장소 코드 기준입니다.
->
-> 2026-11-03 확인: 공개 서버의 `/health`는 200이고, `/api/agent/planner-status`는 `gemini-3.5-flash-lite` 모델로 Agent가 연결되어 있음을 보고합니다. Agent 호출은 IP당 분당 6회·하루 60회, 서비스 전체 하루 500회로 제한됩니다. 공개 배포본은 수동으로 다시 빌드해야 로컬 수정이 반영됩니다([배포 기록](docs/DEPLOY_AWS.md)).
-
-## 기술 스택
-
-| 영역 | 기술 |
-| --- | --- |
-| 프런트엔드 | React 18 · TypeScript · Vite · MapLibre GL JS |
-| 백엔드 | FastAPI · Pydantic · Shapely |
-| Agent | Gemini API(REST, `httpx` 직접 호출) · Ollama(로컬 모델, `AGENT_LLM_PROVIDER=ollama`) |
-| 테스트 | pytest · Vitest · Playwright |
-| 배포 | Docker · NHN Cloud(공개 서버) · AWS EC2(홍수통제소 API 중계) |
-
-- **MapLibre GL JS** — 사건 레이어(건물·도로·하천·HAND 셀)를 GeoJSON 그대로 지도에 올립니다. 별도 벡터 타일 서버가 없습니다.
-- **FastAPI + Pydantic** — 요청·응답을 타입으로 선언해 `/docs`(Swagger)를 자동 생성하고, 통제 시각·HAND 임계 같은 분석 API 입력값을 서버가 검증합니다.
-- **Shapely** — HAND 근사 재구성과 반경별 시설 재고 집계 등 지오메트리 연산에 씁니다.
-- **Gemini REST 직접 호출** — SDK 없이 `httpx`로 호출하고, 서버가 사건·시설마다 등록된 도구(오송 8·서울 5·포항/안동 4·시설 5개)만 실행하도록 직접 검증합니다. 모델은 분석값을 만들지 않고 도구를 선택할 뿐입니다. 같은 프롬프트·도구·검증을 환경변수 한 줄로 로컬 Ollama 모델에서도 돌릴 수 있습니다.
-
-## 지하차도 통제 판단 트윈
-
-트윈의 단위는 사건이 아니라 시설(지하차도)입니다. 첫 시설은 2023년 침수가 일어난 궁평2지하차도이고, 미호강교 수위와 연결했습니다.
-
-- **지금 상태:** 관측 수위로 단계(관심·주의보·경보·심각·계획홍수위)와 계획홍수위까지의 여유, 최근 상승 속도를 보여줍니다(`#twin`, 상태·기준·백테스트 3탭).
-- **통제 검토 규칙(`river_stage_v1`):** 계획홍수위에 도달했거나, 경보 단계 이상에서 직전 30분 상승 속도로 60분 안에 계획홍수위에 닿으면 «통제 검토»를 제안합니다. 외삽은 예보나 지하차도 유입 예측이 아닙니다.
-- **백테스트:** 같은 규칙을 2023-07-15 10분 수위에 적용하면 05:50에 처음 검토를 권해 지하차도 유입(08:27) 157분 전입니다. 2019~2026년 연중 10분 수위 409,152칸에서 다른 해에는 권고가 없었습니다. 기준 탭에서 주의보·경보 × 0~180분 8개 기준의 맞바꿈(더 일찍 알림 ↔ 다른 해 권고)을 비교합니다.
-- **한계:** 2026년에 받은 보관 자료와 관측소의 현재 기준값으로 계산했으며, 2023년 당시 실시간 자료·기준값과 같은지는 확인하지 못했습니다(발표 06:40 / 보관 자료 06:50 계획홍수위 도달). 2023-05-16 센서 계단 구간은 품질 정책으로 제외합니다. 157분은 백테스트 결과이지 실시간 경보 성능이 아닙니다.
-- **시설 Agent 도구 5개:** 상태·규칙·백테스트·기준 비교·연구 모델(6시간 최대 상승, `kind=RESEARCH`, 통제 판단에 쓰지 않음). 자세한 내용은 [시설 Agent](docs/FACILITY_AGENT.md).
-
-## 한눈에 보기
-
 <p align="center">
-  <img src="docs/screenshots/lead-times.png" alt="네 사례의 실제 대응과 가정한 대응이 기준 사건보다 몇 분 앞섰는지 비교한 차트. 오송은 실제 통제 없음, 가정 +107분. 서울은 실제 -20분, 가정 +10분. 포항은 실제 +7분, 가정 +37분. 안동·의성은 실제 +30분, 가정 +50분." width="100%">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/React_18-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React">
+  <img src="https://img.shields.io/badge/MapLibre_GL-396CB2?style=flat-square&logo=maplibre&logoColor=white" alt="MapLibre GL">
+  <img src="https://img.shields.io/badge/Gemini_API-8E75B2?style=flat-square&logo=googlegemini&logoColor=white" alt="Gemini API">
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker">
+  <img src="https://img.shields.io/badge/Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white" alt="Playwright">
 </p>
 
-관측 강우·수위와 공간 자료로 사건을 단계별로 재생하고, 대응 시각 하나를 옮겼을 때 기준 사건까지 남는 시간을 계산합니다. 사례 선택 화면의 "사례 간 비교"(`GET /api/cases/lead-times`)가 같은 값을 보여줍니다. 구조는 [구조 문서](docs/ARCHITECTURE.md)와 [데이터 안내](docs/DATA_GUIDE.md)에 있습니다. 근사 침수범위는 임시 재구성 보조 자료이며, 검증된 범위가 확보되기 전까지 침수 노출 지표는 계산하지 않습니다.
+**"이 지하차도, 지금 막아야 할까?"** 전국 하천 접점 시설(지하차도·둔치·세월교·하천변 야영장) **2,453곳**을 홍수통제소·기상청 실시간 관측으로 판정하고, 통제 검토 기준까지 몇 분 남았는지 보여주는 **홍수 대응 의사결정 디지털 트윈**입니다. 판정 규칙은 2023 오송 지하차도 참사 같은 과거 사건에 백테스트해 검증합니다. 통제 결정은 담당자가 하며, 트윈은 근거와 남은 시간을 보여줄 뿐 자동으로 차단하지 않습니다.
 
-## 현재 구현 범위
+## 무엇을 만들었나
 
-| 사례 | 화면·자료 상태 |
+| | |
 | --- | --- |
-| 2023 오송 지하차도 | 관제·사건 재생·시나리오 비교 가능 |
-| 2022 서울 도림천 유역 침수 | 관제·사건 재생·반사실 비교(경보 시각, 빗물터널 저류) 가능. 공식 침수흔적도 기준 노출 |
-| 2022 포항 냉천·지하주차장 | 사건 시각 재생·반사실 비교(지하주차장 진입 금지 안내 시각) 가능. 시각은 언론 보도 기준, 침수범위 미연결 |
-| 2024 익산 극한호우 (산북천 유역) | 사건 목록 등록. 시각이 확인된 사건이 없어 잠금 유지 |
-| 2026 안동·의성 복합재난 | 사건 시각 재생·반사실 비교(대피명령, 산사태 위기경보 시각) 가능. 시각은 언론 보도 기준, 침수범위 미연결 |
-
-접속 흐름은 **소개 → 사례 선택 → 오송 또는 서울 관제**입니다. 오송 관제 화면에서는 7단계 사건 재생, 지도 레이어와 관측 근거, 시나리오 비교, Agent 질의를 볼 수 있습니다. 서울 관제 화면은 강우계 관측과 보도된 사건 시각으로 7단계를 재생하고, 공식 침수흔적도를 지도에 올리며, "강우 임계 기반 경보"와 "도림천 빗물터널" 두 반사실을 계산합니다. 포항과 안동·의성은 공식 침수범위·강우계 자료 없이 보도된 사건 시각만으로 재생하고, 대응 시각 하나를 옮겨 이후 사건까지 남는 시간을 계산합니다. 사례 선택 화면의 "사례 간 비교"는 네 사례의 실제 대응과 반사실 대응이 기준 사건보다 몇 분 앞섰는지를 한 축에 모아 보여줍니다(`GET /api/cases/lead-times`). Agent는 네 사례 모두에서 사건별로 등록된 도구(오송 통제·지연, 서울 경보 시각·저류, 포항·안동 대응 시각)를 골라 답합니다. 익산은 시각 근거가 없어 잠겨 있습니다. 사건 목록 등록을 분석 자료 연결 완료로 해석하면 안 됩니다.
-
-### 오송에서 할 수 있는 일
-
-- **사건 재구성:** 강우·수위 관측, 사건 단계, 도로·건물·하천·지형 자료와 임시 HAND 침수 추정 셀을 같은 지도에서 검토합니다.
-- **지하차도 통제 시각 비교:** 지정 시각부터 신규 진입을 막았다는 가정 아래, 유입·주행불능 등 재구성 시각까지 남은 시간을 비교합니다. 물의 진행이나 이미 진입한 차량의 결과는 바꾸지 않습니다.
-- **HAND 판정 기준 민감도:** 선택 임계를 0~2.5 m 낮추고 같은 사건 단계의 지도 셀을 다시 선택합니다. 08:27 단계에서 1.5 m 감소 예시는 기준 306셀, 변경 후 283셀, 제외 23셀입니다. 이 수치는 지도 선택 규칙의 변화이며 제방 증고·차수벽 설치의 물리적 효과가 아닙니다.
-- **주변 시설 재고:** 지하차도 주변의 연결된 건물·도로·시설을 반경별로 집계합니다. 재고 수를 침수 피해량으로 해석하지 않습니다.
-- **Agent 질의:** Gemini가 등록된 읽기 전용 도구를 선택하고 결과를 확인한 뒤 근거 번호와 도구 호출 내역을 보여줍니다. 최대 4회 도구 호출을 허용하며, 도구명과 사용자 입력값을 서버에서 검증합니다.
+| **문제** | 2023 오송 지하차도 참사에서 하천 수위가 계획홍수위에 도달한 뒤에도 지하차도는 통제되지 않았습니다. 수위 정보는 있었지만 «이 시설을 지금 막아야 하는가»로 이어지지 않았습니다. |
+| **해결** | 시설마다 가까운 수위·강우 관측소를 연결하고, 관측소의 공식 기준 수위(관심·주의보·경보·계획홍수위)와 상승 속도, 호우특보 기준 강우량으로 단계와 계획홍수위까지 남은 시간을 계산합니다. 같은 규칙을 과거 사건에 돌려 «몇 분 먼저 알 수 있었는가»를 채점합니다. |
+| **규모** | 시설 2,453곳(지하차도 748·하천변 1,705), 수위 관측소 1,203곳·강우 628곳 실시간, 과거 사례 4건 재구성 |
+| **개발** | 1인 개발 · 2026-08-30 ~ 진행 중 · 커밋 270개 이상 · 기획·데이터 수집·백엔드·프런트엔드·Agent·배포 전부 |
+| **운영** | 민관협력 지원 플랫폼 NHN Cloud에서 실시간 운영 중(2026 AI·디지털 챌린지 출품작) |
 
 ## 화면
 
+4개 탭이 장마 전·중·후 업무 순서를 따릅니다.
+
 <table>
   <tr>
-    <td width="50%" align="center" valign="top">
-      <b>사례 선택</b><br>
-      <img src="docs/screenshots/screen-cases.jpg" alt="사례 선택 화면" width="440"><br>
-      <sub>현재 등록된 5개 사례 중 관제 가능한 사례를 고릅니다</sub>
-    </td>
-    <td width="50%" align="center" valign="top">
-      <b>관제 화면</b><br>
-      <img src="docs/screenshots/screen-console.jpg" alt="오송 관제 화면" width="440"><br>
-      <sub>사건 단계를 재생하며 지도 레이어와 관측 근거를 함께 봅니다</sub>
+    <td colspan="2" align="center">
+      <b>관제 보드</b> · 장마 중<br>
+      <img src="docs/screenshots/ops-watch.png" alt="전국 2,453곳 시설을 실시간 위험 순위와 지도로 보여주는 관제 보드" width="100%"><br>
+      <sub>전국 시설의 실시간 위험 순위. 시설마다 판정 근거(수위·강우)와 계획홍수위까지 남은 분을 함께 보여줍니다.</sub>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center" valign="top">
-      <b>시나리오 비교</b><br>
-      <img src="docs/screenshots/screen-compare.jpg" alt="시나리오 비교 화면" width="440"><br>
-      <sub>HAND 판정 임계를 낮춰 같은 시각의 선택 셀 변화를 나란히 봅니다</sub>
+      <b>에이전트</b><br>
+      <img src="docs/screenshots/ops-agent.png" alt="관제 보드 오른쪽 에이전트 패널에서 위험 시설을 질의한 화면" width="100%"><br>
+      <sub>자연어 질문을 등록된 도구 호출로 바꾸고, 근거 번호와 함께 답합니다.</sub>
     </td>
     <td width="50%" align="center" valign="top">
-      <b>출처·한계</b><br>
-      <img src="docs/screenshots/screen-provenance.jpg" alt="출처·한계 화면" width="440"><br>
-      <sub>자료별 출처·시점·역할과 이 자료로 판단할 수 없는 것을 함께 보여줍니다</sub>
+      <b>기준 채점</b> · 장마 후<br>
+      <img src="docs/screenshots/ops-scoring.png" alt="판정 기준을 과거 사건에 적용해 선행·지연을 채점한 화면" width="100%"><br>
+      <sub>판정 기준이 실제 사건보다 몇 분 먼저 알렸는지 채점합니다.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center" valign="top">
+      <b>시설 기준</b> · 장마 전<br>
+      <img src="docs/screenshots/ops-criteria.png" alt="시설별 통제 기준과 연결 관측소를 보여주는 화면" width="100%"><br>
+      <sub>시설마다 연결된 관측소와 통제 기준을 미리 점검합니다.</sub>
+    </td>
+    <td width="50%" align="center" valign="top">
+      <b>사례 재구성</b> · 근거<br>
+      <img src="docs/screenshots/ops-cases.png" alt="과거 홍수 사례를 단계별로 재구성한 화면" width="100%"><br>
+      <sub>오송·서울·포항·안동 사례를 관측 자료로 단계별 재생합니다.</sub>
     </td>
   </tr>
 </table>
 
-## Agent가 답하는 범위
+## 기술적 도전과 해결
 
-로컬 서버에 유효한 `GEMINI_API_KEY`가 있을 때 관제 화면은 `POST /api/agent/ask`를 사용합니다. 질문, 최근 대화, 도구 결과가 Gemini에 전달됩니다. Agent는 사건 조회·재구성, 통제 시각, 명시한 유입 지연, 주변 시설 재고, 기준 시나리오 비교, HAND 임계 민감도, 관측 요약 등 오송에 **등록된 8개 도구** 중에서 선택합니다(서울 5·포항/안동 4·시설 5개는 각 범위의 도구). 답변에는 호출 결과와 `[1]` 같은 근거 번호를 남기며, 후속 질문을 제안할 수 있습니다.
+**1. 전국 관측소 실시간 수집을 호출 1회로**
+관측소마다 API를 부르면 갱신 한 번에 1,400번 넘게 호출해야 합니다. 홍수통제소의 일괄 조회(`waterlevel/list/10M.json`)를 찾아 수위 1,203곳·댐 50곳·강우 628곳의 최신값을 호출 1회로 받고, 5분 캐시와 스냅샷을 두어 실시간 개요를 1.8초에 만들었습니다.
 
-예를 들어 다음처럼 물어볼 수 있습니다.
+**2. 정부망 차단을 중계 서버로 우회**
+플랫폼 서버(NHN Cloud)에서 위험도 응답이 25초 걸리고 관측 시각이 비었습니다. 처음엔 IP 차단으로 봤지만 공공데이터포털·기상청은 열리고 환경부 계열 도메인만 TCP 단계에서 끊기는 것을 확인해, 키 문제가 아니라 망 차단으로 좁혔습니다. AWS EC2의 Caddy에 플랫폼 서버 IP 하나만 허용하는 중계를 세워 연결했습니다(중계 0.5초).
 
-```text
-08:25에 지하차도를 통제했다면 유입까지 몇 분 남나요?
-HAND 선택 임계를 1.5m 낮추면 단계별 붉은 셀이 어떻게 바뀌나요?
-지하차도 반경 500m 안에 건물이 몇 개인가요?
-```
+**3. 시설×관측소 반복 탐색 제거**
+시설이 2,453곳이 되자 위험도 API가 요청마다 평균 52.9초(응답 6.39 MB)를 썼습니다. 시설마다 강우 관측소 약 2,400곳을 매번 선형 탐색하던 O(시설×관측소) 반복이 원인이었습니다. 시설→10 km 안 관측소 목록을 한 번만 계산해 캐시하고, 서버 시작 때 백그라운드에서 미리 데워 첫 요청자가 비용을 떠안지 않게 했습니다.
 
-`제방을 3미터 올린다면?`은 자연어로 해석할 수 있어도 **실제 수위·침수 범위 변화는 계산할 수 없습니다.** 제방 단면과 변경 위치, 유량·수위 경계조건, 검증된 수리모형이 연결되지 않았습니다. 서버는 제방 높이를 HAND 임계 변경량으로 대입하지 않으며, 계산할 수 없는 효과는 `NEEDS_DATA`와 구체적인 한계로 돌려줍니다. Gemini 연결 실패나 키 부재는 `UNAVAILABLE`입니다. 사용법 질문은 등록된 예시로 안내할 수 있습니다.
+**4. 600 MB 컨테이너 메모리 부족**
+스왑 없는 600 MB 컨테이너가 첫 Agent 질문 때 종료(exit 137)됐습니다. 요청마다 최대 메모리를 재 보니 «지도 먼저 → 질문» 순서에서만 +100 MB가 튀었고, 같은 함수를 인자 유무만 다르게 부르는 두 호출이 `lru_cache(maxsize=1)`의 다른 키가 되어 약 140 MB 자료를 번갈아 다시 읽고 있었습니다. 캐시 키를 하나로 합쳐 상시 663 → 506 MiB로 줄였습니다.
 
-이전의 `POST /api/agent/plan`과 `POST /api/agent/workflows`도 남아 있습니다. `/plan`은 Gemini가 없으면 규칙 기반 계획으로 전환하지만, **주 Agent 질의인 `/ask`에는 이 전환이 적용되지 않습니다.** Agent 없이도 시나리오 비교 화면에서 통제 시각과 HAND 기준을 직접 조절할 수 있습니다.
-
-## 자료와 해석 기준
-
-```text
-관측·원자료 → 출처와 품질 확인 → 오송 사건 재구성 → 등록된 분석 도구
-                                            ├─ 관제·지도·시나리오 비교
-                                            └─ Gemini Agent의 도구 호출과 근거 답변
-```
-
-`approx_flood_envelope`와 HAND 셀은 지형을 이용한 **임시 근사 재구성**입니다. 공식 침수범위, 실측 침수심·유속 또는 검증된 수리해석 결과가 아닙니다. 공식 침수 도형이 필요한 노출·피해 지표는 `PENDING_FLOOD_EXTENT`로 남겨 둡니다. 일부 사건 단계 시각에는 원문 페이지 재확인이 필요한 `NEEDS_SOURCE_PAGE` 상태가 표시됩니다. 시나리오 결과에서 사망 예방, 피해액 감소, 침수심 변화 같은 효과를 산출하지 않습니다.
-
-데이터 출처·이용 조건과 가용 상태는 [`data/manifests/`](data/manifests/) 및 [데이터 품질 기록](docs/data-quality.md)에 정리되어 있습니다. 시나리오 저장은 현재 메모리 기반이고 PostGIS 연계는 보류 상태입니다.
-
-## 주요 API
-
-| 경로 | 용도 |
-| --- | --- |
-| `GET /api/events` | 5개 사건 목록과 자료 상태 |
-| `GET /api/events/osong-2023/reconstruction` | 오송 사건 단계와 출처 |
-| `GET /api/events/osong-2023/layers` | 지도 레이어 |
-| `POST /api/events/osong-2023/analysis/closure-timing` | 통제 시각 비교 |
-| `POST /api/events/osong-2023/analysis/hand-threshold` | HAND 선택 셀 민감도 |
-| `GET /api/events/osong-2023/exposure-inventory` | 반경별 시설 재고 |
-| `GET /api/agent/examples` | 등록 도구로 답할 수 있는 예시 질문 |
-| `POST /api/agent/ask` | Gemini의 연속 도구 호출과 근거 답변 |
-
-건물별 개입 시나리오 API(`POST /api/scenarios`, `POST /api/scenarios/{id}/run`)는 건물 ID와 자료 연결 상태를 검사합니다. 검증된 개입 모델이 없어 효과 지표는 `UNAVAILABLE`로 반환하며 전후 위험도 감소를 만들어 내지 않습니다.
-
-## 검증
-
-```powershell
-python -m pytest backend/tests -q
-npm test
-npm run build
-npx playwright install --only-shell chromium
-npm run test:e2e
-```
-
-Playwright E2E는 FastAPI(`8035`)와 Vite(`5175`)를 자동으로 띄워 오송 진입·사건 재생·레이어 설정·출처·한계 화면·통제 시각 비교와 트윈 보드를 확인합니다. 2026-10-15 기준 백엔드 테스트 240개가 통과했고, 이후 추가한 시설 도구·Ollama·안정성 테스트까지 전체 통과했습니다([작업 기록](WORKLOG.md)).
-
-### Agent 벤치마크
-
-요청마다 라우터·모델 판단·검증·도구·근거 검사를 시간·토큰과 함께 trace로 남기고, 7유형(정상·도구 선택·모호·자료 부족·잘못된 입력·도구 실패·안전 표현) 고정 문항으로 «측정 → 원인 → 한 가지 변경 → 같은 문항 재측정»을 반복했습니다(`backend/evaluation/agent_benchmark.py`).
+**5. LLM Agent를 측정하며 개선**
+모델이 분석값을 만들지 않고 등록된 도구만 고르도록 서버에서 도구명·입력값을 검증합니다. 7유형 고정 문항으로 «측정 → 원인 → 한 가지 변경 → 재측정»을 반복했습니다.
 
 | 단계 | 바꾼 것 | 통과 | 모델 요청 · 토큰 |
 | --- | --- | --- | --- |
@@ -165,14 +96,50 @@ Playwright E2E는 FastAPI(`8035`)와 Vite(`5175`)를 자동으로 띄워 오송 
 | 시설 도구 확장 | 기준 비교·연구 모델 도구 (문항 43개) | 43/43 | 80 · 278,200 |
 | 프롬프트 축소 | 도구 결과의 지도용 필드·카탈로그 중복 제외 | 43/43 | 80 · 218,766 (−21.4%) |
 
-- 모델 `gemini-3.5-flash-lite`. 근거 유효성·도구 정확도 1.0, 근거 없는 주장 0. 문항은 작성자가 고른 회귀 기준선이며 사용자 성공률이 아닙니다. 지연은 모델 응답 시간이 실행마다 달라 비교하지 않습니다.
-- 로컬 `qwen2.5:3b`(Ollama, 노트북 CPU) 대표 13문항: 11/13(Gemini 13/13), 판단 1회 15~180초. 소형 모델이 드러낸 서버 규칙 빈틈 3가지는 규칙과 회귀 테스트로 막았습니다.
-- 600 MB 무스왑 컨테이너에서 첫 Agent 질문 때 메모리 부족으로 종료되던 문제를 캐시 키 통일로 고쳤습니다(정착 506 MiB).
-- 상세: [최적화 기록](docs/AGENT_OPTIMIZATION_LOG.md) · [평가 기록](docs/AGENT_EVALUATION_RESULTS.md) · [도구 계약](docs/AGENT_TOOL_CONTRACTS.md)
+모델 `gemini-3.5-flash-lite`. 문항은 작성자가 고른 회귀 기준선이며 사용자 성공률이 아닙니다. 같은 프롬프트·도구·검증을 로컬 `qwen2.5:3b`(Ollama)에서도 돌려 11/13을 확인했습니다. 상세: [최적화 기록](docs/AGENT_OPTIMIZATION_LOG.md) · [평가 기록](docs/AGENT_EVALUATION_RESULTS.md)
 
-## 관련 문서
+## 구조
 
-- [프로젝트 계획](docs/PROJECT_PLAN.md) · [개발 가이드](docs/DEVELOPMENT_GUIDE.md) · [아키텍처](docs/ARCHITECTURE.md)
-- [데이터 가이드](docs/DATA_GUIDE.md) · [데이터 폴더](data/README.md) · [데이터 품질 기록](docs/data-quality.md)
-- [의사결정 기록](docs/DECISIONS.md) · [작업 기록](WORKLOG.md) · [현재 TODO](TODO.md)
-- [시설 Agent](docs/FACILITY_AGENT.md) · [Agent 로드맵](docs/HARVARD_AGENT_ROADMAP.md) · [Agent 최적화 기록](docs/AGENT_OPTIMIZATION_LOG.md) · [Agent 도구 계약](docs/AGENT_TOOL_CONTRACTS.md)
+<p align="center">
+  <img src="docs/screenshots/architecture.png" alt="관측 수집 → 위치 매칭 → 규칙 판정 → 화면·에이전트의 4단계 처리 구조와 NHN Cloud·AWS 배포 구성" width="100%">
+</p>
+
+| 영역 | 기술 | 선택 이유 |
+| --- | --- | --- |
+| 프런트엔드 | React 18 · TypeScript · Vite · MapLibre GL JS | 건물·도로·하천·시설 레이어를 GeoJSON 그대로 지도에 올려 벡터 타일 서버 없이 운영 |
+| 백엔드 | FastAPI · Pydantic · Shapely | 요청·응답을 타입으로 선언해 Swagger를 자동 생성하고, 통제 시각·임계 같은 분석 입력을 서버가 검증 |
+| Agent | Gemini REST(`httpx` 직접 호출) · Ollama | SDK 없이 호출해 도구 선택·검증 흐름을 직접 통제, 환경변수 한 줄로 로컬 모델 전환 |
+| 테스트 | pytest · Vitest · Playwright | 백엔드 375개, E2E 8개 시나리오 파일(관제 보드·사례 재생·Agent 대화 등) |
+| 배포 | Docker · Caddy · NHN Cloud · AWS EC2 | 웹·API 단일 컨테이너, HTTPS, AWS는 홍수통제소 API 중계만 담당 |
+
+## 실행
+
+4탭 앱과 API를 한 컨테이너로 띄웁니다(공개 서버와 같은 `Dockerfile.ops`).
+
+```powershell
+cp .env.example .env          # 홍수통제소·기상청·Gemini 키 (없으면 2023-07-15 재생 모드)
+docker build -f Dockerfile.ops -t floodops:ops .
+docker run --rm -p 8000:8000 --env-file .env floodops:ops
+# 앱 http://localhost:8000  ·  Swagger http://localhost:8000/docs
+```
+
+```powershell
+pip install -r backend/requirements.txt
+python -m pytest backend/tests -q   # 375 passed (2026-11-03)
+npm test
+npx playwright install --only-shell chromium
+npm run test:e2e
+```
+
+## 한계와 다음 단계
+
+- 판정은 하천 수위·강우만 씁니다. 지하차도 침수심·진입차단시설 상태는 공개 실시간 API가 없어 기관 협력 과제로 남겨 두었습니다.
+- 시설과 관측소 연결은 거리 기준이며, 관측소가 시설의 실제 수위를 대표하는지는 검증하지 않았습니다. 둔치 시설은 OSM 수면에서의 거리로 찾은 근사입니다.
+- 과거 사건 백테스트는 2026년에 받은 보관 자료와 현재 기준값으로 계산했습니다. 예: 궁평2 규칙은 2023-07-15에 유입 157분 전 검토를 권했지만, 이는 백테스트 결과이지 실시간 경보 성능이 아닙니다.
+- 사례 재생의 침수 범위는 지형(HAND) 기반 임시 근사이며, 공식 침수범위나 수리해석 결과가 아닙니다.
+
+## 더 보기
+
+- [사례 재생·지하차도 트윈 상세](docs/CASE_REPLAY.md) — 오송·서울·포항·안동 재생, 반사실 비교, Agent 범위, 주요 API
+- [아키텍처](docs/ARCHITECTURE.md) · [데이터 가이드](docs/DATA_GUIDE.md) · [데이터 품질 기록](docs/data-quality.md) · [의사결정 기록](docs/DECISIONS.md)
+- [시설 Agent](docs/FACILITY_AGENT.md) · [Agent 도구 계약](docs/AGENT_TOOL_CONTRACTS.md) · [작업 기록](WORKLOG.md)
