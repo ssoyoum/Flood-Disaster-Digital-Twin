@@ -144,16 +144,32 @@ def _with_kma(rain_at: datetime | None, totals: dict[str, dict[str, float | None
     return observed_at, merged, basis + " + 기상청 AWS 매분(RN-15m · RN-60m · RN-12H; 3시간 = RN-60m 3회 합)"
 
 
-def _nearest_rain_codes(lon: float, lat: float, codes: set[str]) -> list[tuple[str, float]]:
-    near = []
-    for code in codes:
-        gauge = _gauge(code)
-        if gauge is None or abs(gauge.lat - lat) > 0.1 or abs(gauge.lon - lon) > 0.13:
-            continue
-        distance = nw._km(lon, lat, gauge.lon, gauge.lat)
-        if distance <= nw.RAIN_LINK_KM:
-            near.append((code, round(distance, 1)))
-    return sorted(near, key=lambda item: item[1])
+@lru_cache(maxsize=1)
+def _all_gauge_codes() -> tuple[str, ...]:
+    return tuple(set(nw.rain_gauges()) | {f"kma:{stn}" for stn in kma_aws.stations()})
+
+
+@lru_cache(maxsize=1)
+def _facility_rain_candidates() -> dict[str, tuple[tuple[str, float], ...]]:
+    """Every rain/AWS gauge within RAIN_LINK_KM of each facility, nearest first.
+
+    Facility and gauge coordinates never change while the process runs, so this precomputes the
+    scan once instead of `_nearest_rain_codes` repeating an O(facilities x gauges) distance scan
+    on every /api/watch/facility-risk request (this was the main cost behind requests taking 50+
+    seconds for the ~2,450 facilities x ~2,400 gauges in production).
+    """
+    gauges = [(code, gauge) for code in _all_gauge_codes() if (gauge := _gauge(code)) is not None]
+    out: dict[str, tuple[tuple[str, float], ...]] = {}
+    for item in nw.facility_catalog():
+        lon, lat = item["lon"], item["lat"]
+        near = sorted((nw._km(lon, lat, gauge.lon, gauge.lat), code) for code, gauge in gauges
+                      if abs(gauge.lat - lat) < 0.1 and abs(gauge.lon - lon) < 0.13)
+        out[item["facility_id"]] = tuple((code, round(distance, 1)) for distance, code in near if distance <= nw.RAIN_LINK_KM)
+    return out
+
+
+def _nearest_rain_codes(facility_id: str, codes: set[str]) -> list[tuple[str, float]]:
+    return [(code, distance) for code, distance in _facility_rain_candidates().get(facility_id, ()) if code in codes]
 
 
 def _replay_totals(at: str) -> tuple[datetime, dict[str, dict[str, float | None]]]:
@@ -396,7 +412,7 @@ def facility_risk(at: str | None = None, region: str | None = None, driver: str 
         if driver and kind != driver:
             continue
         active_route = kind
-        near = _nearest_rain_codes(item["lon"], item["lat"], codes)
+        near = _nearest_rain_codes(item["facility_id"], codes)
         rain = None
         if near:
             code, distance = near[0]

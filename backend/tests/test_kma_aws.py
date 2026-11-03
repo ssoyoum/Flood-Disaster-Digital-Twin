@@ -43,15 +43,25 @@ def test_parse_stations_reads_position_name_and_address():
 def test_live_rain_adds_kma_stations_and_survives_an_outage(monkeypatch):
     from app import facility_risk as fr
 
-    monkeypatch.setattr(kma_aws, "stations", lambda: {"42": {"stn": "42", "name": "군산오식도", "lon": 126.6, "lat": 35.94, "address": "전북특별자치도 군산시"}})
+    # _nearest_rain_codes looks up a facility by id in a cached facility->gauge distance index (built once,
+    # since facility and gauge coordinates are static in production), so the fake station below is placed
+    # exactly on a real facility's coordinates rather than tested through an arbitrary (lon, lat) pair.
+    facility = fr.nw.facility_catalog()[0]
+    monkeypatch.setattr(kma_aws, "stations", lambda: {"42": {"stn": "42", "name": "군산오식도", "lon": facility["lon"], "lat": facility["lat"], "address": "전북특별자치도 군산시"}})
     monkeypatch.setattr(kma_aws, "rain_totals", lambda: {"rows": {"kma:42": {"rain_10m_mm": None, "rain_1h_mm": 20.0, "rain_3h_mm": 65.0, "rain_12h_mm": 70.0}},
                                                          "observed_at": None, "error": None})
-    _, totals, basis = fr._with_kma(None, {}, "base")
-    assert totals["kma:42"]["rain_3h_mm"] == 65.0 and "기상청 AWS" in basis
-    assert fr._gauge("kma:42").name == "군산오식도(기상청 AWS)" and fr._nearest_rain_codes(126.61, 35.94, set(totals))[0][0] == "kma:42"
-    assert fr._pluvial_level({**totals["kma:42"]})[0] == 2
-    monkeypatch.setattr(kma_aws, "rain_totals", lambda: (_ for _ in ()).throw(OSError("down")))
-    assert fr._with_kma(None, {"x": {}}, "base") == (None, {"x": {}}, "base")
+    fr._all_gauge_codes.cache_clear()
+    fr._facility_rain_candidates.cache_clear()
+    try:
+        _, totals, basis = fr._with_kma(None, {}, "base")
+        assert totals["kma:42"]["rain_3h_mm"] == 65.0 and "기상청 AWS" in basis
+        assert fr._gauge("kma:42").name == "군산오식도(기상청 AWS)" and fr._nearest_rain_codes(facility["facility_id"], set(totals))[0][0] == "kma:42"
+        assert fr._pluvial_level({**totals["kma:42"]})[0] == 2
+        monkeypatch.setattr(kma_aws, "rain_totals", lambda: (_ for _ in ()).throw(OSError("down")))
+        assert fr._with_kma(None, {"x": {}}, "base") == (None, {"x": {}}, "base")
+    finally:
+        fr._all_gauge_codes.cache_clear()
+        fr._facility_rain_candidates.cache_clear()
 
 
 def test_fetch_without_a_key_reports_not_configured(monkeypatch):

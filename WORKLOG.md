@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 관제 보드 /api/watch/facility-risk 50초대 응답 고침
+
+- 작업일: 2026-11-03
+
+주요 작업:
+- Claude in Chrome으로 공개 서버(`floodops.duckdns.org`)의 관제 보드를 직접 열어 네트워크 탭을 확인: `GET /api/watch/facility-risk?limit=10000`이 TTFB 52.89 s, 6.39 MB로 응답했다(`curl -w`로 재확인). 같은 요청이 매번 이 시간을 썼다.
+- 원인은 `facility_risk._nearest_rain_codes`와 `national_watch._rain_near_point`가 시설(2,453곳)마다 강우 관측소(HRFCO+기상청 AWS 약 2,400곳) 전체를 선형 탐색하는 O(시설×관측소) 반복이었다(요청마다 중복 2회). 시설·관측소 좌표는 서버가 떠 있는 동안 바뀌지 않으므로, `national_watch.facility_rain_neighbours()`와 `facility_risk._facility_rain_candidates()`로 "시설→10 km 안 관측소" 목록을 `lru_cache`로 한 번만 계산해 두고, 매 요청은 그 목록에서 지금 값이 있는 관측소만 고르게 바꿨다. `main.py` 시작 이벤트에 백그라운드 스레드로 이 캐시를 미리 데워서 첫 요청자가 그 비용을 떠안지 않게 했다.
+
+검증 결과:
+- 재생 모드(`FLOODOPS_TWIN_MODE=replay`, `AT=2023-07-15T06:00:00`)로 `facility_risk.facility_risk(AT, limit=2000)`을 연이어 호출: 캐시가 비어 있는 첫 호출 27.09 s(기존 요청 1회와 같은 양의 계산을 한 번만 함), 캐시가 찬 두 번째 호출 0.18 s.
+- `pytest backend/tests/test_facility_risk.py backend/tests/test_national_watch.py -k facility backend/tests/test_kma_aws.py` 통과. 전체 스위트를 한 번에 돌리면 이 변경과 무관한 파일(예: `test_timeline_cases.py`, `test_seoul_case.py`)까지 포함해 실행마다 실패 개수·대상이 달라지는 기존 Windows `ProactorEventLoop`/TestClient 자원 문제가 있어(동일 코드로 반복 실행해도 결과가 달라짐), 이번 변경과 관련된 파일만 따로 돌려 확인했다.
+
+문제/해결:
+- 문제: `test_kma_aws.py::test_live_rain_adds_kma_stations_and_survives_an_outage`가 `fr._nearest_rain_codes(lon, lat, codes)`로 임의 좌표를 넘겨 호출했는데, 새 인터페이스는 `facility_id`로 미리 계산된 캐시를 찾는 방식이라 그대로는 맞지 않았다.
+  해결: 가짜 기상청 AWS 관측소 좌표를 실제 시설(`facility_catalog()[0]`) 좌표와 똑같이 두고 `facility_id`로 호출하게 고쳤다. `lru_cache`가 monkeypatch 이전에 이미 데워져 있으면 가짜 데이터가 반영되지 않으므로 테스트 앞뒤로 `_all_gauge_codes.cache_clear()`·`_facility_rain_candidates.cache_clear()`를 넣었다.
+- 문제: `test_facility_risk.py::test_replay_ranks_river_and_pluvial_facilities_together`가 `limit=2000`으로 불러 `counts.total`(전체 2,453)과 `len(rows[:limit])`(2,000)이 다르다고 실패하는데, `git show HEAD:...`로 대조하니 이번 변경 전에도 같은 코드였다. 시설 카탈로그가 2,000곳을 넘어서면서 생긴 기존 버그라 이번 작업 범위 밖으로 보고 손대지 않았다.
+
 ## 관제 보드 시설 상세에 6시간 최대 상승 예측(연구) 카드
 
 - 작업일: 2026-11-03

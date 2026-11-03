@@ -333,6 +333,24 @@ def rain_neighbours() -> dict[str, tuple[tuple[str, float], ...]]:
     return out
 
 
+@lru_cache(maxsize=1)
+def facility_rain_neighbours() -> dict[str, tuple[tuple[str, float], ...]]:
+    """Rain gauges within RAIN_LINK_KM of each facility, nearest first.
+
+    Facility and gauge coordinates never change while the process runs, so this precomputes the
+    scan once instead of `_rain_near_point` repeating an O(facilities x gauges) distance scan on
+    every /api/watch/facility-status (and /api/watch/facility-risk) request.
+    """
+    gauges = list(rain_gauges().values())
+    out: dict[str, tuple[tuple[str, float], ...]] = {}
+    for facility in facility_catalog():
+        lon, lat = facility["lon"], facility["lat"]
+        near = sorted((_km(lon, lat, gauge.lon, gauge.lat), gauge.code) for gauge in gauges
+                      if abs(gauge.lat - lat) < 0.1 and abs(gauge.lon - lon) < 0.13)
+        out[facility["facility_id"]] = tuple((code, round(distance, 1)) for distance, code in near if distance <= RAIN_LINK_KM)
+    return out
+
+
 def rain_class(mm_per_hour: float | None) -> tuple[str, str]:
     if not mm_per_hour:
         return "none", "강우 없음"
@@ -872,18 +890,12 @@ def overview(at: str | None = None, region: str | None = None, min_stage: str | 
     }
 
 
-def _rain_near_point(lon: float, lat: float, readings: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
-    best: tuple[float, dict[str, Any]] | None = None
-    for reading in readings.values():
-        if abs(reading["lat"] - lat) > 0.1 or abs(reading["lon"] - lon) > 0.13:
-            continue
-        distance = _km(lon, lat, reading["lon"], reading["lat"])
-        if distance <= RAIN_LINK_KM and (best is None or distance < best[0]):
-            best = (distance, reading)
-    if best is None:
-        return None
-    reading = best[1]
-    return {key: reading[key] for key in ("code", "name", "short_name", "rain_10m_mm", "rain_1h_mm", "rain_1h_basis", "intensity_mm_h", "intensity", "intensity_label", "time")} | {"distance_km": round(best[0], 1)}
+def _rain_near_point(facility_id: str, readings: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
+    for code, distance in facility_rain_neighbours().get(facility_id, ()):
+        reading = readings.get(code)
+        if reading:
+            return {key: reading[key] for key in ("code", "name", "short_name", "rain_10m_mm", "rain_1h_mm", "rain_1h_basis", "intensity_mm_h", "intensity", "intensity_label", "time")} | {"distance_km": distance}
+    return None
 
 
 def _facility_priority(row: dict[str, Any]) -> tuple:
@@ -907,7 +919,7 @@ def facility_status(at: str | None = None, region: str | None = None, group: str
             continue
         gauge = by_code.get(facility["station_code"]) if facility["station_code"] else None
         item = {**facility, "gauge": None, "stage": None, "stage_label": "하천 관측소 없음" if not facility["station_code"] else "관측 없음",
-                "minutes_to_planned_flood": None, "rate_m_per_10min": None, "rain_nearby": _rain_near_point(facility["lon"], facility["lat"], rain[2])}
+                "minutes_to_planned_flood": None, "rate_m_per_10min": None, "rain_nearby": _rain_near_point(facility["facility_id"], rain[2])}
         if gauge:
             item.update(gauge={key: gauge.get(key) for key in ("code", "name", "short_name", "observation", "quality", "levels_m", "rise_label", "flood_forecast")},
                         stage=gauge.get("stage"), stage_label=gauge.get("stage_label") or "기준 없음",

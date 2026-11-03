@@ -238,6 +238,19 @@ def _warm_layer_cache() -> None:
 
 
 @app.on_event("startup")
+def _warm_facility_rain_neighbours() -> None:
+    # Precomputing facility-to-gauge distances is an O(facilities x gauges) scan (~2,450 x ~2,400); build it once
+    # in the background so the first /api/watch/facility-risk request does not pay that cost (it was taking 50+ s).
+    def warm() -> None:
+        from . import facility_risk
+
+        national_watch.facility_rain_neighbours()
+        facility_risk._facility_rain_candidates()
+
+    threading.Thread(target=warm, daemon=True).start()
+
+
+@app.on_event("startup")
 def _start_watch_log() -> None:
     from . import watch_log
 
